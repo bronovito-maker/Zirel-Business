@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiringuito da Gino | Riccione - Sapori di Mare & Vibe Romagnolo</title>
+    <meta name="description"
+        content="Il meglio della cucina romagnola incontra il mare a Riccione. Prenota il tuo tavolo e goditi il tramonto.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="zirel_logo_compatto.svg">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            blue: '#003049',
+                            sand: '#F2E5C8',
+                            cyan: '#48CAE4',
+                            white: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@n8n/chat/style.css" />
+
+    <style>
+        .demo-gradient {
+            background: linear-gradient(135deg, #FF8C42 0%, #e07a3a 100%);
+        }
+
+        /* Override CSS variables for n8n embedded chat */
+        :root {
+            /* Colors */
+            --chat--color--primary: #FF8c42;
+            --chat--color--primary-shade-50: #e07a3a;
+            --chat--color--primary--shade-100: #c26a32;
+            --chat--color--secondary: #003049;
+            --chat--color-secondary-shade-50: #002233;
+            --chat--color-white: #ffffff;
+            --chat--color-light: #fdf0d5;
+            /* Beigelino come sfondo primario */
+            --chat--color-light-shade-50: #f2e5c8;
+            --chat--color-light-shade-100: #e6dfc3;
+            --chat--color-medium: #ced4da;
+            --chat--color-dark: #001219;
+            --chat--color-disabled: #d2d4d9;
+            --chat--color-typing: #404040;
+
+            /* Base Layout */
+            --chat--spacing: 1rem;
+            --chat--border-radius: 25px;
+            --chat--transition-duration: 0.15s;
+            --chat--font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+            /* Window Dimensions */
+            --chat--window--width: 400px;
+            --chat--window--height: 600px;
+            --chat--window--bottom: 30px;
+            --chat--window--right: 30px;
+            --chat--window--z-index: 9999;
+            --chat--window--border: none;
+            --chat--window--border-radius: 25px;
+            --chat--window--margin-bottom: var(--chat--spacing);
+            /* Aggiungiamo un'ombra più definita, la precedente forse era stata tagliata */
+            --chat--window--box-shadow: 0 15px 40px rgba(0, 48, 73, 0.2);
+
+            /* Header Styles */
+            --chat--header-height: auto;
+            --chat--header--padding: 2rem 1.5rem;
+            --chat--header--background: var(--chat--color--secondary);
+            --chat--header--color: #ffffff;
+            --chat--header--border-top: none;
+            --chat--header--border-bottom: none;
+            --chat--header--border-left: none;
+            --chat--header--border-right: none;
+            --chat--heading--font-size: 1.8rem;
+            --chat--subtitle--font-size: 0.9rem;
+            --chat--subtitle--line-height: 1.5;
+
+            /* Message Styles */
+            --chat--message--font-size: 0.95rem;
+            --chat--message--padding: 1rem;
+            --chat--message--border-radius: 20px;
+            --chat--message-line-height: 1.5;
+            --chat--message--margin-bottom: calc(var(--chat--spacing) * 1);
+            --chat--message--bot--background: var(--chat--color-white);
+            --chat--message--bot--color: var(--chat--color-dark);
+            --chat--message--bot--border: none;
+            --chat--message--user--background: var(--chat--color--primary);
+            /* L'utente usa l'arancio Chiringuito */
+            --chat--message--user--color: var(--chat--color-white);
+            --chat--message--user--border: none;
+            --chat--message--pre--background: rgba(0, 0, 0, 0.05);
+            --chat--messages-list--padding: 1.5rem;
+
+            /* Toggle Button */
+            --chat--toggle--size: 64px;
+            --chat--toggle--width: var(--chat--toggle--size);
+            --chat--toggle--height: var(--chat--toggle--size);
+            --chat--toggle--border-radius: 50%;
+            --chat--toggle--background: var(--chat--color--primary);
+            --chat--toggle--hover--background: var(--chat--color--primary-shade-50);
+            --chat--toggle--active--background: var(--chat--color--primary--shade-100);
+            --chat--toggle--color: var(--chat--color-white);
+
+            /* Input Area */
+            --chat--textarea--height: 50px;
+            --chat--input--border-radius: 25px;
+            --chat--input--padding: 0.8rem 1rem;
+            --chat--input--background: var(--chat--color-white);
+            /* Border active and input shadow */
+            --chat--input--border: 1px solid var(--chat--color-medium);
+            --chat--input--border-active: 1px solid var(--chat--color--primary);
+
+            /* Send Button explicitly defined */
+            --chat--input--send--button--background: var(--chat--color--primary);
+            --chat--input--send--button--color: var(--chat--color-white);
+            --chat--input--send--button--background-hover: var(--chat--color--primary-shade-50);
+            --chat--input--send--button--color-hover: var(--chat--color-white);
+
+            /* Body and Footer */
+            --chat--body--background: #FCF8F2;
+            /* Warmer background fitting the site */
+            --chat--footer--background: #ffffff;
+            --chat--footer--color: var(--chat--color-dark);
+        }
+
+        /* Explicit class overrides for elements that don't support CSS variables in the latest n8n release */
+
+        /* Font Overrides */
+        .chat-layout,
+        .chat-message {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            line-height: 1.6 !important;
+        }
+
+        /* Stacking title and subtitle in the header */
+        .chat-layout .chat-header {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: center !important;
+            padding: 1.5rem 1.5rem !important;
+        }
+
+        .chat-header h1 {
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 800 !important;
+            font-size: 1.8rem !important;
+            line-height: 1.2 !important;
+            margin: 0 !important;
+            margin-bottom: 0.2rem !important;
+        }
+
+        /* Color "Zirèl" in the header */
+        .zirel-brand {
+            color: var(--chat--color--primary) !important;
+        }
+
+        .chat-header p {
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 0.95rem !important;
+            margin: 0 !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Clean up the send button while preserving the icon */
+        .chat-input .chat-input-send-button {
+            border-radius: 50% !important;
+            margin-left: 10px !important;
+            box-shadow: 0 4px 10px rgba(255, 140, 66, 0.3) !important;
+            color: white !important;
+            /* Force icon color */
+            background-color: var(--chat--color--primary) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 50px !important;
+            height: 50px !important;
+            min-width: 50px !important;
+            min-height: 50px !important;
+            flex-shrink: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Make sure the SVG scales inside the button */
+        .chat-input .chat-input-send-button svg {
+            width: 24px !important;
+            height: 24px !important;
+        }
+
+        .chat-input .chat-input-send-button:hover {
+            background-color: var(--chat--color--primary-shade-50) !important;
+        }
+
+        /* Message Overrides for readability */
+        .chat-message.chat-message-from-user {
+            background: var(--chat--color--primary) !important;
+            color: var(--chat--color-white) !important;
+            box-shadow: 0 4px 12px rgba(255, 140, 66, 0.15) !important;
+        }
+
+        .chat-message.chat-message-from-bot {
+            background: var(--chat--color-white) !important;
+            color: var(--chat--color-dark) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .chat-window-wrapper .chat-window {
+            box-shadow: 0 15px 40px rgba(0, 48, 73, 0.2) !important;
+        }
+
+        /* Hide branding inside the N8N embedded chat if possible */
+        #n8n-chat .chat-powered-by,
+        #n8n-chat .n8n-chat-footer {
+            display: none !important;
+        }
+
+        /* Mobile Fixes */
+        @media (max-width: 480px) {
+            :root {
+                --chat--window--width: 100%;
+                --chat--window--height: 100%;
+                --chat--window--bottom: 0px;
+                --chat--window--right: 0px;
+                --chat--window--border-radius: 0px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+        <ul class="nav-links">
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="demo.html" class="active">Demo</a></li>
+            <li><a href="index.html#faq">FAQ</a></li>
+            <li><a href="index.html#contatti">Contatti</a></li>
+        </ul>
+        <a href="index.html#contatti" class="cta-nav">Inizia Ora</a>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="demo-font">Chiringuito <span>da Gino</span></h1>
+            <p>Sapore di mare, cuore romagnolo. La tua oasi esclusiva a Riccione.</p>
+            <div class="hero-actions">
+                <a href="#prenota" class="btn btn-primary">Esplora il Menu</a>
+                <a href="#menu" class="btn btn-secondary">Prenota un Tavolo</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="menu" class="container">
+        <h2 class="section-title demo-font">Esperienze <span>di Gusto</span></h2>
+        <p class="section-subtitle">Dalla barca alla tavola</p>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div class="menu-img-wrapper">
+                    <img src="food_premium.png" alt="Spaghetti allo Scoglio" class="menu-img">
+                </div>
+                <div class="menu-info">
+                    <h3>Lo Scoglio Reale</h3>
+                    <p>Spaghetto trafilato al bronzo con vongole veraci, cozze di Cattolica e scampi freschi.</p>
+                    <span class="menu-price">€22.00</span>
+                </div>
+            </div>
+            <div class="menu-card">
+                <div class="menu-img-wrapper">
+                    <img src="cocktail_premium.png" alt="Signature Cocktail" class="menu-img">
+                </div>
+                <div class="menu-info">
+                    <h3>Sunset Mojito</h3>
+                    <p>Zucchero di canna, lime fresco, menta del giardino e rum invecchiato al sole della Riviera.</p>
+                    <span class="menu-price">€12.00</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="esperienze" class="experiences">
+        <div class="container">
+            <h2 class="section-title demo-font">Vivi il <span>Chiringuito</span></h2>
+            <div class="experiences-grid">
+                <div class="exp-card">
+                    <span class="exp-icon">🌅</span>
+                    <h3>Aperitivi al Tramonto</h3>
+                    <p>Musica lounge e il miglior tramonto di Riccione, con i piedi sulla sabbia.</p>
+                </div>
+                <div class="exp-card">
+                    <span class="exp-icon">🍤</span>
+                    <h3>Cena Sotto le Stelle</h3>
+                    <p>La brezza marina accompagna i nostri piatti di pesce freschissimo.</p>
+                </div>
+                <div class="exp-card">
+                    <span class="exp-icon">🎸</span>
+                    <h3>Eventi & Live Music</h3>
+                    <p>Serate a tema e musica dal vivo per un'atmosfera indimenticabile.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="parallax-quote" id="prenota">
+        <div class="testimonial-card">
+            <p>"Non è solo un ristorante, è un pezzo di cuore rimasto sulla spiaggia di Riccione."</p>
+            <span class="author">— Guida Gourmet 2026</span>
+        </div>
+    </div>
+
+    <!-- Info & Map -->
+    <section id="info" class="container">
+        <div class="info-container">
+            <div class="info-text">
+                <h2 class="section-title demo-font">Dove <span>Trovarci</span></h2>
+                <p>La brezza del mare, il profumo della griglia e l'accoglienza di casa. Ti aspettiamo nel cuore
+                    pulsante di Riccione.</p>
+
+                <div class="info-details">
+                    <div class="info-item">
+                        <span>📍</span>
+                        <div>
+                            <h5>Indirizzo</h5>
+                            <p>Lungomare della Repubblica, Zona 71, Riccione</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span>📞</span>
+                        <div>
+                            <h5>Telefono</h5>
+                            <p>+39 0541 123456</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span>🕒</span>
+                        <div>
+                            <h5>Orari</h5>
+                            <p>Tutti i giorni: 12:00 — 02:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="map-placeholder">
+                <img src="hero_premium.png" alt="Location"
+                    style="width:100%; height:100%; object-fit:cover; opacity:0.9;">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Chiedi all'Oste! 🍹
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500">
+        <div
+            class="bg-white w-[calc(100vw-2rem)] sm:w-[350px] h-[65vh] sm:h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            <div class="demo-gradient p-5 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 22h8 M12 15v7 M12 15l-9-9c-2-2 2-6 8-6h2c6 0 10 4 8 6l-9 9 M5 9h14" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="font-bold text-sm">Chiringuito da Gino</h6>
+                        <p class="text-[10px] opacity-70">Sapore di mare e piadine h24</p>
+                    </div>
+                </div>
+                <button onclick="toggleDemo()" class="opacity-50 hover:opacity-100 italic">Chiudi</button>
+            </div>
+
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p>Ben arrivato! 🍹 Sono l'Oste del <strong class="text-brand-orange font-sans">Chiringuito da
+                            Gino</strong>.</p>
+                    <p>Come posso aiutarti oggi?</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🍽️ Mostrami il Menù')">
+                        🍽️ Mostrami il Menù
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🕒 Quali sono gli orari?')">
+                        🕒 Quali sono gli orari?
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📍 Dove siete?')">
+                        📍 Dove siete?
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Voglio parlare con lo staff')">
+                        📞 Parla con lo staff
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi all'Oste..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[101] hover:-translate-y-1 active:scale-95 transition-all duration-300 flex overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            💬
+        </span>
+    </button>
+    <script>
+        // Custom Headless Chat Logic
+        if (!sessionStorage.getItem('zirel_session_id')) {
+            sessionStorage.setItem('zirel_session_id', 'session_' + Math.random().toString(36).substring(2, 10));
+        }
+        const sessionId = sessionStorage.getItem('zirel_session_id');
+        const webhookUrl = 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('chat-tooltip');
+            if (tooltip) tooltip.classList.remove('visible');
+            if (window.tooltipTimer) clearTimeout(window.tooltipTimer);
+        }
+
+        function toggleDemo() {
+            const widget = document.getElementById('n8n-widget-mock');
+            const icon = document.getElementById('toggle-icon-open');
+            hideTooltip();
+            if (widget.classList.contains('scale-0')) {
+                widget.classList.remove('scale-0');
+                widget.classList.add('scale-100');
+                icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
+            } else {
+                widget.classList.remove('scale-100');
+                widget.classList.add('scale-0');
+                icon.innerHTML = '<span class="text-3xl">💬</span>';
+            }
+        }
+
+        async function sendChatMessage(text) {
+            const container = document.getElementById('chat-messages');
+            const quickReplies = document.getElementById('quick-replies-container');
+            if (quickReplies) quickReplies.style.display = 'none';
+
+            // User Message HTML
+            const userMsg = document.createElement('div');
+            userMsg.className = 'bg-brand-cyan/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-cyan/20';
+            userMsg.innerText = text;
+            container.appendChild(userMsg);
+            container.scrollTop = container.scrollHeight;
+
+            // Loading state
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[50%] text-sm border border-brand-sand/50 mt-4 italic text-slate-400';
+            loadingMsg.innerText = 'Scrivendo...';
+            container.appendChild(loadingMsg);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                // Call n8n webhook
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chatInput: text,
+                        sessionId: sessionId,
+                        metadata: {
+                            tenant_id: 'chiringuito_gino_001'
+                        }
+                    })
+                });
+
+                let responseData;
+                const clonedResponse = response.clone();
+                try {
+                    responseData = await response.json();
+                } catch (e) {
+                    const textResponse = await clonedResponse.text();
+                    responseData = { output: textResponse };
+                }
+
+                // Remove loading
+                loadingMsg.remove();
+
+                // Get bot text
+                let botText = "Scusa, ho avuto un imprevisto con la connessione.";
+                if (responseData && responseData.output) {
+                    botText = responseData.output;
+                } else if (Array.isArray(responseData) && responseData.length > 0 && responseData[0].output) {
+                    botText = responseData[0].output;
+                } else if (typeof responseData === 'object' && Object.keys(responseData).length > 0) {
+                    botText = JSON.stringify(responseData);
+                } else if (typeof responseData === 'string') {
+                    botText = responseData;
+                }
+
+                const botMsg = document.createElement('div');
+                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4 whitespace-pre-line';
+
+                // Markdown Bold parser
+                let formattedText = botText.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>');
+                botMsg.innerHTML = formattedText;
+
+                container.appendChild(botMsg);
+                container.scrollTop = container.scrollHeight;
+
+            } catch (e) {
+                loadingMsg.remove();
+                const botMsg = document.createElement('div');
+                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
+                botMsg.innerText = "Non sono riuscito a contattare il server. Riprova tra poco.";
+                container.appendChild(botMsg);
+                container.scrollTop = container.scrollHeight;
+                console.error("Chat error:", e);
+            }
+        }
+
+        function handleTextInput() {
+            const input = document.getElementById('chat-input-field');
+            const text = input.value.trim();
+            if (text) {
+                sendChatMessage(text);
+                input.value = '';
+            }
+        }
+
+        // Dynamic Tooltip Logic
+        const tooltipMessages = [
+            "Hai dubbi? Chiedi all'Oste! 💬",
+            "Vuoi prenotare un tavolo? 📅",
+            "Scopri il nostro menu del giorno! 🐟",
+            "Quali sono gli orari? 🕒"
+        ];
+        let tooltipIndex = 0;
+
+        function showAndCycleTooltip() {
+            const tooltip = document.getElementById('chat-tooltip');
+            const widget = document.getElementById('n8n-widget-mock');
+
+            // Only show if widget is closed
+            if (widget && widget.classList.contains('scale-0') && tooltip) {
+                tooltip.innerText = tooltipMessages[tooltipIndex];
+                tooltip.classList.add('visible');
+
+                tooltipIndex = (tooltipIndex + 1) % tooltipMessages.length;
+
+                // Hide after 4 seconds
+                window.tooltipTimer = setTimeout(() => {
+                    tooltip.classList.remove('visible');
+                }, 4000);
+            }
+        }
+
+        // Start cycle after initial 5 seconds, then repeat every 7 seconds
+        setTimeout(() => {
+            showAndCycleTooltip();
+            setInterval(showAndCycleTooltip, 7000);
+        }, 5000);
+    </script>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+                    <p>Tecnologia AI d'avanguardia al servizio dell'ospitalità romagnola. Innovazione per la tua
+                        struttura.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigazione</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="index.html#contatti">Contatti</a></li>
+                        <li><a href="index.html#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Hospitality AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

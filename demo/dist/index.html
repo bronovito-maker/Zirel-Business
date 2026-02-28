@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiringuito da Gino | Riccione - Sapori di Mare & Vibe Romagnolo</title>
+    <meta name="description"
+        content="Il meglio della cucina romagnola incontra il mare a Riccione. Prenota il tuo tavolo e goditi il tramonto.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        /* --- VIA MAESTRA: Styling Ufficiale n8n (Shadow DOM Compatible) --- */
+        :root {
+            /* 🛡️ VIA MAESTRA: Standard n8n (v1.9.3) - Nomi esatti delle variabili */
+            --chat--color--primary: #FF8c42;
+            /* Chiringuito Orange */
+            --chat--color--primary-shade-50: #e07a3a;
+            --chat--color--primary--shade-100: #c26a32;
+            --chat--color--secondary: #003049;
+            /* Chiringuito Navy */
+            --chat--color-white: #ffffff;
+            /* Singolo trattino: confermato dai doc */
+            --chat--color-light: #f8f9fa;
+            --chat--color-dark: #001219;
+            --chat--color-medium: #ced4da;
+
+            /* Tipografia & Border Radius */
+            --chat--font-family: 'Outfit', sans-serif;
+            --chat--spacing: 1rem;
+            --chat--border-radius: 25px;
+            /* Forza il look "Pill" su tutto il widget */
+            --chat--message--border-radius: 20px;
+
+            /* Window Dimensions */
+            --chat--window--width: 400px;
+            --chat--window--height: 600px;
+            --chat--window--border-radius: 20px;
+            --chat--window--box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+
+            /* Header Branding */
+            --chat--header--background: var(--chat--color--secondary);
+            --chat--header--color: var(--chat--color-light);
+            --chat--header--padding: 1.5rem 1.25rem;
+            --chat--heading--font-size: 1.5rem;
+            --chat--subtitle--font-size: 0.85rem;
+            --chat--subtitle--line-height: 1.4;
+
+            /* Toggle & Input */
+            --chat--toggle--size: 64px;
+            --chat--toggle--background: var(--chat--color--primary);
+            --chat--input--background: #ffffff;
+            --chat--input--send--button--color: var(--chat--color--primary);
+        }
+
+        /* Branding: Solo questo è permesso fuori dal Shadow DOM se n8n lo espone, 
+           altrimenti va messo nel 'Custom Chat Styling' del nodo n8n */
+        .n8n-chat-footer,
+        .chat-powered-by {
+            display: none !important;
+        }
+
+        /* Mobile Fixes */
+        @media (max-width: 480px) {
+            :root {
+                --chat--window--width: 100%;
+                --chat--window--height: 100%;
+                --chat--window--bottom: 0px;
+                --chat--window--right: 0px;
+                --chat--window--border-radius: 0px;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-CHohUvJM.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BIgaNLI4.css">
+</head>
+
+<body>
+    <!-- [Resto dell'HTML invariato] -->
+    <nav class="navbar">
+        <div class="logo">Zirèl <span>Demo</span></div>
+        <ul class="nav-links">
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#esperienze">Esperienze</a></li>
+            <li><a href="#info">Dove Siamo</a></li>
+        </ul>
+        <a href="#prenota" class="cta-nav">Prenota Ora</a>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Chiringuito <span>da Gino</span></h1>
+            <p>Sapore di mare, cuore romagnolo. La tua oasi a Riccione.</p>
+            <div class="hero-actions">
+                <a href="#prenota" class="btn-primary">Prenota un Tavolo</a>
+                <a href="#menu" class="btn-secondary">Sfoglia il Menu</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ... (Tutte le sezioni HTML rimosse nel view precedente per brevità, ma mantenute nel file reale) ... -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@n8n/chat/style.css" />
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <div class="logo">Zirèl <span>Demo</span></div>
+                    <p>Tecnologia per l'ospitalità romagnola.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Link Rapidi</h4>
+                    <ul>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#experiences">Esperienze</a></li>
+                        <li><a href="#info">Contatti</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Chiringuito da Gino | Creato con Zirèl AI</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zirèl | Il Concierge AI della Riviera Romagnola</title>
+    <meta name="description"
+        content="Aumenta le prenotazioni e l'accoglienza con Zirèl, l'assistente AI multilingua per hotel e ristoranti in Riviera.">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            blue: '#003049',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Shared scroll effect script compat */
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .brand-gradient {
+            background: linear-gradient(135deg, #003049 0%, #00AEEF 100%);
+        }
+
+        .hero-pattern {
+            background-color: #fdf0d5;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23f2e5c8' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        .sticky-bar {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sticky-bar.visible {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <!-- 1. Header & Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+        <ul class="nav-links">
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="demo.html">Demo</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contatti">Contatti</a></li>
+        </ul>
+        <a href="#contatti" class="cta-nav">Inizia Ora</a>
+    </nav>
+
+    <!-- 2. Hero Section (Il Gancio) -->
+    <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10">
+            <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
+                <span
+                    class="inline-block bg-brand-orange/10 text-brand-orange px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 animate-pulse">
+                    Novità: L'AI che parla Romagnolo
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    Basta telefonate perse.<br />
+                    Inizia a prenotare con il <span class="text-brand-orange italic">sorriso</span> (e l'AI).
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl">
+                    Il concierge digitale che parla 10 lingue, gestisce le tue prenotazioni e consiglia i tuoi ospiti.
+                    <span class="font-semibold text-brand-blue">Tutto mentre tu ti occupi della tua attività.</span>
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <button onclick="toggleDemo()"
+                        class="bg-brand-orange text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        Prova la Demo Gratuita
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <a href="#features"
+                        class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/10 hover:bg-white transition-all text-center">
+                        Scopri di più
+                    </a>
+                </div>
+            </div>
+            <div class="md:w-2/5 flex justify-center items-center relative">
+                <div
+                    class="relative w-64 md:w-80 h-[500px] md:h-[600px] bg-brand-blue rounded-[3rem] p-4 shadow-2xl border-8 border-white/20 transform rotate-3 hover:rotate-0 transition-transform duration-700 overflow-hidden">
+                    <img src="hero_premium.png" alt="Zirèl Smartphone Mockup"
+                        class="w-full h-full object-cover rounded-[2rem] opacity-80">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-blue via-transparent to-transparent"></div>
+                    <div class="absolute bottom-8 left-0 right-0 px-6 text-white">
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                            <p class="text-xs opacity-70 mb-1">Zirèl Assistant</p>
+                            <p class="text-sm font-medium">"Prenotazione confermata per le 20:30! Buona serata al
+                                Chiringuito 🥂"</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Piatto Cappelletti floating effect -->
+                <div class="absolute -bottom-10 -left-10 md:-bottom-20 md:-left-20 w-32 md:w-48 animate-bounce">
+                    <div class="bg-white p-2 rounded-full shadow-2xl">
+                        <img src="food_premium.png" alt="Icona Cappelletti"
+                            class="w-full rounded-full ring-4 ring-brand-sand">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background Elements -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
+    </header>
+
+    <!-- 3. Sezione Problema vs Soluzione -->
+    <section class="py-24 bg-white" id="demo">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-serif">Trasforma lo stress in <span
+                        class="text-brand-cyan">ospitalità</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Perché continuare a correre dietro alle chiamate quando
+                    c'è Zirèl?</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 md:gap-16 items-stretch">
+                <!-- Il Problema -->
+                <div
+                    class="bg-slate-50 p-8 md:p-12 rounded-[2rem] border-2 border-dashed border-slate-200 opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="text-4xl mb-6">😫</div>
+                    <h3 class="text-2xl font-bold mb-6 text-slate-700">Il Vecchio Modo</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 font-bold mt-1 leading-none">✕</span>
+                            <span class="text-slate-600">Centralino intasato nelle ore di punta</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 font-bold mt-1 leading-none">✕</span>
+                            <span class="text-slate-600">Turisti stranieri che non sanno come prenotare</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 font-bold mt-1 leading-none">✕</span>
+                            <span class="text-slate-600">Risposte che arrivano ore dopo (o mai)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 font-bold mt-1 leading-none">✕</span>
+                            <span class="text-slate-600">Clienti che scappano dalla concorrenza velocemente</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- La Soluzione -->
+                <div
+                    class="brand-gradient p-8 md:p-12 rounded-[2rem] text-white shadow-2xl transform md:scale-105 relative border-4 border-brand-cyan/20">
+                    <div
+                        class="absolute -top-4 -right-4 bg-brand-orange text-white font-black px-4 py-2 rounded-lg rotate-12 shadow-lg">
+                        SCOPRI IL FUTURO
+                    </div>
+                    <div class="text-4xl mb-6">😎</div>
+                    <h3 class="text-2xl font-bold mb-6">Il Modo Zirèl</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
+                            <span class="opacity-90">Disponibilità 24/7 (anche a ferragosto!)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
+                            <span class="opacity-90">Traduzione simultanea in 10+ lingue</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
+                            <span class="opacity-90">Integrazione Telegram immediata</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
+                            <span class="opacity-90">Consigli personalizzati sulla Riviera dopo cena</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Caratteristiche Chiave (Features) -->
+    <section class="py-24 bg-brand-sand/30" id="features">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                    <div
+                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-orange group-hover:text-white transition-all">
+                        📱</div>
+                    <h4 class="text-xl font-bold mb-3">Prenotazioni Intelligenti</h4>
+                    <p class="text-brand-blue/60 text-sm">Tavoli, camere o ombrelloni confermati in un clic su Google
+                        Sheets o Telegram.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                    <div
+                        class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-cyan group-hover:text-white transition-all">
+                        🌍</div>
+                    <h4 class="text-xl font-bold mb-3">Multilingua Nativo</h4>
+                    <p class="text-brand-blue/60 text-sm">Accogli turisti da tutto il mondo come se fossi madrelingua.
+                        Zero barriere.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                    <div
+                        class="w-14 h-14 bg-brand-blue/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-blue group-hover:text-white transition-all">
+                        📍</div>
+                    <h4 class="text-xl font-bold mb-3">Local Guru</h4>
+                    <p class="text-brand-blue/60 text-sm">Suggerisce eventi a Rimini e Riccione, aumentando il valore
+                        del tuo servizio.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                    <div
+                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-sand-dark group-hover:text-brand-blue transition-all">
+                        ⚡</div>
+                    <h4 class="text-xl font-bold mb-3">Installazione 'Zero Stress'</h4>
+                    <p class="text-brand-blue/60 text-sm">Una riga di codice e sei online. WordPress, Wix o custom,
+                        funziona ovunque.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Settori ad Alto Potenziale (Carousel) -->
+    <section class="carousel-section overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Per chi è <span
+                        class="text-brand-orange">Zirèl</span>?</h2>
+                <p class="text-brand-blue/60">Abbiamo creato l'AI perfetta per ogni realtà della Riviera.</p>
+            </div>
+
+            <div class="carousel-container">
+                <button class="carousel-btn btn-prev" aria-label="Precedente">←</button>
+                <div class="carousel-viewport">
+                    <div class="carousel-track" id="carousel-track">
+                        <!-- Hotel -->
+                        <div class="sector-card">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">🏨</div>
+                            <h3>Hotel & Resort</h3>
+                            <p>Concierge digitale h24 per info colazioni, servizi e check-in rapido per i tuoi ospiti.
+                            </p>
+                        </div>
+                        <!-- Ristoranti -->
+                        <div class="sector-card cyan">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">🍝</div>
+                            <h3>Ristoranti</h3>
+                            <p>Gestione tavoli automatizzata e menu sempre aggiornato via chat. Mai più telefono
+                                occupato.</p>
+                        </div>
+                        <!-- Studi Medici -->
+                        <div class="sector-card orange">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">🏥</div>
+                            <h3>Studi Medici & Dentisti</h3>
+                            <p>Prenotazione visite e gestione promemoria per azzerare gli appuntamenti persi e i
+                                no-show.</p>
+                        </div>
+                        <!-- Beauty & Spa -->
+                        <div class="sector-card">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">💆‍♀️</div>
+                            <h3>Beauty & Spa</h3>
+                            <p>Prenotazione trattamenti in tempo reale mentre il tuo team è impegnato con i clienti.</p>
+                        </div>
+                        <!-- Bagni -->
+                        <div class="sector-card cyan">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">🏖️</div>
+                            <h3>Bagni & Beach Club</h3>
+                            <p>Prenotazione ombrelloni e lettini sotto il sole di agosto senza estenuanti telefonate.
+                            </p>
+                        </div>
+                        <!-- Professionisti -->
+                        <div class="sector-card orange">
+                            <span class="sector-badge">Settore</span>
+                            <div class="sector-icon">⚖️</div>
+                            <h3>Professionisti</h3>
+                            <p>Segreteria intelligente per appuntamenti (Avvocati/Commercialisti) e prima accoglienza
+                                clienti.</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-btn btn-next" aria-label="Successivo">→</button>
+                <div class="carousel-dots" id="carousel-dots"></div>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-brand-sand/20 p-8 md:p-12 rounded-[3rem] relative mt-20">
+                <span class="absolute top-8 left-8 text-8xl text-brand-orange/20 leading-none font-serif">“</span>
+                <div class="relative z-10 text-center">
+                    <p class="text-xl md:text-3xl font-bold text-brand-blue leading-relaxed mb-8 italic">
+                        Da quando abbiamo Zirèl, non perdiamo più una prenotazione notturna dai turisti stranieri. È
+                        come avere una receptionist instancabile che sa tutto della città.
+                    </p>
+                    <p class="font-black text-brand-orange font-sans">Gino Pasticcio</p>
+                    <p class="text-sm text-brand-blue/60">Titolare Hotel & Chiringuito a Riccione</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section bg-brand-sand/30 py-24 relative overflow-hidden" id="faq">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Tutto quello che devi <span
+                        class="text-brand-cyan">sapere</span> su Zirèl</h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Risposte chiare alle domande più frequenti dei nostri
+                    clienti. Nessuna sorpresa.</p>
+            </div>
+            <div class="max-w-4xl mx-auto faq-grid space-y-4">
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Ma non è che l'AI risponde male ai miei clienti o inventa cose?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Assolutamente no. Zirèl si basa esclusivamente sui dati
+                            che ci fornisci tu (menu, listino, orari, regole della casa). Se un utente fa una domanda a
+                            cui non sappiamo rispondere, l'AI lo invita gentilmente a lasciare un recapito per essere
+                            ricontattato da un umano, evitando ogni tipo di "allucinazione".</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Ho già un sito web fatto da un'agenzia, posso usarlo comunque?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Certamente. Zirèl è progettato per essere "agnostico".
+                            Forniamo al tuo tecnico (o lo facciamo noi per te) una singola riga di codice da incollare.
+                            Funziona su WordPress, Wix, Shopify o siti fatti a mano.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>I miei clienti sono anziani e non sanno usare l'AI. Come facciamo?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">È proprio qui il punto forte. L'AI parla in linguaggio
+                            naturale, non come un robot. Il tuo cliente anziano deve solo scrivere sulla chat o su
+                            Telegram come se stesse scrivendo a suo nipote. Sarà Zirèl a capire l'intento e guidarlo.
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Ma la privacy? I dati dei miei clienti dove finiscono?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Tutto è al sicuro in server Europei (GDPR compliant). Non
+                            vendiamo i dati a terzi e, soprattutto, non usiamo le tue conversazioni per "addestrare"
+                            l'intelligenza artificiale pubblica di altre aziende.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>E se voglio modificare un prezzo nel menu all'ultimo minuto?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Lo puoi fare tu dal tuo smartphone, aprendo semplicemente
+                            il foglio Google Sheets che ti condividiamo. Modifichi la cella e Zirèl impara
+                            immediatamente il nuovo prezzo. Nessun ticket tecnico da aprire.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Quanto ci vuole per attivarlo?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Dopo aver compilato il nostro questionario iniziale con
+                            le tue info, in 48 ore lavorative ti consegniamo l'assistente pronto e testato.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Posso disdire quando voglio?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
+                        <p class="p-6 pt-2 text-brand-blue/70">Sì, non ci sono vincoli annuali. L'unico costo non
+                            rimborsabile è il setup iniziale una tantum. Poi, se non sei soddisfatto, blocchi il rinnovo
+                            mensile con un clic.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Call to Action Finale & Footer -->
+    <section class="py-24 relative overflow-hidden" id="contatti">
+        <div
+            class="container mx-auto px-4 md:px-8 bg-brand-blue rounded-[3rem] p-12 md:p-24 text-center text-white relative z-10">
+            <h2 class="text-3xl md:text-6xl font-black mb-8">Porta la tua ospitalità nel 2026.<br /><span
+                    class="text-brand-cyan">Attiva <span class="text-brand-orange font-sans">Zirèl</span>.</span></h2>
+            <p class="text-lg opacity-80 mb-12 max-w-2xl mx-auto italic">Non lasciate che la prossima chiamata sia
+                un'occasione persa. Entra nell'era del Concierge AI.</p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <button onclick="toggleDemo()"
+                    class="bg-brand-orange text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:bg-white hover:text-brand-orange transition-all active:scale-95">
+                    Prenota Demo Gratuita
+                </button>
+            </div>
+            <div class="mt-12 flex justify-center gap-8 text-sm opacity-60">
+                <span>✓ Prova gratuita 14 giorni</span>
+                <span>✓ Nessuna carta richiesta</span>
+                <span>✓ Setup in 5 minuti</span>
+            </div>
+        </div>
+
+        <!-- Decorative waves -->
+        <div class="absolute bottom-0 left-0 w-full h-24 bg-brand-cyan/10"></div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+                    <p>Tecnologia AI d'avanguardia al servizio dell'ospitalità romagnola. Innovazione per la tua
+                        struttura.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigazione</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="#contatti">Contatti</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Hospitality AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Mobile Sticky Bar -->
+    <div id="sticky-bar"
+        class="sticky-bar fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-brand-sand p-4 z-[60] flex items-center justify-between md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.1)]">
+        <div class="flex flex-col">
+            <span class="text-[0.6rem] font-black text-brand-orange uppercase tracking-tighter">Zirèl Business</span>
+            <span class="text-xs font-bold text-brand-blue truncate">Pronto per il 2026?</span>
+        </div>
+        <button onclick="toggleDemo()"
+            class="bg-brand-orange text-white px-6 py-2.5 rounded-full text-xs font-black shadow-lg">
+            Prenota Demo
+        </button>
+    </div>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Serve aiuto per prenotare? Ci penso io! 💬
+    </div>
+
+    <!-- n8n Chat Widget Placeholder -->
+    <div id="n8n-widget-mock"
+        class="fixed bottom-24 right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500">
+        <div
+            class="bg-white w-[350px] h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            <div class="brand-gradient p-5 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">🤖</div>
+                    <div>
+                        <h6 class="font-bold text-sm">Zirèl Assistant</h6>
+                        <p class="text-[10px] opacity-70">Risponde istantaneamente</p>
+                    </div>
+                </div>
+                <button onclick="toggleDemo()" class="opacity-50 hover:opacity-100 italic">Chiudi</button>
+            </div>
+
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <!-- Welcome Message -->
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>,
+                        l'assistente ufficiale del team.</p>
+                    <p>Posso spiegarti come rivoluzionare la tua struttura, mostrarti i piani o fissarti una Demo. Come
+                        posso aiutarti?</p>
+                </div>
+
+                <!-- Quick Replies Section -->
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="handleQuickReply('✨ Come funziona Zirèl?', 'funziona')">
+                        ✨ Come funziona Zirèl?
+                    </button>
+                    <button class="quick-reply-btn"
+                        onclick="handleQuickReply('💰 Mostrami i piani e i Prezzi', 'prezzi')">
+                        💰 Piani e Prezzi
+                    </button>
+                    <button class="quick-reply-btn"
+                        onclick="handleQuickReply('🚀 Vorrei prenotare una Demo Gratuita', 'demo')">
+                        🚀 Prenota una Demo
+                    </button>
+                    <button class="quick-reply-btn"
+                        onclick="handleQuickReply('📞 Vorrei parlare con Federico', 'umano')">
+                        📞 Parla con Federico
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <div
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 flex items-center text-xs text-slate-400 border border-slate-200">
+                    Scrivi un messaggio...
+                </div>
+                <button
+                    class="w-10 h-10 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-6 right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[101] hover:-translate-y-1 active:scale-95 transition-all duration-300 md:flex overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-2xl drop-shadow-md">🤖</span>
+    </button>
+
+    <script>
+        // Toggle Chat Demo
+        function toggleDemo() {
+            const widget = document.getElementById('n8n-widget-mock');
+            const icon = document.getElementById('toggle-icon-open');
+            if (widget.classList.contains('scale-0')) {
+                widget.classList.remove('scale-0');
+                widget.classList.add('scale-100');
+                icon.innerText = '✕';
+            } else {
+                widget.classList.remove('scale-100');
+                widget.classList.add('scale-0');
+                icon.innerText = '🤖';
+            }
+        }
+
+        // Carousel Logic
+        const track = document.getElementById('carousel-track');
+        const dotsContainer = document.getElementById('carousel-dots');
+        const prevBtn = document.querySelector('.btn-prev');
+        const nextBtn = document.querySelector('.btn-next');
+        const slides = Array.from(track.children);
+
+        let currentIndex = 0;
+        let autoScrollTimer;
+
+        function getVisibleCards() {
+            if (window.innerWidth <= 768) return 1;
+            if (window.innerWidth <= 1024) return 2;
+            return 3;
+        }
+
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            const visibleCards = getVisibleCards();
+            const dotCount = slides.length - (visibleCards - 1);
+
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateCarousel() {
+            const cardWidth = slides[0].offsetWidth;
+            const gap = 24;
+            track.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
+
+            // Update dots
+            const dots = Array.from(dotsContainer.children);
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function goToSlide(index) {
+            const visibleCards = getVisibleCards();
+            const maxIndex = slides.length - visibleCards;
+
+            currentIndex = index;
+            if (currentIndex < 0) currentIndex = maxIndex;
+            if (currentIndex > maxIndex) currentIndex = 0;
+
+            updateCarousel();
+            resetTimer();
+        }
+
+        function nextSlide() {
+            goToSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentIndex - 1);
+        }
+
+        function resetTimer() {
+            clearInterval(autoScrollTimer);
+            autoScrollTimer = setInterval(nextSlide, 5000);
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        window.addEventListener('resize', () => {
+            createDots();
+            currentIndex = 0;
+            updateCarousel();
+        });
+
+        createDots();
+        resetTimer();
+
+        // FAQ Accordion Logic
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+
+                // Close all other items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.faq-answer').style.maxHeight = null;
+                    }
+                });
+
+                // Toggle current item
+                if (isActive) {
+                    item.classList.remove('active');
+                    answer.style.maxHeight = null;
+                } else {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+
+        // Navbar & Sticky Bar Scroll logic
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const stickyBar = document.getElementById('sticky-bar');
+            const heroHeight = document.querySelector('header').offsetHeight;
+
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+
+            if (stickyBar) {
+                if (window.scrollY > heroHeight - 100) {
+                    stickyBar.classList.add('visible');
+                } else {
+                    stickyBar.classList.remove('visible');
+                }
+            }
+        });
+
+        // Chat Tooltip Timer
+        let tooltipTimer;
+        document.addEventListener('DOMContentLoaded', () => {
+            tooltipTimer = setTimeout(() => {
+                const widget = document.getElementById('n8n-widget-mock');
+                // Mostra tooltip solo se il widget è chiuso
+                if (widget.classList.contains('scale-0')) {
+                    document.getElementById('chat-tooltip').classList.add('visible');
+                }
+            }, 5000);
+        });
+
+        // Funzione per nascondere il tooltip
+        function hideTooltip() {
+            document.getElementById('chat-tooltip').classList.remove('visible');
+            clearTimeout(tooltipTimer);
+        }
+
+        // Modifica Toggle Demo per nascondere il tooltip
+        const originalToggleDemo = toggleDemo;
+        toggleDemo = function () {
+            hideTooltip();
+            originalToggleDemo();
+        };
+
+        // Gestione Quick Replies (Mock)
+        function handleQuickReply(text, action) {
+            const container = document.getElementById('chat-messages');
+            const quickReplies = document.getElementById('quick-replies-container');
+
+            // Nascondi i bottoni rapidi
+            quickReplies.style.display = 'none';
+
+            // Aggiungi messaggio utente
+            const userMsg = document.createElement('div');
+            userMsg.className = 'bg-brand-cyan/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-cyan/20';
+            userMsg.innerHTML = text;
+            container.appendChild(userMsg);
+
+            // Simula "sta scrivendo..."
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4';
+
+                // Risposte differenziate in base all'azione
+                if (action === 'funziona') {
+                    botMsg.innerHTML = 'È semplicissimo! Tu ci fornisci le tue info (menu, orari, regole), noi istruiamo Zirèl e ti diamo uno script da inserire nel sito. Inizia a rispondere ai tuoi clienti h24 su sito e Telegram. 🚀';
+                } else if (action === 'prezzi') {
+                    botMsg.innerHTML = 'Abbiamo piani per ogni esigenza: dal <strong>Piano Bagnino</strong> (39€/mese) al <strong>Piano Azdora</strong> (79€/mese) che include automazione Telegram e Google Sheets. <a href="pricing.html" class="text-brand-orange underline font-medium cursor-pointer">Scopri tutti i dettagli qui</a>.';
+                } else if (action === 'demo') {
+                    botMsg.innerHTML = 'Ottima scelta! 🎉 Saremmo felici di mostrarti come Zirèl può trasformare la tua attività. <a href="#contatti" class="text-brand-orange underline font-medium cursor-pointer">Vai in fondo a questa pagina</a> per attivare il servizio.';
+                } else {
+                    botMsg.innerHTML = 'Certamente. 📞 Ti stiamo mettendo in contatto diretto con Federico (il fondatore). Nel frattempo, puoi anticiparmi qual è la tua esigenza principale?';
+                }
+
+                container.appendChild(botMsg);
+                container.scrollTop = container.scrollHeight;
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>

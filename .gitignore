@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+.env
+.idea/
+.vscode/
+*.psd
+*.log
+/Users/bronovito/.gemini/antigravity/brain/0feb64ef-f794-416a-b3cb-bea0c1f3c9b4/
