@@ -1,0 +1,13 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="2360 0 1080 1080" width="1080" height="1080">
+	<defs>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp1">
+			<path d="m2360 0h1080v1080h-1080z"/>
+		</clipPath>
+	</defs>
+	<style>
+		.s0 { fill: #ff8c42 } 
+	</style>
+	<g id="Artboard 3" clip-path="url(#cp1)">
+		<path id="Z copy" class="s0" aria-label="Z"  d="m2852.9 776.2h-265.5l358.3-474.2h266.6zm349.6 151.9h-615.1v-151.9l119.1-28.4h496zm-111.5-597.5h-486.1v-180.3h607.4v151.9z"/>
+	</g>
+</svg>
