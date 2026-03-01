@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chiringuito da Gino | Riccione - Sapori di Mare & Vibe Romagnolo</title>
     <meta name="description"
@@ -12,7 +13,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="zirel_logo_compatto.svg">
     <link rel="stylesheet" href="style.css">
 
     <!-- Tailwind CSS CDN -->
@@ -247,13 +247,18 @@
 <body>
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
-        <ul class="nav-links">
-            <li><a href="pricing.html">Pricing</a></li>
-            <li><a href="demo.html" class="active">Demo</a></li>
-            <li><a href="index.html#faq">FAQ</a></li>
-            <li><a href="index.html#contatti">Contatti</a></li>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+            <li><a href="demo.html" class="nav-link active">Demo</a></li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="index.html#contatti" class="nav-link">Contatti</a></li>
+            <li class="cta-nav-mobile-li"><a href="index.html#contatti" class="cta-nav">Inizia
+                    Ora</a></li>
         </ul>
-        <a href="index.html#contatti" class="cta-nav">Inizia Ora</a>
+        <a href="index.html#contatti" class="cta-nav cta-nav-desktop">Inizia Ora</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
     </nav>
 
     <header class="hero">
@@ -274,7 +279,7 @@
         <div class="menu-grid">
             <div class="menu-card">
                 <div class="menu-img-wrapper">
-                    <img src="food_premium.png" alt="Spaghetti allo Scoglio" class="menu-img">
+                    <img src="food_premium.webp" alt="Spaghetti allo Scoglio" class="menu-img">
                 </div>
                 <div class="menu-info">
                     <h3>Lo Scoglio Reale</h3>
@@ -284,7 +289,7 @@
             </div>
             <div class="menu-card">
                 <div class="menu-img-wrapper">
-                    <img src="cocktail_premium.png" alt="Signature Cocktail" class="menu-img">
+                    <img src="cocktail_premium.webp" alt="Signature Cocktail" class="menu-img">
                 </div>
                 <div class="menu-info">
                     <h3>Sunset Mojito</h3>
@@ -358,7 +363,7 @@
                 </div>
             </div>
             <div class="map-placeholder">
-                <img src="hero_premium.png" alt="Location"
+                <img src="hero_premium.webp" alt="Location"
                     style="width:100%; height:100%; object-fit:cover; opacity:0.9;">
             </div>
         </div>
@@ -439,157 +444,28 @@
             💬
         </span>
     </button>
+    <script src="config.js"></script>
     <script>
-        // Custom Headless Chat Logic
-        if (!sessionStorage.getItem('zirel_session_id')) {
-            sessionStorage.setItem('zirel_session_id', 'session_' + Math.random().toString(36).substring(2, 10));
-        }
-        const sessionId = sessionStorage.getItem('zirel_session_id');
-        const webhookUrl = 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
+        // ─── Persona: Chiringuito da Gino ─────────────────────────────────────────
+        // OVERRIDE INTENZIONALE: questa pagina usa un tenant separato al 100%.
+        // Il chatbot si comporta come il receptionist REALE del locale.
+        // Non fa mai riferimenti a Zirèl, prezzi del software o "demo".
+        // Il webhook routing in n8n usa tenantId per servire il system prompt corretto.
+        window.ZirelConfig = {
+            webhookUrl: window.ZirelConfig?.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat',
+            tenantId: 'chiringuito_gino_001',
+        };
 
-        function hideTooltip() {
-            const tooltip = document.getElementById('chat-tooltip');
-            if (tooltip) tooltip.classList.remove('visible');
-            if (window.tooltipTimer) clearTimeout(window.tooltipTimer);
-        }
-
-        function toggleDemo() {
-            const widget = document.getElementById('n8n-widget-mock');
-            const icon = document.getElementById('toggle-icon-open');
-            hideTooltip();
-            if (widget.classList.contains('scale-0')) {
-                widget.classList.remove('scale-0');
-                widget.classList.add('scale-100');
-                icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
-            } else {
-                widget.classList.remove('scale-100');
-                widget.classList.add('scale-0');
-                icon.innerHTML = '<span class="text-3xl">💬</span>';
-            }
-        }
-
-        async function sendChatMessage(text) {
-            const container = document.getElementById('chat-messages');
-            const quickReplies = document.getElementById('quick-replies-container');
-            if (quickReplies) quickReplies.style.display = 'none';
-
-            // User Message HTML
-            const userMsg = document.createElement('div');
-            userMsg.className = 'bg-brand-cyan/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-cyan/20';
-            userMsg.innerText = text;
-            container.appendChild(userMsg);
-            container.scrollTop = container.scrollHeight;
-
-            // Loading state
-            const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[50%] text-sm border border-brand-sand/50 mt-4 italic text-slate-400';
-            loadingMsg.innerText = 'Scrivendo...';
-            container.appendChild(loadingMsg);
-            container.scrollTop = container.scrollHeight;
-
-            try {
-                // Call n8n webhook
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chatInput: text,
-                        sessionId: sessionId,
-                        metadata: {
-                            tenant_id: 'chiringuito_gino_001'
-                        }
-                    })
-                });
-
-                let responseData;
-                const clonedResponse = response.clone();
-                try {
-                    responseData = await response.json();
-                } catch (e) {
-                    const textResponse = await clonedResponse.text();
-                    responseData = { output: textResponse };
-                }
-
-                // Remove loading
-                loadingMsg.remove();
-
-                // Get bot text
-                let botText = "Scusa, ho avuto un imprevisto con la connessione.";
-                if (responseData && responseData.output) {
-                    botText = responseData.output;
-                } else if (Array.isArray(responseData) && responseData.length > 0 && responseData[0].output) {
-                    botText = responseData[0].output;
-                } else if (typeof responseData === 'object' && Object.keys(responseData).length > 0) {
-                    botText = JSON.stringify(responseData);
-                } else if (typeof responseData === 'string') {
-                    botText = responseData;
-                }
-
-                const botMsg = document.createElement('div');
-                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4 whitespace-pre-line';
-
-                // Markdown Bold parser
-                let formattedText = botText.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>');
-                botMsg.innerHTML = formattedText;
-
-                container.appendChild(botMsg);
-                container.scrollTop = container.scrollHeight;
-
-            } catch (e) {
-                loadingMsg.remove();
-                const botMsg = document.createElement('div');
-                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
-                botMsg.innerText = "Non sono riuscito a contattare il server. Riprova tra poco.";
-                container.appendChild(botMsg);
-                container.scrollTop = container.scrollHeight;
-                console.error("Chat error:", e);
-            }
-        }
-
-        function handleTextInput() {
-            const input = document.getElementById('chat-input-field');
-            const text = input.value.trim();
-            if (text) {
-                sendChatMessage(text);
-                input.value = '';
-            }
-        }
-
-        // Dynamic Tooltip Logic
-        const tooltipMessages = [
+        // Messaggi tooltip in-character (cameriere del locale, NON consulente Zirèl)
+        window.zirelTooltipMessages = [
             "Hai dubbi? Chiedi all'Oste! 💬",
-            "Vuoi prenotare un tavolo? 📅",
-            "Scopri il nostro menu del giorno! 🐟",
-            "Quali sono gli orari? 🕒"
+            'Vuoi prenotare un tavolo? 📅',
+            'Scopri il nostro menù del giorno! 🐟',
+            'Che orari facciamo? 🕒',
         ];
-        let tooltipIndex = 0;
-
-        function showAndCycleTooltip() {
-            const tooltip = document.getElementById('chat-tooltip');
-            const widget = document.getElementById('n8n-widget-mock');
-
-            // Only show if widget is closed
-            if (widget && widget.classList.contains('scale-0') && tooltip) {
-                tooltip.innerText = tooltipMessages[tooltipIndex];
-                tooltip.classList.add('visible');
-
-                tooltipIndex = (tooltipIndex + 1) % tooltipMessages.length;
-
-                // Hide after 4 seconds
-                window.tooltipTimer = setTimeout(() => {
-                    tooltip.classList.remove('visible');
-                }, 4000);
-            }
-        }
-
-        // Start cycle after initial 5 seconds, then repeat every 7 seconds
-        setTimeout(() => {
-            showAndCycleTooltip();
-            setInterval(showAndCycleTooltip, 7000);
-        }, 5000);
     </script>
+    <script src="chat.js"></script>
+    <script src="ui-helpers.js"></script>
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
@@ -610,8 +486,8 @@
                 <div class="footer-links">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>
                 </div>
             </div>

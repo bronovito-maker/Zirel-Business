@@ -1,58 +1,95 @@
 # Zirèl: Integrazione e Configurazione 🛠️
 
-Questa guida è destinata a webmaster, agenzie web e tecnici incaricati di integrare il Concierge AI Zirèl sul sito web del cliente (WordPress, Wix, custom, ecc.) e di configurarne il database.
+Guida per webmaster e tecnici che installano il widget Zirèl su un sito cliente.
 
 ---
 
-## 1. Configurare il Database (Google Sheets)
+## 1. Database (Google Sheets)
 
-La genialità di Zirèl risiede nella semplicità della gestione dati. Il "cervello" dell'AI si nutre di un Google Sheet che il cliente stesso può aggiornare.
+Il "cervello" di Zirèl legge da un Google Sheet che il gestore aggiorna autonomamente.
 
-### Passo 1: Copia il Template
-1. Fai una copia del nostro **[Template Google Sheet Zirèl Master]** (Link generico) per il tuo cliente.
-2. Assicurati di impostare i permessi in lettura: *"Chiunque abbia il link può visualizzare"*.
+### Setup
+1. Copia il **Template Google Sheet Zirèl Master** per il cliente.
+2. Imposta i permessi: *"Chiunque abbia il link può visualizzare"*.
+3. Il documento deve avere queste schede:
 
-### Passo 2: Struttura dei Fogli
-Il documento deve contenere le seguenti schede (tabs):
+| Scheda       | Contenuto                                          |
+| :----------- | :------------------------------------------------- |
+| **Generali** | Orari, indirizzo, telefono, regole, policy         |
+| **Listino**  | Menu/tariffe/servizi                               |
+| **Eventi**   | Serate, musica live, promozioni                    |
 
-| Nome Scheda | Descrizione & Utilizzo |
-| :--- | :--- |
-| **Generali** | Orari, indirizzo, telefono, regole di base, policy cani. |
-| **Listino** | Menu (se ristorante), tariffe camere (se hotel), servizi (se estate). |
-| **Eventi** | Cosa succede oggi/questa settimana (serate a tema, musica dal vivo). |
-
-### Passo 3: Collega il Foglio a n8n
-Nelle impostazioni del workflow su n8n (che ti verranno fornite), incolla l'ID del Google Sheet appena creato per permettere all'AI di leggerne i dati in tempo reale.
+4. Incolla l'ID del foglio nel workflow n8n fornito da Zirèl.
 
 ---
 
-## 2. Installazione del Widget Chat (Webmaster)
+## 2. Installazione Widget (Webmaster)
 
-L'integrazione del widget sul sito web del cliente è un processo "plug & play". 
+La modalità consigliata è hostare il **build statico** (`demo/dist/`) sul dominio del cliente.
 
-### Per siti Custom / HTML
-Inserisci il seguente script prima della chiusura del tag `</body>` in tutte le pagine dove vuoi mostrare Zirèl:
+### Step 1 — Clona il repository
 
-```html
-<!-- Zirèl AI Concierge Widget -->
-<script src="https://cdn.zirel.ai/widget/v1/zirel.js" async></script>
-<script>
-  window.ZirelConfig = {
-    clientId: 'INSERISCI_QUI_IL_CLIENT_ID',       // Es: 'chiringuito_gino'
-    themeColor: '#FF6B35',                        // Colore principale (HEX)
-    welcomeMessage: 'Ciao! 👋 Sono Zirèl...'      // Msg personalizzato
-  };
-</script>
+```bash
+git clone https://github.com/tuo-user/Zirel-Business.git
+cd Zirel-Business/demo
+npm install
 ```
 
-### Per WordPress
-Hai due opzioni:
-1. Usare il plugin **"Insert Headers and Footers"** (incolla lo snippet sopra nel footer).
-2. O usare il **Plugin Zirèl per WP** (attualmente in beta), dove basterà inserire il `clientId` nel pannello impostazioni.
+### Step 2 — Configura le credenziali del cliente
+
+Per un sito cliente reale, devi generare un `config.js` specifico usando lo script di configurazione fornito.
+
+1. Esporta le variabili d'ambiente nel tuo terminale:
+   ```bash
+   export ZIREL_WEBHOOK_URL=https://tuo-n8n.railway.app/webhook/...
+   export ZIREL_TENANT_ID=nome_cliente_001
+   ```
+2. Esegui il setup per il cliente o avvia l'ambiente di sviluppo locale. `npm run client:setup` leggerà le variabili e creerà il `config.js` reale in `demo/public/`.
+   ```bash
+   npm run client:setup
+   npm run build
+   ```
+
+> **Nota**: Su **Vercel** o piattaforme simili, imposta `ZIREL_WEBHOOK_URL` e `ZIREL_TENANT_ID` nel dashboard delle Environment Variables. Poi imposta il comando di build personalizzato: `npm run client:setup && npm run build`.
+
+> Per un riferimento dei campi disponibili e della struttura generata, vedi `demo/public/config.template.js`.
+
+### Step 3 — Builda
+
+```bash
+npm run build
+```
+
+Il prebuild script (`generate-config.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente. Vite lo copia poi in `dist/config.js`.
+
+### Step 4 — Pubblica `dist/`
+
+Carica l'intera cartella `dist/` sul dominio del cliente (Vercel, FTP, S3, ecc.).
 
 ---
 
-## 3. Troubleshooting Comune
+## 3. Deploy su Vercel (raccomandato)
 
-* **Il widget non si apre:** Controlla la console del browser per errori CORS. Assicurati che il dominio del cliente sia stato aggiunto alla *Whitelist* nel pannello di controllo Zirèl.
-* **L'AI dà informazioni vecchie:** Richiede circa 60 secondi perché l'AI si accorga delle modifiche fatte su Google Sheets. Prova ad aggiornare la pagina. Se il problema persiste, controlla che n8n stia leggendo dal Foglio Google corretto.
+| Impostazione       | Valore    |
+| :----------------- | :-------- |
+| Root Directory     | `demo`    |
+| Build Command      | `npm run build` |
+| Output Directory   | `dist`    |
+| Env var 1          | `ZIREL_WEBHOOK_URL` |
+| Env var 2          | `ZIREL_TENANT_ID`  |
+
+---
+
+## 4. Per WordPress
+
+Usa il plugin **"Insert Headers and Footers"** per aggiungere gli script nel `<head>` del tema, e un blocco Custom HTML nel footer per il widget.
+
+---
+
+## 5. Troubleshooting
+
+| Sintomo | Causa probabile | Soluzione |
+| :--- | :--- | :--- |
+| Chat non risponde | CORS bloccato | Aggiungi il dominio del cliente in n8n → Webhook → Header CORS |
+| `config.js` non trovato | Env var mancanti in build | Controlla `.env.local` o le env var Vercel |
+| Risposte AI datate | Cache webhook | Verifica che n8n legga dal Google Sheet corretto |

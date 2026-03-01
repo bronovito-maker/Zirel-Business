@@ -34,9 +34,9 @@ Prima di vendere, devi avere qualcosa di visibile.
 
 1. **Il Prototipo "Demo":** Crea un sito one-page (usando Bolt.new o Lovable in 5 minuti) per un ristorante fittizio, es. *"Chiringuito da Gino - Riccione"*.
 2. **Il Listino Prezzi:** Struttura tre pacchetti chiari:
-* **BASIC (Solo Info):** Risponde a domande, non prenota. (€399 setup + €29/mese).
-* **PRO (Prenotazioni):** Gestisce tavoli/camere e invia notifiche. (€799 setup + €49/mese).
-* **FULL VIBE (Marketing):** Include follow-up dopo la cena per chiedere recensioni. (€1200+ setup).
+* **Bagnino (Solo Info):** Risponde a domande, non prenota. (€299 setup + €39/mese).
+* **Azdora (Prenotazioni):** Gestisce tavoli/camere e invia notifiche. (€499 setup + €79/mese).
+* **Gran Turismo (Marketing):** Include follow-up dopo la cena per chiedere recensioni. (Prezzo Custom).
 
 
 
@@ -47,7 +47,8 @@ Prima di vendere, devi avere qualcosa di visibile.
 Non vendere telefonicamente, vendi con gli occhi.
 
 1. **Video Demo Personalizzata:** Scegli 5 locali reali. Registra un video di 60 secondi col cellulare mentre interagisci con l'assistente che hai pre-configurato con i loro nomi e il loro menu (preso da Facebook).
-2. **Invio "Pillola":** Manda il video su Instagram DM o WhatsApp al titolare. *"Ciao! Ho creato questo assistente AI per [Nome Locale] che parla 10 lingue e gestisce le prenotazioni. Vi interessa vederlo in azione?"*
+2. **Video Testimonianze:** Raccogli brevi video (15 secondi) dai primi clienti reali che dicono: *"Zirèl mi ha salvato il sabato sera"*. Usali in outreach per abbattere l'attrito iniziale.
+3. **Invio "Pillola":** Manda il video su Instagram DM o WhatsApp al titolare. *"Ciao! Ho creato questo assistente AI per [Nome Locale] che parla 10 lingue e gestisce le prenotazioni. Vi interessa vederlo in azione?"*
 
 ---
 

@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zirèl | Il Concierge AI della Riviera Romagnola</title>
     <meta name="description"
         content="Aumenta le prenotazioni e l'accoglienza con Zirèl, l'assistente AI multilingua per hotel e ristoranti in Riviera.">
-    <link rel="icon" type="image/svg+xml" href="zirel_logo_compatto.svg">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -71,9 +71,10 @@
             <li><a href="demo.html" class="nav-link">Demo</a></li>
             <li><a href="#faq" class="nav-link">FAQ</a></li>
             <li><a href="#contatti" class="nav-link">Contatti</a></li>
-            <li class="lg:hidden mt-4"><a href="#contatti" class="cta-nav inline-block">Inizia Ora</a></li>
+            <li class="cta-nav-mobile-li"><a href="#contatti" class="cta-nav">Inizia Ora</a>
+            </li>
         </ul>
-        <a href="#contatti" class="cta-nav hidden lg:inline-block">Inizia Ora</a>
+        <a href="#contatti" class="cta-nav cta-nav-desktop">Inizia Ora</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -87,20 +88,23 @@
             <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
                 <span
                     class="inline-block bg-brand-orange/10 text-brand-orange px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 animate-pulse">
-                    Novità: L'AI che parla Romagnolo
+                    Accoglie. Prenota. Vende.
                 </span>
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
-                    Basta telefonate perse.<br />
-                    Inizia a prenotare con il <span class="text-brand-orange italic">sorriso</span> (e l'AI).
+                    L'ospitalità romagnola.<br />
+                    <span class="text-brand-orange italic">Ora infaticabile.</span>
                 </h1>
-                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl">
-                    Il concierge digitale che parla 10 lingue, gestisce le tue prenotazioni e consiglia i tuoi ospiti.
-                    <span class="font-semibold text-brand-blue">Tutto mentre tu ti occupi della tua attività.</span>
+                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Il telefono squilla in continuazione. Le commissioni pesano a fine mese. Il tempo per la tua
+                    famiglia è svanito. Lo sappiamo quanto è dura.<br /><br />
+                    Zirèl è la tua rivoluzione silenziosa. Risponde in 10 lingue, assicura le prenotazioni e taglia
+                    fuori gli intermediari.<br />
+                    <span class="font-semibold text-brand-blue mt-2 block">Invisibile. Intelligente. Tuo.</span>
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <button onclick="toggleDemo()"
                         class="bg-brand-orange text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        Prova la Demo Gratuita
+                        Riprenditi il tuo tempo
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
@@ -109,28 +113,28 @@
                     </button>
                     <a href="#features"
                         class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/10 hover:bg-white transition-all text-center">
-                        Scopri di più
+                        Guarda come lavora
                     </a>
                 </div>
             </div>
             <div class="md:w-2/5 flex justify-center items-center relative">
                 <div
                     class="relative w-64 md:w-80 h-[500px] md:h-[600px] bg-brand-blue rounded-[3rem] p-4 shadow-2xl border-8 border-white/20 transform rotate-3 hover:rotate-0 transition-transform duration-700 overflow-hidden">
-                    <img src="hero_premium.png" alt="Zirèl Smartphone Mockup"
+                    <img src="hero_premium.webp" alt="Zirèl Smartphone Mockup"
                         class="w-full h-full object-cover rounded-[2rem] opacity-80">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-blue via-transparent to-transparent"></div>
                     <div class="absolute bottom-8 left-0 right-0 px-6 text-white">
                         <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
                             <p class="text-xs opacity-70 mb-1">Zirèl Assistant</p>
-                            <p class="text-sm font-medium">"Prenotazione confermata per le 20:30! Buona serata al
-                                Chiringuito 🥂"</p>
+                            <p class="text-sm font-medium text-brand-orange font-bold">"Parla 10 lingue. Non dorme mai.
+                                Ama la tua attività quanto te."</p>
                         </div>
                     </div>
                 </div>
                 <!-- Piatto Cappelletti floating effect -->
                 <div class="absolute -bottom-10 -left-10 md:-bottom-20 md:-left-20 w-32 md:w-48 animate-bounce">
                     <div class="bg-white p-2 rounded-full shadow-2xl">
-                        <img src="food_premium.png" alt="Icona Cappelletti"
+                        <img src="food_premium.webp" alt="Icona Cappelletti"
                             class="w-full rounded-full ring-4 ring-brand-sand">
                     </div>
                 </div>
@@ -182,27 +186,29 @@
                 <div
                     class="brand-gradient p-8 md:p-12 rounded-[2rem] text-white shadow-2xl transform md:scale-105 relative border-4 border-brand-cyan/20">
                     <div
-                        class="absolute -top-4 -right-4 bg-brand-orange text-white font-black px-4 py-2 rounded-lg rotate-12 shadow-lg">
-                        SCOPRI IL FUTURO
+                        class="absolute -top-4 -right-4 bg-brand-orange text-white font-black px-4 py-2 rounded-lg rotate-12 shadow-lg tracking-wider text-sm uppercase">
+                        Scopri il Futuro
                     </div>
                     <div class="text-4xl mb-6">😎</div>
                     <h3 class="text-2xl font-bold mb-6">Il Modo Zirèl</h3>
                     <ul class="space-y-4">
                         <li class="flex items-start gap-3">
                             <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
-                            <span class="opacity-90">Disponibilità 24/7 (anche a ferragosto!)</span>
+                            <div><strong class="text-white">Libertà:</strong> <span
+                                    class="opacity-90 leading-relaxed">Zero telefonate interrotte durante il
+                                    servizio.</span></div>
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
-                            <span class="opacity-90">Traduzione simultanea in 10+ lingue</span>
+                            <div><strong class="text-white">Inclusione:</strong> <span
+                                    class="opacity-90 leading-relaxed">Accogli turisti da tutto il mondo nella loro
+                                    lingua.</span></div>
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
-                            <span class="opacity-90">Integrazione Telegram immediata</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="text-brand-orange font-bold mt-1 leading-none text-xl">✓</span>
-                            <span class="opacity-90">Consigli personalizzati sulla Riviera dopo cena</span>
+                            <div><strong class="text-white">Crescita:</strong> <span
+                                    class="opacity-90 leading-relaxed">Trasforma ogni dubbio in una prenotazione
+                                    confermata.</span></div>
                         </li>
                     </ul>
                 </div>
@@ -213,42 +219,68 @@
     <!-- 4. Caratteristiche Chiave (Features) -->
     <section class="py-24 bg-brand-sand/30" id="features">
         <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-serif text-brand-blue">
+                    L'innovazione che non si vede. <span class="text-brand-orange">Ma si incassa.</span>
+                </h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">
+                    Quattro superpoteri. Nessuna curva d'apprendimento.<br />
+                    I vecchi software gestionali ti obbligano a studiare manuali infiniti e cambiare il tuo modo di
+                    lavorare. Zirèl fa l'opposto: scompare nel tuo sito e fa il lavoro sporco. Tu continui a usare i
+                    tuoi fogli, lui ti porta i clienti. Semplice. Veloce. Tuo.
+                </p>
+                <div class="mt-8">
+                    <a href="#pricing"
+                        class="inline-block bg-brand-orange text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95">
+                        Assumilo oggi stesso
+                    </a>
+                </div>
+            </div>
+
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Feature 1 -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
                     <div
                         class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-orange group-hover:text-white transition-all">
                         📱</div>
-                    <h4 class="text-xl font-bold mb-3">Prenotazioni Intelligenti</h4>
-                    <p class="text-brand-blue/60 text-sm">Tavoli, camere o ombrelloni confermati in un clic su Google
-                        Sheets o Telegram.</p>
+                    <h4 class="text-xl font-bold mb-3 leading-tight">L'agenda che si riempie da sola.</h4>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">
+                        Mentre tu regali sorrisi a chi è già arrivato, Zirèl conferma tavoli e camere per domani. Ti
+                        arriva un messaggio e il posto è assegnato. Nessuna chiamata persa.
+                    </p>
                 </div>
                 <!-- Feature 2 -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
                     <div
                         class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-cyan group-hover:text-white transition-all">
                         🌍</div>
-                    <h4 class="text-xl font-bold mb-3">Multilingua Nativo</h4>
-                    <p class="text-brand-blue/60 text-sm">Accogli turisti da tutto il mondo come se fossi madrelingua.
-                        Zero barriere.</p>
+                    <h4 class="text-xl font-bold mb-3 leading-tight">Tutto il mondo. Senza interpreti.</h4>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">
+                        Tedesco, inglese o francese? Zirèl capisce ogni lingua e risponde con il calore di casa nostra.
+                        I turisti prenotano prima, senza esitare. Zero barriere.
+                    </p>
                 </div>
                 <!-- Feature 3 -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
                     <div
                         class="w-14 h-14 bg-brand-blue/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-blue group-hover:text-white transition-all">
                         📍</div>
-                    <h4 class="text-xl font-bold mb-3">Local Guru</h4>
-                    <p class="text-brand-blue/60 text-sm">Suggerisce eventi a Rimini e Riccione, aumentando il valore
-                        del tuo servizio.</p>
+                    <h4 class="text-xl font-bold mb-3 leading-tight">Più di un bot. Un vero romagnolo.</h4>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">
+                        Non si limita a fissare appuntamenti. Consiglia l'evento top a Rimini o la piadina segreta a
+                        Riccione. Il valore della tua accoglienza vola alle stelle. Da solo.
+                    </p>
                 </div>
                 <!-- Feature 4 -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
                     <div
                         class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-sand-dark group-hover:text-brand-blue transition-all">
                         ⚡</div>
-                    <h4 class="text-xl font-bold mb-3">Installazione 'Zero Stress'</h4>
-                    <p class="text-brand-blue/60 text-sm">Una riga di codice e sei online. WordPress, Wix o custom,
-                        funziona ovunque.</p>
+                    <h4 class="text-xl font-bold mb-3 leading-tight">Sessanta secondi. Sei operativo.</h4>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">
+                        Nessun tecnico costoso. Nessun sistema difficile da imparare. Prendi una "riga magica", la
+                        incolli sul tuo sito e il tuo nuovo collaboratore inizia il turno.
+                    </p>
                 </div>
             </div>
         </div>
@@ -369,8 +401,11 @@
                     <div
                         class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-brand-sand/10">
                         <p class="p-6 pt-2 text-brand-blue/70">Certamente. Zirèl è progettato per essere "agnostico".
-                            Forniamo al tuo tecnico (o lo facciamo noi per te) una singola riga di codice da incollare.
-                            Funziona su WordPress, Wix, Shopify o siti fatti a mano.</p>
+                            Forniamo al tuo tecnico (o lo facciamo noi per te) una singola riga di codice da
+                            incollare.<br><br>
+                            <strong class="text-brand-blue block text-lg font-black">Copia. Incolla. Sei nel
+                                futuro.</strong>
+                        </p>
                     </div>
                 </div>
                 <div
@@ -492,8 +527,8 @@
                 <div class="footer-links">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -533,10 +568,9 @@
             <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
                 <div
                     class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
-                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>,
-                        l'assistente ufficiale del team.</p>
-                    <p>Posso spiegarti come rivoluzionare la tua struttura, mostrarti i piani o fissarti una Demo. Come
-                        posso aiutarti?</p>
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
+                    <p>Posso prenotarti un tavolo o consigliarti il posto perfetto per il tuo dopocena a Riccione. Cosa
+                        ti ispira oggi?</p>
                 </div>
 
                 <div class="quick-replies" id="quick-replies-container">
@@ -578,304 +612,18 @@
             💬
         </span>
     </button>
+    <script src="config.js"></script>
     <script>
-        // Custom Headless Chat Logic
-        // Genera un ID sessione casuale per l'utente, così n8n ricorda la cronologia
-        if (!sessionStorage.getItem('zirel_session_id')) {
-            sessionStorage.setItem('zirel_session_id', 'session_' + Math.random().toString(36).substring(2, 10));
-        }
-        const sessionId = sessionStorage.getItem('zirel_session_id');
-        const webhookUrl = 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
-
-        function hideTooltip() {
-            const tooltip = document.getElementById('chat-tooltip');
-            if (tooltip) tooltip.classList.remove('visible');
-            if (window.tooltipTimer) clearTimeout(window.tooltipTimer);
-        }
-
-        function toggleDemo() {
-            const widget = document.getElementById('n8n-widget-mock');
-            const icon = document.getElementById('toggle-icon-open');
-            hideTooltip();
-            if (widget.classList.contains('scale-0')) {
-                widget.classList.remove('scale-0');
-                widget.classList.add('scale-100');
-                icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
-            } else {
-                widget.classList.remove('scale-100');
-                widget.classList.add('scale-0');
-                // Restore icon
-                icon.innerHTML = '<span class="text-3xl">💬</span>';
-            }
-        }
-
-        async function sendChatMessage(text) {
-            const container = document.getElementById('chat-messages');
-            const quickReplies = document.getElementById('quick-replies-container');
-            if (quickReplies) quickReplies.style.display = 'none';
-
-            // User Message HTML
-            const userMsg = document.createElement('div');
-            userMsg.className = 'bg-brand-cyan/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-cyan/20';
-            userMsg.innerText = text;
-            container.appendChild(userMsg);
-            container.scrollTop = container.scrollHeight;
-
-            // Loading state
-            const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[50%] text-sm border border-brand-sand/50 mt-4 italic text-slate-400';
-            loadingMsg.innerText = 'Scrivendo...';
-            container.appendChild(loadingMsg);
-            container.scrollTop = container.scrollHeight;
-
-            try {
-                // Call n8n webhook
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chatInput: text,
-                        sessionId: sessionId,
-                        metadata: {
-                            tenant_id: 'zirel_official'
-                        }
-                    })
-                });
-
-                let responseData;
-                const clonedResponse = response.clone();
-                try {
-                    responseData = await response.json();
-                } catch (e) {
-                    const textResponse = await clonedResponse.text();
-                    responseData = { output: textResponse };
-                }
-
-                // Remove loading
-                loadingMsg.remove();
-
-                // Get bot text
-                let botText = "Scusa, ho avuto un imprevisto con la connessione.";
-                if (responseData && responseData.output) {
-                    botText = responseData.output;
-                } else if (Array.isArray(responseData) && responseData.length > 0 && responseData[0].output) {
-                    botText = responseData[0].output;
-                } else if (typeof responseData === 'object' && Object.keys(responseData).length > 0) {
-                    botText = JSON.stringify(responseData);
-                } else if (typeof responseData === 'string') {
-                    botText = responseData;
-                }
-
-                const botMsg = document.createElement('div');
-                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4 whitespace-pre-line';
-                // Convert Markdown bold to HTML strong tags
-                let formattedText = botText.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>');
-                botMsg.innerHTML = formattedText; // Use innerHTML to allow links if n8n returns them
-                container.appendChild(botMsg);
-                container.scrollTop = container.scrollHeight;
-
-            } catch (e) {
-                loadingMsg.remove();
-                const botMsg = document.createElement('div');
-                botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
-                botMsg.innerText = "Non sono riuscito a contattare il server. Riprova tra poco.";
-                container.appendChild(botMsg);
-                container.scrollTop = container.scrollHeight;
-                console.error("Chat error:", e);
-            }
-        }
-
-        function handleTextInput() {
-            const input = document.getElementById('chat-input-field');
-            const text = input.value.trim();
-            if (text) {
-                sendChatMessage(text);
-                input.value = '';
-            }
-        }
-
-        // Dynamic Tooltip Logic
-        const tooltipMessages = [
-            "Serve aiuto? Ci pensa Zirèl! 💬",
-            "Fissa una Demo Gratuita! 🚀",
+        // Messaggi tooltip specifici di questa pagina (Business landing)
+        window.zirelTooltipMessages = [
+            'Serve aiuto? Ci pensa Zirèl! 💬',
+            'Fissa una Demo Gratuita! 🚀',
             "Scopri come funziona l'AI 🤖",
-            "Aumenta le tue prenotazioni! 📈"
+            'Aumenta le tue prenotazioni! 📈',
         ];
-        let tooltipIndex = 0;
-
-        function showAndCycleTooltip() {
-            const tooltip = document.getElementById('chat-tooltip');
-            const widget = document.getElementById('n8n-widget-mock');
-
-            // Only show if widget is closed
-            if (widget && widget.classList.contains('scale-0') && tooltip) {
-                tooltip.innerText = tooltipMessages[tooltipIndex];
-                tooltip.classList.add('visible');
-
-                tooltipIndex = (tooltipIndex + 1) % tooltipMessages.length;
-
-                // Hide after 4 seconds
-                window.tooltipTimer = setTimeout(() => {
-                    tooltip.classList.remove('visible');
-                }, 4000);
-            }
-        }
-
-        // Start cycle after initial 5 seconds, then repeat every 7 seconds
-        setTimeout(() => {
-            showAndCycleTooltip();
-            setInterval(showAndCycleTooltip, 7000);
-        }, 5000);
-
-
-        // Carousel Logic
-        const track = document.getElementById('carousel-track');
-        const slides = track ? Array.from(track.children) : [];
-        const dotsContainer = document.getElementById('carousel-dots');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        let currentIndex = 0;
-        let autoScrollTimer;
-
-        function getVisibleCards() {
-            if (window.innerWidth < 768) return 1;
-            if (window.innerWidth < 1024) return 2;
-            return 3;
-        }
-
-        function createDots() {
-            if (!dotsContainer || slides.length === 0) return;
-            dotsContainer.innerHTML = '';
-            const visibleCards = getVisibleCards();
-            const dotCount = slides.length - (visibleCards - 1);
-
-            for (let i = 0; i < dotCount; i++) {
-                const dot = document.createElement('div');
-                dot.classList.add('dot');
-                if (i === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => goToSlide(i));
-                dotsContainer.appendChild(dot);
-            }
-        }
-
-        function updateCarousel() {
-            if (!track || slides.length === 0) return;
-            const cardWidth = slides[0].offsetWidth;
-            const gap = 24;
-            track.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
-
-            // Update dots
-            if (dotsContainer) {
-                const dots = Array.from(dotsContainer.children);
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === currentIndex);
-                });
-            }
-        }
-
-        function goToSlide(index) {
-            const visibleCards = getVisibleCards();
-            const maxIndex = slides.length - visibleCards;
-
-            currentIndex = index;
-            if (currentIndex < 0) currentIndex = maxIndex;
-            if (currentIndex > maxIndex) currentIndex = 0;
-
-            updateCarousel();
-            resetTimer();
-        }
-
-        function nextSlide() {
-            goToSlide(currentIndex + 1);
-        }
-
-        function prevSlide() {
-            goToSlide(currentIndex - 1);
-        }
-
-        function resetTimer() {
-            clearInterval(autoScrollTimer);
-            autoScrollTimer = setInterval(nextSlide, 5000);
-        }
-
-        if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-        }
-
-        window.addEventListener('resize', () => {
-            createDots();
-            currentIndex = 0;
-            updateCarousel();
-        });
-
-        createDots();
-        resetTimer();
-
-        // FAQ Accordion Logic
-        const faqItems = document.querySelectorAll('.faq-item');
-
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            const answer = item.querySelector('.faq-answer');
-
-            question.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-
-                // Close all other items
-                faqItems.forEach(otherItem => {
-                    if (otherItem !== item) {
-                        otherItem.classList.remove('active');
-                        otherItem.querySelector('.faq-answer').style.maxHeight = null;
-                    }
-                });
-
-                // Toggle current item
-                if (isActive) {
-                    item.classList.remove('active');
-                    answer.style.maxHeight = null;
-                } else {
-                    item.classList.add('active');
-                    answer.style.maxHeight = answer.scrollHeight + 'px';
-                }
-            });
-        });
-
-        // Navbar Scroll logic
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-
-            if (nav) {
-                if (window.scrollY > 50) {
-                    nav.classList.add('scrolled');
-                } else {
-                    nav.classList.remove('scrolled');
-                }
-            }
-        });
-
-        // Hamburger Menu Logic
-        const hamburger = document.getElementById("hamburger");
-        const navMenu = document.getElementById("nav-menu");
-
-        if (hamburger && navMenu) {
-            hamburger.addEventListener("click", () => {
-                hamburger.classList.toggle("active");
-                navMenu.classList.toggle("nav-active");
-                // Prevent scrolling when menu is open
-                document.body.style.overflow = navMenu.classList.contains("nav-active") ? "hidden" : "";
-            });
-
-            document.querySelectorAll(".nav-link").forEach(n => n.addEventListener("click", () => {
-                hamburger.classList.remove("active");
-                navMenu.classList.remove("nav-active");
-                document.body.style.overflow = "";
-            }));
-        }
-
     </script>
+    <script src="chat.js"></script>
+    <script src="ui-helpers.js"></script>
 </body>
 
 </html>
