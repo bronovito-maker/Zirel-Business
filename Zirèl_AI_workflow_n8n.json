@@ -1,0 +1,449 @@
+{
+  "name": "Zirèl_AI",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "50bf1523-0fe7-439c-9d71-684fbf02160f",
+      "name": "When chat message received",
+      "webhookId": "d9e10e54-2d61-4643-98ed-7bbe6221699e"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}\n",
+        "options": {
+          "systemMessage": "=Oggi è il giorno: {{ new Date().toLocaleDateString('it-IT') }}\nOra attuale: {{ new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) }}\n\n{{ $('Get tenant_id').item.json.prompt_di_sistema }}\n\n🛑 REGOLE OPERATIVE AGGIORNATE IN TEMPO REALE 🛑\nDevi assolutamente rispettare questi parametri attuali del locale:\n- Orari di apertura: {{ $('Get tenant_id').item.json.orari }}\n- Giorni di chiusura: {{ $('Get tenant_id').item.json.giorni_chiusura }}\n- Promozione da spingere oggi: {{ $('Get tenant_id').item.json.promozione_attiva }}\n- Info extra: {{ $('Get tenant_id').item.json.dati_testuali_brevi }}\n\nSe il cliente ti fa domande su Menu, Prezzi, Listini Spa o Hotel Convenzionati, USA ESCLUSIVAMENTE IL TUO STRUMENTO DI RICERCA DOCUMENTI (Vector Store). Non inventare MAI prezzi o servizi non presenti nei documenti."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        704,
+        0
+      ],
+      "id": "3d2419b9-504a-41cb-a95f-6534218dfb6c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        224
+      ],
+      "id": "9811c459-e9cb-4a3e-adc3-d0310b1be560",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "\"Usa questo SOLO per salvare una prenotazione quando hai Nome, Telefono, Data, Ora e Persone\".",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM",
+          "mode": "list",
+          "cachedResultName": "zirèl_master_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Prenotazioni_Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome_Cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Nome_Cliente', ``, 'string') }}",
+            "Timestamp": "={{ new Date().toLocaleString() }}",
+            "ID": "=PREN-{{ $now.toFormat('ddMM') }}-{{ Math.floor(Math.random() * 10000) }}\n",
+            "Telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Telefono', ``, 'string') }}",
+            "Data_Prenotazione": "={{ $fromAI('Data_Prenotazione', ``, 'string') }}",
+            "Ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Ora', ``, 'string') }}",
+            "Persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Persone', ``, 'string') }}",
+            "Stato": "=PENDING",
+            "tenant_id": "={{ $('When chat message received').item.json.metadata.tenant_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nome_Cliente",
+              "displayName": "Nome_Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Data_Prenotazione",
+              "displayName": "Data_Prenotazione",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ora",
+              "displayName": "Ora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Persone",
+              "displayName": "Persone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Stato",
+              "displayName": "Stato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        272
+      ],
+      "id": "d4d153c0-b6c4-4f27-8774-808719933f90",
+      "name": "Registra_Prenotazione",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7Tiy94cUnbja9wlY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        224
+      ],
+      "id": "28fa8778-919f-4de2-8beb-03fa6f3f1faf",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM",
+          "mode": "list",
+          "cachedResultName": "zirèl_master_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 292130034,
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit#gid=292130034"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "tenant_id",
+              "lookupValue": "={{ $json.metadata.tenant_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f9aac1f1-3586-42fa-809b-208d43520eac",
+      "name": "Get tenant_id",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7Tiy94cUnbja9wlY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "gl": "it",
+          "device": "mobile",
+          "google_domain": "google.it",
+          "hl": "it"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        960,
+        224
+      ],
+      "id": "29970a2a-be98-48d7-8ff9-a88f7ae68e49",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "kqXQA46ctKwlejbq",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "=Usa questo strumento per cercare menu, listini e documenti",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "zirel_docs",
+          "mode": "list",
+          "cachedResultName": "zirel_docs"
+        },
+        "topK": 5,
+        "options": {
+          "filter": "={{ JSON.stringify({ must: [{ key: \"tenant_id\", match: { value: $('When chat message received').item.json.metadata?.tenant_id || \"default\" } }] }) }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        224
+      ],
+      "id": "99a872bb-5f60-4bd1-94b4-8460a27b7aef",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "xQepdFiDVfIA3vRf",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        432
+      ],
+      "id": "8ab1d13d-363f-4bf8-904d-f5f76e817a62",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Get tenant_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registra_Prenotazione": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get tenant_id": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1633e176-5568-45b1-abdb-3ece10bdc78e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "Xz1IogER4NodwxRv",
+  "tags": []
+}
