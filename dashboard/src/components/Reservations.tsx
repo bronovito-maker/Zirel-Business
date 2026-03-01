@@ -146,7 +146,7 @@ const Reservations = ({ tenantId }: ReservationsProps) => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Phone className="w-4 h-4 text-gray-400" />
-                                        <a href={`tel:${res.telefono}`} className="hover:text-blue-600 transition-colors">{res.telefono}</a>
+                                        <a href={`tel:${res.telefono}`} className="text-blue-500 hover:text-blue-700 underline font-medium transition-colors">{res.telefono}</a>
                                     </div>
                                 </div>
                                 <div className="text-xs text-gray-400 italic mt-2">

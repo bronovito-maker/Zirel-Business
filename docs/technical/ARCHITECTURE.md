@@ -8,14 +8,15 @@ Progetto: landing statica multi-pagina con widget chat AI integrato.
 
 | Livello      | File / Tecnologia     | Responsabilità                                    |
 |--------------|-----------------------|---------------------------------------------------|
-| Frontend     | HTML + CSS            | Landing, demo, pricing, pagine legali             |
+| Frontend Vetrina | HTML + CSS            | Landing, demo, pricing, pagine legali             |
+| Client Dashboard | React + Tailwind (Vite)| Pannello di controllo, gestione AI, prenotazioni  |
 | Config demo  | `public/config.js`    | Endpoint webhook + tenant_id — committato         |
 | Chat Logic   | `public/chat.js`      | Fetch al webhook, escape XSS, rendering messaggi  |
 | UI Logic     | `public/ui-helpers.js`| Carousel, FAQ, navbar, hamburger                  |
-| Build        | Vite 6                | Multi-pagina, copia asset da `public/` in `dist/` |
-| Automation   | n8n (Railway)         | Routing, AI Agent, lettura Google Sheets          |
+| Build        | Vite                  | Multi-pagina per vetrina, SPA per dashboard       |
+| Automation   | n8n                   | Routing, AI Agent, lettura Supabase, prenotazioni |
 | AI           | OpenAI GPT-4o         | Generazione risposte                              |
-| Database     | Google Sheets         | CMS no-code (menu, orari, eventi)                 |
+| Database     | Supabase (PostgreSQL) | CMS no-code (menu, orari), prenotazioni, Qdrant   |
 
 ---
 
@@ -37,10 +38,13 @@ Zirel-Business/
 │   ├── pricing.html
 │   ├── privacy.html
 │   ├── cookie.html
-│   ├── style.css
 │   ├── vite.config.js
 │   ├── package.json
-│   └── client-deploy.js   ← strumento per clienti reali (vedi sotto)
+│   └── client-deploy.js   ← strumento per clienti reali
+├── dashboard/
+│   ├── src/               ← React components for Supabase sync
+│   ├── vercel.json
+│   └── vite.config.ts
 └── docs/
     ├── technical/ARCHITECTURE.md
     ├── integration/INTEGRATION_GUIDE.md

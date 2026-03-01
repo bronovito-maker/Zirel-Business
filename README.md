@@ -11,9 +11,9 @@ Zirel-Business/
 ├── README.md
 ├── PRELAUNCH.md            ← checklist pre-pubblicazione
 ├── .gitignore
-├── demo/                   ← applicazione web (Vite multi-page)
+├── demo/                   ← applicazione web vetrina (Vite multi-page)
 │   ├── public/             ← asset statici copiati in dist/
-│   │   ├── config.js       ← endpoint demo (committato, vedi ARCHITECTURE.md)
+│   │   ├── config.js       ← endpoint demo e tenant configurati
 │   │   ├── chat.js         ← logica chat condivisa
 │   │   └── ui-helpers.js   ← carousel, FAQ, navbar
 │   ├── index.html          ← landing principale
@@ -21,11 +21,12 @@ Zirel-Business/
 │   ├── pricing.html
 │   ├── privacy.html
 │   ├── cookie.html
-│   ├── style.css
-│   ├── vite.config.js
-│   ├── package.json
-│   ├── generate-config.js  ← genera config.js da env var (clienti reali)
-│   └── config.template.js  ← campi configurabili (solo riferimento, non buildato)
+│   └── vite.config.js
+├── dashboard/              ← applicazione web React SPA per i clienti
+│   ├── src/                ← componenti React (Login, Dashboard, Reservations)
+│   ├── index.html          ← entry point (Zirèl Dashboard)
+│   ├── vercel.json         ← regole di fallback SPA per Vercel
+│   └── vite.config.ts
 └── docs/
     ├── technical/ARCHITECTURE.md
     ├── integration/INTEGRATION_GUIDE.md
@@ -36,6 +37,8 @@ Zirel-Business/
 
 ## Setup Locale (sviluppo)
 
+### Sito Vetrina (`/demo`)
+
 ```bash
 cd demo
 npm install
@@ -44,26 +47,41 @@ npm run dev       # avvia Vite su http://localhost:5173
 
 La demo usa la config pubblica in `public/config.js` — nessuna configurazione aggiuntiva necessaria.
 
----
-
-## Build di Produzione
+### Dashboard Clienti (`/dashboard`)
 
 ```bash
-cd demo
-npm run build     # genera demo/dist/
+cd dashboard
+npm install
+npm run dev       # avvia React app su http://localhost:5174
 ```
-
-Per clienti con credenziali proprie, imposta prima `ZIREL_WEBHOOK_URL` e `ZIREL_TENANT_ID` nel tuo ambiente (`.env.local` o Vercel Dashboard).
+La dashboard richiede le chiavi `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` nel file `.env.local` per connettersi al database PostgreSQL.
 
 ---
 
-## Deploy su Vercel
+## Build di Produzione e Deploy
 
+Il progetto è diviso in due deploy separati: sito vetrina e dashboard.
+
+### 1. Sito Vetrina
+Vai nella cartella `demo` e usa `npm run build`. Su Vercel:
 | Campo | Valore |
 |-------|--------|
 | Root Directory | `demo` |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
+
+### 2. Dashboard
+Questa è un'applicazione Single Page (SPA) React connessa a Supabase. Su Vercel (es. `dashboard.zirel.org`):
+| Campo | Valore |
+|-------|--------|
+| Root Directory | `dashboard` |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Env Vars | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
+
+> ⚠️ Il file `dashboard/vercel.json` assicura che il routing React funzioni correttamente (fallback a `index.html`).
+
+---
 
 → Segui `docs/integration/INTEGRATION_GUIDE.md` per il dettaglio completo.
 

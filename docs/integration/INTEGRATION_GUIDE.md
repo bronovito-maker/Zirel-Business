@@ -4,22 +4,16 @@ Guida per webmaster e tecnici che installano il widget Zirèl su un sito cliente
 
 ---
 
-## 1. Database (Google Sheets)
+## 1. Database (Supabase PostgreSQL)
 
-Il "cervello" di Zirèl legge da un Google Sheet che il gestore aggiorna autonomamente.
+Il "cervello" di Zirèl legge da una tabella PostgreSQL ospitata su Supabase, aggiornabile dal cliente tramite la Dashboard.
 
-### Setup
-1. Copia il **Template Google Sheet Zirèl Master** per il cliente.
-2. Imposta i permessi: *"Chiunque abbia il link può visualizzare"*.
-3. Il documento deve avere queste schede:
-
-| Scheda       | Contenuto                                          |
-| :----------- | :------------------------------------------------- |
-| **Generali** | Orari, indirizzo, telefono, regole, policy         |
-| **Listino**  | Menu/tariffe/servizi                               |
-| **Eventi**   | Serate, musica live, promozioni                    |
-
-4. Incolla l'ID del foglio nel workflow n8n fornito da Zirèl.
+### Setup Iniziale
+1. Crea un progetto su Supabase.
+2. Esegui la migrazione usando i file SQL o importa i `tenants` da CSV.
+3. Seleziona le regole RLS per impedire scritture anonime non autorizzate, permettendo alla dashboard autenticata (via `tenant_id`) di leggere e scrivere se stessa.
+4. Usa le chiavi in `dashboard/.env.local` (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
+5. Configura n8n collegando le credenziali di Supabase API per leggere/scrivere i dati in tempo reale.
 
 ---
 
@@ -54,13 +48,21 @@ Per un sito cliente reale, devi generare un `config.js` specifico usando lo scri
 
 > Per un riferimento dei campi disponibili e della struttura generata, vedi `demo/public/config.template.js`.
 
-### Step 3 — Builda
+### Step 3 — Pubblica
+Le due entità (Sito e Dashboard) hanno pipeline di build distinte:
 
+**1. Per il Sito Vetrina (`/demo`):**
 ```bash
 npm run build
 ```
+Il prebuild script (`client-deploy.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente (webhook, auth, ecc.).
 
-Il prebuild script (`client-deploy.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente. Vite lo copia poi in `dist/config.js`.
+**2. Per la Dashboard (`/dashboard`):**
+```bash
+cd ../dashboard
+npm run build
+```
+La SPA React usa le variabili `VITE_SUPABASE_*` incluse nel build.
 
 > **Vercel Analytics**: Il tracciamento delle visite (Vercel Web Analytics) è già pre-installato e integrato nativamente via script in tutti i file HTML. Funzionerà automaticamente non appena la pagina sarà distribuita su Vercel.
 
@@ -72,13 +74,23 @@ Carica l'intera cartella `dist/` sul dominio del cliente (Vercel, FTP, S3, ecc.)
 
 ## 3. Deploy su Vercel (raccomandato)
 
+Hai bisogno di due **Progetti Vercel** collegati allo stesso Repository Github.
+
+### Progetto 1: Sito Vetrina
 | Impostazione       | Valore    |
 | :----------------- | :-------- |
 | Root Directory     | `demo`    |
 | Build Command      | `npm run client:setup && npm run build` |
 | Output Directory   | `dist`    |
-| Env var 1          | `ZIREL_WEBHOOK_URL` |
-| Env var 2          | `ZIREL_TENANT_ID`  |
+| Env Var            | `ZIREL_WEBHOOK_URL`, `ZIREL_TENANT_ID` |
+
+### Progetto 2: Dashboard
+| Impostazione       | Valore    |
+| :----------------- | :-------- |
+| Root Directory     | `dashboard` |
+| Build Command      | `npm run build` |
+| Output Directory   | `dist`    |
+| Env Var            | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
 
 ---
 
@@ -93,5 +105,5 @@ Usa il plugin **"Insert Headers and Footers"** per aggiungere gli script nel `<h
 | Sintomo | Causa probabile | Soluzione |
 | :--- | :--- | :--- |
 | Chat non risponde | CORS bloccato | Aggiungi il dominio del cliente in n8n → Webhook → Header CORS |
-| `config.js` non trovato | Env var mancanti in build | Controlla `.env.local` o le env var Vercel |
-| Risposte AI datate | Cache webhook | Verifica che n8n legga dal Google Sheet corretto |
+| Errore Login Database | Non trova il tenant | Assicurati che il token inserito coincida con una chiave `tenant_id` su Supabase |
+| Risposte AI datate | n8n cache / RLS non passata | Verifica che n8n legga correttamente la riga Supabase aggiornata via Dashboard |
