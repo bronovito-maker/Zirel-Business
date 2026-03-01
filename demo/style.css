@@ -13,7 +13,8 @@
 
     /* Romagna Sea Palette - Pricing */
     --sea-deep: #003049;
-    --sea-cyan: #00aeef;
+    --brand-azure: #0ea5e9;
+    --sea-cyan: #FF8c42;
     --sand-white: #fdf0d5;
     --sand-dark: #f2e5c8;
     --font-main: 'Outfit', sans-serif;
@@ -707,7 +708,7 @@ section {
 }
 
 .pricing-card.recommended {
-    border: 2px solid var(--sea-cyan);
+    border: 2px solid #00AEEF !important;
     transform: scale(1.05);
     z-index: 2;
 }
@@ -721,7 +722,7 @@ section {
     top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--sea-cyan);
+    background: #00AEEF !important;
     color: var(--white);
     padding: 0.6rem 1.5rem;
     border-radius: 50px;
@@ -764,7 +765,7 @@ section {
 .psychological-tag {
     display: inline-block;
     background: rgba(0, 174, 239, 0.1);
-    color: var(--sea-cyan);
+    color: #00AEEF !important;
     padding: 0.4rem 1rem;
     border-radius: 10px;
     font-size: 0.85rem;
@@ -789,7 +790,7 @@ section {
 
 .pricing-features li::before {
     content: '✓';
-    color: var(--sea-cyan);
+    color: #00AEEF !important;
     font-weight: 900;
     margin-right: 12px;
 }
@@ -869,6 +870,10 @@ section {
 .carousel-viewport {
     overflow: hidden;
     width: 100%;
+    padding: 30px 0;
+    /* Space for card expansion */
+    margin: -30px 0;
+    /* Offset padding to maintain layout */
 }
 
 .carousel-track {
@@ -901,6 +906,10 @@ section {
 
 .sector-card.orange {
     background: var(--primary);
+}
+
+.sector-card.azure {
+    background: #00AEEF !important;
 }
 
 .sector-badge {
@@ -981,7 +990,7 @@ section {
 }
 
 .dot.active {
-    background: var(--primary);
+    background: #00AEEF !important;
     width: 30px;
     border-radius: 20px;
 }
@@ -1038,7 +1047,7 @@ section {
 
 .faq-item.active {
     box-shadow: 0 10px 30px rgba(0, 48, 73, 0.1);
-    border-color: var(--sea-cyan);
+    border-color: #00AEEF !important;
 }
 
 .faq-question {

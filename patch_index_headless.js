@@ -47,8 +47,8 @@ const chatHtml = `
                         onclick="sendChatMessage('🚀 Vorrei prenotare una Demo Gratuita')">
                         🚀 Prenota una Demo
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei parlare con Federico')">
-                        📞 Parla con Federico
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei parlare con Niki')">
+                        📞 Parla con Niki
                     </button>
                 </div>
             </div>

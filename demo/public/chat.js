@@ -87,7 +87,7 @@
 
         // Messaggio utente
         const userMsg = document.createElement('div');
-        userMsg.className = 'bg-brand-cyan/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-cyan/20';
+        userMsg.className = 'bg-brand-orange/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-orange/20';
         userMsg.innerText = text;
         container.appendChild(userMsg);
         container.scrollTop = container.scrollHeight;

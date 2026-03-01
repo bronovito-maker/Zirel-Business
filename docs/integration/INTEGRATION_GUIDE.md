@@ -60,7 +60,7 @@ Per un sito cliente reale, devi generare un `config.js` specifico usando lo scri
 npm run build
 ```
 
-Il prebuild script (`generate-config.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente. Vite lo copia poi in `dist/config.js`.
+Il prebuild script (`client-deploy.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente. Vite lo copia poi in `dist/config.js`.
 
 ### Step 4 — Pubblica `dist/`
 
@@ -73,7 +73,7 @@ Carica l'intera cartella `dist/` sul dominio del cliente (Vercel, FTP, S3, ecc.)
 | Impostazione       | Valore    |
 | :----------------- | :-------- |
 | Root Directory     | `demo`    |
-| Build Command      | `npm run build` |
+| Build Command      | `npm run client:setup && npm run build` |
 | Output Directory   | `dist`    |
 | Env var 1          | `ZIREL_WEBHOOK_URL` |
 | Env var 2          | `ZIREL_TENANT_ID`  |

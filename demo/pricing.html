@@ -13,6 +13,29 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            blue: '#003049',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="style.css?v=3">
 </head>
 
@@ -104,19 +127,124 @@
         </div>
     </section>
 
-    <section class="faq-section">
-        <div class="container">
-            <h2 class="section-title">Domande <span>Frequenti</span></h2>
-            <div class="faq-grid">
+    <section class="py-20 bg-brand-sand/30" id="faq">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black text-brand-blue mb-4">Domande <span
+                        class="text-brand-orange">Frequenti</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Tutto quello che devi sapere su Zirèl. Niente
+                    tecnicismi, solo chiarezza.</p>
+            </div>
+            <div class="faq-accordion" id="faq-accordion">
+                <!-- FAQ 1: Qualità risposte -->
                 <div class="faq-item">
-                    <h4>È difficile da installare?</h4>
-                    <p>No, basta copiare una riga di codice che ti forniamo noi. È come mettere un ombrellone in prima
-                        fila: facile e veloce!</p>
+                    <button class="faq-question">
+                        <h4>Ma non è che l'AI risponde male ai miei clienti o inventa cose?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Precisione assoluta.</strong> Zirèl risponde
+                                basandosi esclusivamente sui tuoi dati: menu, listini e regole. Se non conosce la
+                                risposta,
+                                invita gentilmente il cliente a lasciare un contatto, senza mai inventare nulla.</p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- FAQ 2: Sito esistente -->
                 <div class="faq-item">
-                    <h4>Cosa succede se ho già un'agenzia che segue il sito?</h4>
-                    <p>Zirèl è compatibile con ogni piattaforma. Collaboriamo noi direttamente con i tuoi tecnici per
-                        l'integrazione, così tu non devi pensare a nulla.</p>
+                    <button class="faq-question">
+                        <h4>Ho già un sito web fatto da un'agenzia, posso usarlo comunque?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Integrazione invisibile.</strong> Che il tuo sito
+                                sia fatto in WordPress, Wix o codice personalizzato, basta una singola riga di codice.
+                                Collaboriamo noi direttamente con i tuoi tecnici per l'integrazione, così tu non devi
+                                pensare a nulla.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3: Target anziano -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <h4>I miei clienti sono anziani e non sanno usare l'AI. Come facciamo?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Semplicità universale.</strong> Zirèl parla come
+                                una persona vera. I tuoi clienti non devono imparare nulla: scrivono o chiedono
+                                vocalmente
+                                come farebbero con un nipote. È l'AI che si adatta all'uomo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4: Privacy -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <h4>Ma la privacy? I dati dei miei clienti dove finiscono?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>La tua privacy al primo posto.</strong> Tutti i
+                                dati sono custoditi in server europei sicuri e conformi al GDPR. La tua attività e le
+                                tue
+                                conversazioni restano tue, senza eccezioni.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5: Aggiornamento prezzi -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <h4>E se voglio modificare un prezzo nel menu all'ultimo minuto?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Controllo totale.</strong> Cambia un prezzo o un
+                                orario su un semplice foglio Google Sheets e Zirèl impara all'istante. Non hai bisogno
+                                di un
+                                tecnico per gestire la tua intelligenza artificiale.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6: Tempi attivazione -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <h4>Quanto ci vuole per attivarlo?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Attivazione lampo.</strong> Dalla firma del
+                                contratto alla messa online passano solitamente meno di 24 ore. L'integrazione tecnica
+                                sul tuo sito richiede letteralmente 30 secondi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 7: Disdetta -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <h4>Posso disdire quando voglio?</h4>
+                        <div class="faq-icon"></div>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p><strong>Massima flessibilità.</strong> I nostri piani
+                                sono mensili e senza vincoli. Vogliamo che tu resti perché Zirèl ti porta valore, non
+                                perché
+                                sei obbligato da un contratto.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
