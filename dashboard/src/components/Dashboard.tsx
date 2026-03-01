@@ -155,44 +155,44 @@ const Dashboard = ({ tenantId, onLogout }: DashboardProps) => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 animate-fade-in">
-                <div className="flex items-center gap-6">
-                    <img src="/logo-esteso.svg" alt="Zirèl Logo" className="h-10 w-auto" />
-                    <div className="h-8 w-px bg-gray-200 hidden md:block"></div>
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Benvenuto {tenantId}!</h1>
-                        <p className="text-gray-500">Pannello di controllo dell'Intelligenza Artificiale.</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16 animate-fade-in">
+                <div className="flex flex-col md:flex-row items-center gap-0 md:gap-6 text-center md:text-left">
+                    <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-28 md:h-40 w-auto drop-shadow-sm -mb-4 md:mb-0 relative z-10" />
+                    <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
+                    <div className="mt-2 md:mt-0 relative z-20">
+                        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Benvenuto {tenantId}!</h1>
+                        <p className="text-gray-500 text-sm md:text-base">Pannello di controllo dell'Intelligenza Artificiale.</p>
                     </div>
                 </div>
 
-                <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group self-start">
+                <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto mt-4 md:mt-0">
                     <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
                     Esci
                 </button>
             </header>
 
             {/* Tab Navigation */}
-            <div className="flex space-x-2 border-b border-gray-200 mb-8 animate-fade-in delay-100">
+            <div className="flex flex-wrap gap-2 md:space-x-2 border-b border-gray-200 mb-8 animate-fade-in delay-100 pb-2 md:pb-0">
                 <button
                     onClick={() => setActiveTab('prenotazioni')}
-                    className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'prenotazioni'
-                        ? 'border-zirel-orange text-zirel-orange'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'prenotazioni'
+                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                 >
-                    <CalendarDays className="w-4 h-4" />
-                    Prenotazioni
+                    <CalendarDays className="w-4 h-4 md:w-5 md:h-5" />
+                    <span className="md:inline">Prenotazioni</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('impostazioni')}
-                    className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'impostazioni'
-                        ? 'border-zirel-orange text-zirel-orange'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'impostazioni'
+                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                 >
-                    <Settings className="w-4 h-4" />
-                    Impostazioni AI
+                    <Settings className="w-4 h-4 md:w-5 md:h-5" />
+                    <span className="md:inline">Impostazioni AI</span>
                 </button>
             </div>
 

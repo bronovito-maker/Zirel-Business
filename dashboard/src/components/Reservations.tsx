@@ -101,12 +101,12 @@ const Reservations = ({ tenantId }: ReservationsProps) => {
 
     return (
         <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold tracking-tight">Le Tue Prenotazioni</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                <h2 className="text-xl md:text-2xl font-bold tracking-tight">Le Tue Prenotazioni</h2>
                 <button
                     onClick={() => fetchReservations(true)}
                     disabled={isRefreshing}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zirel-orange transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zirel-orange transition-colors w-full sm:w-auto"
                 >
                     <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                     Aggiorna
@@ -149,26 +149,26 @@ const Reservations = ({ tenantId }: ReservationsProps) => {
                                         <a href={`tel:${res.telefono}`} className="hover:text-blue-600 transition-colors">{res.telefono}</a>
                                     </div>
                                 </div>
-                                <div className="text-xs text-gray-400 italic">
+                                <div className="text-xs text-gray-400 italic mt-2">
                                     Ricevuta il: {new Date(res.created_at).toLocaleString('it-IT')}
                                 </div>
                             </div>
 
-                            <div className="flex flex-row md:flex-col gap-2 shrink-0 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+                            <div className="flex flex-row md:flex-col gap-3 shrink-0 border-t md:border-t-0 md:border-l border-gray-100 pt-5 md:pt-0 md:pl-6 mt-2 md:mt-0">
                                 <button
                                     onClick={() => updateStatus(res.id, 'CONFERMATA')}
                                     disabled={res.stato?.toUpperCase() === 'CONFERMATA'}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <Check className="w-4 h-4" />
+                                    <Check className="w-5 h-5 md:w-4 md:h-4" />
                                     Conferma
                                 </button>
                                 <button
                                     onClick={() => updateStatus(res.id, 'RIFIUTATA')}
                                     disabled={res.stato?.toUpperCase() === 'RIFIUTATA'}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 md:py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-5 h-5 md:w-4 md:h-4" />
                                     Rifiuta
                                 </button>
                             </div>
