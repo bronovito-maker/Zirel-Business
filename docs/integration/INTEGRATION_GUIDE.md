@@ -62,6 +62,8 @@ npm run build
 
 Il prebuild script (`client-deploy.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente. Vite lo copia poi in `dist/config.js`.
 
+> **Vercel Analytics**: Il tracciamento delle visite (Vercel Web Analytics) è già pre-installato e integrato nativamente via script in tutti i file HTML. Funzionerà automaticamente non appena la pagina sarà distribuita su Vercel.
+
 ### Step 4 — Pubblica `dist/`
 
 Carica l'intera cartella `dist/` sul dominio del cliente (Vercel, FTP, S3, ecc.).
