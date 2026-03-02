@@ -1,17 +1,37 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { login } from '../lib/auth';
+import toast from 'react-hot-toast';
 
 interface LoginProps {
-    onLogin: (id: string) => void;
+    onLogin: () => void;
 }
 
 const Login = ({ onLogin }: LoginProps) => {
-    const [id, setId] = useState('');
+    const [token, setToken] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (id.trim()) {
-            onLogin(id.trim());
+        const trimmedToken = token.trim();
+        if (!trimmedToken) return;
+
+        setIsLoading(true);
+        try {
+            await login({ token: trimmedToken });
+            onLogin();
+            toast.success('Accesso eseguito!');
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            if (message === 'INVALID_FORMAT') {
+                toast.error('Token non valido. Inserisci un codice completo.');
+            } else if (message === 'AUTH_FAILED') {
+                toast.error('Token errato. Verifica il codice e riprova.');
+            } else {
+                toast.error('Impossibile connettersi. Riprova più tardi.');
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,20 +67,28 @@ const Login = ({ onLogin }: LoginProps) => {
                         <div className="relative">
                             <input
                                 type="text"
-                                value={id}
-                                onChange={(e) => setId(e.target.value)}
-                                placeholder="TOKEN"
-                                className="apple-input text-center text-lg md:text-xl uppercase tracking-widest placeholder:tracking-normal placeholder:uppercase-none h-14"
+                                value={token}
+                                onChange={(e) => setToken(e.target.value)}
+                                placeholder="IL TUO API TOKEN"
+                                className="apple-input text-center text-lg md:text-xl tracking-widest placeholder:tracking-normal h-14"
                                 required
+                                disabled={isLoading}
                             />
                         </div>
 
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="apple-button w-full flex items-center justify-center gap-2"
                         >
-                            Accedi al tuo Concierge
-                            <ArrowRight className="w-5 h-5" />
+                            {isLoading ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    Accedi al tuo Concierge
+                                    <ArrowRight className="w-5 h-5" />
+                                </>
+                            )}
                         </button>
                     </form>
 

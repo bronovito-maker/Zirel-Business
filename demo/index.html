@@ -33,7 +33,9 @@
                     colors: {
                         brand: {
                             orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
                             blue: '#003049',
+                            'blue-dark': '#001D2D',
                             cyan: '#00AEEF',
                             sand: '#FDF0D5',
                             'sand-dark': '#F2E5C8',
@@ -42,6 +44,9 @@
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
                     }
                 }
             }
@@ -65,7 +70,7 @@
             padding: 0.8rem 4rem;
         }
 
-        .brand-gradient {
+        .zirel-blue-gradient {
             background: linear-gradient(135deg, #003049 0%, #00AEEF 100%);
         }
 
@@ -87,12 +92,13 @@
         <ul class="nav-links" id="nav-menu">
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="demo.html" class="nav-link">DEMO</a></li>
-            <li><a href="http://localhost:5174" class="nav-link">DASHBOARD</a></li>
+            <li><a href="register.html" class="nav-link">REGISTRATI</a></li>
+            <li><a href="https://dashboard.zirel.org" class="nav-link">DASHBOARD</a></li>
             <li><a href="#faq" class="nav-link">FAQ</a></li>
             <li><a href="#contatti" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="#contatti" class="cta-nav">INIZIA ORA</a></li>
+            <li class="cta-nav-mobile-li"><a href="register.html" class="cta-nav">PROVA GRATIS</a></li>
         </ul>
-        <a href="#contatti" class="cta-nav cta-nav-desktop">INIZIA ORA</a>
+        <a href="register.html" class="cta-nav cta-nav-desktop">PROVA GRATIS</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -120,17 +126,17 @@
                     <span class="font-semibold text-brand-blue mt-2 block">Invisibile. Intelligente. Tuo.</span>
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <button onclick="toggleDemo()"
-                        class="bg-brand-orange text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        Riprenditi il tuo tempo
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
+                        Attiva Prova Gratuita
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
                                 clip-rule="evenodd" />
                         </svg>
-                    </button>
+                    </a>
                     <a href="#features"
-                        class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/10 hover:bg-white transition-all text-center">
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-lg">
                         Guarda come lavora
                     </a>
                 </div>
@@ -202,7 +208,7 @@
 
                 <!-- La Soluzione -->
                 <div
-                    class="brand-gradient p-8 md:p-12 rounded-[2rem] text-white shadow-2xl transform md:scale-105 relative border-4 border-brand-orange/20">
+                    class="zirel-blue-gradient p-8 md:p-12 rounded-[2rem] text-white shadow-2xl transform md:scale-105 relative border-4 border-brand-orange/20">
                     <div
                         class="absolute -top-4 -right-4 bg-brand-orange text-white font-black px-4 py-2 rounded-lg rotate-12 shadow-lg tracking-wider text-sm uppercase">
                         Scopri il Futuro
@@ -248,18 +254,18 @@
                     tuoi fogli, lui ti porta i clienti. Semplice. Veloce. Tuo.
                 </p>
                 <div class="mt-8">
-                    <a href="#pricing"
-                        class="inline-block bg-brand-orange text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95">
-                        Assumilo oggi stesso
+                    <a href="register.html"
+                        class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20">
+                        Attiva 14 giorni gratis
                     </a>
                 </div>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Feature 1 -->
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                <div class="zirel-card group">
                     <div
-                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-orange group-hover:text-white transition-all">
+                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-zirel-gradient group-hover:text-white transition-all">
                         📱</div>
                     <h4 class="text-xl font-bold mb-3 leading-tight">L'agenda che si riempie da sola.</h4>
                     <p class="text-brand-blue/60 text-sm leading-relaxed">
@@ -268,9 +274,9 @@
                     </p>
                 </div>
                 <!-- Feature 2 -->
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                <div class="zirel-card group">
                     <div
-                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-orange group-hover:text-white transition-all">
+                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-zirel-gradient group-hover:text-white transition-all">
                         🌍</div>
                     <h4 class="text-xl font-bold mb-3 leading-tight">Tutto il mondo. Senza interpreti.</h4>
                     <p class="text-brand-blue/60 text-sm leading-relaxed">
@@ -279,7 +285,7 @@
                     </p>
                 </div>
                 <!-- Feature 3 -->
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                <div class="zirel-card group">
                     <div
                         class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-cyan group-hover:text-white transition-all">
                         📍</div>
@@ -290,9 +296,9 @@
                     </p>
                 </div>
                 <!-- Feature 4 -->
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all group">
+                <div class="zirel-card group">
                     <div
-                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-sand-dark group-hover:text-brand-blue transition-all">
+                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-blue group-hover:text-white transition-all">
                         ⚡</div>
                     <h4 class="text-xl font-bold mb-3 leading-tight">Sessanta secondi. Sei operativo.</h4>
                     <p class="text-brand-blue/60 text-sm leading-relaxed">
@@ -523,9 +529,9 @@
                     dei
                     tuoi ospiti. Unisciti alla rivoluzione invisibile dell'accoglienza romagnola.</p>
                 <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                    <a href="http://localhost:5174"
-                        class="bg-brand-orange text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:bg-white hover:text-brand-orange transition-all active:scale-95">Area
-                        Business</a>
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Prova
+                        Gratuita</a>
                 </div>
                 <!-- Features List - Stacked on Mobile -->
                 <div
@@ -585,9 +591,9 @@
 
     <!-- Custom Chat Widget -->
     <div id="n8n-widget-mock"
-        class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500">
+        class="fixed bottom-0 sm:bottom-24 right-0 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
         <div
-            class="bg-white w-[calc(100vw-2rem)] sm:w-[350px] h-[65vh] sm:h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
 
             <!-- Widget Header -->
             <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
@@ -627,7 +633,7 @@
                         🚀 Prenota una Demo
                     </button>
                     <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei parlare con Niki')">
-                        📞 Parla con Niki
+                        💬 Chat WhatsApp con Niki
                     </button>
                 </div>
             </div>
@@ -668,7 +674,21 @@
             'Aumenta le tue prenotazioni! 📈',
         ];
     </script>
-    <script src="chat.js"></script>
+    <!-- Zirèl Widget Config -->
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_official',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        // This will be dynamically populated by the server/CDN in a real SaaS scenario
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Assistant',
+            widget_subtitle: 'Concierge AI h24',
+            widget_color: '#FF8C42',
+            widget_icon: '💬'
+        };
+    </script>
+    <script src="chat.js" data-tenant-id="zirel_official"></script>
     <script src="ui-helpers.js"></script>
 </body>
 

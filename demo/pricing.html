@@ -22,7 +22,9 @@
                     colors: {
                         brand: {
                             orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
                             blue: '#003049',
+                            'blue-dark': '#001D2D',
                             cyan: '#00AEEF',
                             sand: '#FDF0D5',
                             'sand-dark': '#F2E5C8',
@@ -31,6 +33,9 @@
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
                     }
                 }
             }
@@ -48,12 +53,13 @@
         <ul class="nav-links" id="nav-menu">
             <li><a href="pricing.html" class="nav-link active">PRICING</a></li>
             <li><a href="demo.html" class="nav-link">DEMO</a></li>
-            <li><a href="http://localhost:5174" class="nav-link">DASHBOARD</a></li>
+            <li><a href="register.html" class="nav-link">REGISTRATI</a></li>
+            <li><a href="https://dashboard.zirel.org" class="nav-link">DASHBOARD</a></li>
             <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
             <li><a href="index.html#contatti" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="index.html#contatti" class="cta-nav">INIZIA ORA</a></li>
+            <li class="cta-nav-mobile-li"><a href="register.html" class="cta-nav">PROVA GRATIS</a></li>
         </ul>
-        <a href="index.html#contatti" class="cta-nav cta-nav-desktop">INIZIA ORA</a>
+        <a href="register.html" class="cta-nav cta-nav-desktop">PROVA GRATIS</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -68,66 +74,93 @@
         </div>
     </header>
 
-    <section class="container">
-        <div class="pricing-grid">
-            <!-- Piano Bagnino -->
-            <div class="pricing-card">
-                <div class="card-icon">⚓</div>
-                <h3>Piano Bagnino</h3>
-                <p>L'essenziale. Tutto ciò che ti serve per essere online.</p>
-                <div class="price-box">
-                    <span class="price-main">€39<small>/mese</small></span>
-                    <span class="price-setup">+ €299 setup una tantum</span>
+    <section class="pricing-section">
+        <div class="container">
+            <div class="pricing-grid">
+                <!-- Piano Bagnino -->
+                <div class="pricing-card">
+                    <div class="card-icon">⚓</div>
+                    <h3>Piano Bagnino</h3>
+                    <p>L'essenziale. Tutto ciò che ti serve per essere online.</p>
+                    <div class="price-box">
+                        <span class="price-main">€39<small>/mese</small></span>
+                        <span class="price-setup">+ €299 setup una tantum</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Risposte AI h24</li>
+                        <li>Info su orari e menu</li>
+                        <li>1 lingua (Italiano)</li>
+                        <li>Widget chat personalizzato</li>
+                    </ul>
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">Inizia
+                        la Prova Gratuita</a>
                 </div>
-                <ul class="pricing-features">
-                    <li>Risposte AI h24</li>
-                    <li>Info su orari e menu</li>
-                    <li>1 lingua (Italiano)</li>
-                    <li>Widget chat personalizzato</li>
-                </ul>
-                <a href="index.html#info" class="btn btn-secondary">Inizia la Prova Gratuita</a>
+
+                <!-- Piano Azdora -->
+                <div class="pricing-card recommended">
+                    <span class="badge-recommended">Consigliato</span>
+                    <div class="card-icon">🥧</div>
+                    <h3>Piano Azdora</h3>
+                    <p>La perfezione. Il cuore pulsante della tua accoglienza.</p>
+                    <div class="price-box">
+                        <span class="price-main">€79<small>/mese</small></span>
+                        <span class="price-setup text-brand-cyan">+ €499 setup una tantum</span>
+                    </div>
+                    <div class="psychological-tag">Il più scelto dagli Hotel</div>
+                    <ul class="pricing-features">
+                        <li>Tutto del piano Bagnino</li>
+                        <li><strong>10 lingue </strong> incluse</li>
+                        <li>Prenotazione Tavoli e Camere</li>
+                        <li>Integrazione Dashboard</li>
+                    </ul>
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">Scegli
+                        Azdora</a>
+                </div>
+
+                <!-- Piano Gran Turismo -->
+                <div class="pricing-card">
+                    <div class="card-icon">🏎️</div>
+                    <h3>Gran Turismo</h3>
+                    <p>Nessun limite. L'AI cucita su misura per te.</p>
+                    <div class="price-box">
+                        <span class="price-main text-brand-blue">Custom</span>
+                        <span class="price-setup text-brand-cyan">Analisi e Progetto inclusi</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Tutto del piano Azdora</li>
+                        <li>Formazione Staff</li>
+                        <li>Analisi Business Intelligence</li>
+                        <li>Sviluppo feature su misura</li>
+                    </ul>
+                    <a href="register.html"
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center">Parla
+                        con noi</a>
+                </div>
             </div>
 
-            <!-- Piano Azdora -->
-            <div class="pricing-card recommended">
-                <span class="badge-recommended">Consigliato</span>
-                <div class="card-icon">🥧</div>
-                <h3>Piano Azdora</h3>
-                <p>La perfezione. Il cuore pulsante della tua accoglienza.</p>
-                <div class="price-box">
-                    <span class="price-main">€79<small>/mese</small></span>
-                    <span class="price-setup">+ €499 setup una tantum</span>
+            <!-- Assisted Setup Promo -->
+            <div
+                class="mt-20 bg-brand-blue text-white rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 max-w-5xl mx-auto shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors duration-700">
                 </div>
-                <span class="psychological-tag font-bold">Si ripaga con due sole prenotazioni</span>
-                <ul class="pricing-features">
-                    <li>Tutto il piano Base</li>
-                    <li>Prenotazione via Telegram/Email</li>
-                    <li>Multilingua automatico (10+ lingue)</li>
-                    <li>Attività locali (Concierge)</li>
-                    <li>Integrazione Google Sheets</li>
-                </ul>
-                <a href="index.html#info" class="btn btn-primary">Inizia la Prova Gratuita</a>
-            </div>
-
-            <!-- Piano Gran Turismo -->
-            <div class="pricing-card">
-                <div class="card-icon">🏨</div>
-                <h3>Gran Turismo</h3>
-                <p>Senza confini. Per chi vuole offrire un'esperienza d'élite.</p>
-                <div class="price-box">
-                    <span class="price-main">Custom</span>
-                    <span class="price-setup">Prezzo su richiesta</span>
+                <div class="relative z-10 space-y-4 text-center md:text-left">
+                    <h3 class="text-3xl font-black">Non vuoi pensare al setup?</h3>
+                    <p class="text-brand-sand/70 text-lg max-w-xl leading-relaxed">Richiedi l'installazione assistita
+                        gratuita. Il nostro team configurerà tutto per te, integrando Zirèl sul tuo sito in meno di 24
+                        ore.
+                    </p>
                 </div>
-                <ul class="pricing-features">
-                    <li>Tutto il piano Pro</li>
-                    <li>Integrazione gestionali (API)</li>
-                    <li>Gestione richieste speciali</li>
-                    <li>Dashboard analitica avanzata</li>
-                    <li>Supporto prioritario 24/7</li>
-                </ul>
-                <a href="index.html#info" class="btn btn-secondary">Inizia la Prova Gratuita</a>
+                <div class="relative z-10 flex flex-col items-center gap-3">
+                    <a href="https://wa.me/393461027447?text=Ciao%20Niki,%20ho%20visto%20i%20prezzi%20di%20Zir%C3%A8l%20e%20vorrei%20maggiori%20informazioni"
+                        target="_blank"
+                        class="bg-brand-orange text-white px-10 py-5 rounded-full font-black text-lg hover:bg-white hover:text-brand-orange hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap shadow-xl shadow-brand-orange/20">
+                        Contatta Niki su WhatsApp →
+                    </a>
+                </div>
             </div>
-        </div>
     </section>
 
     <section class="py-20 bg-brand-sand/30" id="faq">

@@ -1,16 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+import { useState, useEffect, useCallback } from 'react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
+import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
+import { syncTenantFieldState } from '../lib/tenant-form';
+import type { TenantData } from '../types';
 import Reservations from './Reservations';
 import DocumentManager from './DocumentManager';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
-    tenantId: string;
     onLogout: () => void;
 }
 
-const InputField = ({ label, value, onChange, placeholder = '' }: any) => (
+interface InputFieldProps {
+    label: string;
+    value: string | undefined;
+    onChange: (val: string) => void;
+    placeholder?: string;
+}
+
+const InputField = ({ label, value, onChange, placeholder = '' }: InputFieldProps) => (
     <div>
         <label className="block text-sm font-medium text-gray-500 mb-2 px-1">{label}</label>
         <input
@@ -23,7 +32,15 @@ const InputField = ({ label, value, onChange, placeholder = '' }: any) => (
     </div>
 );
 
-const TextareaField = ({ label, value, onChange, placeholder = '', rows = 3 }: any) => (
+interface TextareaFieldProps {
+    label: string;
+    value: string | undefined;
+    onChange: (val: string) => void;
+    placeholder?: string;
+    rows?: number;
+}
+
+const TextareaField = ({ label, value, onChange, placeholder = '', rows = 3 }: TextareaFieldProps) => (
     <div>
         <label className="block text-sm font-medium text-gray-500 mb-2 px-1">{label}</label>
         <textarea
@@ -36,299 +53,588 @@ const TextareaField = ({ label, value, onChange, placeholder = '', rows = 3 }: a
     </div>
 );
 
-const Dashboard = ({ tenantId, onLogout }: DashboardProps) => {
-    // Tutti i campi modificabili dal CSV Tenants
-    const [formData, setFormData] = useState<Record<string, string>>({
-        telefono: '',
-        mail: '',
-        indirizzo: '',
-        sito_web_url: '',
-        google_maps_link: '',
-        orari_apertura: '',
-        giorni_chiusura: '',
-        orari_checkin_checkout: '',
-        durata_media_appuntamento: '',
-        tipo_cucina: '',
-        specialita_casa: '',
-        prezzo_medio: '',
-        prima_consulenza_costo: '',
-        servizi_inclusi: '',
-        wifi_password: '',
-        parcheggio_info: '',
-        animali_ammessi: '',
-        metodi_pagamento: '',
-        tassa_soggiorno: '',
-        allergie_policy: '',
-        emergenze_istruzioni: '',
-        politica_cancellazione: '',
-        link_prenotazione_tavoli: '',
-        link_booking_esterno: '',
-        instagram_url: '',
-        facebook_url: '',
-        tripadvisor_url: '',
-        recensioni_url: '',
-        promozione_attiva: '',
-        dati_testuali_brevi: '',
-        menu_testo: '',
-    });
+const Dashboard = ({ onLogout }: DashboardProps) => {
+    const [formData, setFormData] = useState<TenantData | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione'>('prenotazioni');
+    const [isTokenVisible, setIsTokenVisible] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<TenantData>>({});
+
+    const tenantId = formData?.tenant_id || getCurrentTenantId();
+
+    const fetchData = useCallback(async () => {
+        try {
+            setIsLoadingInitial(true);
+            const data = await getTenantData();
+            if (data) {
+                setFormData(data);
+                setEditForm(data);
+            } else {
+                onLogout();
+            }
+        } catch {
+            toast.error('Sessione non valida.');
+            onLogout();
+        } finally {
+            setIsLoadingInitial(false);
+        }
+    }, [onLogout]);
 
     useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('tenants')
-                    .select('*')
-                    .eq('tenant_id', tenantId)
-                    .single();
-
-                if (error) {
-                    console.error('Supabase error:', error);
-                    toast.error('Codice Invalido o non trovato nel database Zirèl');
-                    onLogout();
-                    return;
-                }
-
-                if (data && data.tenant_id) {
-                    setFormData(prev => ({ ...prev, ...data }));
-                } else {
-                    toast.error('Codice Invalido o non trovato nel database Zirèl');
-                    onLogout();
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                toast.error('Errore di server. Riprova più tardi.');
-                onLogout();
-            } finally {
-                setIsLoadingInitial(false);
-            }
-        };
-
-        fetchInitialData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tenantId]);
+        fetchData();
+    }, [fetchData]);
 
     const handleUpdate = async () => {
+        if (!tenantId) return;
         setIsUpdating(true);
         const loadingToast = toast.loading('Aggiorno l\'Intelligenza Artificiale...');
 
         try {
-            // Remove dynamically generated/immutable columns if they exist before update
-            const { row_number, id, ...updateData } = formData as any;
-
-            const { error } = await supabase
-                .from('tenants')
-                .update(updateData)
-                .eq('tenant_id', tenantId);
-
-            if (error) {
-                throw error;
-            }
-
+            await updateTenantData(editForm);
+            const nextFormData = formData ? { ...formData, ...editForm } : null;
+            setFormData(nextFormData);
+            setEditForm(nextFormData || {});
             toast.success('Il tuo assistente ha imparato le nuove regole!', {
                 id: loadingToast,
                 duration: 5000,
                 icon: <CheckCircle2 className="text-green-500" />,
             });
-        } catch (error) {
-            console.error('Update error:', error);
-            // Ignore error for now if it's related to missing RLS or just show generic error
-            toast.error('Errore durante l\'aggiornamento. Verifica i permessi (RLS) su Supabase.', {
-                id: loadingToast,
-                duration: 5000,
-            });
+        } catch (err) {
+            const message = err instanceof Error ? err.message : '';
+            if (message === 'NO_CHANGES') {
+                toast('Nessuna modifica da salvare.', {
+                    id: loadingToast,
+                    duration: 4000,
+                });
+            } else {
+                toast.error('Errore durante l\'aggiornamento.', {
+                    id: loadingToast,
+                    duration: 5000,
+                });
+            }
         } finally {
             setIsUpdating(false);
         }
     };
 
-    const updateField = (key: string) => (val: string) => setFormData(prev => ({ ...prev, [key]: val }));
+    const handleRegenerateToken = async () => {
+        if (!tenantId) return;
+        if (!confirm('Sei sicuro? Il vecchio token smetterà di funzionare immediatamente.')) return;
 
-    if (isLoadingInitial) {
+        setIsRegeneratingToken(true);
+        const loadingToast = toast.loading('Generazione nuovo token...');
+
+        try {
+            const newToken = await regenerateTenantToken(tenantId);
+
+            setIsTokenVisible(false);
+            setFormData(prev => prev ? { ...prev, api_token: newToken, api_token_revealed: false } : null);
+            setEditForm(prev => ({ ...prev, tenant_id: tenantId, api_token: newToken, api_token_revealed: false }));
+            saveAuthToken(newToken);
+
+            toast.success('Token aggiornato con successo!', { id: loadingToast });
+            setIsTokenVisible(true);
+        } catch {
+            toast.error('Errore durante la generazione del token.', { id: loadingToast });
+        } finally {
+            setIsRegeneratingToken(false);
+        }
+    };
+
+    const handleConfirmTokenRevealed = async () => {
+        if (!tenantId) return;
+        try {
+            await markApiTokenRevealed(tenantId);
+
+            setIsTokenVisible(true);
+            setFormData(prev => prev ? { ...prev, api_token_revealed: true } : null);
+            setEditForm(prev => ({ ...prev, api_token_revealed: true }));
+            toast.success('Token sbloccato. Copialo ora, verrà oscurato al prossimo accesso.');
+        } catch (_err) {
+            console.error('Update revealed error:', _err);
+            toast.error('Errore nel salvataggio dello stato del token.');
+        }
+    };
+
+    const updateField = (key: keyof TenantData) => (val: string) => {
+        const nextState = syncTenantFieldState(formData, editForm, key, val);
+        setFormData(nextState.formData);
+        setEditForm(nextState.editForm);
+    };
+
+    const getTrialDaysRemaining = () => {
+        if (!formData?.trial_ends_at) return null;
+        const end = new Date(formData.trial_ends_at);
+        const now = new Date();
+        const diff = end.getTime() - now.getTime();
+        return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+    };
+
+    const trialDays = getTrialDaysRemaining();
+
+    const TrialBanner = () => {
+        if (trialDays === null || formData?.subscription_status !== 'trialing') return null;
+
+        return (
+            <div className="mb-8 animate-fade-in px-4 sm:px-0">
+                <div className="bg-zirel-gradient text-white p-4 md:p-6 rounded-3xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-white/20 p-2 rounded-full shrink-0"><Clock size={20} /></div>
+                        <div>
+                            <p className="font-bold">Periodo di Prova Attivo</p>
+                            <p className="text-sm opacity-90">Ti rimangono {trialDays} giorni per esplorare tutte le potenzialità di Zirèl.</p>
+                        </div>
+                    </div>
+                    <button className="bg-white text-brand-blue px-6 py-2.5 rounded-full font-bold hover:bg-orange-50 transition-colors shadow-sm text-sm whitespace-nowrap w-full md:w-auto">
+                        Attiva Abbonamento
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    if (isLoadingInitial || !formData) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center">
-                <Loader2 className="w-12 h-12 text-zirel-orange animate-spin mb-4" />
+                <Loader2 className="w-12 h-12 text-zirel-orange-dark animate-spin mb-4" />
                 <p className="text-gray-500 font-medium animate-pulse">Autenticazione e recupero dati in corso...</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16 animate-fade-in">
-                <div className="flex flex-col md:flex-row items-center gap-0 md:gap-6 text-center md:text-left">
-                    <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-28 md:h-40 w-auto drop-shadow-sm -mb-4 md:mb-0 relative z-10" />
-                    <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
-                    <div className="mt-2 md:mt-0 relative z-20">
-                        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Benvenuto {tenantId}!</h1>
-                        <p className="text-gray-500 text-sm md:text-base">Pannello di controllo</p>
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row items-center gap-4">
-                    <a
-                        href="http://localhost:5173"
-                        className="text-gray-500 hover:text-indigo-600 text-sm font-medium flex items-center gap-2 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50"
-                    >
-                        <ExternalLink size={16} />
-                        Torna alla Home
-                    </a>
-                    <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto">
-                        <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
-                        Esci
-                    </button>
-                </div>
-            </header>
-
-            {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 md:space-x-2 border-b border-gray-200 mb-8 animate-fade-in delay-100 pb-2 md:pb-0">
-                <button
-                    onClick={() => setActiveTab('prenotazioni')}
-                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'prenotazioni'
-                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        } `}
-                >
-                    <CalendarDays className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="md:inline">Prenotazioni</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('impostazioni')}
-                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'impostazioni'
-                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        } `}
-                >
-                    <Settings className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="md:inline">Impostazioni</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('documenti')}
-                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'documenti'
-                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        } `}
-                >
-                    <FileText className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="md:inline">Documenti</span>
-                </button>
-            </div>
-
-            {activeTab === 'prenotazioni' ? (
-                <Reservations tenantId={tenantId} />
-            ) : activeTab === 'documenti' ? (
-                <DocumentManager tenantId={tenantId} />
-            ) : (
-                <>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12 animate-fade-in delay-200">
-
-                        {/* 1. Contatti & Info Base */}
-                        <section className="apple-card p-6 space-y-4">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Store className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Contatti & Info Base</h2>
-                            </div>
-                            <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" />
-                            <InputField label="Email" value={formData.mail} onChange={updateField('mail')} />
-                            <InputField label="Indirizzo" value={formData.indirizzo} onChange={updateField('indirizzo')} />
-                            <InputField label="Sito Web URL" value={formData.sito_web_url} onChange={updateField('sito_web_url')} />
-                            <InputField label="Google Maps Link" value={formData.google_maps_link} onChange={updateField('google_maps_link')} />
-                        </section>
-
-                        {/* 2. Orari & Chiusure */}
-                        <section className="apple-card p-6 space-y-4">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Clock className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Orari & Tempistiche</h2>
-                            </div>
-                            <TextareaField label="Orari di Apertura" value={formData.orari_apertura} onChange={updateField('orari_apertura')} rows={2} />
-                            <InputField label="Giorni di Chiusura" value={formData.giorni_chiusura} onChange={updateField('giorni_chiusura')} />
-                            <InputField label="Orari Check-in / Check-out" value={formData.orari_checkin_checkout} onChange={updateField('orari_checkin_checkout')} />
-                            <InputField label="Durata Media Appuntamento" value={formData.durata_media_appuntamento} onChange={updateField('durata_media_appuntamento')} />
-                        </section>
-
-                        {/* 3. Social & Link Esterni */}
-                        <section className="apple-card p-6 space-y-4">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-pink-50 text-pink-600 rounded-xl"><LinkIcon className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Social & Link</h2>
-                            </div>
-                            <InputField label="Link Prenotazione Tavoli" value={formData.link_prenotazione_tavoli} onChange={updateField('link_prenotazione_tavoli')} />
-                            <InputField label="Link Booking/Calendario" value={formData.link_booking_esterno} onChange={updateField('link_booking_esterno')} />
-                            <InputField label="Instagram URL" value={formData.instagram_url} onChange={updateField('instagram_url')} />
-                            <InputField label="Facebook URL" value={formData.facebook_url} onChange={updateField('facebook_url')} />
-                            <InputField label="TripAdvisor URL" value={formData.tripadvisor_url} onChange={updateField('tripadvisor_url')} />
-                            <InputField label="Link Recensioni (Google)" value={formData.recensioni_url} onChange={updateField('recensioni_url')} />
-                        </section>
-
-                        {/* 4. Menu, Servizi e Dettagli */}
-                        <section className="apple-card p-6 space-y-4 lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                            <div className="col-span-1 md:col-span-2 flex items-center gap-3 mb-2">
-                                <div className="p-2 bg-green-50 text-green-600 rounded-xl"><Utensils className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Dettagli Offerta (Menu, Servizi, Costi)</h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                <InputField label="Tipo Cucina / Categoria" value={formData.tipo_cucina} onChange={updateField('tipo_cucina')} />
-                                <TextareaField label="Specialità della Casa" value={formData.specialita_casa} onChange={updateField('specialita_casa')} rows={2} />
-                                <InputField label="Prezzo Medio" value={formData.prezzo_medio} onChange={updateField('prezzo_medio')} />
-                                <InputField label="Costo Prima Consulenza" value={formData.prima_consulenza_costo} onChange={updateField('prima_consulenza_costo')} />
-                                <TextareaField label="Servizi Inclusi" value={formData.servizi_inclusi} onChange={updateField('servizi_inclusi')} rows={3} />
-                            </div>
-
-                            <div className="space-y-4 flex flex-col h-full">
-                                <TextareaField label="Testo del Menu Ridotto o Tariffario (Extra info per l'AI)" value={formData.menu_testo} onChange={updateField('menu_testo')} rows={10} />
-                            </div>
-                        </section>
-
-                        {/* 5. Info Pratiche e Policy */}
-                        <section className="apple-card p-6 space-y-4 lg:col-span-2">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-purple-50 text-purple-600 rounded-xl"><Info className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Info Pratiche & Regole</h2>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputField label="WiFi Password" value={formData.wifi_password} onChange={updateField('wifi_password')} />
-                                <TextareaField label="Info Parcheggio" value={formData.parcheggio_info} onChange={updateField('parcheggio_info')} rows={1} />
-                                <InputField label="Animali Ammessi" value={formData.animali_ammessi} onChange={updateField('animali_ammessi')} placeholder="es. Si, no cani di grossa taglia" />
-                                <InputField label="Metodi di Pagamento" value={formData.metodi_pagamento} onChange={updateField('metodi_pagamento')} />
-                                <InputField label="Tassa di Soggiorno" value={formData.tassa_soggiorno} onChange={updateField('tassa_soggiorno')} />
-                                <TextareaField label="Policy Allergie" value={formData.allergie_policy} onChange={updateField('allergie_policy')} rows={1} />
-                                <TextareaField label="Istruzioni Emergenze" value={formData.emergenze_istruzioni} onChange={updateField('emergenze_istruzioni')} rows={1} />
-                                <TextareaField label="Politica di Cancellazione" value={formData.politica_cancellazione} onChange={updateField('politica_cancellazione')} rows={1} />
-                            </div>
-                        </section>
-
-                        {/* 6. AI e Marketing */}
-                        <section className="apple-card p-6 space-y-4 xl:col-span-1">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-orange-50 text-orange-600 rounded-xl"><Megaphone className="w-5 h-5" /></div>
-                                <h2 className="text-lg font-bold">Marketing & Custom AI</h2>
-                            </div>
-                            <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} placeholder="Menzionata dall'AI in conversazione" />
-                            <TextareaField label="Informazioni Aggiuntive Rapide" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} placeholder="Altre note per guidare il comportamento dell'AI" />
-                        </section>
+        <div className="min-h-screen bg-gray-50/50">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+                {/* Header */}
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16 animate-fade-in">
+                    <div className="flex flex-col md:flex-row items-center gap-0 md:gap-6 text-center md:text-left">
+                        <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-28 md:h-40 w-auto drop-shadow-sm -mb-4 md:mb-0 relative z-10" />
+                        <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
+                        <div className="mt-2 md:mt-0 relative z-20">
+                            <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+                                Benvenuto, <span className="text-brand-orange-dark">{formData.nome_ristorante || tenantId}</span>
+                            </h1>
+                            <p className="text-gray-500 text-sm md:text-base">Pannello di controllo</p>
+                        </div>
                     </div>
 
-                    {/* Action Area */}
-                    <footer className="flex justify-center pb-20 animate-fade-in delay-500 sticky bottom-6 z-10 w-full px-4">
-                        <button
-                            onClick={handleUpdate}
-                            disabled={isUpdating}
-                            className="apple-button h-16 md:h-20 text-lg md:text-xl px-8 md:px-12 bg-zirel-orange flex items-center justify-center gap-4 min-w-[300px] shadow-2xl shadow-orange-500/30 w-full md:w-auto mx-auto border border-orange-400"
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                        <a
+                            href="https://zirel.org"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-500 hover:text-zirel-orange-dark text-sm font-medium flex items-center gap-2 transition-colors px-4 py-2 rounded-xl hover:bg-orange-50"
                         >
-                            {isUpdating ? (
-                                <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/20 border-t-white"></div>
-                            ) : (
-                                <Save className="w-6 h-6" />
-                            )}
-                            Salva e Aggiorna AI
+                            <ExternalLink size={16} />
+                            Torna alla Home
+                        </a>
+                        <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto border-gray-200">
+                            <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
+                            Esci
                         </button>
-                    </footer>
-                </>
-            )}
+                    </div>
+                </header>
+
+                {/* Tab Navigation - Mobile Scrollable */}
+                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-5 gap-2 animate-fade-in delay-100 pb-2">
+                    {[
+                        { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
+                        { id: 'documenti', label: 'Documenti', icon: FileText },
+                        { id: 'sicurezza', label: 'Sicurezza', icon: Shield },
+                        { id: 'integrazione', label: 'Integrazione', icon: LinkIcon },
+                        { id: 'impostazioni', label: 'Impostazioni', icon: Settings },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                            className={`flex-1 min-w-[140px] sm:min-w-0 flex items-center justify-center gap-2 p-4 rounded-2xl font-bold transition-all ${activeTab === tab.id
+                                ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50 scale-[1.02]'
+                                : 'bg-white text-gray-500 hover:bg-orange-50 border border-gray-100'
+                                }`}
+                        >
+                            <tab.icon size={20} />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                <TrialBanner />
+
+                {/* Tab Content */}
+                <div className="min-h-[600px]">
+                    {activeTab === 'prenotazioni' ? (
+                        <Reservations />
+                    ) : activeTab === 'documenti' ? (
+                        <DocumentManager />
+                    ) : activeTab === 'sicurezza' ? (
+                        <div className="max-w-4xl mx-auto animate-fade-in">
+                            <section className="apple-card p-8 md:p-12 space-y-8">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Shield className="w-6 h-6" /></div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold">Sicurezza & Accesso API</h2>
+                                        <p className="text-gray-500">Gestisci le chiavi di accesso per il tuo Concierge</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Il tuo API Token</label>
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="relative flex-1 group">
+                                                <input
+                                                    type={isTokenVisible ? "text" : "password"}
+                                                    value={formData.api_token || ''}
+                                                    readOnly
+                                                    className="apple-input font-mono text-sm md:text-base pr-12 bg-white"
+                                                />
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
+                                                    {isTokenVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {isTokenVisible ? (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(formData.api_token);
+                                                            toast.success('Token copiato negli appunti!');
+                                                        }}
+                                                        className="apple-button-secondary flex items-center justify-center gap-2 h-12 px-6 bg-white"
+                                                    >
+                                                        <Copy size={18} />
+                                                        Copia
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={handleConfirmTokenRevealed}
+                                                        className="apple-button bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 h-12 px-6"
+                                                    >
+                                                        <Eye size={18} />
+                                                        Rivela Token
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {formData.api_token_revealed && !isTokenVisible && (
+                                            <p className="mt-4 text-sm text-gray-500 italic">
+                                                Il token è stato già visualizzato ed è ora oscurato per la tua sicurezza.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="pt-8 border-t border-gray-200 mt-8">
+                                        <h3 className="text-lg font-bold mb-4">Rigenerazione Chiave</h3>
+                                        <p className="text-gray-500 mb-6 text-sm md:text-base">
+                                            Se temi che la tua chiave sia stata compromessa, o se l'hai smarrita, puoi generarne una nuova.
+                                            <span className="text-red-500 font-medium font-bold block mt-2 px-3 py-2 bg-red-50 rounded-xl border border-red-100">
+                                                Attenzione: la chiave precedente smetterà immediatamente di funzionare.
+                                            </span>
+                                        </p>
+                                        <button
+                                            onClick={handleRegenerateToken}
+                                            disabled={isRegeneratingToken}
+                                            className="apple-button-secondary border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 flex items-center gap-2 group w-full md:w-auto justify-center"
+                                        >
+                                            <RefreshCw className={`w-4 h-4 ${isRegeneratingToken ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                                            Rigenera API Token
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    ) : activeTab === 'integrazione' ? (
+                        <div className="max-w-4xl mx-auto animate-fade-in">
+                            <section className="apple-card p-8 md:p-12 space-y-12">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-orange-50 text-zirel-orange-dark rounded-2xl"><LinkIcon className="w-6 h-6" /></div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold">Attivazione Assistente</h2>
+                                        <p className="text-gray-500">Scegli come installare Zirèl sul tuo sito</p>
+                                    </div>
+                                </div>
+
+                                {/* Opzione 1: Installazione Assistita */}
+                                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2rem] p-8 md:p-10 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
+                                    <div className="relative z-10 space-y-6">
+                                        <div className="space-y-2">
+                                            <span className="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Consigliato</span>
+                                            <h3 className="text-3xl font-black">Serve aiuto? Ci pensiamo noi.</h3>
+                                            <p className="text-indigo-100 text-lg opacity-90 max-w-2xl leading-relaxed">
+                                                Non sai come fare? Contatta il tuo webmaster o chiedi a noi.
+                                                Per garantirti un'attivazione perfetta, il team di Zirèl può occuparsi dell'installazione per te.
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col md:flex-row items-center gap-6 pt-4">
+                                            <a
+                                                href="https://wa.me/393461027447"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-white text-indigo-600 px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-2"
+                                            >
+                                                Richiedi installazione assistita →
+                                            </a>
+                                            <div className="text-indigo-100 text-sm opacity-80 space-y-1 text-center md:text-left">
+                                                <p className="font-bold">Contatto di Urgenza:</p>
+                                                <p>Niki: (+39) 346 1027447</p>
+                                                <p>Email: bronovito@gmail.com</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Widget Customization Section */}
+                                <div className="apple-card p-8 md:p-10 space-y-8 border-t-4 border-zirel-orange-dark">
+                                    <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
+                                        <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl">
+                                            <Settings className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-gray-800">Personalizzazione Widget</h3>
+                                            <p className="text-gray-500">Rendi il widget chat unico per il tuo brand</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-6">
+                                            <InputField
+                                                label="Titolo Widget"
+                                                value={formData.widget_title || ''}
+                                                onChange={updateField('widget_title')}
+                                                placeholder="es. Zirèl Assistant"
+                                            />
+                                            <InputField
+                                                label="Sottotitolo Widget"
+                                                value={formData.widget_subtitle || ''}
+                                                onChange={updateField('widget_subtitle')}
+                                                placeholder="es. Concierge AI h24"
+                                            />
+                                        </div>
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 ml-1">Colore Brand (Hex)</label>
+                                                <div className="flex gap-3">
+                                                    <input
+                                                        type="color"
+                                                        value={formData.widget_color || '#FF8C42'}
+                                                        onChange={(e) => updateField('widget_color')(e.target.value)}
+                                                        className="w-14 h-14 rounded-xl cursor-pointer border-none p-0 overflow-hidden shadow-sm"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={formData.widget_color || '#FF8C42'}
+                                                        onChange={(e) => updateField('widget_color')(e.target.value)}
+                                                        className="flex-grow apple-input"
+                                                        placeholder="#FF8C42"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <InputField
+                                                label="Icona Widget (Emoji)"
+                                                value={formData.widget_icon || ''}
+                                                onChange={updateField('widget_icon')}
+                                                placeholder="es. 💬 o 🤖"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Simple Preview */}
+                                    <div className="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-6">
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Anteprima Rapida</p>
+                                        <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 max-w-sm mx-auto">
+                                            <div
+                                                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl text-white shadow-lg"
+                                                style={{ backgroundColor: formData.widget_color || '#FF8C42' }}
+                                            >
+                                                {formData.widget_icon || '💬'}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-800">{formData.widget_title || 'Zirèl Assistant'}</h4>
+                                                <p className="text-xs text-gray-500">{formData.widget_subtitle || 'Concierge AI h24'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Dedicated Save Button for Widget */}
+                                    <div className="flex justify-end pt-4 border-t border-gray-50">
+                                        <button
+                                            onClick={handleUpdate}
+                                            disabled={isUpdating}
+                                            className="apple-button px-8 py-4 bg-zirel-gradient text-white flex items-center gap-3 shadow-lg shadow-orange-500/20"
+                                        >
+                                            {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                            <span className="font-bold">Salva Personalizzazione</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Opzione 2: Fai da te */}
+                                <div className="space-y-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-full h-px bg-gray-100"></div>
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest px-4 whitespace-nowrap">Oppure in autonomia</span>
+                                        <div className="w-full h-px bg-gray-100"></div>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                            <div>
+                                                <h4 className="font-bold text-gray-800">Copia lo Snippet</h4>
+                                                <p className="text-sm text-gray-500">Inserisci questo codice nel tuo sito</p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const snippet = `<!-- Zirèl Chat Widget -->\n<script \n  src="https://cdn.zirel.org/widget.js" \n  data-tenant-id="${tenantId}"\n  async>\n</script>`;
+                                                    navigator.clipboard.writeText(snippet);
+                                                    toast.success('Snippet copiato!');
+                                                }}
+                                                className="apple-button-secondary text-sm flex items-center gap-2 w-full md:w-auto justify-center"
+                                            >
+                                                <Copy size={16} />
+                                                Copia Codice
+                                            </button>
+                                        </div>
+
+                                        <div className="bg-slate-900 rounded-3xl p-6 md:p-8 relative overflow-hidden">
+                                            <pre className="text-indigo-300 font-mono text-xs md:text-sm leading-relaxed overflow-x-auto whitespace-pre">
+                                                {`<!-- Zirèl Chat Widget -->
+<script 
+  src="https://cdn.zirel.org/widget.js" 
+  data-tenant-id="${tenantId}"
+  async>
+</script>`}
+                                            </pre>
+                                        </div>
+
+                                        <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-start gap-4">
+                                            <div className="p-2 bg-white text-gray-400 rounded-lg shrink-0 border border-gray-100"><Info size={16} /></div>
+                                            <p className="text-sm text-gray-600 leading-relaxed italic">
+                                                <strong>Istruzioni:</strong> Inserisci questo codice subito prima del tag <code className="bg-white border border-gray-200 px-1.5 py-0.5 rounded text-xs font-mono">&lt;/body&gt;</code>.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    ) : (
+                        <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-32">
+                            {/* Premium Header for Impostazioni */}
+                            <div className="apple-card p-8 md:p-12 mb-0">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Settings className="w-8 h-8" /></div>
+                                    <div>
+                                        <h2 className="text-3xl font-black text-gray-800">Impostazioni Assistente</h2>
+                                        <p className="text-gray-500 text-lg">Personalizza l'identità e la conoscenza del tuo Concierge AI</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                                {/* Section 1: Contatti */}
+                                <section className="apple-card p-6 space-y-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Store className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Contatti & Info Base</h2>
+                                    </div>
+                                    <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" />
+                                    <InputField label="Email" value={formData.mail} onChange={updateField('mail')} />
+                                    <InputField label="Indirizzo" value={formData.indirizzo} onChange={updateField('indirizzo')} />
+                                    <InputField label="Sito Web URL" value={formData.sito_web_url} onChange={updateField('sito_web_url')} />
+                                    <InputField label="Google Maps Link" value={formData.google_maps_link} onChange={updateField('google_maps_link')} />
+                                </section>
+
+                                {/* Section 2: Orari */}
+                                <section className="apple-card p-6 space-y-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Clock className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Orari & Tempistiche</h2>
+                                    </div>
+                                    <TextareaField label="Orari di Apertura" value={formData.orari_apertura} onChange={updateField('orari_apertura')} rows={2} />
+                                    <InputField label="Giorni di Chiusura" value={formData.giorni_chiusura} onChange={updateField('giorni_chiusura')} />
+                                    <InputField label="Orari Check-in / Check-out" value={formData.orari_checkin_checkout} onChange={updateField('orari_checkin_checkout')} />
+                                    <InputField label="Durata Media Appuntamento" value={formData.durata_media_appuntamento} onChange={updateField('durata_media_appuntamento')} />
+                                </section>
+
+                                {/* Section 3: Social */}
+                                <section className="apple-card p-6 space-y-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-pink-50 text-pink-600 rounded-xl"><LinkIcon className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Social & Link</h2>
+                                    </div>
+                                    <InputField label="Link Prenotazione Tavoli" value={formData.link_prenotazione_tavoli} onChange={updateField('link_prenotazione_tavoli')} />
+                                    <InputField label="Link Booking/Calendario" value={formData.link_booking_esterno} onChange={updateField('link_booking_esterno')} />
+                                    <InputField label="Instagram URL" value={formData.instagram_url} onChange={updateField('instagram_url')} />
+                                    <InputField label="Facebook URL" value={formData.facebook_url} onChange={updateField('facebook_url')} />
+                                    <InputField label="TripAdvisor URL" value={formData.tripadvisor_url} onChange={updateField('tripadvisor_url')} />
+                                    <InputField label="Link Recensioni (Google)" value={formData.recensioni_url} onChange={updateField('recensioni_url')} />
+                                </section>
+
+                                {/* Section 4: Offerta */}
+                                <section className="apple-card p-6 space-y-4 lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="col-span-1 md:col-span-2 flex items-center gap-3 mb-2">
+                                        <div className="p-2 bg-green-50 text-green-600 rounded-xl"><Utensils className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Dettagli Offerta (Menu, Servizi, Costi)</h2>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <InputField label="Tipo Cucina / Categoria" value={formData.tipo_cucina} onChange={updateField('tipo_cucina')} />
+                                        <TextareaField label="Specialità della Casa" value={formData.specialita_casa} onChange={updateField('specialita_casa')} rows={2} />
+                                        <InputField label="Prezzo Medio" value={formData.prezzo_medio} onChange={updateField('prezzo_medio')} />
+                                        <InputField label="Costo Prima Consulenza" value={formData.prima_consulenza_costo} onChange={updateField('prima_consulenza_costo')} />
+                                        <TextareaField label="Servizi Inclusi" value={formData.servizi_inclusi} onChange={updateField('servizi_inclusi')} rows={3} />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <TextareaField label="Testo del Menu Ridotto o Tariffario (Extra info per l'AI)" value={formData.menu_testo} onChange={updateField('menu_testo')} rows={10} />
+                                    </div>
+                                </section>
+
+                                {/* Section 5: Info Pratiche */}
+                                <section className="apple-card p-6 space-y-4 lg:col-span-2">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-purple-50 text-purple-600 rounded-xl"><Info className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Info Pratiche & Regole</h2>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <InputField label="WiFi Password" value={formData.wifi_password} onChange={updateField('wifi_password')} />
+                                        <TextareaField label="Info Parcheggio" value={formData.parcheggio_info} onChange={updateField('parcheggio_info')} rows={1} />
+                                        <InputField label="Animali Ammessi" value={formData.animali_ammessi} onChange={updateField('animali_ammessi')} />
+                                        <InputField label="Metodi di Pagamento" value={formData.metodi_pagamento} onChange={updateField('metodi_pagamento')} />
+                                        <InputField label="Tassa di Soggiorno" value={formData.tassa_soggiorno} onChange={updateField('tassa_soggiorno')} />
+                                        <TextareaField label="Policy Allergie" value={formData.allergie_policy} onChange={updateField('allergie_policy')} rows={2} />
+                                    </div>
+                                </section>
+
+                                {/* Section 6: Marketing */}
+                                <section className="apple-card p-6 space-y-4 xl:col-span-1">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-orange-50 text-orange-600 rounded-xl"><Megaphone className="w-5 h-5" /></div>
+                                        <h2 className="text-lg font-bold">Marketing & Custom AI</h2>
+                                    </div>
+                                    <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} />
+                                    <TextareaField label="Informazioni Aggiuntive Rapide" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} />
+                                </section>
+                            </div>
+
+                            {/* Floating Save Button */}
+                            <footer className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 animate-fade-in sm:px-6">
+                                <button
+                                    onClick={handleUpdate}
+                                    disabled={isUpdating}
+                                    className="apple-button h-16 md:h-18 px-8 md:px-12 bg-zirel-gradient flex items-center justify-center gap-4 shadow-2xl shadow-orange-500/30 w-full md:w-auto mx-auto border-none outline-none group"
+                                >
+                                    {isUpdating ? (
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                    ) : (
+                                        <Save className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                    )}
+                                    <span className="text-lg font-bold">Salva e Aggiorna AI</span>
+                                </button>
+                            </footer>
+                        </div>
+                    )}
+                </div>
+            </main>
         </div>
     );
 };

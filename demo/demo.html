@@ -24,11 +24,20 @@
                     colors: {
                         brand: {
                             orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
                             blue: '#003049',
-                            sand: '#F2E5C8',
-                            cyan: '#FF8c42',
-                            white: '#FFFFFF'
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
                         }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
                     }
                 }
             }
@@ -253,14 +262,17 @@
         <ul class="nav-links" id="nav-menu">
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="demo.html" class="nav-link active">DEMO</a></li>
-            <li><a href="http://localhost:5174" class="nav-link">DASHBOARD</a></li>
+            <li><a href="register.html" class="nav-link">REGISTRATI</a></li>
+            <li><a href="https://dashboard.zirel.org" class="nav-link">DASHBOARD</a></li>
             <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
             <li><a href="index.html#contatti" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="index.html#contatti" class="cta-nav">INIZIA ORA</a></li>
+            <li class="cta-nav-mobile-li"><a href="register.html" class="cta-nav">PROVA GRATIS</a></li>
         </ul>
-        <a href="index.html#contatti" class="cta-nav cta-nav-desktop">INIZIA ORA</a>
+        <a href="register.html" class="cta-nav cta-nav-desktop">PROVA GRATIS</a>
         <div class="hamburger" id="hamburger">
-            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
         </div>
     </nav>
 
@@ -334,7 +346,7 @@
     </div>
 
     <!-- Info & Map -->
-    <section id="info" class="container">
+    <section id="info">
         <div class="info-container">
             <div class="info-text">
                 <h2 class="section-title demo-font">Dove <span>Trovarci</span></h2>
@@ -350,10 +362,10 @@
                         </div>
                     </div>
                     <div class="info-item">
-                        <span>📞</span>
+                        <span>✉️</span>
                         <div>
-                            <h5>Telefono</h5>
-                            <p>+39 0541 123456</p>
+                            <h5>Email</h5>
+                            <p>bronovito@gmail.com</p>
                         </div>
                     </div>
                     <div class="info-item">
@@ -364,10 +376,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="map-placeholder">
-                <img src="hero_premium.webp" alt="Location"
-                    style="width:100%; height:100%; object-fit:cover; opacity:0.9;">
             </div>
         </div>
     </section>
@@ -380,9 +388,9 @@
 
     <!-- Custom Chat Widget -->
     <div id="n8n-widget-mock"
-        class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500">
+        class="fixed bottom-0 sm:bottom-24 right-0 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
         <div
-            class="bg-white w-[calc(100vw-2rem)] sm:w-[350px] h-[65vh] sm:h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
             <div class="demo-gradient p-5 text-white flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -454,6 +462,21 @@
             window.ZirelConfig.tenantId = 'chiringuito_gino_001';
         }
     </script>
+    <!-- Zirèl Widget Config -->
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_official',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        // This will be dynamically populated by the server/CDN in a real SaaS scenario
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Assistant',
+            widget_subtitle: 'Concierge AI h24',
+            widget_color: '#FF8C42',
+            widget_icon: '💬'
+        };
+    </script>
+    <script src="chat.js" data-tenant-id="zirel_official"></script>
     <script>
         // ─── Persona: Chiringuito da Gino ─────────────────────────────────────────
         // OVERRIDE INTENZIONALE: questa pagina usa un tenant separato al 100%.
@@ -504,6 +527,7 @@
                 riservati.</p>
         </div>
     </footer>
+    <script src="ui-helpers.js"></script>
 </body>
 
 </html>

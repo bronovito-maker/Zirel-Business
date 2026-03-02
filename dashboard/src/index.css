@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --color-zirel-blue: #2563eb;
-  --color-zirel-orange: #f97316;
+  --font-sans: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-zirel-blue: #003049;
+  --color-zirel-orange: #FF8C42;
+  --color-zirel-orange-dark: #E67E22;
+  --color-zirel-cyan: #00AEEF;
+  --zirel-gradient: linear-gradient(135deg, #FF8C42 0%, #E67E22 100%);
 }
 
 body {
@@ -15,8 +18,14 @@ body {
 }
 
 @theme {
-  --color-zirel-blue: #2563eb;
-  --color-zirel-orange: #f97316;
+  --color-zirel-blue: #003049;
+  --color-zirel-orange: #FF8C42;
+  --color-zirel-orange-dark: #E67E22;
+  --color-zirel-cyan: #00AEEF;
+}
+
+@utility bg-zirel-gradient {
+  background: var(--zirel-gradient);
 }
 
 @layer components {
@@ -29,7 +38,7 @@ body {
   }
 
   .apple-button {
-    @apply px-8 py-4 bg-zirel-blue text-white font-semibold rounded-2xl hover:brightness-110 active:scale-95 transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-8 py-4 bg-zirel-gradient text-white font-semibold rounded-2xl hover:brightness-110 active:scale-95 transition-all duration-200 shadow-lg shadow-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed border-none outline-none;
   }
 
   .apple-button-secondary {

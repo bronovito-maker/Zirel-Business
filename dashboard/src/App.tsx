@@ -1,35 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import { isAuthenticated, logout } from './lib/auth';
 
 function App() {
-  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [isAuth, setIsAuth] = useState<boolean>(() => isAuthenticated());
 
-  useEffect(() => {
-    const savedId = localStorage.getItem('zirel_tenant_id');
-    if (savedId) {
-      setTenantId(savedId);
-    }
-  }, []);
-
-  const handleLogin = (id: string) => {
-    localStorage.setItem('zirel_tenant_id', id);
-    setTenantId(id);
+  const handleLogin = () => {
+    setIsAuth(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('zirel_tenant_id');
-    setTenantId(null);
+    logout();
+    setIsAuth(false);
   };
 
   return (
     <div className="min-h-screen bg-[#FBFBFD]">
       <Toaster position="top-center" />
-      {!tenantId ? (
+      {!isAuth ? (
         <Login onLogin={handleLogin} />
       ) : (
-        <Dashboard tenantId={tenantId} onLogout={handleLogout} />
+        <Dashboard onLogout={handleLogout} />
       )}
     </div>
   );

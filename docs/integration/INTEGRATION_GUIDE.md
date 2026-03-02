@@ -1,109 +1,59 @@
-# Zirèl: Integrazione e Configurazione 🛠️
+# Zirèl — Guida all'Integrazione per Business
 
-Guida per webmaster e tecnici che installano il widget Zirèl su un sito cliente.
-
----
-
-## 1. Database (Supabase PostgreSQL)
-
-Il "cervello" di Zirèl legge da una tabella PostgreSQL ospitata su Supabase, aggiornabile dal cliente tramite la Dashboard.
-
-### Setup Iniziale
-1. Crea un progetto su Supabase.
-2. Esegui la migrazione usando i file SQL o importa i `tenants` da CSV.
-3. Seleziona le regole RLS per impedire scritture anonime non autorizzate, permettendo alla dashboard autenticata (via `tenant_id`) di leggere e scrivere se stessa.
-4. Usa le chiavi in `dashboard/.env.local` (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
-5. Configura n8n collegando le credenziali di Supabase API per leggere/scrivere i dati in tempo reale.
+Benvenuto in Zirèl. Questa guida ti aiuterà a installare e personalizzare il tuo Concierge AI sul tuo sito web in pochi minuti.
 
 ---
 
-## 2. Installazione Widget (Webmaster)
+## 1. Installazione Rapida
 
-La modalità consigliata è hostare il **build statico** (`demo/dist/`) sul dominio del cliente.
+Copia e incolla questo snippet di codice subito prima del tag di chiusura `</body>` di tutte le pagine del tuo sito:
 
-### Step 1 — Clona il repository
-
-```bash
-git clone https://github.com/tuo-user/Zirel-Business.git
-cd Zirel-Business/demo
-npm install
+```html
+<!-- Zirèl Chat Widget -->
+<script 
+  src="https://cdn.zirel.org/widget.js" 
+  data-tenant-id="TUO_TENANT_ID"
+  async>
+</script>
 ```
 
-### Step 2 — Configura le credenziali del cliente
-
-Per un sito cliente reale, devi generare un `config.js` specifico usando lo script di configurazione fornito.
-
-1. Esporta le variabili d'ambiente nel tuo terminale:
-   ```bash
-   export ZIREL_WEBHOOK_URL=https://tuo-n8n.railway.app/webhook/...
-   export ZIREL_TENANT_ID=nome_cliente_001
-   ```
-2. Esegui il setup per il cliente o avvia l'ambiente di sviluppo locale. `npm run client:setup` leggerà le variabili e creerà il `config.js` reale in `demo/public/`.
-   ```bash
-   npm run client:setup
-   npm run build
-   ```
-
-> **Nota**: Su **Vercel** o piattaforme simili, imposta `ZIREL_WEBHOOK_URL` e `ZIREL_TENANT_ID` nel dashboard delle Environment Variables. Poi imposta il comando di build personalizzato: `npm run client:setup && npm run build`.
-
-> Per un riferimento dei campi disponibili e della struttura generata, vedi `demo/public/config.template.js`.
-
-### Step 3 — Pubblica
-Le due entità (Sito e Dashboard) hanno pipeline di build distinte:
-
-**1. Per il Sito Vetrina (`/demo`):**
-```bash
-npm run build
-```
-Il prebuild script (`client-deploy.js`) legge le variabili d'ambiente e sovrascrive `public/config.js` con le credenziali del cliente (webhook, auth, ecc.).
-
-**2. Per la Dashboard (`/dashboard`):**
-```bash
-cd ../dashboard
-npm run build
-```
-La SPA React usa le variabili `VITE_SUPABASE_*` incluse nel build.
-
-> **Vercel Analytics**: Il tracciamento delle visite (Vercel Web Analytics) è già pre-installato e integrato nativamente via script in tutti i file HTML. Funzionerà automaticamente non appena la pagina sarà distribuita su Vercel.
-
-### Step 4 — Pubblica `dist/`
-
-Carica l'intera cartella `dist/` sul dominio del cliente (Vercel, FTP, S3, ecc.).
+> [!TIP]
+> Puoi trovare il tuo `data-tenant-id` personale nella sezione **Integrazione** della tua Dashboard.
 
 ---
 
-## 3. Deploy su Vercel (raccomandato)
-
-Hai bisogno di due **Progetti Vercel** collegati allo stesso Repository Github.
-
-### Progetto 1: Sito Vetrina
-| Impostazione       | Valore    |
-| :----------------- | :-------- |
-| Root Directory     | `demo`    |
-| Build Command      | `npm run client:setup && npm run build` |
-| Output Directory   | `dist`    |
-| Env Var            | `ZIREL_WEBHOOK_URL`, `ZIREL_TENANT_ID` |
-
-### Progetto 2: Dashboard
-| Impostazione       | Valore    |
-| :----------------- | :-------- |
-| Root Directory     | `dashboard` |
-| Build Command      | `npm run build` |
-| Output Directory   | `dist`    |
-| Env Var            | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
+## 2. Accesso alla Dashboard
+Il pannello di controllo è accessibile all'indirizzo `https://dashboard.zirel.org`.
+Per accedere, dovrai inserire il tuo **API Token** segreto.
 
 ---
 
-## 4. Per WordPress
-
-Usa il plugin **"Insert Headers and Footers"** per aggiungere gli script nel `<head>` del tema, e un blocco Custom HTML nel footer per il widget.
+## 3. Gestione Sicurezza (API Token)
+Il tuo API Token protegge l'accesso al tuo Concierge.
+- **Dov'è?** Nella scheda **Sicurezza**.
+- **Perché è oscurato?** Per evitare che occhi indiscreti possano copiarlo per errore.
+- **Come lo vedo?** Clicca su "Mostra Token", copialo in un posto sicuro e conferma l'oscuramento. Una volta oscurato, non sarà più visibile (per la tua sicurezza). Se lo perdi, potrai sempre "Rigenerarlo".
 
 ---
 
-## 5. Troubleshooting
+## 4. Personalizzazione del Widget
+Non c'è bisogno di scrivere codice per cambiare l'aspetto del widget. Vai nella scheda **Integrazione** e usa la sezione **Personalizzazione Widget**:
 
-| Sintomo | Causa probabile | Soluzione |
-| :--- | :--- | :--- |
-| Chat non risponde | CORS bloccato | Aggiungi il dominio del cliente in n8n → Webhook → Header CORS |
-| Errore Login Database | Non trova il tenant | Assicurati che il token inserito coincida con una chiave `tenant_id` su Supabase |
-| Risposte AI datate | n8n cache / RLS non passata | Verifica che n8n legga correttamente la riga Supabase aggiornata via Dashboard |
+- **Titolo & Sottotitolo:** Cambia il nome dell'assistente (es. "Concierge Rossi") e la descrizione.
+- **Colore Brand:** Scegli il tuo colore aziendale. Il widget adatterà automaticamente l'intestazione e il pulsante di apertura.
+- **Icona (Avatar):** Scegli un'emoji che rappresenti il tuo brand (es. 🍹 per un bar, 🏨 per un hotel).
+
+---
+
+## 5. Alimentare la Conoscenza dell'AI
+Nella scheda **Documenti**, puoi caricare file PDF o CSV (es. Menu, Listini, FAQ, Regolamenti).
+- L'AI studierà questi file in tempo reale.
+- Più informazioni carichi, più precise saranno le risposte ai tuoi clienti.
+
+---
+
+## 6. Assistenza & Setup
+Hai bisogno di aiuto con l'installazione? Il team di Zirèl offre un servizio di **Installazione Assistita**.
+- **Contatto WhatsApp:** [Clicca qui per chattare con Niki](https://wa.me/393461027447)
+- **Email:** bronovito@gmail.com
+- **Urgenze:** (+39) 346 1027447

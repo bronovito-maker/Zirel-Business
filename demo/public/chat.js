@@ -11,9 +11,12 @@
 (function () {
     'use strict';
 
+    // Nuova logica SaaS: Legge dal tag <script src=".../chat.js" data-tenant-id="...">
+    const me = document.currentScript;
     const cfg = window.ZirelConfig || {};
-    const webhookUrl = cfg.webhookUrl || 'https://zirel.app.n8n.cloud/webhook/zirel-chat';
-    const tenantId = cfg.tenantId || 'zirel_official';
+
+    const tenantId = me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official';
+    const webhookUrl = me?.getAttribute('data-webhook-url') || cfg.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
 
     // Sessione utente — prefissata con tenantId per garantire isolamento
     // nel Postgres Chat Memory (evita collisioni tra sessioni di tenant diversi)
@@ -34,6 +37,83 @@
         'Aumenta le tue prenotazioni! 📈',
     ];
     let tooltipIndex = 0;
+
+    // ─── Fetch Widget Configuration ───────────────────────────────────────────
+    async function applyWidgetCustomization() {
+        if (!tenantId) return;
+
+        try {
+            // Fetch configuration from Supabase at runtime for real-time sync
+            const supabaseUrl = 'https://ighmsttwjfoywhklgluf.supabase.co';
+            const anonKey = 'sb_publishable_757hQTSKPmrOs9iVEGRb4A_21Ccx-AT';
+
+            const response = await fetch(`${supabaseUrl}/rest/v1/tenants?tenant_id=eq.${tenantId}&select=widget_title,widget_subtitle,widget_color,widget_icon`, {
+                headers: {
+                    'apikey': anonKey,
+                    'Authorization': `Bearer ${anonKey}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Supabase fetch failed');
+
+            const data = await response.json();
+            const config = data?.[0] || window.ZirelWidgetConfig || {};
+
+            const { widget_title, widget_subtitle, widget_color, widget_icon } = config;
+
+            if (widget_title) {
+                const titleEl = document.querySelector('#n8n-widget-mock h6');
+                if (titleEl) titleEl.innerText = widget_title;
+            }
+            if (widget_subtitle) {
+                const subtitleEl = document.querySelector('#n8n-widget-mock p');
+                if (subtitleEl) subtitleEl.innerText = widget_subtitle;
+            }
+            if (widget_icon) {
+                const iconContainer = document.querySelector('#n8n-widget-mock .flex-shrink-0.text-2xl') ||
+                    document.querySelector('#n8n-widget-mock .bg-white\\/20.rounded-full.text-2xl');
+                if (iconContainer) iconContainer.innerText = widget_icon;
+
+                const toggleIconHtml = `<span class="text-white drop-shadow-md flex items-center justify-center text-3xl">${widget_icon}</span>`;
+                const toggleIcon = document.getElementById('toggle-icon-open');
+                const widget = document.getElementById('n8n-widget-mock');
+
+                if (toggleIcon && (!widget || widget.classList.contains('scale-0'))) {
+                    toggleIcon.innerHTML = toggleIconHtml;
+                }
+            }
+            if (widget_color) {
+                // Apply theme color to header
+                const header = document.querySelector('#n8n-widget-mock .brand-gradient') ||
+                    document.querySelector('#n8n-widget-mock .demo-gradient');
+                if (header) {
+                    header.style.background = `linear-gradient(135deg, ${widget_color} 0%, ${widget_color}CC 100%)`;
+                }
+
+                // Apply theme color to toggle button
+                const toggleBtn = document.getElementById('chat-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.style.background = widget_color;
+                    toggleBtn.style.boxShadow = `0 10px 25px -5px ${widget_color}66`;
+                }
+
+                // Apply theme color to user messages (optional enhancement)
+                // We'll skip for now to maintain consistency with the CSS variables approach if possible
+            }
+        } catch (err) {
+            console.warn('[Zirèl] Error applying dynamic customization, using defaults:', err);
+            // Fallback to static window config if available
+            const { widget_title, widget_subtitle, widget_color, widget_icon } = window.ZirelWidgetConfig || {};
+            // ... rest of logic if needed, but the catch already logs it.
+        }
+    }
+
+    // Initialize customization
+    document.addEventListener('DOMContentLoaded', applyWidgetCustomization);
+    // Also run immediately in case DOM is already ready
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        applyWidgetCustomization();
+    }
 
     // ─── Utility ─────────────────────────────────────────────────────────────
     function escapeHTML(str) {
@@ -70,15 +150,29 @@
     window.toggleDemo = function () {
         const widget = document.getElementById('n8n-widget-mock');
         const icon = document.getElementById('toggle-icon-open');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+        const isMobile = window.innerWidth < 640; // sm breakpoint in Tailwind
+
         hideTooltip();
+
         if (widget.classList.contains('scale-0')) {
             widget.classList.remove('scale-0');
             widget.classList.add('scale-100');
             icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
+
+            if (isMobile) {
+                if (toggleBtn) toggleBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden'; // Lock scroll
+            }
         } else {
             widget.classList.remove('scale-100');
             widget.classList.add('scale-0');
             icon.innerHTML = '<span class="text-3xl">💬</span>';
+
+            if (isMobile) {
+                if (toggleBtn) toggleBtn.style.display = 'flex';
+                document.body.style.overflow = ''; // Restore scroll
+            }
         }
     };
 
@@ -105,13 +199,24 @@
         console.log(`[Zirèl Chat] Sending message for tenant: ${tenantId}`);
 
         try {
+            const traceId = crypto.randomUUID();
             const response = await fetch(webhookUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Zirel-Source': 'widget-public',
+                    'X-Zirel-Timestamp': new Date().toISOString(),
+                    'X-Zirel-Trace-Id': traceId,
+                },
                 body: JSON.stringify({
                     chatInput: text,
                     sessionId: sessionId,
-                    metadata: { tenant_id: tenantId },
+                    metadata: {
+                        tenant_id: tenantId,
+                        client: 'widget-public',
+                        protocol_version: '1.1',
+                        trace_id: traceId,
+                    },
                 }),
             });
 

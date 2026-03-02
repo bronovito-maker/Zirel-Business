@@ -1,47 +1,40 @@
 :root {
-    --primary: #FF8c42;
-    /* Sunset Orange */
-    --primary-dark: #e87a2a;
+    /* Brand Colors - Unified 2.0 */
+    --primary: #FF8C42;
+    --primary-dark: #E67E22;
     --secondary: #003049;
-    /* Deep Ocean Blue */
-    --accent: #669bbc;
-    /* Sky Blue */
-    --light: #fdf0d5;
-    /* Sand Beige */
-    --white: #ffffff;
+    --secondary-dark: #001D2D;
+    --accent: #00AEEF;
+    --light: #FDF0D5;
+    --white: #FFFFFF;
     --dark: #001219;
 
-    /* Romagna Sea Palette - Pricing */
-    --sea-deep: #003049;
-    --brand-azure: #0ea5e9;
-    --sea-cyan: #FF8c42;
-    --sand-white: #fdf0d5;
-    --sand-dark: #f2e5c8;
+    /* Functional Colors */
+    --text-main: var(--secondary);
+    --text-muted: rgba(0, 48, 73, 0.6);
+    --bg-main: #FFFFFF;
+    --bg-alt: var(--light);
 
-    /* Fluid Typography - Mobile First */
-    --font-main: 'Outfit', sans-serif;
-    --font-heading: 'Playfair Display', serif;
+    /* Typography - Apple Style */
+    --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-    --h1-size: clamp(3rem, 10vw, 7.5rem);
-    --h2-size: clamp(2.2rem, 6vw, 4.5rem);
-    --h3-size: clamp(1.8rem, 4vw, 2.5rem);
+    /* Design Tokens */
+    --radius-lg: 2rem;
+    --radius-md: 1rem;
+    --radius-full: 9999px;
 
-    --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-    --glass: rgba(255, 255, 255, 0.1);
-    --glass-dark: rgba(0, 48, 73, 0.8);
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --shadow-soft: 0 10px 30px rgba(0, 48, 73, 0.08);
+    --shadow-hover: 0 20px 50px rgba(0, 48, 73, 0.12);
+    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --space-card: 3.5rem;
+    --space-section: 12rem;
+    --space-grid: 4rem;
+    --space-page: 2rem;
+    --space-title: 4rem;
+    --space-header-gap: 3rem;
 
-    /* Spacing System */
-    --space-section: clamp(80px, 12vw, 160px);
-    --space-page: clamp(1.5rem, 5vw, 4rem);
-    --space-grid: clamp(2rem, 5vw, 4rem);
-    --space-card: clamp(1.5rem, 3vw, 2.5rem);
-    --space-title: 2rem;
-    /* Gap between H2 and subtitle/text */
-    --space-header-gap: clamp(3rem, 6vw, 5rem);
-    /* Gap between header block and content area */
-    --space-element: 1.5rem;
+    /* Gradients */
+    --zirel-gradient: linear-gradient(135deg, #FF8C42 0%, #E67E22 100%);
 }
 
 * {
@@ -57,38 +50,57 @@ html {
 
 body {
     font-family: var(--font-main);
-    background-color: var(--light);
-    color: var(--dark);
-    line-height: 1.7;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-    font-size: var(--h1-size);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-main);
-    line-height: 1.05;
+    font-weight: 800;
+    line-height: 1.1;
     letter-spacing: -0.02em;
 }
 
-h2 {
-    font-size: var(--h2-size);
-    font-family: var(--font-main);
-    line-height: 1.1;
-    font-weight: 800;
+/* Apple-Style Utility Classes */
+.zirel-card {
+    background: var(--white) !important;
+    border-radius: var(--radius-lg);
+    padding: var(--space-card);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+    border: 1px solid rgba(0, 48, 73, 0.05);
+    display: block;
+    height: 100%;
 }
 
-h3,
-h4 {
-    font-size: var(--h3-size);
-    font-family: var(--font-main);
-    line-height: 1.2;
-    font-weight: 700;
+.zirel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.bg-zirel-gradient {
+    background: var(--zirel-gradient);
+}
+
+.text-zirel-orange {
+    color: var(--primary);
+}
+
+.text-zirel-blue {
+    color: var(--secondary);
 }
 
 /* Specific class for the Demo/Restaurant flavor where Playfair is still desired */
 .demo-font {
-    font-family: var(--font-heading) !important;
+    font-family: 'Playfair Display', serif !important;
 }
 
 .container {
@@ -268,9 +280,9 @@ section {
 }
 
 .hero h1 {
-    /* Font size now handled by fluid var(--h1-size) */
-    margin-bottom: 1.5rem;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    font-size: clamp(3.5rem, 10vw, 7.5rem);
+    margin-bottom: 2rem;
+    text-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
     animation: fadeInUp 1s ease-out;
 }
 
@@ -435,10 +447,10 @@ section {
 
 .exp-card {
     text-align: center;
-    padding: var(--space-card) var(--space-element);
+    padding: 5rem 3.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
+    border-radius: 40px;
     backdrop-filter: blur(10px);
     transition: var(--transition);
 }
@@ -558,19 +570,29 @@ section {
 }
 
 /* Info Section Refinement */
+#info {
+    background-color: #F8F5F0;
+    /* Warm sand-white for contrast */
+}
+
 .info-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-grid);
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    max-width: 1000px;
+    margin: 0 auto;
     background: var(--white);
-    padding: var(--space-card);
-    border-radius: 40px;
-    box-shadow: var(--shadow);
+    padding: 6rem 4rem;
+    border-radius: 60px;
+    box-shadow: var(--shadow-soft);
+}
+
+.info-text {
+    width: 100%;
+    text-align: center;
 }
 
 .info-text h2 {
-    text-align: left;
+    text-align: center;
     margin-bottom: 2rem;
     font-size: 3.5rem;
 }
@@ -582,10 +604,13 @@ section {
 }
 
 .info-details {
-    margin-top: var(--space-header-gap);
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    max-width: 500px;
+    margin-inline: auto;
+    text-align: left;
 }
 
 .info-item {
@@ -612,6 +637,7 @@ section {
     font-weight: 600;
     color: var(--secondary);
     margin-bottom: 0;
+    font-size: 1.2rem;
 }
 
 .map-placeholder {
@@ -646,8 +672,25 @@ section {
 }
 
 @media (max-width: 768px) {
+    .hero {
+        padding-top: 120px;
+        min-height: auto;
+        padding-bottom: 4rem;
+    }
+
+    .hero h1.demo-font {
+        font-size: 3.2rem;
+        line-height: 1.1;
+    }
+
     .hero p {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+        font-weight: 400;
+        line-height: 1.5;
+        max-width: 90% !important;
+        margin-inline: auto;
     }
 
     .hero-actions {
@@ -671,70 +714,130 @@ section {
     .parallax-quote p {
         font-size: 1.8rem;
     }
+
+    .info-container {
+        grid-template-columns: 1fr;
+        padding: 4rem 2.5rem;
+        border-radius: 40px;
+        gap: 3rem;
+        margin: 0 1.5rem;
+        /* Add lateral breathing room */
+        width: auto;
+        /* Ensure margin works with full-width section */
+    }
+
+    .info-text h2 {
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-text p {
+        text-align: center;
+    }
+
+    .info-details {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: row;
+        text-align: left;
+        gap: 1.5rem;
+        align-items: center;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0, 48, 73, 0.05);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-item span {
+        font-size: 2rem;
+    }
+
+    .map-placeholder {
+        height: 300px;
+        border-radius: 20px;
+    }
 }
 
 /* =========================================
    Pricing Page Styles
    ========================================= */
 
+.pricing-section {
+    background-color: var(--light);
+    padding: 100px 0;
+    margin-top: 0;
+}
+
 .pricing-hero {
-    background: linear-gradient(135deg, var(--sea-deep), var(--secondary));
+    background: var(--secondary);
     padding: 160px 0 100px;
     text-align: center;
     color: var(--white);
 }
 
 .pricing-hero h1 {
-    font-family: 'Outfit', sans-serif;
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 1.5rem;
     font-weight: 800;
 }
 
-.pricing-hero h1 .brand {
+.pricing-hero h1 .zirel-brand {
     color: var(--primary);
 }
 
 .pricing-hero p {
     font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 700px;
+    opacity: 0.8;
+    max-width: 600px;
     margin: 0 auto;
+    font-weight: 300;
 }
 
 .pricing-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2.5rem;
-    margin-top: -60px;
+    gap: var(--space-grid);
+    margin-top: 0;
     margin-bottom: 80px;
 }
 
 .pricing-card {
     background: var(--white);
-    border-radius: 30px;
+    border-radius: var(--radius-lg);
     padding: 3.5rem 2.5rem;
     display: flex;
     flex-direction: column;
     position: relative;
     transition: var(--transition);
     border: 1px solid rgba(0, 48, 73, 0.05);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-soft);
 }
 
 .pricing-card:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 20px 60px rgba(0, 48, 73, 0.1);
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
 }
 
 .pricing-card.recommended {
-    border: 2px solid #00AEEF !important;
+    border: 2px solid var(--accent) !important;
     transform: scale(1.05);
     z-index: 2;
 }
 
 .pricing-card.recommended:hover {
-    transform: scale(1.05) translateY(-15px);
+    transform: scale(1.05) translateY(-10px);
 }
 
 .badge-recommended {
@@ -742,15 +845,15 @@ section {
     top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    background: #00AEEF !important;
+    background: var(--accent);
     color: var(--white);
     padding: 0.6rem 1.5rem;
-    border-radius: 50px;
+    border-radius: var(--radius-full);
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(0, 174, 239, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 174, 239, 0.2);
 }
 
 .pricing-card .card-icon {
@@ -848,27 +951,24 @@ section {
 
 .faq-item {
     background: var(--white);
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: var(--space-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 48, 73, 0.05);
+    transition: var(--transition);
 }
 
-.faq-item h4 {
-    color: var(--secondary);
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
+.faq-item:hover {
+    box-shadow: var(--shadow-hover);
 }
 
-.faq-item h4::before {
-    content: '💬';
-    margin-right: 12px;
+.faq-icon::before {
+    content: '+';
+    color: var(--primary);
 }
 
-.faq-item p {
-    color: #555;
-    line-height: 1.6;
+.faq-item.active .faq-icon::before {
+    content: '-';
 }
 
 /* =========================================
@@ -904,58 +1004,52 @@ section {
 
 .sector-card {
     flex: 0 0 calc(33.333% - 16px);
-    background: var(--secondary);
-    color: var(--white);
+    background: var(--white);
+    color: var(--secondary);
     padding: 3rem 2rem;
-    border-radius: 30px;
+    border-radius: var(--radius-lg);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
     min-height: 320px;
-    box-shadow: 0 10px 30px rgba(0, 48, 73, 0.1);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 48, 73, 0.05);
 }
 
 .sector-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 50px rgba(0, 48, 73, 0.2);
-}
-
-.sector-card.cyan {
-    background: var(--sea-cyan);
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
 }
 
 .sector-card.orange {
     background: var(--primary);
+    color: var(--white);
+    border: none;
+}
+
+.sector-card.cyan {
+    background: var(--secondary);
+    color: var(--white);
+    border: none;
 }
 
 .sector-card.azure {
-    background: #00AEEF !important;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
 }
 
-.sector-badge {
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    opacity: 0.6;
-    margin-bottom: 1rem;
-}
-
-.sector-card h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
+.sector-card.orange h3,
+.sector-card.cyan h3,
+.sector-card.azure h3 {
     color: var(--white);
 }
 
-.sector-icon {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-}
-
-.sector-card p {
-    font-size: 1rem;
-    opacity: 0.85;
-    line-height: 1.6;
+.sector-card.orange .sector-badge,
+.sector-card.cyan .sector-badge,
+.sector-card.azure .sector-badge {
+    color: var(--white);
+    opacity: 0.7;
 }
 
 /* Carousel Controls */

@@ -1,99 +1,65 @@
-# Architettura Tecnica — Zirèl
+# Zirèl System Architecture (Current Runtime)
 
-Progetto: landing statica multi-pagina con widget chat AI integrato.
+## Overview
 
----
+Zirèl e attualmente una piattaforma SaaS multi-tenant con architettura **client-heavy**:
+- `demo/` fornisce il sito pubblico e il widget dimostrativo
+- `dashboard/` fornisce il pannello clienti React
+- Supabase gestisce dati, storage e enforcement server-side
+- n8n gestisce i workflow AI e ingestione
 
-## Stack
+Il backend proxy, JWT e i cookie `HttpOnly` sono **roadmap futura** e non fanno parte del runtime attivo oggi.
 
-| Livello      | File / Tecnologia     | Responsabilità                                    |
-|--------------|-----------------------|---------------------------------------------------|
-| Frontend Vetrina | HTML + CSS            | Landing, demo, pricing, pagine legali             |
-| Client Dashboard | React + Tailwind (Vite)| Pannello di controllo, gestione AI, prenotazioni  |
-| Config demo  | `public/config.js`    | Endpoint webhook + tenant_id — committato         |
-| Chat Logic   | `public/chat.js`      | Fetch al webhook, escape XSS, rendering messaggi  |
-| UI Logic     | `public/ui-helpers.js`| Carousel, FAQ, navbar, hamburger                  |
-| Build        | Vite                  | Multi-pagina per vetrina, SPA per dashboard       |
-| Automation   | n8n                   | Routing, AI Agent, lettura Supabase, prenotazioni |
-| AI           | OpenAI GPT-4o         | Generazione risposte                              |
-| Database     | Supabase (PostgreSQL) | CMS no-code (menu, orari), prenotazioni, Qdrant   |
+## Stack attuale
 
----
+| Layer | Tecnologia | Ruolo |
+|-------|------------|-------|
+| Landing / Demo | HTML, CSS, Vite, JS vanilla | Sito pubblico, demo, widget embeddabile |
+| Dashboard | React, TypeScript, Vite, Tailwind | Configurazione tenant, documenti, prenotazioni |
+| Data Layer | Supabase | Database, storage, query client-side |
+| AI Layer | n8n | Chat orchestration, ingestione documenti |
 
-## Struttura del Repository
+## Runtime attivo oggi
 
-```
-Zirel-Business/
-├── README.md
-├── PRELAUNCH.md
-├── .gitignore
-├── demo/
-│   ├── public/            ← copiati in dist/ verbatim
-│   │   ├── config.js      ← ✅ COMMITTATO (config demo pubblica)
-│   │   ├── config.template.js ← riferimento campi (usato da client-deploy)
-│   │   ├── chat.js
-│   │   └── ui-helpers.js
-│   ├── index.html
-│   ├── demo.html
-│   ├── pricing.html
-│   ├── privacy.html
-│   ├── cookie.html
-│   ├── vite.config.js
-│   ├── package.json
-│   └── client-deploy.js   ← strumento per clienti reali
-├── dashboard/
-│   ├── src/               ← React components for Supabase sync
-│   ├── vercel.json
-│   └── vite.config.ts
-└── docs/
-    ├── technical/ARCHITECTURE.md
-    ├── integration/INTEGRATION_GUIDE.md
-    └── ai/
-```
+### Dashboard
+- Il dashboard autentica il tenant tramite `api_token`.
+- Dopo il login, il browser interroga direttamente Supabase.
+- Le chiamate applicative sono centralizzate in `src/lib/supabase-helpers.ts`.
+- La persistenza sessione e session-based di default con fallback compatibile da `localStorage`.
 
----
+### Widget pubblico
+- Il widget viene iniettato con `<script ... data-tenant-id="...">`.
+- Il browser del visitatore chiama direttamente il webhook chat.
+- Il widget puo leggere una configurazione limitata da Supabase con anon key pubblica.
 
-## Strategia di Configurazione
+### Ingestione
+- Il dashboard carica file su Supabase Storage.
+- Il browser richiede una signed URL.
+- Il browser invoca il webhook di ingestione n8n con payload legacy e metadata di tracciabilita.
 
-**Scelta definitiva: `public/config.js` è pubblico e versionato.**
+## Trust Boundaries
 
-| Aspetto | Scelta |
-|---------|--------|
-| config.js nel repo? | ✅ Sì — contiene l'endpoint della demo |
-| Secret? | No — è un URL client-side visibile via DevTools |
-| Nel .gitignore? | No |
-| Come si builda? | `npm run build` — build Vite pura, nessuna generazione |
+| Boundary | Cosa puo fare | Rischio principale |
+|----------|---------------|-------------------|
+| Browser dashboard | Leggere/scrivere dati tenant via Supabase | Dipendenza da RLS e rischio XSS |
+| Browser widget pubblico | Inviare messaggi al webhook e leggere config widget | Webhook pubblico e configurazione client-side |
+| Supabase | Applicare policy e isolare tenant | Misconfigurazione RLS |
+| n8n webhook | Processare chat e ingestione | Mancanza di auth forte lato webhook |
+| Storage | Conservare documenti per tenant | Accesso cross-tenant se policy deboli |
+| Dati tenant | Config, prenotazioni, KB | Leakage se il server non valida correttamente |
 
-### Per la demo pubblica
+## Stato della sicurezza
 
-1. `npm run build`
-2. Deploy `dist/` su Vercel
+- L'isolamento multi-tenant lato codice client e migliorato, ma non e sufficiente da solo.
+- La sicurezza reale dipende oggi da:
+  - RLS di Supabase
+  - policy storage
+  - validazioni dei workflow n8n
+- Il frontend include guardrail utili, ma non sostituisce controlli authoritativi server-side.
 
-### Per un sito cliente reale
+## Roadmap tecnica successiva
 
-Usa `client-deploy.js` per sovrascrivere `public/config.js` prima del build:
-
-```bash
-export ZIREL_WEBHOOK_URL=https://tuo-webhook
-export ZIREL_TENANT_ID=nome_cliente
-npm run client:setup && npm run build
-```
-
----
-
-## Dual Persona Chat
-
-| Pagina | `tenantId` | Comportamento |
-|--------|-----------|---------------|
-| Tutte tranne `/demo.html` | `zirel_official` | Consulente di vendita Zirèl |
-| `/demo.html` | `chiringuito_gino_001` | Receptionist white-label Chiringuito da Gino |
-
-L'override avviene in un inline script in `demo.html` che sovrascrive `window.ZirelConfig` prima del caricamento di `chat.js`.
-
----
-
-## Sicurezza
-
-- **XSS**: risposte bot passano per `escapeHTML()` con `String()` coercion prima di `.innerHTML`.
-- **Sessioni**: UUID in `sessionStorage` — nessun cookie, nessun dato persistente.
-- **Demo endpoint**: intenzionalmente pubblico — limitato al tenant `zirel_official`.
+1. Verifica e hardening delle policy RLS su database e storage.
+2. Autenticazione dei webhook n8n con secret condiviso o firma.
+3. Introduzione di un backend proxy compatibile in parallelo.
+4. Migrazione da token client-side a sessioni `HttpOnly`.

@@ -59,6 +59,18 @@ Controlla ogni punto prima di pubblicare. Spunta con [x] quando fatto.
 - [ ] SSL attivo (automatico con Vercel)
 - [ ] Preview deploy testato prima della promozione a production
 
+## 7b. Deploy Dashboard
+
+- [ ] Root Directory impostata su `dashboard`
+- [ ] Build Command: `npm run build`
+- [ ] Output Directory: `dist`
+- [ ] Variabili Vercel configurate:
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
+  - `VITE_N8N_INGESTION_WEBHOOK` (se vuoi ingestion live)
+- [ ] Verificato che `dashboard/vercel.json` venga incluso nel deploy
+- [ ] Preview deploy testato con login reale prima della promozione a production
+
 ## 8. Repository GitHub
 
 - [ ] `demo/dist/` non è tracciato (check: `git status` non mostra file in dist/)
@@ -77,6 +89,7 @@ Controlla ogni punto prima di pubblicare. Spunta con [x] quando fatto.
 | Vite warning `type="module"` su script legacy | Bassa | Non blocca nulla; risolto passando a ES modules in futuro |
 | Pagine legali con email placeholder | Media | Aggiornare `privacy@zirel.it` e `info@zirel.it` prima del lancio |
 | CORS non configurato per dominio produzione | Alta | Aggiungere il dominio Vercel in n8n → Webhook CORS prima di andare live |
+| Env del dashboard mancanti su Vercel | Alta | Copiare tutte le variabili da `dashboard/.env` alle env del progetto dashboard |
 
 ---
 

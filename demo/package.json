@@ -4,13 +4,13 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "./node_modules/vite/bin/vite.js",
-        "build": "./node_modules/vite/bin/vite.js build",
-        "preview": "./node_modules/vite/bin/vite.js preview",
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
         "client:setup": "node client-deploy.js"
     },
     "devDependencies": {
-        "vite": "^6.4.1"
+        "vite": "^7.3.1"
     },
     "dependencies": {
         "@vercel/analytics": "^1.6.1"
