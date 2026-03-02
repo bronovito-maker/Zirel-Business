@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         demo: resolve(__dirname, 'demo.html'),
+        register: resolve(__dirname, 'register.html'),
         pricing: resolve(__dirname, 'pricing.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         cookie: resolve(__dirname, 'cookie.html'),
