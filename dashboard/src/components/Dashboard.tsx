@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Reservations from './Reservations';
+import DocumentManager from './DocumentManager';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
@@ -72,7 +73,7 @@ const Dashboard = ({ tenantId, onLogout }: DashboardProps) => {
     });
     const [isUpdating, setIsUpdating] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti'>('prenotazioni');
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -194,10 +195,22 @@ const Dashboard = ({ tenantId, onLogout }: DashboardProps) => {
                     <Settings className="w-4 h-4 md:w-5 md:h-5" />
                     <span className="md:inline">Impostazioni AI</span>
                 </button>
+                <button
+                    onClick={() => setActiveTab('documenti')}
+                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'documenti'
+                        ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                        }`}
+                >
+                    <FileText className="w-4 h-4 md:w-5 md:h-5" />
+                    <span className="md:inline">Documenti & Knowledge Base</span>
+                </button>
             </div>
 
             {activeTab === 'prenotazioni' ? (
                 <Reservations tenantId={tenantId} />
+            ) : activeTab === 'documenti' ? (
+                <DocumentManager tenantId={tenantId} />
             ) : (
                 <>
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12 animate-fade-in delay-200">
