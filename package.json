@@ -1,0 +1,10 @@
+{
+    "name": "zirel-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev:dashboard": "cd dashboard && npm run dev",
+        "dev:landing": "cd demo && npm run dev",
+        "dev": "npm run dev:landing & npm run dev:dashboard"
+    }
+}

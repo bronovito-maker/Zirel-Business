@@ -154,7 +154,7 @@ const DocumentManager = ({ tenantId }: DocumentManagerProps) => {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900">Documenti & Knowledge Base</h2>
-                    <p className="text-gray-500 mt-1">Carica menu, policy o guide in PDF. L'Intelligenza Artificiale li studierà per rispondere ai clienti.</p>
+                    <p className="text-gray-500 mt-1">Carica menu, policy o guide in PDF. Zirèl li studierà per rispondere ai tuoi clienti.</p>
                 </div>
 
                 <div>
@@ -180,7 +180,7 @@ const DocumentManager = ({ tenantId }: DocumentManagerProps) => {
                 <div className="p-4 md:p-6 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                     <h3 className="font-semibold text-gray-700 flex items-center gap-2">
                         <FileText className="w-5 h-5 text-gray-400" />
-                        Archivio Attuale (Qdrant)
+                        Archivio Attuale
                     </h3>
                     <button onClick={fetchDocuments} className="p-2 text-gray-400 hover:text-zirel-orange transition-colors rounded-full hover:bg-orange-50" title="Aggiorna lista">
                         <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin text-zirel-orange' : ''}`} />

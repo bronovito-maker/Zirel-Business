@@ -17,8 +17,15 @@
     --sea-cyan: #FF8c42;
     --sand-white: #fdf0d5;
     --sand-dark: #f2e5c8;
+
+    /* Fluid Typography - Mobile First */
     --font-main: 'Outfit', sans-serif;
     --font-heading: 'Playfair Display', serif;
+
+    --h1-size: clamp(3rem, 10vw, 7.5rem);
+    --h2-size: clamp(2.2rem, 6vw, 4.5rem);
+    --h3-size: clamp(1.8rem, 4vw, 2.5rem);
+
     --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     --glass: rgba(255, 255, 255, 0.1);
     --glass-dark: rgba(0, 48, 73, 0.8);
@@ -26,13 +33,13 @@
     --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.2);
 
     /* Spacing System */
-    --space-section: 160px;
-    --space-page: clamp(2rem, 5vw, 4rem);
-    --space-grid: 4rem;
-    --space-card: 2.5rem;
+    --space-section: clamp(80px, 12vw, 160px);
+    --space-page: clamp(1.5rem, 5vw, 4rem);
+    --space-grid: clamp(2rem, 5vw, 4rem);
+    --space-card: clamp(1.5rem, 3vw, 2.5rem);
     --space-title: 2rem;
     /* Gap between H2 and subtitle/text */
-    --space-header-gap: 5rem;
+    --space-header-gap: clamp(3rem, 6vw, 5rem);
     /* Gap between header block and content area */
     --space-element: 1.5rem;
 }
@@ -45,6 +52,7 @@
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -53,23 +61,26 @@ body {
     color: var(--dark);
     line-height: 1.7;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1 {
+    font-size: var(--h1-size);
     font-family: var(--font-main);
-    /* Changed from Playfair for global standardization */
-    line-height: 1.1;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
 }
 
 h2 {
+    font-size: var(--h2-size);
     font-family: var(--font-main);
-    /* Changed from Playfair for global standardization */
-    line-height: 1.2;
-    font-weight: 700;
+    line-height: 1.1;
+    font-weight: 800;
 }
 
 h3,
 h4 {
+    font-size: var(--h3-size);
     font-family: var(--font-main);
     line-height: 1.2;
     font-weight: 700;
@@ -226,7 +237,9 @@ section {
 
 /* Hero Section */
 .hero {
-    height: 100vh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Dynamic Viewport Height for mobile browsers */
     background: url('hero_premium.webp') no-repeat center center/cover;
     display: flex;
     align-items: center;
@@ -234,6 +247,8 @@ section {
     text-align: center;
     position: relative;
     color: var(--white);
+    padding-top: 80px;
+    /* Space for navbar */
 }
 
 .hero-overlay {
@@ -249,12 +264,12 @@ section {
     position: relative;
     z-index: 1;
     max-width: 900px;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
 }
 
 .hero h1 {
-    font-size: 7.5rem;
-    margin-bottom: 1rem;
+    /* Font size now handled by fluid var(--h1-size) */
+    margin-bottom: 1.5rem;
     text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     animation: fadeInUp 1s ease-out;
 }
@@ -267,31 +282,48 @@ section {
 }
 
 .hero p {
-    font-size: 1.8rem;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
     margin-bottom: 3rem;
     font-weight: 300;
     opacity: 0.95;
     animation: fadeInUp 1s ease-out 0.2s backwards;
+    line-height: 1.6;
 }
 
 .hero-actions {
     display: flex;
-    gap: 2rem;
+    flex-direction: column;
+    /* Stack vertically on mobile */
+    gap: 1.5rem;
     justify-content: center;
     animation: fadeInUp 1s ease-out 0.4s backwards;
 }
 
+@media (min-width: 640px) {
+    .hero-actions {
+        flex-direction: row;
+    }
+}
+
 .btn {
-    padding: 1.4rem 3.5rem;
+    padding: 1.2rem 3rem;
     border-radius: 60px;
     text-decoration: none;
     font-weight: 700;
     font-family: var(--font-main);
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: var(--transition);
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+@media (min-width: 1025px) {
+    .btn {
+        padding: 1.4rem 3.5rem;
+        font-size: 1.1rem;
+    }
 }
 
 .btn-primary {
@@ -604,10 +636,6 @@ section {
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .hero h1 {
-        font-size: 4.5rem;
-    }
-
     .navbar {
         padding: 1.2rem 2rem;
     }
@@ -618,16 +646,8 @@ section {
 }
 
 @media (max-width: 768px) {
-    .section-title {
-        font-size: 2.8rem;
-    }
-
-    .hero h1 {
-        font-size: 3.5rem;
-    }
-
     .hero p {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
 
     .hero-actions {
@@ -1002,17 +1022,84 @@ section {
 }
 
 @media (max-width: 768px) {
+    .carousel-section {
+        overflow: hidden;
+        /* Prevent horizontal scroll on body */
+    }
+
     .carousel-container {
-        padding: 0 20px;
+        padding: 0;
+        margin-top: 2rem;
+        position: relative;
+        /* Ensure z-index context */
+        z-index: 1;
+    }
+
+    .carousel-viewport {
+        overflow: hidden;
+        padding: 40px 0;
+        /* V padding, removed H padding */
+        margin: -40px 0;
+        /* Offset the padding */
+    }
+
+    .carousel-track {
+        gap: 16px;
+        display: flex;
+        align-items: stretch;
     }
 
     .sector-card {
-        flex: 0 0 100%;
-        padding: 2.5rem 1.5rem;
+        flex: 0 0 85%;
+        /* Peek effect */
+        padding: 2rem 1.5rem;
+        min-height: 280px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
+    .sector-card h3 {
+        font-size: 1.5rem;
+    }
+
+    /* Fixed arrows visibility + Glassmorphism */
     .carousel-btn {
-        display: none;
+        display: flex !important;
+        /* Force visibility */
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--brand-orange);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .carousel-btn:hover,
+    .carousel-btn:active {
+        background: rgba(255, 255, 255, 0.6);
+        /* Keep glass effect, slightly whiter */
+        color: var(--brand-orange);
+        transform: translateY(-50%) scale(0.95);
+        /* Little tap effect */
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-prev {
+        left: 4px;
+    }
+
+    .btn-next {
+        right: 4px;
+    }
+
+    .carousel-dots {
+        margin-top: 2.5rem;
     }
 }
 

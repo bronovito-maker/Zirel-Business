@@ -11,17 +11,20 @@
 (function () {
     'use strict';
 
-    // Sessione utente
-    if (!sessionStorage.getItem('zirel_session_id')) {
-        sessionStorage.setItem(
-            'zirel_session_id',
-            'session_' + Math.random().toString(36).substring(2, 10)
-        );
-    }
-    const sessionId = sessionStorage.getItem('zirel_session_id');
     const cfg = window.ZirelConfig || {};
     const webhookUrl = cfg.webhookUrl || 'https://zirel.app.n8n.cloud/webhook/zirel-chat';
     const tenantId = cfg.tenantId || 'zirel_official';
+
+    // Sessione utente — prefissata con tenantId per garantire isolamento
+    // nel Postgres Chat Memory (evita collisioni tra sessioni di tenant diversi)
+    const sessionKey = 'zirel_session_' + tenantId;
+    if (!sessionStorage.getItem(sessionKey)) {
+        sessionStorage.setItem(
+            sessionKey,
+            tenantId + '__' + Math.random().toString(36).substring(2, 10)
+        );
+    }
+    const sessionId = sessionStorage.getItem(sessionKey);
 
     // Messaggi tooltip (sovrascrivibili dalla pagina ospite)
     const tooltipMessages = window.zirelTooltipMessages || [
@@ -98,6 +101,8 @@
         loadingMsg.innerText = 'Scrivendo...';
         container.appendChild(loadingMsg);
         container.scrollTop = container.scrollHeight;
+
+        console.log(`[Zirèl Chat] Sending message for tenant: ${tenantId}`);
 
         try {
             const response = await fetch(webhookUrl, {

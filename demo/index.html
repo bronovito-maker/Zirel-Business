@@ -85,14 +85,14 @@
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="pricing.html" class="nav-link">Pricing</a></li>
-            <li><a href="demo.html" class="nav-link">Demo</a></li>
+            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="demo.html" class="nav-link">DEMO</a></li>
+            <li><a href="http://localhost:5174" class="nav-link">DASHBOARD</a></li>
             <li><a href="#faq" class="nav-link">FAQ</a></li>
-            <li><a href="#contatti" class="nav-link">Contatti</a></li>
-            <li class="cta-nav-mobile-li"><a href="#contatti" class="cta-nav">Inizia Ora</a>
-            </li>
+            <li><a href="#contatti" class="nav-link">CONTATTI</a></li>
+            <li class="cta-nav-mobile-li"><a href="#contatti" class="cta-nav">INIZIA ORA</a></li>
         </ul>
-        <a href="#contatti" class="cta-nav cta-nav-desktop">Inizia Ora</a>
+        <a href="#contatti" class="cta-nav cta-nav-desktop">INIZIA ORA</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -316,7 +316,7 @@
             </div>
 
             <div class="carousel-container">
-                <button class="carousel-btn btn-prev" aria-label="Precedente">←</button>
+                <button id="prev-btn" class="carousel-btn btn-prev" aria-label="Precedente">←</button>
                 <div class="carousel-viewport">
                     <div class="carousel-track" id="carousel-track">
                         <!-- Hotel -->
@@ -367,7 +367,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="carousel-btn btn-next" aria-label="Successivo">→</button>
+                <button id="next-btn" class="carousel-btn btn-next" aria-label="Successivo">→</button>
                 <div class="carousel-dots" id="carousel-dots"></div>
             </div>
 
@@ -513,28 +513,37 @@
 
     <!-- 6. Call to Action Finale & Footer -->
     <section class="py-24 relative overflow-hidden" id="contatti">
-        <div
-            class="container mx-auto px-4 md:px-8 bg-brand-blue rounded-[3rem] p-12 md:p-24 text-center text-white relative z-10">
-            <h2 class="text-3xl md:text-6xl font-black mb-8">L'ospitalità di domani.<br /><span
-                    class="text-brand-orange">Inizia oggi con <span
-                        class="text-brand-orange font-sans">Zirèl</span>.</span></h2>
-            <p class="text-lg opacity-80 mb-12 max-w-2xl mx-auto italic">Riprenditi il tuo tempo. Eleva l'esperienza dei
-                tuoi ospiti. Unisciti alla rivoluzione invisibile dell'accoglienza romagnola.</p>
-            <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <button onclick="toggleDemo()"
-                    class="bg-brand-orange text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:bg-white hover:text-brand-orange transition-all active:scale-95">
-                    Assumi Zirèl ora
-                </button>
-            </div>
-            <div class="mt-12 flex justify-center gap-8 text-sm opacity-60">
-                <span>✓ Nessun setup tecnico richiesto</span>
-                <span>✓ Prova gratuita inclusa</span>
-                <span>✓ Supporto dedicato in Riviera</span>
+        <div class="container mx-auto px-4 md:px-8">
+            <div
+                class="bg-brand-blue rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-white relative z-10 transition-all duration-500 hover:shadow-2xl">
+                <h2 class="text-3xl md:text-6xl font-black mb-8 leading-tight">L'ospitalità di domani.<br /><span
+                        class="text-brand-orange">Inizia oggi con <span
+                            class="text-brand-orange font-sans">Zirèl</span>.</span></h2>
+                <p class="text-lg opacity-80 mb-12 max-w-2xl mx-auto italic">Riprenditi il tuo tempo. Eleva l'esperienza
+                    dei
+                    tuoi ospiti. Unisciti alla rivoluzione invisibile dell'accoglienza romagnola.</p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <a href="http://localhost:5174"
+                        class="bg-brand-orange text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:bg-white hover:text-brand-orange transition-all active:scale-95">Area
+                        Business</a>
+                </div>
+                <!-- Features List - Stacked on Mobile -->
+                <div
+                    class="mt-12 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-12 text-sm opacity-60">
+                    <span class="flex items-center gap-2">✓ Nessun setup tecnico richiesto</span>
+                    <span class="flex items-center gap-2">✓ Prova gratuita inclusa</span>
+                    <span class="flex items-center gap-2">✓ Supporto dedicato in Riviera</span>
+                </div>
             </div>
         </div>
 
-        <!-- Decorative waves -->
-        <div class="absolute bottom-0 left-0 w-full h-24 bg-brand-orange/10"></div>
+        <!-- Decorative backgrounds -->
+        <div
+            class="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-brand-orange/10 blur-[100px] pointer-events-none">
+        </div>
+        <div
+            class="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-brand-cyan/10 blur-[100px] pointer-events-none">
+        </div>
     </section>
 
     <footer class="footer">
@@ -568,6 +577,7 @@
     </footer>
 
 
+
     <!-- Chat Tooltip -->
     <div id="chat-tooltip" class="chat-tooltip">
         Serve aiuto? Ci pensa Zirèl! 💬
@@ -578,29 +588,32 @@
         class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[100] scale-0 transition-transform origin-bottom-right duration-500">
         <div
             class="bg-white w-[calc(100vw-2rem)] sm:w-[350px] h-[65vh] sm:h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
-            <div class="brand-gradient p-5 text-white flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                            <path fill-rule="evenodd"
-                                d="M4.804 21.644A6.707 6.707 0 006 21.75a6.721 6.721 0 003.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 01-.814 1.686.75.75 0 00.44 1.223zM8.25 10.875a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zM10.875 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h6 class="font-bold text-sm">Zirèl Assistant</h6>
-                        <p class="text-[10px] opacity-70">Risponde istantaneamente</p>
-                    </div>
+
+            <!-- Widget Header -->
+            <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
+                <!-- Avatar icona -->
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    💬
                 </div>
-                <button onclick="toggleDemo()" class="opacity-50 hover:opacity-100 italic">Chiudi</button>
+                <!-- Titolo + sottotitolo -->
+                <div class="flex-grow">
+                    <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
+                    <p class="text-[11px] text-white/75 mt-0.5">Risponde istantaneamente</p>
+                </div>
+                <!-- Chiudi -->
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
             </div>
 
+            <!-- Messages Area -->
             <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
                 <div
                     class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
                     <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
-                    <p>Posso prenotarti un tavolo o consigliarti il posto perfetto per il tuo dopocena a Riccione. Cosa
-                        ti ispira oggi?</p>
+                    <p>Posso rispondere a tutte le tue domande sull'assistente AI per la tua struttura, o aiutarti a
+                        prenotare una demo gratuita. Come posso esserti utile?</p>
                 </div>
 
                 <div class="quick-replies" id="quick-replies-container">
@@ -619,6 +632,7 @@
                 </div>
             </div>
 
+            <!-- Input Bar -->
             <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
                 <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
                     class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
@@ -632,16 +646,18 @@
                     </svg>
                 </button>
             </div>
+
         </div>
     </div>
 
     <!-- Chat Toggle Button -->
     <button onclick="toggleDemo()" id="chat-toggle-btn"
-        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[101] hover:-translate-y-1 active:scale-95 transition-all duration-300 flex overflow-hidden border-2 border-white">
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[101] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
         <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
             💬
         </span>
     </button>
+
     <script src="config.js"></script>
     <script>
         // Messaggi tooltip specifici di questa pagina (Business landing)

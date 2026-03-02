@@ -117,7 +117,7 @@ const Reservations = ({ tenantId }: ReservationsProps) => {
                 <div className="text-center py-16 apple-card">
                     <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900">Nessuna prenotazione</h3>
-                    <p className="mt-1 text-gray-500">L'Intelligenza Artificiale non ha ancora registrato prenotazioni per il tuo locale.</p>
+                    <p className="mt-1 text-gray-500">La Chat non ha ancora registrato prenotazioni per il tuo locale.</p>
                 </div>
             ) : (
                 <div className="grid gap-4">

@@ -3,6 +3,10 @@ import { resolve } from 'path';
 
 export default defineConfig({
   base: './',
+  server: {
+    port: 5173,
+    host: true,
+  },
   build: {
     // Multi-page app: each HTML file becomes a separate entry point
     rollupOptions: {

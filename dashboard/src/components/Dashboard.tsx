@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Reservations from './Reservations';
 import DocumentManager from './DocumentManager';
@@ -163,47 +163,56 @@ const Dashboard = ({ tenantId, onLogout }: DashboardProps) => {
                     <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
                     <div className="mt-2 md:mt-0 relative z-20">
                         <h1 className="text-xl md:text-2xl font-bold tracking-tight">Benvenuto {tenantId}!</h1>
-                        <p className="text-gray-500 text-sm md:text-base">Pannello di controllo dell'Intelligenza Artificiale.</p>
+                        <p className="text-gray-500 text-sm md:text-base">Pannello di controllo</p>
                     </div>
                 </div>
 
-                <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto mt-4 md:mt-0">
-                    <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
-                    Esci
-                </button>
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                    <a
+                        href="http://localhost:5173"
+                        className="text-gray-500 hover:text-indigo-600 text-sm font-medium flex items-center gap-2 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50"
+                    >
+                        <ExternalLink size={16} />
+                        Torna alla Home
+                    </a>
+                    <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto">
+                        <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
+                        Esci
+                    </button>
+                </div>
             </header>
 
             {/* Tab Navigation */}
             <div className="flex flex-wrap gap-2 md:space-x-2 border-b border-gray-200 mb-8 animate-fade-in delay-100 pb-2 md:pb-0">
                 <button
                     onClick={() => setActiveTab('prenotazioni')}
-                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'prenotazioni'
+                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'prenotazioni'
                         ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        }`}
+                        } `}
                 >
                     <CalendarDays className="w-4 h-4 md:w-5 md:h-5" />
                     <span className="md:inline">Prenotazioni</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('impostazioni')}
-                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'impostazioni'
+                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'impostazioni'
                         ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        }`}
+                        } `}
                 >
                     <Settings className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="md:inline">Impostazioni AI</span>
+                    <span className="md:inline">Impostazioni</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('documenti')}
-                    className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-4 md:px-6 py-3 text-sm font-medium transition-colors border-b-2 rounded-t-lg md:rounded-none md:border-b-2 ${activeTab === 'documenti'
+                    className={`flex - 1 md: flex - none flex justify - center items - center gap - 2 px - 4 md: px - 6 py - 3 text - sm font - medium transition - colors border - b - 2 rounded - t - lg md: rounded - none md: border - b - 2 ${activeTab === 'documenti'
                         ? 'border-zirel-orange text-zirel-orange bg-orange-50 md:bg-transparent'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                        }`}
+                        } `}
                 >
                     <FileText className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="md:inline">Documenti & Knowledge Base</span>
+                    <span className="md:inline">Documenti</span>
                 </button>
             </div>
 
