@@ -18,16 +18,15 @@
     const tenantId = me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official';
     const webhookUrl = me?.getAttribute('data-webhook-url') || cfg.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
 
-    // Sessione utente — prefissata con tenantId per garantire isolamento
-    // nel Postgres Chat Memory (evita collisioni tra sessioni di tenant diversi)
-    const sessionKey = 'zirel_session_' + tenantId;
-    if (!sessionStorage.getItem(sessionKey)) {
-        sessionStorage.setItem(
-            sessionKey,
-            tenantId + '__' + Math.random().toString(36).substring(2, 10)
-        );
+    // Sessione runtime: resta stabile finche la pagina e aperta, ma si resetta al reload.
+    // In questo modo un refresh forza una nuova conversazione e non riprende
+    // automaticamente la memoria precedente sul backend.
+    const runtimeSessions = window.__zirelRuntimeSessions || (window.__zirelRuntimeSessions = {});
+    if (!runtimeSessions[tenantId]) {
+        runtimeSessions[tenantId] =
+            tenantId + '__' + Math.random().toString(36).substring(2, 10);
     }
-    const sessionId = sessionStorage.getItem(sessionKey);
+    const sessionId = runtimeSessions[tenantId];
 
     // Messaggi tooltip (sovrascrivibili dalla pagina ospite)
     const tooltipMessages = window.zirelTooltipMessages || [
