@@ -139,6 +139,45 @@
         }
     }
 
+    function elevateWidgetLayer(isMobile, isOpen) {
+        const widget = document.getElementById('n8n-widget-mock');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+
+        if (!widget) return;
+
+        widget.style.zIndex = '2147483646';
+        if (toggleBtn) toggleBtn.style.zIndex = '2147483647';
+
+        if (isMobile && isOpen) {
+            widget.style.top = '0';
+            widget.style.left = '0';
+            widget.style.right = '0';
+            widget.style.bottom = '0';
+            widget.style.width = '100vw';
+            widget.style.height = '100dvh';
+            widget.style.maxWidth = '100vw';
+            widget.style.maxHeight = '100dvh';
+        } else if (isMobile) {
+            widget.style.top = '0';
+            widget.style.left = '0';
+            widget.style.right = '0';
+            widget.style.bottom = '0';
+            widget.style.width = '';
+            widget.style.height = '';
+            widget.style.maxWidth = '';
+            widget.style.maxHeight = '';
+        } else {
+            widget.style.top = '';
+            widget.style.left = '';
+            widget.style.right = '';
+            widget.style.bottom = '';
+            widget.style.width = '';
+            widget.style.height = '';
+            widget.style.maxWidth = '';
+            widget.style.maxHeight = '';
+        }
+    }
+
     // Avvia ciclo tooltip dopo 5s, poi ogni 7s
     setTimeout(() => {
         showAndCycleTooltip();
@@ -155,6 +194,7 @@
         hideTooltip();
 
         if (widget.classList.contains('scale-0')) {
+            elevateWidgetLayer(isMobile, true);
             widget.classList.remove('scale-0');
             widget.classList.add('scale-100');
             icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
@@ -167,6 +207,7 @@
             widget.classList.remove('scale-100');
             widget.classList.add('scale-0');
             icon.innerHTML = '<span class="text-3xl">💬</span>';
+            elevateWidgetLayer(isMobile, false);
 
             if (isMobile) {
                 if (toggleBtn) toggleBtn.style.display = 'flex';
