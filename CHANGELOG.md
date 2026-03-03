@@ -3,6 +3,15 @@
 Tutte le modifiche importanti a questo progetto (Zirèl) saranno documentate in questo file.
 Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it-IT/1.0.0/).
 
+## [Unreleased]
+### Added
+- Workflow `Registra_Appuntamento` consolidato come motore unico per gli appuntamenti non-restaurant, con primo ramo attivo `demo_request`.
+- Conferma cliente via Resend nel workflow appuntamenti, eseguita su ramo laterale e con brand del tenant nel contenuto della mail.
+
+### Changed
+- Hardening del parser data/ora del workflow appuntamenti: supporto a date testuali e numeriche con validazione contro date impossibili.
+- Rifattorizzato il flusso notifiche del workflow appuntamenti: il salvataggio in Supabase resta la fonte di verita, mentre Telegram e Resend non bloccano la risposta finale del tool.
+
 ## [1.1.0] - 2026-02-28
 ### Added
 - **Chat Widget "Concierge" Experience**: Introdotto il messaggio di benvenuto personalizzato e le Quick Replies (Prenota, Menu, Eventi, Umano).

@@ -1,7 +1,7 @@
 # n8n AI Orchestration Workflows
 
 ## Overview
-n8n acts as the central intelligence engine for Zirèl, connecting the chat UI to the AI models and the tenant's knowledge base. Two main workflows drive the system.
+n8n acts as the central intelligence engine for Zirèl, connecting the chat UI to the AI models and the tenant's knowledge base. Three main workflows drive the system.
 
 ---
 
@@ -37,7 +37,37 @@ n8n acts as the central intelligence engine for Zirèl, connecting the chat UI t
 
 ---
 
-## 3. Webhook Integration Details
+## 3. Appointment Workflow (`Registra_Appuntamento`)
+
+This workflow is the shared appointment engine for non-restaurant tenants. It should be called only after explicit user confirmation and only when the assistant has already collected the required contact data, date, and time.
+
+### Recommended Trigger
+`When Executed by Another Workflow`
+
+### Purpose
+- Save a real appointment into Supabase.
+- Send an internal Telegram alert.
+- Optionally send a customer confirmation email via Resend.
+- Return a structured success payload so the AI can confirm the appointment without hallucinating.
+
+### Guardrails
+- Reject unsupported sectors.
+- Reject unsupported appointment types.
+- Reject incomplete contact data.
+- Reject vague scheduling requests that cannot be parsed reliably.
+- Use `Europe/Rome` when resolving dates.
+- Never let the assistant claim the appointment is booked before this workflow returns `success: true`.
+- Keep Telegram and Resend on side branches so notification failures do not invalidate the successful database write.
+- Brand the customer email body with the tenant identity; keep the sender on a verified Zirèl domain unless the tenant domain is separately verified.
+
+### Operational Note
+- If Railway shows `Queued` / `Starting soon`, this is usually infrastructure contention (busy worker, restart, cold start), not a workflow logic failure.
+
+> See the detailed build spec in `docs/technical/REGISTRA_APPUNTAMENTO.md`.
+
+---
+
+## 4. Webhook Integration Details
 - **Environment Variables:** All base URLs and keys are stored in n8n/Railway environment variables.
 - **Fail-Safe:** If the webhook is unreachable, the widget should gracefully handle errors or switch to a fallback "Sito in manutenzione" message.
 - **Scalability:** Hosted on Railway for predictable auto-scaling and high availability.

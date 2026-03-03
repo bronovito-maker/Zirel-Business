@@ -1,0 +1,764 @@
+{
+  "name": "Zirèl - Registra_Appuntamento",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        320
+      ],
+      "id": "4dfe1b25-3dcb-4e27-8a28-001d9a7d9001",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "business_type_is_supported",
+              "leftValue": "={{ ['professional', 'medical', 'legal', 'hotel'].includes(String($json.business_type || '').trim().toLowerCase()) }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        320
+      ],
+      "id": "0e83bbdd-f367-4fdb-bb1b-001d9a7d9002",
+      "name": "Check Sector Supported"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "code",
+              "name": "code",
+              "value": "UNSUPPORTED_SECTOR",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "Questo workflow gestisce solo appuntamenti per settori non-restaurant supportati.",
+              "type": "string"
+            },
+            {
+              "id": "final_reply",
+              "name": "final_reply",
+              "value": "Posso raccogliere i dati, ma questa richiesta non puo essere registrata da questo flusso.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        480
+      ],
+      "id": "cb38a0dd-8d61-4e6f-b4c6-001d9a7d9003",
+      "name": "Unsupported Sector Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has_nome",
+              "leftValue": "={{ !!String($json.nome || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "has_telefono",
+              "leftValue": "={{ !!String($json.telefono || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "has_email",
+              "leftValue": "={{ !!String($json.email || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        240
+      ],
+      "id": "85f31965-5db0-4b79-9bd8-001d9a7d9004",
+      "name": "Check Appointment Type"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "code",
+              "name": "code",
+              "value": "UNSUPPORTED_APPOINTMENT_TYPE",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "Il tipo di appuntamento richiesto non e supportato da questo workflow.",
+              "type": "string"
+            },
+            {
+              "id": "final_reply",
+              "name": "final_reply",
+              "value": "Posso raccogliere i dati, ma questo tipo di appuntamento non e ancora attivo.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        400
+      ],
+      "id": "4b84fbd8-0ef8-4656-978f-001d9a7d9005",
+      "name": "Unsupported Appointment Type Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const value = $json;\n\nconst normalizeSpaces = (input) => String(input || '').replace(/\\s+/g, ' ').trim();\n\nconst nome = normalizeSpaces(value.nome)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\n\nconst telefono = normalizeSpaces(value.telefono).replace(/[^\\d+\\s]/g, '');\nconst email = normalizeSpaces(value.email).toLowerCase();\nconst note = normalizeSpaces(value.note);\nconst orario = normalizeSpaces(value.orario);\nconst data_input = normalizeSpaces(value.data_input).toLowerCase();\nconst appointment_type = normalizeSpaces(value.appointment_type).toLowerCase();\nconst business_type = normalizeSpaces(value.business_type).toLowerCase();\n\nreturn [{\n  json: {\n    ...value,\n    nome,\n    telefono,\n    email,\n    note,\n    orario,\n    data_input,\n    appointment_type,\n    business_type,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        240
+      ],
+      "id": "d2f18b94-d6fc-4e0b-858c-001d9a7d9006",
+      "name": "Normalize Contact Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has_nome",
+              "leftValue": "={{ !!String($json.nome || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "has_telefono",
+              "leftValue": "={{ !!String($json.telefono || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "email_if_demo",
+              "leftValue": "={{ $json.appointment_type !== 'demo_request' || !!String($json.email || '').trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "11ff58b4-c4df-4116-8d4d-001d9a7d9006b",
+      "name": "Check Required Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "code",
+              "name": "code",
+              "value": "MISSING_REQUIRED_FIELDS",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "Mancano uno o piu campi obbligatori per registrare l'appuntamento.",
+              "type": "string"
+            },
+            {
+              "id": "final_reply",
+              "name": "final_reply",
+              "value": "Per registrare davvero l'appuntamento mi servono almeno nome e telefono, e per la demo anche email.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        400
+      ],
+      "id": "f1b4b5a3-cd27-4d2e-9e15-001d9a7d9006c",
+      "name": "Missing Fields Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst timezone = 'Europe/Rome';\n\nconst months = {\n  gennaio: 0,\n  febbraio: 1,\n  marzo: 2,\n  aprile: 3,\n  maggio: 4,\n  giugno: 5,\n  luglio: 6,\n  agosto: 7,\n  settembre: 8,\n  ottobre: 9,\n  novembre: 10,\n  dicembre: 11,\n};\n\nconst weekdays = {\n  domenica: 0,\n  lunedi: 1,\n  martedi: 2,\n  mercoledi: 3,\n  giovedi: 4,\n  venerdi: 5,\n  sabato: 6,\n};\n\nconst stripAccents = (value) => String(value || '')\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '');\n\nconst normalizeText = (value) => stripAccents(value)\n  .toLowerCase()\n  .replace(/[,]/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\nconst normalizedDate = normalizeText(input.data_input);\nconst normalizedTime = String(input.orario || '').trim();\n\nif (!/^([01]?\\d|2[0-3]):[0-5]\\d$/.test(normalizedTime)) {\n  return [{\n    json: {\n      ...input,\n      parse_ok: false,\n      parse_error: 'INVALID_TIME',\n    },\n  }];\n}\n\nconst vaguePatterns = [\n  'settimana prossima',\n  'prossima settimana',\n  'la mattina',\n  'di mattina',\n  'nel pomeriggio',\n  'un pomeriggio',\n  'quando potete',\n  'quando siete liberi',\n  'appena potete',\n];\n\nif (!normalizedDate || vaguePatterns.some((pattern) => normalizedDate.includes(pattern))) {\n  return [{\n    json: {\n      ...input,\n      parse_ok: false,\n      parse_error: 'NEED_EXACT_SLOT',\n    },\n  }];\n}\n\nconst now = new Date();\nconst todayInRome = new Date(now.toLocaleString('en-US', { timeZone: timezone }));\ntodayInRome.setHours(0, 0, 0, 0);\n\nconst formatIso = (date) => {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, '0');\n  const d = String(date.getDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n};\n\nconst formatLabel = (date) => date.toLocaleDateString('it-IT', {\n  weekday: 'long',\n  day: 'numeric',\n  month: 'long',\n  year: 'numeric',\n  timeZone: timezone,\n});\n\nlet target = null;\n\nif (normalizedDate === 'oggi') {\n  target = new Date(todayInRome);\n}\n\nif (!target && normalizedDate === 'domani') {\n  target = new Date(todayInRome);\n  target.setDate(target.getDate() + 1);\n}\n\nif (!target) {\n  const explicit = normalizedDate.match(/^(\\d{1,2})\\s+([a-z]+)(?:\\s+(\\d{4}))?$/);\n  if (explicit && months[explicit[2]] !== undefined) {\n    const day = Number(explicit[1]);\n    let year = explicit[3] ? Number(explicit[3]) : todayInRome.getFullYear();\n    target = new Date(year, months[explicit[2]], day);\n    target.setHours(0, 0, 0, 0);\n\n    if (!explicit[3] && target < todayInRome) {\n      target = new Date(year + 1, months[explicit[2]], day);\n      target.setHours(0, 0, 0, 0);\n    }\n  }\n}\n\nif (!target && weekdays[normalizedDate] !== undefined) {\n  const wanted = weekdays[normalizedDate];\n  target = new Date(todayInRome);\n  const delta = (wanted - target.getDay() + 7) % 7 || 7;\n  target.setDate(target.getDate() + delta);\n}\n\nif (!target || Number.isNaN(target.getTime())) {\n  return [{\n    json: {\n      ...input,\n      parse_ok: false,\n      parse_error: 'NEED_EXACT_SLOT',\n    },\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    parse_ok: true,\n    data_appuntamento: formatIso(target),\n    data_appuntamento_label: formatLabel(target),\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        240
+      ],
+      "id": "89fcf791-d37d-4a43-8560-001d9a7d9007",
+      "name": "Parse Appointment Date"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "parse_success",
+              "leftValue": "={{ $json.parse_ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        240
+      ],
+      "id": "9d52d982-7f87-44c1-9eb1-001d9a7d9008",
+      "name": "Check Parsed Date"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "success",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "code",
+              "name": "code",
+              "value": "NEED_EXACT_SLOT",
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "name": "message",
+              "value": "Data o orario non abbastanza precisi.",
+              "type": "string"
+            },
+            {
+              "id": "final_reply",
+              "name": "final_reply",
+              "value": "Per registrare davvero l'appuntamento mi serve una data precisa e un orario preciso, ad esempio 13 marzo alle 10:30.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        400
+      ],
+      "id": "5d5bd0df-8823-40e7-b2f2-001d9a7d9009",
+      "name": "Need Exact Slot Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const labels = {\n  demo_request: {\n    kind: 'Richiesta demo',\n    successMessage: 'Richiesta demo registrata correttamente.',\n    finalReply: `Perfetto, ho registrato la tua richiesta demo per ${$json.data_appuntamento_label} alle ${$json.orario}. Il nostro team ti contattera a breve usando telefono o email indicati.`,\n  },\n};\n\nconst copy = labels[$json.appointment_type] || {\n  kind: 'Appuntamento',\n  successMessage: 'Appuntamento registrato correttamente.',\n  finalReply: `Perfetto, ho registrato il tuo appuntamento per ${$json.data_appuntamento_label} alle ${$json.orario}.`,\n};\n\nreturn [{\n  json: {\n    ...$json,\n    appointment_kind_label: copy.kind,\n    success_message: copy.successMessage,\n    generated_final_reply: copy.finalReply,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        240
+      ],
+      "id": "ef1d4950-c2ff-44f0-a893-001d9a7d9009b",
+      "name": "Build Appointment Copy"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "appointments",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $json.tenant_id }}",
+            "business_type": "={{ $json.business_type }}",
+            "appointment_type": "={{ $json.appointment_type }}",
+            "nome": "={{ $json.nome }}",
+            "telefono": "={{ $json.telefono }}",
+            "email": "={{ $json.email }}",
+            "data_appuntamento": "={{ $json.data_appuntamento }}",
+            "orario": "={{ $json.orario }}",
+            "note": "={{ $json.note }}",
+            "stato": "new",
+            "source": "chat_widget"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "appointment_type",
+              "displayName": "appointment_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "data_appuntamento",
+              "displayName": "data_appuntamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "orario",
+              "displayName": "orario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "note",
+              "displayName": "note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "stato",
+              "displayName": "stato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        240
+      ],
+      "id": "0fa90d2f-ea1f-4f6c-a1e6-001d9a7d9010",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.ZIREL_INTERNAL_TELEGRAM_CHAT_ID || '' }}",
+        "text": "=Nuovo appuntamento Zirèl\\n\\nTenant: {{$json.tenant_id}}\\nSettore: {{$json.business_type}}\\nTipo: {{$json.appointment_type}}\\nNome: {{$json.nome}}\\nTelefono: {{$json.telefono}}\\nEmail: {{$json.email || 'Non fornita'}}\\nSlot richiesto: {{$json.data_appuntamento_label}} alle {{$json.orario}}\\nNote: {{$json.note || 'Nessuna nota'}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2640,
+        240
+      ],
+      "id": "f1418c7a-5e53-4240-b9ea-001d9a7d9011",
+      "name": "Telegram - Team Alert",
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.ZIREL_FROM_EMAIL || '' }}",
+        "toEmail": "={{ $env.ZIREL_SALES_EMAIL || '' }}",
+        "subject": "=[Zirèl] Nuovo appuntamento ({{$json.appointment_type}}) da {{$json.nome}}",
+        "emailType": "text",
+        "message": "=Nuovo appuntamento Zirèl\\n\\nTenant: {{$json.tenant_id}}\\nSettore: {{$json.business_type}}\\nTipo: {{$json.appointment_type}}\\nNome: {{$json.nome}}\\nTelefono: {{$json.telefono}}\\nEmail: {{$json.email || 'Non fornita'}}\\nSlot richiesto: {{$json.data_appuntamento_label}} alle {{$json.orario}}\\nNote: {{$json.note || 'Nessuna nota'}}"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2880,
+        240
+      ],
+      "id": "d6b0feea-28a8-4d1c-9ff2-001d9a7d9012",
+      "name": "Email - Internal Notification",
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    code: 'APPOINTMENT_CREATED',\n    message: $json.success_message || 'Appuntamento registrato correttamente.',\n    lead_id: $json.id || $json.lead_id || null,\n    appointment_type: $json.appointment_type,\n    business_type: $json.business_type,\n    data_appuntamento: $json.data_appuntamento,\n    data_appuntamento_label: $json.data_appuntamento_label,\n    orario: $json.orario,\n    nome: $json.nome,\n    telefono: $json.telefono,\n    email: $json.email || '',\n    note: $json.note || '',\n    booking_summary: `${$json.appointment_kind_label || 'Appuntamento'} da ${$json.nome} per ${$json.data_appuntamento_label} alle ${$json.orario}.`,\n    final_reply: $json.generated_final_reply || `Perfetto, ho registrato il tuo appuntamento per ${$json.data_appuntamento_label} alle ${$json.orario}.`,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        240
+      ],
+      "id": "06d65b85-374f-467f-95fa-001d9a7d9013",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Check Sector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Sector Supported": {
+      "main": [
+        [
+          {
+            "node": "Check Appointment Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Sector Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Appointment Type": {
+      "main": [
+        [
+          {
+            "node": "Normalize Contact Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Appointment Type Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Contact Data": {
+      "main": [
+        [
+          {
+            "node": "Check Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Required Fields": {
+      "main": [
+        [
+          {
+            "node": "Parse Appointment Date",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Missing Fields Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Appointment Date": {
+      "main": [
+        [
+          {
+            "node": "Check Parsed Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Parsed Date": {
+      "main": [
+        [
+          {
+            "node": "Build Appointment Copy",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Need Exact Slot Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Appointment Copy": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Team Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Team Alert": {
+      "main": [
+        [
+          {
+            "node": "Email - Internal Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Internal Notification": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
