@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zirèl Hotel | Più richieste dirette.</title>
+    <meta name="description"
+        content="Zirèl Hotel aiuta hotel e strutture ricettive a gestire richieste dirette, follow-up e contatti in modo più ordinato. Scopri la soluzione e richiedi una demo guidata.">
+
+    <link rel="canonical" href="https://zirel.org/hotel" />
+    <meta property="og:title"
+        content="Zirèl Hotel | Più richieste dirette, meno tempo perso tra reception e follow-up." />
+    <meta property="og:description"
+        content="La soluzione Zirèl per hotel e strutture ricettive: richieste dirette, lead più ordinati e follow-up coerente con il brand della struttura." />
+    <meta property="og:url" content="https://zirel.org/hotel" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://zirel.org/hero_premium.png" />
+    <meta property="og:site_name" content="Zirèl Hotel" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title"
+        content="Zirèl Hotel | Più richieste dirette, meno tempo perso tra reception e follow-up." />
+    <meta name="twitter:description"
+        content="Scopri come Zirèl Hotel aiuta la tua struttura a raccogliere richieste, ordinare i lead e migliorare il follow-up." />
+    <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
+    <meta name="twitter:site" content="@zirelcore" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .hero-pattern {
+            background-color: #eefcff;
+            background-image:
+                radial-gradient(circle at top right, rgba(125, 211, 252, 0.22), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(186, 230, 253, 0.24), transparent 34%);
+        }
+
+        .hotel-shell {
+            border-color: rgba(186, 230, 253, 0.95);
+            box-shadow: 0 30px 76px rgba(14, 116, 144, 0.14);
+        }
+
+        .hotel-note {
+            background: linear-gradient(180deg, #ffffff 0%, #f0fbff 100%);
+            border: 1px solid rgba(186, 230, 253, 0.85);
+        }
+
+        .hotel-panel {
+            background: linear-gradient(180deg, #f4fcff 0%, #e8faff 100%);
+            border: 1px solid rgba(125, 211, 252, 0.65);
+            box-shadow: 0 26px 64px rgba(14, 116, 144, 0.10);
+        }
+
+        .page-hotel {
+            background: linear-gradient(180deg, #ecfbff 0%, #ffffff 22%);
+        }
+
+        .page-hotel .zirel-card {
+            border-color: rgba(186, 230, 253, 0.8);
+            box-shadow: 0 18px 42px rgba(14, 116, 144, 0.07);
+        }
+
+        .page-hotel #problemi,
+        .page-hotel #demo-guidata {
+            background: linear-gradient(180deg, #ffffff 0%, #f0fbff 100%);
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="page-hotel font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Hotel</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing-hotel.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10">
+            <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
+                <span
+                    class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-sky-100 shadow-sm">
+                    Ogni richiesta diretta conta.
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    Più richieste dirette.<br />
+                    <span class="text-brand-orange italic">Meno carico in reception.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Tu gestisci la struttura. Zirèl gestisce primo contatto, FAQ e richieste iniziali.<br /><br />
+                    Lead più puliti. Follow-up più veloce.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="hotel-demo.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
+                        Prova la demo
+                    </a>
+                    <a href="#demo-guidata"
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
+                        Vedi il flusso
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:w-2/5 flex justify-center items-center relative">
+                <div
+                    class="hotel-shell relative w-72 md:w-96 bg-white rounded-[2.5rem] p-4 overflow-hidden">
+                    <div
+                        class="rounded-[2rem] overflow-hidden bg-gradient-to-br from-brand-blue to-brand-blue-dark p-5 md:p-6">
+                        <div class="flex items-start justify-between gap-4 mb-5 text-white">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold">Zirèl Hotel
+                                </p>
+                                <h3 class="text-2xl font-black mt-1 leading-tight">Richieste più pulite,<br>follow-up
+                                    più veloce</h3>
+                            </div>
+                            <span
+                                class="px-3 py-1 rounded-full bg-brand-orange/15 text-brand-orange text-[10px] font-bold uppercase tracking-[0.12em]">Live</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Richieste
+                                    oggi</p>
+                                <p class="text-3xl font-black mt-1">21</p>
+                                <p class="text-[11px] text-white/45 mt-1">9 già qualificate</p>
+                            </div>
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Tempo medio
+                                </p>
+                                <p class="text-3xl font-black mt-1">46s</p>
+                                <p class="text-[11px] text-white/45 mt-1">dal primo contatto</p>
+                            </div>
+                        </div>
+
+                        <div class="hotel-note rounded-3xl p-5 shadow-lg mb-4">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Cosa
+                                vedi in demo</p>
+                            <p class="text-base font-bold text-brand-blue leading-snug mb-2">Ti mostriamo come Zirèl
+                                accoglie una richiesta, ordina i dati e prepara un follow-up coerente con il brand
+                                della struttura.</p>
+                            <div class="grid grid-cols-2 gap-3 mt-4">
+                                <div class="rounded-2xl bg-sky-50 p-3 border border-sky-100">
+                                    <p class="text-[10px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">
+                                        Lead</p>
+                                    <p class="text-sm font-bold text-brand-blue mt-1">Completo e leggibile</p>
+                                </div>
+                                <div class="rounded-2xl bg-sky-50 p-3 border border-sky-100">
+                                    <p class="text-[10px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">
+                                        Follow-up</p>
+                                    <p class="text-sm font-bold text-brand-blue mt-1">Pronto da gestire</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand-orange">Sito demo live</span>
+                            <a href="hotel-demo.html"
+                                class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg">Apri il sito demo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-sky-100 rounded-full blur-3xl -ml-48 -mb-48"></div>
+    </header>
+
+    <section class="py-24 bg-white" id="problemi">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cosa risolve <span
+                        class="text-brand-orange">davvero</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Quando la reception non può inseguire ogni richiesta e
+                    ogni lead lasciato in sospeso pesa sul fatturato diretto.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="zirel-card">
+                    <div
+                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        📨</div>
+                    <h3 class="text-2xl font-bold mb-4">Richieste disperse</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Sito, telefono, form e mail producono contatti
+                        frammentati. Il team perde tempo prima ancora di capire cosa vuole davvero l'utente.</p>
+                </div>
+                <div class="zirel-card">
+                    <div class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        🧭</div>
+                    <h3 class="text-2xl font-bold mb-4">Lead poco ordinati</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Date incerte, richieste vaghe, dati mancanti: il
+                        primo contatto diventa rumoroso e il follow-up perde precisione.</p>
+                </div>
+                <div class="zirel-card">
+                    <div
+                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        ⏱️</div>
+                    <h3 class="text-2xl font-bold mb-4">Tempo tolto al team</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Ogni domanda ripetitiva sottrae attenzione alle
+                        attività a maggior valore: risposte lente, più attrito, meno continuità commerciale.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-sky-50/40" id="features">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cosa fa <span
+                        class="text-brand-orange">Zirèl Hotel</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Un primo contatto più ordinato, più coerente,
+                    più utile per il tuo team.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Accoglie la richiesta</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Raccoglie date, contesto e contatto in modo
+                        guidato, senza lasciare la conversazione vaga o incompleta.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Riduce il rumore</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Filtra domande ripetitive e organizza meglio
+                        il primo scambio, così il team riceve informazioni più pulite.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Protegge il brand</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Tone of voice coerente, messaggi ordinati,
+                        follow-up più professionale: il visitatore percepisce una struttura più solida.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Attiva il prossimo passo</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Il risultato non è una chat fine a sé stessa:
+                        è un lead pronto da lavorare o una demo commerciale da fissare.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white" id="demo-guidata">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Vederlo è <span
+                            class="text-brand-orange">demo guidata</span></h2>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">Apri il sito demo hotel e prova come Zirèl raccoglie una richiesta reale, senza promesse ambigue.</p>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Tono coerente, dati utili, passaggio operativo chiaro. Subito.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="hotel-demo.html"
+                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                            Apri demo Hotel
+                        </a>
+                        <a href="pricing-hotel.html"
+                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-lg">
+                            Vedi pricing
+                        </a>
+                    </div>
+                </div>
+                <div class="zirel-card">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Cosa vedrai
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">1.</span>
+                            <p class="text-brand-blue/70">Come Zirèl accoglie una richiesta diretta senza creare false
+                                promesse o disponibilità inventate.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">2.</span>
+                            <p class="text-brand-blue/70">Come vengono raccolti i dati che servono davvero al team per
+                                capire e lavorare il lead.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">3.</span>
+                            <p class="text-brand-blue/70">Come il follow-up può restare coerente con il brand della
+                                struttura, senza sembrare un sistema freddo o improvvisato.</p>
+                        </div>
+                        <div class="mt-6 p-5 rounded-3xl bg-brand-sand/50 border border-brand-sand">
+                            <p class="text-sm text-brand-blue/70"><strong class="text-brand-blue">Nota:</strong> questa
+                                pagina vende la soluzione. Il focus è mostrarti il valore operativo di Zirèl Hotel, non
+                                simulare la reception di una struttura reale.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-sky-50/40" id="faq">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">FAQ <span
+                        class="text-brand-orange">Hotel</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Le domande che contano prima di introdurre una chat sul
+                    sito di una struttura.</p>
+            </div>
+            <div class="max-w-4xl mx-auto faq-grid space-y-4">
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Zirèl Hotel sostituisce il mio team?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-sky-50/60">
+                        <p class="p-6 pt-2 text-brand-blue/70">No. Il suo lavoro è alleggerire il primo contatto,
+                            ordinare le richieste e preparare un follow-up migliore. Il team mantiene il controllo
+                            operativo.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Può promettere disponibilità camere reali?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-sky-50/60">
+                        <p class="p-6 pt-2 text-brand-blue/70">No. La logica corretta è raccogliere la richiesta e
+                            organizzarla, non inventare disponibilità o preventivi. È un punto di forza, non un limite.
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Devo rifare il sito della struttura?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-sky-50/60">
+                        <p class="p-6 pt-2 text-brand-blue/70">No. L'obiettivo è integrare Zirèl nel tuo sito e nel tuo
+                            tono, senza imporre una UX estranea o pesante.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>La demo guidata serve davvero o è solo commerciale?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-sky-50/60">
+                        <p class="p-6 pt-2 text-brand-blue/70">Serve a vedere il prodotto nel contesto giusto: tono,
+                            dati raccolti, flusso e qualità del primo contatto. Non è una chiacchierata generica.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative overflow-hidden" id="contatti">
+        <div class="container mx-auto px-4 md:px-8">
+            <div
+                class="hotel-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Parliamone in 15 minuti.</h2>
+                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Tu porti il contesto della struttura. Noi ti mostriamo il flusso giusto.</p>
+                <div class="flex justify-center">
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Prenota una demo</a>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-brand-orange/10 blur-[100px] pointer-events-none">
+        </div>
+        <div
+            class="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-brand-cyan/10 blur-[100px] pointer-events-none">
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing-hotel.html">Pricing Hotel</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Più lead. Zero dispersione. 🏨
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+
+            <!-- Widget Header -->
+            <div id="widget-header" class="brand-gradient px-5 py-4 text-white flex items-center gap-4"
+                style="background: #FF8C42;">
+                <!-- Avatar icona -->
+                <div id="widget-icon-container"
+                    class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    🏨
+                </div>
+                <!-- Titolo + sottotitolo -->
+                <div class="flex-grow">
+                    <h6 id="widget-title-text" class="font-bold text-base leading-tight">Zirèl Hotel</h6>
+                    <p id="widget-subtitle-text" class="text-[11px] text-white/75 mt-0.5">Richieste dirette e follow-up
+                    </p>
+                </div>
+                <!-- Chiudi -->
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl Hotel</strong>.</p>
+                    <p>Ti aiuto a capire come alleggerire reception e follow-up con un primo contatto più ordinato.</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('✨ Come funziona Zirèl Hotel?')">
+                        ✨ Come funziona Zirèl Hotel?
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🏨 Come gestisce le richieste camera?')">
+                        🏨 Come gestisce le richieste camera?
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Vorrei una demo guidata')">
+                        🚀 Prenota demo
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📩 Come invia i lead al team?')">
+                        📩 Come invia i lead al team?
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            🏨
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_hotel',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Hotel',
+            widget_subtitle: 'Richieste dirette e follow-up',
+            widget_color: '#FF8C42',
+            widget_icon: '🏨'
+        };
+
+        window.zirelTooltipMessages = [
+            'Riduci le richieste perse. 🏨',
+            'Guarda come si ordina un lead. ✨',
+            'Prova la demo hotel in due minuti. 🚀',
+            'Più follow-up, meno rumore in reception. 📩',
+        ];
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="zirel_hotel"></script>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zirèl Restaurant | Più tavoli confermati.</title>
+    <meta name="description"
+        content="Zirèl Restaurant aiuta i ristoratori a gestire prenotazioni, FAQ e richieste in modo ordinato. Guarda una demo live su un ristorante fittizio già pronta da testare.">
+
+    <link rel="canonical" href="https://zirel.org/restaurant" />
+    <meta property="og:title" content="Zirèl Restaurant | Più tavoli confermati, meno caos in sala." />
+    <meta property="og:description"
+        content="Scopri la soluzione Zirèl dedicata ai ristoranti e prova una demo live già configurata su un ristorante fittizio." />
+    <meta property="og:url" content="https://zirel.org/restaurant" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://zirel.org/food_premium.png" />
+    <meta property="og:site_name" content="Zirèl Restaurant" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zirèl Restaurant | Più tavoli confermati, meno caos in sala." />
+    <meta name="twitter:description"
+        content="La soluzione Zirèl per i ristoranti: prenotazioni, FAQ e demo live già pronta da provare." />
+    <meta name="twitter:image" content="https://zirel.org/food_premium.png" />
+    <meta name="twitter:site" content="@zirelcore" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .hero-pattern {
+            background-color: #fff8ef;
+            background-image:
+                radial-gradient(circle at top right, rgba(255, 140, 66, 0.12), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(253, 240, 213, 0.7), transparent 36%);
+        }
+
+        .restaurant-shell {
+            border-color: rgba(253, 224, 190, 0.9);
+            box-shadow: 0 26px 70px rgba(124, 45, 18, 0.12);
+        }
+
+        .restaurant-note {
+            background: linear-gradient(180deg, #fffaf3 0%, #fff3e3 100%);
+            border: 1px solid rgba(253, 224, 190, 0.9);
+        }
+
+        .restaurant-panel {
+            background: linear-gradient(180deg, #fff6ec 0%, #fff2df 100%);
+            border: 1px solid rgba(253, 224, 190, 0.9);
+            box-shadow: 0 24px 60px rgba(124, 45, 18, 0.10);
+        }
+
+        .page-restaurant {
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 18%);
+        }
+
+        .page-restaurant .zirel-card {
+            border-color: rgba(253, 224, 190, 0.8);
+            box-shadow: 0 18px 42px rgba(124, 45, 18, 0.07);
+        }
+
+        .page-restaurant #problemi,
+        .page-restaurant #demo-live {
+            background: linear-gradient(180deg, #ffffff 0%, #fffaf4 100%);
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="page-restaurant font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Restaurant</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing-restaurant.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10">
+            <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
+                <span
+                    class="inline-block bg-white/80 text-brand-orange px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-orange-100 shadow-sm">
+                    Ogni tavolo conta.
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    Più tavoli confermati.<br />
+                    <span class="text-brand-orange italic">Senza rincorrere il telefono.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Tu servi in sala. Zirèl gestisce primo contatto, FAQ e richieste ricorrenti.<br /><br />
+                    Più ordine nel servizio. Meno richieste perse.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="demo.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
+                        Prova la demo
+                    </a>
+                    <a href="#demo-live"
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-orange-100 bg-white hover:bg-orange-50 transition-all text-center text-brand-blue shadow-sm">
+                        Come funziona
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:w-2/5 flex justify-center items-center relative">
+                <div
+                    class="restaurant-shell relative w-72 md:w-96 bg-white rounded-[2.5rem] p-4 overflow-hidden">
+                    <div class="rounded-[2rem] overflow-hidden bg-gradient-to-br from-brand-blue to-brand-blue-dark p-5 md:p-6">
+                        <div class="flex items-start justify-between gap-4 mb-5 text-white">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold">Zirèl
+                                    Restaurant</p>
+                                <h3 class="text-2xl font-black mt-1 leading-tight">Prenotazioni più semplici,<br>sala più
+                                    libera</h3>
+                            </div>
+                            <span
+                                class="px-3 py-1 rounded-full bg-brand-orange/15 text-brand-orange text-[10px] font-bold uppercase tracking-[0.12em]">Live</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Richieste
+                                    gestite</p>
+                                <p class="text-3xl font-black mt-1">14</p>
+                                <p class="text-[11px] text-white/45 mt-1">5 già confermate</p>
+                            </div>
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Tempo di
+                                    risposta</p>
+                                <p class="text-3xl font-black mt-1">38s</p>
+                                <p class="text-[11px] text-white/45 mt-1">dal primo messaggio</p>
+                            </div>
+                        </div>
+
+                        <div class="restaurant-note rounded-3xl p-5 shadow-lg">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Da
+                                provare subito</p>
+                            <p class="text-base font-bold text-brand-blue leading-snug mb-2">Apri una demo già pronta e
+                                guarda Zirèl Restaurant in azione sul sito di un locale.</p>
+                            <p class="text-sm text-brand-blue/65 leading-relaxed mb-4">Puoi testare prenotazione
+                                tavolo, domande frequenti e flusso conversazionale in meno di un minuto, senza
+                                immaginare “come sarebbe”: lo vedi davvero.</p>
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand-orange">Demo
+                                    reale</span>
+                                <a href="demo.html"
+                                    class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg">Apri
+                                    la demo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-orange/15 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-sand/70 rounded-full blur-3xl -ml-48 -mb-48"></div>
+    </header>
+
+    <section class="py-24 bg-white" id="problemi">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cosa risolve <span
+                        class="text-brand-orange">davvero</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Nel momento peggiore, quando il locale è pieno e il
+                    telefono continua a suonare.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="zirel-card">
+                    <div class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        ☎️</div>
+                    <h3 class="text-2xl font-bold mb-4">Telefonate perse</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Quando il servizio accelera, le richieste si
+                        accavallano e il tavolo perso diventa un cliente perso.</p>
+                </div>
+                <div class="zirel-card">
+                    <div class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        🧾</div>
+                    <h3 class="text-2xl font-bold mb-4">Richieste incomplete</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Nomi mancanti, orari confusi, gruppi non filtrati:
+                        il flusso diventa fragile e il team deve rincorrere i dettagli.</p>
+                </div>
+                <div class="zirel-card">
+                    <div
+                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                        ❓</div>
+                    <h3 class="text-2xl font-bold mb-4">FAQ ripetitive</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Orari, parcheggio, allergie, animali, gruppi:
+                        troppe domande semplici che rubano tempo quando dovresti stare sul servizio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#fff8ef]" id="features">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cosa fa <span
+                        class="text-brand-orange">Zirèl Restaurant</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Lo stesso stile del tuo locale, ma con una
+                    disciplina operativa che non si distrae mai.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Gestisce prenotazioni tavolo</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Raccoglie nome, telefono, data, ora e
+                        persone in modo ordinato e chiede conferma prima di registrare davvero.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Filtra gruppi e casi speciali</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Se la richiesta esce dal flusso standard,
+                        non forza una falsa conferma: reindirizza al passo corretto.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Risponde alle FAQ utili</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Parcheggio, policy, allergie e info logistiche
+                        vengono servite con dati reali, senza improvvisazioni.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-xl font-bold mb-3">Protegge il tuo brand</h3>
+                    <p class="text-brand-blue/60 text-sm leading-relaxed">Tono coerente, risposte pulite, conferme
+                        tracciabili: il cliente percepisce controllo, non caos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white" id="demo-live">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Vederlo è <span
+                            class="text-brand-orange">demo già pronta</span></h2>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">Apri la <a href="demo.html"
+                            class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">demo live restaurant</a> e prova un flusso reale, non una simulazione vuota.</p>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Prenotazioni, FAQ e domande operative. Tutto in azione in meno di un minuto.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="demo.html"
+                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                            Apri demo Restaurant
+                        </a>
+                        <a href="pricing-restaurant.html"
+                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-lg">
+                            Vedi pricing
+                        </a>
+                    </div>
+                </div>
+                <div class="zirel-card">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Cosa puoi
+                        verificare</p>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">1.</span>
+                            <p class="text-brand-blue/70">Come il bot raccoglie i dati della prenotazione senza far
+                                perdere tempo al cliente.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">2.</span>
+                            <p class="text-brand-blue/70">Come risponde a domande frequenti del locale con tono coerente
+                                e informazioni già pronte.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">3.</span>
+                            <p class="text-brand-blue/70">Come apparirebbe il prodotto sul sito di un ristoratore, senza
+                                cambiare identità visiva o stile del brand.</p>
+                        </div>
+                        <div class="mt-6 p-5 rounded-3xl bg-brand-sand/50 border border-brand-sand">
+                            <p class="text-sm text-brand-blue/70"><strong class="text-brand-blue">Nota importante:</strong>
+                                la demo live esistente resta utile e va mantenuta, perché è la prova hands-on della
+                                soluzione. Questa pagina serve a venderne il valore, non a sostituirla.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#fff8ef]" id="faq">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">FAQ <span
+                        class="text-brand-orange">Ristorante</span></h2>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Le obiezioni che un ristoratore serio si fa prima di
+                    mettere una chat sul proprio sito.</p>
+            </div>
+            <div class="max-w-4xl mx-auto faq-grid space-y-4">
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Se il locale è pieno, Zirèl può davvero aiutarmi?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-orange-50/50">
+                        <p class="p-6 pt-2 text-brand-blue/70">Sì. Il valore principale è proprio questo: rispondere
+                            mentre il servizio è in corso, così non perdi richieste solo perché nessuno può prendere il
+                            telefono.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Rischia di confermare tavoli in modo sbagliato?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-orange-50/50">
+                        <p class="p-6 pt-2 text-brand-blue/70">No se il flusso è configurato correttamente: Zirèl
+                            raccoglie i dati, fa il riepilogo e conferma solo dopo il passaggio operativo previsto.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>Devo cambiare il mio sito o rifare il design?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-orange-50/50">
+                        <p class="p-6 pt-2 text-brand-blue/70">No. L’obiettivo di Zirèl è integrarsi nel tuo sito e nel
+                            tuo brand, non imporre un’interfaccia estranea o pesante.</p>
+                    </div>
+                </div>
+                <div
+                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                        <span>La demo live è finta o posso usarla per capire davvero il prodotto?</span>
+                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                    </button>
+                    <div
+                        class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-orange-50/50">
+                        <p class="p-6 pt-2 text-brand-blue/70">Puoi usarla davvero. È un ristorante fittizio, ma il
+                            flusso che provi è pensato proprio per mostrare il comportamento del prodotto in un caso
+                            realistico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative overflow-hidden" id="contatti">
+        <div class="container mx-auto px-4 md:px-8">
+            <div
+                class="restaurant-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Parliamone in 15 minuti.</h2>
+                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Tu porti il contesto del locale. Noi ti mostriamo il flusso giusto.</p>
+                <div class="flex justify-center">
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Prenota una demo</a>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-brand-orange/10 blur-[100px] pointer-events-none">
+        </div>
+        <div
+            class="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-brand-cyan/10 blur-[100px] pointer-events-none">
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing-restaurant.html">Pricing Restaurant</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Più lead. Zero richieste perse. 📈
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+
+            <!-- Widget Header -->
+            <div id="widget-header" class="brand-gradient px-5 py-4 text-white flex items-center gap-4" style="background: #FF8C42;">
+                <!-- Avatar icona -->
+                <div id="widget-icon-container" class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    🍝
+                </div>
+                <!-- Titolo + sottotitolo -->
+                <div class="flex-grow">
+                    <h6 id="widget-title-text" class="font-bold text-base leading-tight">Zirèl Restaurant</h6>
+                    <p id="widget-subtitle-text" class="text-[11px] text-white/75 mt-0.5">Prenotazioni e richieste per il locale</p>
+                </div>
+                <!-- Chiudi -->
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl Restaurant</strong>.</p>
+                    <p>Ti aiuto a capire come gestire prenotazioni e richieste con meno caos. Da dove partiamo?</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('✨ Come funziona Zirèl Restaurant?')">
+                        ✨ Come funziona Zirèl Restaurant?
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🍝 Voglio provare la demo live')">
+                        🍝 Prova demo live
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Vorrei una demo guidata')">
+                        🚀 Prenota demo
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📈 Quali sono i vantaggi per il mio locale?')">
+                        📈 Vantaggi per il mio locale
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            🍝
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <!-- Zirèl Widget Config -->
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_restaurant',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        // This will be dynamically populated by the server/CDN in a real SaaS scenario
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Restaurant',
+            widget_subtitle: 'Prenotazioni e richieste per il locale',
+            widget_color: '#FF8C42',
+            widget_icon: '🍝'
+        };
+
+        // Messaggi tooltip specifici della landing Restaurant
+        window.zirelTooltipMessages = [
+            'Più lead. Zero richieste perse. 📈',
+            'Come lavora Zirèl Restaurant? 🍝',
+            'Prova la demo live del locale 🍹',
+            'Prenota una demo guidata 🚀',
+        ];
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="zirel_restaurant"></script>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

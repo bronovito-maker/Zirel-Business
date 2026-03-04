@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domande. Risposte. | Zirèl FAQ</title>
+    <meta name="description"
+        content="Tutte le FAQ di Zirèl in un'unica pagina: Core, Pricing, Restaurant, Hotel e Professional.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .faq-page {
+            background: linear-gradient(180deg, #eef6ff 0%, #ffffff 20%);
+        }
+
+        .faq-hero {
+            background:
+                radial-gradient(circle at top right, rgba(0, 174, 239, 0.18), transparent 28%),
+                linear-gradient(135deg, #003049 0%, #0a4d6d 52%, #0d6a92 100%);
+            color: #fff;
+            padding: 160px 0 96px;
+            text-align: center;
+        }
+
+        .faq-context {
+            margin-top: 2.25rem;
+            padding-block: 0;
+            scroll-margin-top: 110px;
+        }
+
+        .faq-context:first-of-type {
+            margin-top: 0;
+        }
+
+        .faq-index {
+            padding-block: 0;
+        }
+
+        .faq-context-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .faq-context-title {
+            font-size: clamp(1.35rem, 2.2vw, 1.95rem);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            color: #003049;
+            font-weight: 800;
+        }
+
+        .faq-context-title span {
+            color: #ff8c42;
+        }
+
+        .faq-grid {
+            width: 100%;
+            max-width: 980px;
+            margin-inline: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .faq-item {
+            border-color: rgba(253, 240, 213, 0.95) !important;
+        }
+
+        @media (max-width: 768px) {
+            .faq-hero {
+                padding: 132px 0 72px;
+            }
+
+            .faq-context {
+                margin-top: 1.75rem;
+            }
+
+            .faq-context-header {
+                justify-content: center;
+            }
+
+            .faq-question {
+                padding: 1.05rem 1.1rem !important;
+            }
+        }
+
+        .faq-index-link {
+            border: 1px solid rgba(0, 48, 73, 0.12);
+            color: #003049;
+            background: #fff;
+            border-radius: 9999px;
+            padding: 0.55rem 0.95rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .faq-index-link:hover {
+            background: #003049;
+            color: #fff;
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="faq-page font-sans text-brand-blue overflow-x-hidden">
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="faq-hero">
+        <div class="container">
+            <span
+                class="inline-block bg-white/10 text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-[0.18em] mb-6 border border-white/20">
+                Centro FAQ
+            </span>
+            <h1 class="text-4xl md:text-6xl font-black mb-5">Domande. <span class="text-brand-orange">Risposte.</span></h1>
+            <p class="text-white/80 text-lg md:text-xl max-w-3xl mx-auto">Tutte le FAQ raccolte in un'unica pagina,
+                ordinate per contesto per rendere la consultazione più chiara.</p>
+        </div>
+    </header>
+
+    <main class="py-12 md:py-16">
+        <div class="container mx-auto px-4 md:px-8">
+            <section class="faq-index mb-8 md:mb-10">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Indice rapido</p>
+                <div class="flex flex-wrap gap-2 md:gap-3">
+                    <a href="#faq-core" class="faq-index-link">Core</a>
+                    <a href="#faq-pricing" class="faq-index-link">Pricing</a>
+                    <a href="#faq-restaurant" class="faq-index-link">Restaurant</a>
+                    <a href="#faq-hotel" class="faq-index-link">Hotel</a>
+                    <a href="#faq-professional" class="faq-index-link">Professional</a>
+                </div>
+            </section>
+
+            <section class="faq-context" id="faq-core">
+                <div class="faq-context-header">
+                    <h2 class="faq-context-title">Core. <span>Fondamenta.</span></h2>
+                </div>
+                <div class="faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Ma non è che l'AI risponde male ai miei clienti o inventa cose?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Precisione assoluta.</strong> Zirèl risponde basandosi esclusivamente sui tuoi dati: menu, listini e regole. Se non conosce la risposta, invita gentilmente il cliente a lasciare un contatto, senza mai inventare nulla.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Ho già un sito web fatto da un'agenzia, posso usarlo comunque?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Integrazione invisibile.</strong> Che il tuo sito sia fatto in WordPress, Wix o codice personalizzato, Zirèl si integra senza cambiare header, footer o identità visiva. Se serve, collaboriamo noi con i tuoi tecnici.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>I miei clienti non sono “tecnici”. Rischio di complicare l’esperienza?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Semplicità universale.</strong> Zirèl parla in modo naturale e guida l’utente passo dopo passo. Non chiede di “capire l’AI”: adatta il flusso alla persona e al contesto.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Ma la privacy? I dati dei miei clienti dove finiscono?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>La tua privacy al primo posto.</strong> Tutti i dati sono custoditi in server europei sicuri e conformi al GDPR. La tua attività e le tue conversazioni restano tue, senza eccezioni.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Se cambiano prezzi, regole o disponibilità, devo chiamare un tecnico?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Controllo totale.</strong> No. Zirèl lavora su dati aggiornabili e regole configurate per il tuo business. Quando cambiano prezzi, orari o policy, il sistema si riallinea senza rifare tutto da capo.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Quanto ci vuole per attivare una soluzione Zirèl?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Attivazione rapida.</strong> Il tempo dipende dalla soluzione e dal materiale disponibile, ma il setup tecnico resta leggero. L’obiettivo è andare online in fretta senza rifare il tuo sito.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Posso disdire quando voglio?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Massima flessibilità.</strong> I nostri piani sono mensili e senza vincoli. Vogliamo che tu resti perché Zirèl ti porta valore, non perché sei obbligato da un contratto.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq-context" id="faq-pricing">
+                <div class="faq-context-header">
+                    <h2 class="faq-context-title">Pricing. <span>Chiaro.</span></h2>
+                </div>
+                <div class="faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>I prezzi cambiano tra Restaurant, Hotel e Professional?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>No.</strong> La fascia di prezzo resta la stessa: entry a partire da 49 euro al mese, intermedio da 99 euro al mese e piano custom su progetto. Cambiano naming, esempi e CTA per settore.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Cosa include l'attivazione iniziale?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Non e' un costo tecnico vuoto.</strong> Include configurazione iniziale, caricamento dei contenuti chiave, settaggio del widget e messa a punto del flusso base o del primo intake, in base al settore.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Cosa cambia con l'abbonamento annuale?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Il canone mensile resta invariato</strong>, ma l'attivazione iniziale viene scontata del 50%. E' la leva piu' semplice per partire con meno attrito senza svalutare il servizio.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Se non sono sicuro del settore giusto?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Parliamone.</strong> Vai su <a href="contatti.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">Contatti</a> e ti indirizziamo verso il flusso, la demo e il listino piu' adatti al tuo caso.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Posso annullare senza vincoli? E l'attivazione viene rimborsata?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Sì, l'annullamento e' gratuito e senza vincoli.</strong> Puoi interrompere l'abbonamento senza penali. L'attivazione iniziale una tantum, invece, non e' rimborsabile in alcun caso.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq-context" id="faq-restaurant">
+                <div class="faq-context-header">
+                    <h2 class="faq-context-title">Restaurant. <span>Servizio.</span></h2>
+                </div>
+                <div class="faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Se il locale è pieno, Zirèl può davvero aiutarmi?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">Sì. Il valore principale è proprio questo: rispondere mentre il servizio è in corso, così non perdi richieste solo perché nessuno può prendere il telefono.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Rischia di confermare tavoli in modo sbagliato?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">No se il flusso è configurato correttamente: Zirèl raccoglie i dati, fa il riepilogo e conferma solo dopo il passaggio operativo previsto.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Devo cambiare il mio sito o rifare il design?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. L’obiettivo di Zirèl è integrarsi nel tuo sito e nel tuo brand, non imporre un’interfaccia estranea o pesante.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>La demo live è finta o posso usarla per capire davvero il prodotto?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">Puoi usarla davvero. È un ristorante fittizio, ma il flusso che provi è pensato proprio per mostrare il comportamento del prodotto in un caso realistico.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq-context" id="faq-hotel">
+                <div class="faq-context-header">
+                    <h2 class="faq-context-title">Hotel. <span>Accoglienza.</span></h2>
+                </div>
+                <div class="faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Zirèl Hotel sostituisce il mio team?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. Il suo lavoro è alleggerire il primo contatto, ordinare le richieste e preparare un follow-up migliore. Il team mantiene il controllo operativo.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Può promettere disponibilità camere reali?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. La logica corretta è raccogliere la richiesta e organizzarla, non inventare disponibilità o preventivi. È un punto di forza, non un limite.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Devo rifare il sito della struttura?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. L'obiettivo è integrare Zirèl nel tuo sito e nel tuo tono, senza imporre una UX estranea o pesante.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>La demo guidata serve davvero o è solo commerciale?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70">Serve a vedere il prodotto nel contesto giusto: tono, dati raccolti, flusso e qualità del primo contatto. Non è una chiacchierata generica.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq-context" id="faq-professional">
+                <div class="faq-context-header">
+                    <h2 class="faq-context-title">Professional. <span>Metodo.</span></h2>
+                </div>
+                <div class="faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Può andare bene per studi medici senza sembrare freddo o impersonale?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Sì.</strong> Zirèl mantiene un tono chiaro e rassicurante, ma non promette mai disponibilità o valutazioni cliniche che non può confermare.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Per uno studio legale può raccogliere il primo contatto senza esporsi troppo?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>Sì.</strong> Il suo compito è ordinare la richiesta e preparare il passo successivo, non dare pareri o soluzioni sostanziali al posto del professionista.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Vale solo per medici e avvocati?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>No.</strong> È una soluzione universale per chi lavora su appuntamenti, richieste di contatto o lead commerciali e vuole più ordine nel primo contatto.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Serve rifare il sito per usarlo?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
+                            <p class="p-6 pt-2 text-brand-blue/70"><strong>No.</strong> Zirèl si integra nel sito esistente e si adatta al brand della tua attività senza stravolgere l'esperienza utente.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chiringuito da Gino | Riccione - Sapori di Mare & Vibe Romagnolo</title>
+    <title>Zirèl Restaurant Demo Live | Prova il flusso su un ristorante reale-fittizio</title>
     <meta name="description"
-        content="Il meglio della cucina romagnola incontra il mare a Riccione. Prenota il tuo tavolo e goditi il tramonto.">
+        content="Demo live di Zirèl Restaurant: prova un ristorante fittizio ma realistico e testa con mano il flusso di prenotazione tavolo, FAQ e chat in azione.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -50,6 +50,34 @@
             background: linear-gradient(135deg, #FF8C42 0%, #e07a3a 100%);
         }
 
+        body {
+            background: linear-gradient(180deg, #fff8ef 0%, #fffdf9 40%, #ffffff 100%);
+        }
+
+        .hero-overlay {
+            background: linear-gradient(180deg, rgba(0, 48, 73, 0.52) 0%, rgba(0, 48, 73, 0.68) 100%) !important;
+        }
+
+        .menu-card,
+        .exp-card,
+        .testimonial-card,
+        .info-text,
+        #n8n-widget-mock>div {
+            box-shadow: 0 18px 42px rgba(124, 45, 18, 0.08) !important;
+        }
+
+        .menu-card,
+        .exp-card,
+        .testimonial-card,
+        .info-text {
+            border: 1px solid rgba(253, 224, 190, 0.75);
+        }
+
+        #menu,
+        #info {
+            background: rgba(255, 255, 255, 0.65);
+        }
+
         /* Override CSS variables for n8n embedded chat */
         :root {
             /* Colors */
@@ -84,7 +112,7 @@
             --chat--window--border-radius: 25px;
             --chat--window--margin-bottom: var(--chat--spacing);
             /* Aggiungiamo un'ombra più definita, la precedente forse era stata tagliata */
-            --chat--window--box-shadow: 0 15px 40px rgba(0, 48, 73, 0.2);
+            --chat--window--box-shadow: 0 18px 42px rgba(124, 45, 18, 0.12);
 
             /* Header Styles */
             --chat--header-height: auto;
@@ -141,7 +169,7 @@
             --chat--input--send--button--color-hover: var(--chat--color-white);
 
             /* Body and Footer */
-            --chat--body--background: #FCF8F2;
+            --chat--body--background: #fffaf4;
             /* Warmer background fitting the site */
             --chat--footer--background: #ffffff;
             --chat--footer--color: var(--chat--color-dark);
@@ -258,17 +286,18 @@
 
 <body>
     <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+        <a href="restaurant.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Restaurant</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
-            <li><a href="demo.html" class="nav-link active">DEMO</a></li>
-            <li><a href="register.html" class="nav-link">REGISTRATI</a></li>
-            <li><a href="https://dashboard.zirel.org" class="nav-link">DASHBOARD</a></li>
-            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
-            <li><a href="index.html#contatti" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="register.html" class="cta-nav">PROVA GRATIS</a></li>
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing-restaurant.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
-        <a href="register.html" class="cta-nav cta-nav-desktop">PROVA GRATIS</a>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -279,12 +308,19 @@
     <header class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            <span
+                class="inline-block bg-white/10 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.18em] mb-6 border border-white/10">
+                Demo Live Zirèl Restaurant
+            </span>
             <h1 class="demo-font">Chiringuito <span>da Gino</span></h1>
-            <p>Sapore di mare, cuore romagnolo. La tua oasi esclusiva a Riccione.</p>
+            <p>Un ristorante fittizio ma realistico, costruito per mostrarti come Zirèl può apparire e lavorare sul
+                sito di un locale vero.</p>
             <div class="hero-actions">
-                <a href="#prenota" class="btn btn-primary">Esplora il Menu</a>
-                <a href="#menu" class="btn btn-secondary">Prenota un Tavolo</a>
+                <a href="#n8n-widget-mock" onclick="return openDemoChat(event)" class="btn btn-primary">Prova la chat live</a>
+                <a href="restaurant.html" class="btn btn-secondary">Scopri la soluzione</a>
             </div>
+            <p class="mt-6 text-sm md:text-base text-white/80 max-w-2xl mx-auto">Qui la chat è già configurata per
+                mostrarti prenotazione tavolo, FAQ, orari e richieste reali in azione.</p>
         </div>
     </header>
 
@@ -383,7 +419,7 @@
 
     <!-- Chat Tooltip -->
     <div id="chat-tooltip" class="chat-tooltip">
-        Chiedi all'Oste! 🍹
+        Prova la chat live del ristorante 🍹
     </div>
 
     <!-- Custom Chat Widget -->
@@ -455,28 +491,7 @@
             💬
         </span>
     </button>
-    <script src="config.js"></script>
-    <script>
-        // Override per la pagina di Demo (Il prodotto finito)
-        if (window.ZirelConfig) {
-            window.ZirelConfig.tenantId = 'chiringuito_gino_001';
-        }
-    </script>
-    <!-- Zirèl Widget Config -->
-    <script>
-        window.ZirelConfig = {
-            tenantId: 'zirel_official',
-            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
-        };
-        // This will be dynamically populated by the server/CDN in a real SaaS scenario
-        window.ZirelWidgetConfig = {
-            widget_title: 'Zirèl Assistant',
-            widget_subtitle: 'Concierge AI h24',
-            widget_color: '#FF8C42',
-            widget_icon: '💬'
-        };
-    </script>
-    <script src="chat.js" data-tenant-id="zirel_official"></script>
+    <script type="module" src="/config.js"></script>
     <script>
         // ─── Persona: Chiringuito da Gino ─────────────────────────────────────────
         // OVERRIDE INTENZIONALE: questa pagina usa un tenant separato al 100%.
@@ -496,38 +511,50 @@
             'Che orari facciamo? 🕒',
         ];
     </script>
-    <script src="chat.js"></script>
-    <script src="ui-helpers.js"></script>
+    <script type="module" src="/chat.js" data-tenant-id="chiringuito_gino_001"></script>
+    <script type="module" src="/ui-helpers.js"></script>
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
-                    <p>Tecnologia AI d'avanguardia al servizio dell'ospitalità romagnola. Innovazione per la tua
-                        struttura.</p>
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Navigazione</h4>
+                    <h4>Soluzioni</h4>
                     <ul>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="demo.html">Demo</a></li>
-                        <li><a href="index.html#contatti">Contatti</a></li>
-                        <li><a href="index.html#faq">FAQ</a></li>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
                     <h4>Legal</h4>
                     <ul>
+                        <li><a href="pricing-restaurant.html">Pricing Restaurant</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>
                 </div>
             </div>
-            <p class="copyright">&copy; 2026 Hospitality AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
                 riservati.</p>
         </div>
     </footer>
-    <script src="ui-helpers.js"></script>
 </body>
 
 </html>

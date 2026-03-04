@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accesso | Zirèl</title>
+    <meta name="description"
+        content="Accedi alla dashboard Zirèl oppure crea il tuo account per iniziare la configurazione e richiedere una demo guidata.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+
+    <style>
+        .login-shell {
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .login-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(203, 213, 225, 0.75);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+
+<body class="font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-24 login-shell min-h-screen">
+        <div class="container mx-auto px-4 md:px-8 max-w-6xl">
+            <div class="text-center mb-16">
+                <span
+                    class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-slate-200 shadow-sm">
+                    Accesso e attivazione
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black mb-6">Accesso <span class="text-brand-orange">immediato</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/70 max-w-3xl mx-auto leading-relaxed">
+                    Hai già un account? Entra in dashboard. Devi iniziare? Crea il tuo account in pochi minuti.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                <div class="login-card rounded-[2.5rem] p-8 md:p-10">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Hai già un account
+                    </p>
+                    <h2 class="text-3xl font-black mb-4">Entra in dashboard</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-8">
+                        Gestisci tenant, richieste e flussi già attivi.
+                    </p>
+                    <a href="https://dashboard.zirel.org"
+                        class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                        Vai alla dashboard
+                    </a>
+                </div>
+
+                <div class="login-card rounded-[2.5rem] p-8 md:p-10">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Non sei ancora
+                        registrato</p>
+                    <h2 class="text-3xl font-black mb-4">Attiva il tuo account</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-8">
+                        Registrati e avvia il setup. Se vuoi, partiamo con una demo guidata.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="register.html"
+                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                            Registrati
+                        </a>
+                        <a href="contatti.html"
+                            class="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 text-brand-blue shadow-sm transition-all">
+                            Prenota una demo
+                        </a>
+                    </div>
+                    <p class="text-sm text-brand-blue/55 mt-6 leading-relaxed">
+                        Non sai ancora quale percorso scegliere? Prima puoi vedere il
+                        <a href="pricing.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">pricing per settore</a>
+                        e poi decidere se entrare in dashboard o registrarti.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

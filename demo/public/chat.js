@@ -15,7 +15,22 @@
     const me = document.currentScript;
     const cfg = window.ZirelConfig || {};
 
-    const tenantId = me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official';
+    function sanitizeTenantId(value) {
+        const raw = String(value == null ? '' : value).trim();
+        return /^[a-z0-9_:-]{3,80}$/i.test(raw) ? raw : 'zirel_official';
+    }
+
+    function sanitizeHexColor(value) {
+        const raw = String(value == null ? '' : value).trim();
+        return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(raw) ? raw : '#FF8C42';
+    }
+
+    function sanitizeWidgetIcon(value) {
+        const raw = String(value == null ? '' : value).trim();
+        return /^[\p{L}\p{N}\p{Emoji_Presentation}\p{Extended_Pictographic}\s._-]{1,4}$/u.test(raw) ? raw : '💬';
+    }
+
+    const tenantId = sanitizeTenantId(me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official');
     const webhookUrl = me?.getAttribute('data-webhook-url') || cfg.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
 
     // Sessione runtime: resta stabile finche la pagina e aperta, ma si resetta al reload.
@@ -69,31 +84,31 @@
                 if (subtitleEl) subtitleEl.innerText = widget_subtitle;
             }
             if (widget_icon) {
+                const safeIcon = sanitizeWidgetIcon(widget_icon);
                 const iconContainer = document.querySelector('#n8n-widget-mock .flex-shrink-0.text-2xl') ||
                     document.querySelector('#n8n-widget-mock .bg-white\\/20.rounded-full.text-2xl');
-                if (iconContainer) iconContainer.innerText = widget_icon;
-
-                const toggleIconHtml = `<span class="text-white drop-shadow-md flex items-center justify-center text-3xl">${widget_icon}</span>`;
+                if (iconContainer) iconContainer.innerText = safeIcon;
                 const toggleIcon = document.getElementById('toggle-icon-open');
                 const widget = document.getElementById('n8n-widget-mock');
 
                 if (toggleIcon && (!widget || widget.classList.contains('scale-0'))) {
-                    toggleIcon.innerHTML = toggleIconHtml;
+                    toggleIcon.textContent = safeIcon;
                 }
             }
             if (widget_color) {
+                const safeColor = sanitizeHexColor(widget_color);
                 // Apply theme color to header
                 const header = document.querySelector('#n8n-widget-mock .brand-gradient') ||
                     document.querySelector('#n8n-widget-mock .demo-gradient');
                 if (header) {
-                    header.style.background = `linear-gradient(135deg, ${widget_color} 0%, ${widget_color}CC 100%)`;
+                    header.style.background = `linear-gradient(135deg, ${safeColor} 0%, ${safeColor}CC 100%)`;
                 }
 
                 // Apply theme color to toggle button
                 const toggleBtn = document.getElementById('chat-toggle-btn');
                 if (toggleBtn) {
-                    toggleBtn.style.background = widget_color;
-                    toggleBtn.style.boxShadow = `0 10px 25px -5px ${widget_color}66`;
+                    toggleBtn.style.background = safeColor;
+                    toggleBtn.style.boxShadow = `0 10px 25px -5px ${safeColor}66`;
                 }
 
                 // Apply theme color to user messages (optional enhancement)
@@ -185,6 +200,53 @@
     }, 5000);
 
     // ─── Widget toggle ────────────────────────────────────────────────────────
+    let lockedScrollY = 0;
+    function lockBodyScrollForMobile() {
+        lockedScrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${lockedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function unlockBodyScrollForMobile() {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, lockedScrollY);
+    }
+
+    window.openDemoChat = function (event) {
+        if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+        }
+
+        const widget = document.getElementById('n8n-widget-mock');
+        const icon = document.getElementById('toggle-icon-open');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+        const isMobile = window.innerWidth < 640; // sm breakpoint in Tailwind
+        if (!widget) return false;
+
+        hideTooltip();
+
+        elevateWidgetLayer(isMobile, true);
+        widget.classList.remove('scale-0');
+        widget.classList.add('scale-100');
+        if (icon) icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
+
+        if (isMobile) {
+            if (toggleBtn) toggleBtn.style.display = 'none';
+            lockBodyScrollForMobile();
+        }
+
+        return false;
+    };
+
     window.toggleDemo = function () {
         const widget = document.getElementById('n8n-widget-mock');
         const icon = document.getElementById('toggle-icon-open');
@@ -194,15 +256,7 @@
         hideTooltip();
 
         if (widget.classList.contains('scale-0')) {
-            elevateWidgetLayer(isMobile, true);
-            widget.classList.remove('scale-0');
-            widget.classList.add('scale-100');
-            icon.innerHTML = '<span class="text-2xl font-bold">✕</span>';
-
-            if (isMobile) {
-                if (toggleBtn) toggleBtn.style.display = 'none';
-                document.body.style.overflow = 'hidden'; // Lock scroll
-            }
+            window.openDemoChat();
         } else {
             widget.classList.remove('scale-100');
             widget.classList.add('scale-0');
@@ -211,14 +265,28 @@
 
             if (isMobile) {
                 if (toggleBtn) toggleBtn.style.display = 'flex';
-                document.body.style.overflow = ''; // Restore scroll
+                unlockBodyScrollForMobile();
             }
         }
     };
 
     // ─── Invio messaggio ──────────────────────────────────────────────────────
+    async function fetchWithTimeout(url, options, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     window.sendChatMessage = async function (text) {
         const container = document.getElementById('chat-messages');
+        if (!container) {
+            console.warn('[Zirèl] Chat container non trovato.');
+            return;
+        }
         const quickReplies = document.getElementById('quick-replies-container');
         if (quickReplies) quickReplies.style.display = 'none';
 
@@ -240,7 +308,7 @@
 
         try {
             const traceId = crypto.randomUUID();
-            const response = await fetch(webhookUrl, {
+            const response = await fetchWithTimeout(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -258,7 +326,11 @@
                         trace_id: traceId,
                     },
                 }),
-            });
+            }, 12000);
+
+            if (!response.ok) {
+                throw new Error(`CHAT_HTTP_${response.status}`);
+            }
 
             let responseData;
             const clonedResponse = response.clone();

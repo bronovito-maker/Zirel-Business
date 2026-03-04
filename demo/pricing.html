@@ -5,15 +5,14 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing | Zirèl - Il Concierge AI della Riviera</title>
+    <title>Pricing | Zirèl - Scegli il listino giusto per il tuo settore</title>
     <meta name="description"
-        content="Piani di abbonamento per Zirèl, l'assistente virtuale romagnolo h24. Scegli tra Bagnino, Azdora e Gran Turismo.">
+        content="Scegli il pricing Zirèl più adatto al tuo settore. Stessa struttura di prezzo, con naming e copy dedicati per Restaurant, Hotel e Professional.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,24 +41,59 @@
         }
     </script>
     <link rel="stylesheet" href="style.css?v=3">
-    <!-- Vercel Analytics -->
+    <style>
+        .pricing-core {
+            background: linear-gradient(180deg, #eef8ff 0%, #ffffff 22%);
+        }
+
+        .pricing-core .pricing-hero {
+            background:
+                radial-gradient(circle at top right, rgba(0, 174, 239, 0.2), transparent 28%),
+                linear-gradient(135deg, #07304a 0%, #0e4567 52%, #10628f 100%);
+        }
+
+        .pricing-core .pricing-section {
+            background: linear-gradient(180deg, #eef8ff 0%, #ffffff 100%);
+        }
+
+        .pricing-core .pricing-card,
+        .pricing-core .zirel-card {
+            border: 1px solid rgba(125, 211, 252, 0.55);
+            box-shadow: 0 22px 60px rgba(14, 116, 144, 0.08);
+        }
+
+        .pricing-core .pricing-card.recommended {
+            border-color: rgba(0, 174, 239, 0.9) !important;
+        }
+
+        .pricing-core .badge-recommended {
+            background: #00AEEF;
+            box-shadow: 0 4px 15px rgba(0, 174, 239, 0.28);
+        }
+
+        .pricing-core .psychological-tag {
+            background: rgba(0, 174, 239, 0.1);
+            color: #007fb2 !important;
+        }
+    </style>
     <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body>
+<body class="pricing-core">
     <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="pricing.html" class="nav-link active">PRICING</a></li>
-            <li><a href="demo.html" class="nav-link">DEMO</a></li>
-            <li><a href="register.html" class="nav-link">REGISTRATI</a></li>
-            <li><a href="https://dashboard.zirel.org" class="nav-link">DASHBOARD</a></li>
-            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
-            <li><a href="index.html#contatti" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="register.html" class="cta-nav">PROVA GRATIS</a></li>
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
-        <a href="register.html" class="cta-nav cta-nav-desktop">PROVA GRATIS</a>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -69,98 +103,92 @@
 
     <header class="pricing-hero">
         <div class="container">
-            <h1><span class="zirel-brand">Zirèl</span> per il tuo Business</h1>
-            <p>Porta l'accoglienza romagnola digitale nella tua struttura. Scegli il piano perfetto per te.</p>
+            <h1>Un modello. <span class="zirel-brand">Tre settori.</span></h1>
+            <p>Stessi prezzi. Linguaggio e flusso pensati per il tuo settore.</p>
         </div>
     </header>
 
     <section class="pricing-section">
         <div class="container">
-            <div class="pricing-grid">
-                <!-- Piano Bagnino -->
-                <div class="pricing-card">
-                    <div class="card-icon">⚓</div>
-                    <h3>Piano Bagnino</h3>
-                    <p>L'essenziale. Tutto ciò che ti serve per essere online.</p>
-                    <div class="price-box">
-                        <span class="price-main">€39<small>/mese</small></span>
-                        <span class="price-setup">+ €299 setup una tantum</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>Risposte AI h24</li>
-                        <li>Info su orari e menu</li>
-                        <li>1 lingua (Italiano)</li>
-                        <li>Widget chat personalizzato</li>
-                    </ul>
-                    <a href="register.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">Inizia
-                        la Prova Gratuita</a>
-                </div>
-
-                <!-- Piano Azdora -->
-                <div class="pricing-card recommended">
-                    <span class="badge-recommended">Consigliato</span>
-                    <div class="card-icon">🥧</div>
-                    <h3>Piano Azdora</h3>
-                    <p>La perfezione. Il cuore pulsante della tua accoglienza.</p>
-                    <div class="price-box">
-                        <span class="price-main">€79<small>/mese</small></span>
-                        <span class="price-setup text-brand-cyan">+ €499 setup una tantum</span>
-                    </div>
-                    <div class="psychological-tag">Il più scelto dagli Hotel</div>
-                    <ul class="pricing-features">
-                        <li>Tutto del piano Bagnino</li>
-                        <li><strong>10 lingue </strong> incluse</li>
-                        <li>Prenotazione Tavoli e Camere</li>
-                        <li>Integrazione Dashboard</li>
-                    </ul>
-                    <a href="register.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">Scegli
-                        Azdora</a>
-                </div>
-
-                <!-- Piano Gran Turismo -->
-                <div class="pricing-card">
-                    <div class="card-icon">🏎️</div>
-                    <h3>Gran Turismo</h3>
-                    <p>Nessun limite. L'AI cucita su misura per te.</p>
-                    <div class="price-box">
-                        <span class="price-main text-brand-blue">Custom</span>
-                        <span class="price-setup text-brand-cyan">Analisi e Progetto inclusi</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>Tutto del piano Azdora</li>
-                        <li>Formazione Staff</li>
-                        <li>Analisi Business Intelligence</li>
-                        <li>Sviluppo feature su misura</li>
-                    </ul>
-                    <a href="register.html"
-                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center">Parla
-                        con noi</a>
-                </div>
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-brand-blue text-sm font-bold border border-white/70 shadow-sm">
+                    Scegli il tuo settore
+                </span>
+                <p class="mt-6 text-lg text-brand-blue/70 leading-relaxed">Tre piani per settore. Un'unica logica di prezzo.
+                    Con annuale: -50% sull'attivazione iniziale.</p>
             </div>
 
-            <!-- Assisted Setup Promo -->
-            <div
-                class="mt-20 bg-brand-blue text-white rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 max-w-5xl mx-auto shadow-2xl relative overflow-hidden group">
-                <div
-                    class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors duration-700">
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="card-icon">🍽️</div>
+                    <h3>Restaurant</h3>
+                    <p>Meno caos in sala. Più controllo su prenotazioni e richieste.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €49/mese + attivazione iniziale</p>
+                    <ul class="pricing-features">
+                        <li>Piani: Servizio, Azdora, Maestro</li>
+                        <li>Focus su tavoli, FAQ e richieste</li>
+                        <li>CTA orientate al locale</li>
+                    </ul>
+                    <a href="pricing-restaurant.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        Apri Restaurant
+                    </a>
                 </div>
-                <div class="relative z-10 space-y-4 text-center md:text-left">
-                    <h3 class="text-3xl font-black">Non vuoi pensare al setup?</h3>
-                    <p class="text-brand-sand/70 text-lg max-w-xl leading-relaxed">Richiedi l'installazione assistita
-                        gratuita. Il nostro team configurerà tutto per te, integrando Zirèl sul tuo sito in meno di 24
-                        ore.
-                    </p>
+
+                <div class="pricing-card recommended">
+                    <span class="badge-recommended">3 piani dedicati</span>
+                    <div class="card-icon">🏨</div>
+                    <h3>Hotel</h3>
+                    <p>Più richieste dirette. Lead più chiari per il team reception.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €49/mese + attivazione iniziale</p>
+                    <ul class="pricing-features">
+                        <li>Piani: Direct, Azdora, Gran Turismo</li>
+                        <li>Focus su follow-up e richieste soggiorno</li>
+                        <li>CTA orientate alla struttura</li>
+                    </ul>
+                    <a href="pricing-hotel.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        Apri Hotel
+                    </a>
                 </div>
-                <div class="relative z-10 flex flex-col items-center gap-3">
-                    <a href="https://wa.me/393461027447?text=Ciao%20Niki,%20ho%20visto%20i%20prezzi%20di%20Zir%C3%A8l%20e%20vorrei%20maggiori%20informazioni"
-                        target="_blank"
-                        class="bg-brand-orange text-white px-10 py-5 rounded-full font-black text-lg hover:bg-white hover:text-brand-orange hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap shadow-xl shadow-brand-orange/20">
-                        Contatta Niki su WhatsApp →
+
+                <div class="pricing-card">
+                    <div class="card-icon">🧭</div>
+                    <h3>Professional</h3>
+                    <p>Richieste ordinate. Meno rumore in agenda e nel primo contatto.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €49/mese + attivazione iniziale</p>
+                    <ul class="pricing-features">
+                        <li>Piani: Studio, Equipe, Partner</li>
+                        <li>Focus su intake e primo contatto</li>
+                        <li>CTA orientate al processo di studio</li>
+                    </ul>
+                    <a href="pricing-professional.html"
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center">
+                        Apri Professional
                     </a>
                 </div>
             </div>
+
+            <div class="mt-20 max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+                <div class="zirel-card text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Listino</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Prezzo coerente</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Entry, intermedio e custom. Stessa struttura in ogni settore.</p>
+                </div>
+                <div class="zirel-card text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Leva
+                        commerciale</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Attivazione piu' leggera</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Il canone mensile resta uguale. Con annuale: -50% sull'attivazione iniziale.</p>
+                </div>
+                <div class="zirel-card text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Scelta</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Scelta rapida</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Scegli il settore e apri il listino dedicato. Se hai un caso ibrido, ti guidiamo noi.</p>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="py-20 bg-brand-sand/30" id="faq">
@@ -168,119 +196,87 @@
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-black text-brand-blue mb-4">Domande <span
                         class="text-brand-orange">Frequenti</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto">Tutto quello che devi sapere su Zirèl. Niente
-                    tecnicismi, solo chiarezza.</p>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto">Tutto quello che conta. In chiaro.</p>
             </div>
             <div class="faq-accordion" id="faq-accordion">
-                <!-- FAQ 1: Qualità risposte -->
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>Ma non è che l'AI risponde male ai miei clienti o inventa cose?</h4>
+                        <h4>I prezzi cambiano tra Restaurant, Hotel e Professional?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Precisione assoluta.</strong> Zirèl risponde
-                                basandosi esclusivamente sui tuoi dati: menu, listini e regole. Se non conosce la
-                                risposta,
-                                invita gentilmente il cliente a lasciare un contatto, senza mai inventare nulla.</p>
+                            <p><strong>No.</strong> La fascia di prezzo resta la stessa: entry a partire da 49 euro al
+                                mese, intermedio da 99 euro al mese e piano custom su progetto. Cambiano naming,
+                                esempi e CTA per settore.</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- FAQ 2: Sito esistente -->
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>Ho già un sito web fatto da un'agenzia, posso usarlo comunque?</h4>
+                        <h4>Cosa include l'attivazione iniziale?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Integrazione invisibile.</strong> Che il tuo sito
-                                sia fatto in WordPress, Wix o codice personalizzato, basta una singola riga di codice.
-                                Collaboriamo noi direttamente con i tuoi tecnici per l'integrazione, così tu non devi
-                                pensare a nulla.</p>
+                            <p><strong>Non e' un costo tecnico vuoto.</strong> Include configurazione iniziale,
+                                caricamento dei contenuti chiave, settaggio del widget e messa a punto del flusso base
+                                o del primo intake, in base al settore.</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- FAQ 3: Target anziano -->
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>I miei clienti sono anziani e non sanno usare l'AI. Come facciamo?</h4>
+                        <h4>Cosa cambia con l'abbonamento annuale?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Semplicità universale.</strong> Zirèl parla come
-                                una persona vera. I tuoi clienti non devono imparare nulla: scrivono o chiedono
-                                vocalmente
-                                come farebbero con un nipote. È l'AI che si adatta all'uomo.</p>
+                            <p><strong>Il canone mensile resta invariato</strong>, ma l'attivazione iniziale viene
+                                scontata del 50%. E' la leva piu' semplice per partire con meno attrito senza
+                                svalutare il servizio.</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- FAQ 4: Privacy -->
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>Ma la privacy? I dati dei miei clienti dove finiscono?</h4>
+                        <h4>Se non sono sicuro del settore giusto?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>La tua privacy al primo posto.</strong> Tutti i
-                                dati sono custoditi in server europei sicuri e conformi al GDPR. La tua attività e le
-                                tue
-                                conversazioni restano tue, senza eccezioni.</p>
+                            <p><strong>Parliamone.</strong> Vai su <a href="contatti.html"
+                                    class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">Contatti</a>
+                                e ti indirizziamo verso il flusso, la demo e il listino piu' adatti al tuo caso.</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- FAQ 5: Aggiornamento prezzi -->
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>E se voglio modificare un prezzo nel menu all'ultimo minuto?</h4>
+                        <h4>Posso annullare senza vincoli? E l'attivazione viene rimborsata?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Controllo totale.</strong> Cambia un prezzo o un
-                                orario su un semplice foglio Google Sheets e Zirèl impara all'istante. Non hai bisogno
-                                di un
-                                tecnico per gestire la tua intelligenza artificiale.</p>
+                            <p><strong>Sì, l'annullamento e' gratuito e senza vincoli.</strong> Puoi interrompere
+                                l'abbonamento senza penali. L'attivazione iniziale una tantum, invece, non e'
+                                rimborsabile in alcun caso.</p>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- FAQ 6: Tempi attivazione -->
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <h4>Quanto ci vuole per attivarlo?</h4>
-                        <div class="faq-icon"></div>
-                    </button>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p><strong>Attivazione lampo.</strong> Dalla firma del
-                                contratto alla messa online passano solitamente meno di 24 ore. L'integrazione tecnica
-                                sul tuo sito richiede letteralmente 30 secondi.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FAQ 7: Disdetta -->
-                <div class="faq-item">
-                    <button class="faq-question">
-                        <h4>Posso disdire quando voglio?</h4>
-                        <div class="faq-icon"></div>
-                    </button>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p><strong>Massima flessibilità.</strong> I nostri piani
-                                sono mensili e senza vincoli. Vogliamo che tu resti perché Zirèl ti porta valore, non
-                                perché
-                                sei obbligato da un contratto.</p>
-                        </div>
-                    </div>
+    <section class="pb-20">
+        <div class="container">
+            <div class="zirel-card max-w-5xl mx-auto">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Chiaro dall'inizio</p>
+                <div class="grid md:grid-cols-2 gap-6 text-left">
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">L'attivazione iniziale e' sempre prevista.</strong> Il costo una tantum si applica in partenza ed e' scontato del 50% con abbonamento annuale.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Il canone mensile resta sempre attivo.</strong> L'abbonamento mensile resta parte del servizio in ogni settore.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Widget e implementazione standard sono gratuiti.</strong> L'integrazione tecnica standard sul sito non ha costi aggiuntivi.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Annullamento gratuito e senza vincoli.</strong> Puoi interrompere quando vuoi. L'attivazione iniziale una tantum non e' rimborsabile.</p>
                 </div>
             </div>
         </div>
@@ -290,32 +286,140 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Business</span></a>
-                    <p>Tecnologia AI d'avanguardia al servizio dell'ospitalità romagnola. Innovazione per la tua
-                        struttura.</p>
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live
+                        e accesso dedicato.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Navigazione</h4>
+                    <h4>Soluzioni</h4>
                     <ul>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="demo.html">Demo</a></li>
-                        <li><a href="index.html#contatti">Contatti</a></li>
-                        <li><a href="index.html#faq">FAQ</a></li>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
                     <h4>Legal</h4>
                     <ul>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>
                 </div>
             </div>
-            <p class="copyright">&copy; 2026 Hospitality AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
                 riservati.</p>
         </div>
     </footer>
-    <script src="ui-helpers.js"></script>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Serve aiuto sul pricing? Ci pensa Zirèl! 💬
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    💬
+                </div>
+                <div class="flex-grow">
+                    <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
+                    <p class="text-[11px] text-white/75 mt-0.5">Orientamento e demo commerciale</p>
+                </div>
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
+                    <p>Ti aiuto a scegliere il piano giusto per il tuo settore, capire i costi di attivazione e fissare
+                        una demo guidata. Da dove vuoi iniziare?</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('💶 Spiegami prezzi e attivazione')">
+                        💶 Prezzi e attivazione
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📅 Come funziona lo sconto annuale?')">
+                        📅 Sconto annuale
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🏨 Voglio vedere il pricing Hotel')">
+                        🏨 Pricing Hotel
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Vorrei una demo guidata')">
+                        🚀 Prenota demo
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            💬
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <script>
+        window.zirelTooltipMessages = [
+            'Scegli il piano giusto per il tuo settore 💶',
+            'Scopri attivazione e costi iniziali 🧾',
+            'Con annuale hai -50% sull’attivazione 📅',
+            'Prenota una demo guidata 🚀',
+        ];
+    </script>
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_official',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Assistant',
+            widget_subtitle: 'Orientamento e demo commerciale',
+            widget_color: '#FF8C42',
+            widget_icon: '💬'
+        };
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="zirel_official"></script>
+    <script type="module" src="/ui-helpers.js"></script>
 </body>
 
 </html>

@@ -1,90 +1,46 @@
-# Zirèl: Il Concierge AI della Riviera 🌅🤖
+# Zirèl
 
-Soluzione AI per l'ospitalità e le attività commerciali della Riviera Romagnola. Widget chat intelligente, configurabile, zero-backend per il cliente.
+Piattaforma AI multi-tenant per gestione richieste, lead, prenotazioni e primo contatto.
 
----
+## Workspace
 
-## Struttura del Progetto
+- `demo/` -> sito pubblico, landing settore, demo live, pricing, pagine supporto
+- `dashboard/` -> pannello clienti React + Supabase
+- `docs/` -> documentazione ufficiale progetto
 
-```
-Zirel-Business/
-├── README.md
-├── PRELAUNCH.md            ← checklist pre-pubblicazione
-├── .gitignore
-├── demo/                   ← applicazione web vetrina (Vite multi-page)
-│   ├── public/             ← asset statici copiati in dist/
-│   │   ├── config.js       ← endpoint demo e tenant configurati
-│   │   ├── chat.js         ← logica chat condivisa
-│   │   └── ui-helpers.js   ← carousel, FAQ, navbar
-│   ├── index.html          ← landing principale
-│   ├── demo.html           ← demo interattiva Chiringuito da Gino
-│   ├── pricing.html
-│   ├── privacy.html
-│   ├── cookie.html
-│   └── vite.config.js
-├── dashboard/              ← applicazione web React SPA per i clienti
-│   ├── src/                ← componenti React (Login, Dashboard, Reservations)
-│   ├── index.html          ← entry point (Zirèl Dashboard)
-│   ├── vercel.json         ← regole di fallback SPA per Vercel
-│   └── vite.config.ts
-└── docs/
-    ├── technical/ARCHITECTURE.md
-    ├── integration/INTEGRATION_GUIDE.md
-    └── ai/                 ← prompt e tone of voice
-```
+## Setup rapido
 
----
-
-## Setup Locale (sviluppo)
-
-### Sito Vetrina (`/demo`)
+### Frontend demo
 
 ```bash
 cd demo
 npm install
-npm run dev       # avvia Vite su http://localhost:5173
+npm run dev
 ```
 
-La demo usa la config pubblica in `public/config.js` — nessuna configurazione aggiuntiva necessaria.
-
-### Dashboard Clienti (`/dashboard`)
+### Dashboard
 
 ```bash
 cd dashboard
 npm install
-npm run dev       # avvia React app su http://localhost:5174
+npm run dev
 ```
-La dashboard richiede le chiavi `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` nel file `.env.local` per connettersi al database PostgreSQL.
 
----
+Richiede env dashboard:
 
-## Build di Produzione e Deploy
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
-Il progetto è diviso in due deploy separati: sito vetrina e dashboard.
+## Documentazione
 
-### 1. Sito Vetrina
-Vai nella cartella `demo` e usa `npm run build`. Su Vercel:
-| Campo | Valore |
-|-------|--------|
-| Root Directory | `demo` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
+Indice centrale:
 
-### 2. Dashboard
-Questa è un'applicazione Single Page (SPA) React connessa a Supabase. Su Vercel (es. `dashboard.zirel.org`):
-| Campo | Valore |
-|-------|--------|
-| Root Directory | `dashboard` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Env Vars | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
+- `docs/README.md`
 
-> ⚠️ Il file `dashboard/vercel.json` assicura che il routing React funzioni correttamente (fallback a `index.html`).
+Documenti core:
 
----
-
-→ Segui `docs/integration/INTEGRATION_GUIDE.md` per il dettaglio completo.
-
----
-
-*Realizzato con ❤️ e piadina per la Riviera.*
+- `docs/technical/HANDOFF_CONTEXT_CURRENT.md`
+- `docs/technical/BRAND_IDENTITY.md`
+- `docs/technical/PRICING_MODEL.md`
+- `docs/technical/FRONTEND_TENANT_MAP.md`
+- `docs/technical/ARCHITECTURE.md`

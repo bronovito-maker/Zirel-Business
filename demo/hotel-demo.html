@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Demo Live | Richieste soggiorno in azione</title>
+    <meta name="description"
+        content="Hotel Rivamare: demo live di un sito hotel fittizio ma realistico, con reception online già pronta da testare su richieste soggiorno, servizi e informazioni iniziali.">
+    <link rel="canonical" href="https://zirel.org/hotel-demo" />
+    <meta property="og:title" content="Hotel Rivamare | Richieste soggiorno e reception online" />
+    <meta property="og:description"
+        content="Un hotel fittizio ma realistico per testare con mano la reception online: richieste soggiorno, servizi, check-in e primo contatto." />
+    <meta property="og:url" content="https://zirel.org/hotel-demo" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://zirel.org/hero_premium.png" />
+    <meta property="og:site_name" content="Hotel Rivamare" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hotel Rivamare | Richieste soggiorno e reception online" />
+    <meta name="twitter:description"
+        content="Apri la chat e prova un sito hotel fittizio ma realistico con reception online già pronta da testare." />
+    <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
+    <meta name="twitter:site" content="@zirelcore" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .hero-pattern {
+            background-color: #f7fbff;
+            background-image:
+                radial-gradient(circle at top right, rgba(0, 174, 239, 0.10), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.9), transparent 38%);
+        }
+
+        .hotel-demo-shell {
+            border-color: rgba(191, 219, 254, 0.8);
+            box-shadow: 0 24px 64px rgba(8, 47, 73, 0.10);
+        }
+
+        .hotel-demo-note {
+            background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
+            border: 1px solid rgba(191, 219, 254, 0.75);
+        }
+
+        .hotel-demo-panel {
+            background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
+            border: 1px solid rgba(191, 219, 254, 0.75);
+            box-shadow: 0 22px 56px rgba(8, 47, 73, 0.08);
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="hotel-demo.html" class="logo"><span class="zirel-brand">Hotel</span> <span>Rivamare</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing-hotel.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 md:pt-48 md:pb-28 hero-pattern relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10">
+            <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
+                <span
+                    class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-sky-100 shadow-sm">
+                    Demo hotel in azione
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    Hotel Rivamare.<br />
+                    <span class="text-brand-orange italic">Reception online, già attiva.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Qui provi un flusso reale: domande su camere, servizi, check-in e richieste soggiorno.<br /><br />
+                    Nessuna simulazione astratta. Vedi esattamente come lavorerebbe sul sito della tua struttura.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="#chat-live" onclick="return openDemoChat(event)"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
+                        Prova la chat
+                    </a>
+                    <a href="hotel.html"
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
+                        Scopri Zirèl Hotel
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:w-2/5 flex justify-center items-center relative" id="chat-live">
+                <div
+                    class="hotel-demo-shell relative w-72 md:w-96 bg-white rounded-[2.5rem] p-4 overflow-hidden">
+                    <div
+                        class="rounded-[2rem] overflow-hidden bg-gradient-to-br from-brand-blue to-brand-blue-dark p-5 md:p-6">
+                        <div class="flex items-start justify-between gap-4 mb-5 text-white">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold">Hotel Rivamare
+                                </p>
+                                <h3 class="text-2xl font-black mt-1 leading-tight">Richieste soggiorno,<br>reception online
+                                </h3>
+                            </div>
+                            <span
+                                class="px-3 py-1 rounded-full bg-brand-orange/15 text-brand-orange text-[10px] font-bold uppercase tracking-[0.12em]">Live</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Richieste oggi</p>
+                                <p class="text-3xl font-black mt-1">9</p>
+                                <p class="text-[11px] text-white/45 mt-1">4 già inviate</p>
+                            </div>
+                            <div class="bg-white/8 rounded-2xl p-4 text-white border border-white/8">
+                                <p class="text-[10px] uppercase tracking-[0.14em] text-white/55 font-bold">Tempo medio
+                                </p>
+                                <p class="text-3xl font-black mt-1">36s</p>
+                                <p class="text-[11px] text-white/45 mt-1">alla prima risposta</p>
+                            </div>
+                        </div>
+
+                        <div class="hotel-demo-note rounded-3xl p-5 shadow-lg">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Cosa
+                                puoi fare qui</p>
+                            <div class="space-y-3 text-sm text-brand-blue/75">
+                                <p><strong class="text-brand-blue">1.</strong> Chiedere informazioni su camere, orari e
+                                    servizi.</p>
+                                <p><strong class="text-brand-blue">2.</strong> Simulare una richiesta soggiorno come un
+                                    ospite reale.</p>
+                                <p><strong class="text-brand-blue">3.</strong> Vedere come la reception online raccoglie i
+                                    dati in modo ordinato.</p>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between gap-3">
+                                <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand-orange">Reception live</span>
+                                <button onclick="openDemoChat()"
+                                    class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg">Scrivi
+                                    ora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-sky-100 rounded-full blur-3xl -ml-48 -mb-48"></div>
+    </header>
+
+    <section class="py-24 bg-white" id="prove">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Cosa provi su questo <span
+                            class="text-brand-orange">sito demo</span></h2>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">Apri la chat e fai domande come un ospite reale.</p>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Vedrai tono, raccolta dati e passaggio al team. In tempo reale.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="contatti.html"
+                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                            Prenota demo guidata
+                        </a>
+                        <a href="hotel.html"
+                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
+                            Scopri Zirèl Hotel
+                        </a>
+                    </div>
+                </div>
+                <div class="zirel-card">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Suggerimenti
+                        prova</p>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">1.</span>
+                            <p class="text-brand-blue/70">Chiedi informazioni su camere, check-in, check-out o servizi
+                                inclusi.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">2.</span>
+                            <p class="text-brand-blue/70">Simula un ospite che vuole fare una richiesta soggiorno e guarda
+                                come vengono raccolti i dati.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="text-brand-orange font-bold">3.</span>
+                            <p class="text-brand-blue/70">Osserva come il tono resta coerente con la struttura e come il
+                                primo contatto resta ordinato.</p>
+                        </div>
+                        <div class="hotel-demo-note mt-6 p-5 rounded-3xl">
+                            <p class="text-sm text-brand-blue/70"><strong class="text-brand-blue">Nota:</strong> questo è
+                                un hotel fittizio ma realistico, creato per mostrare come Zirèl può apparire e rispondere
+                                sul sito di una struttura vera.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-sky-50/40" id="camere">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="zirel-card">
+                    <h3 class="text-2xl font-bold mb-4">Camere e soggiorni</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Un demo hotel credibile deve permettere di chiedere
+                        informazioni su camere, periodi e prime richieste senza uscire subito dal flusso.</p>
+                </div>
+                <div class="zirel-card" id="servizi">
+                    <h3 class="text-2xl font-bold mb-4">Servizi chiari</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Parcheggio, check-in, check-out, servizi inclusi e
+                        logistica sono i punti che un ospite tende a chiedere per primi.</p>
+                </div>
+                <div class="zirel-card">
+                    <h3 class="text-2xl font-bold mb-4">Primo contatto ordinato</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">L'obiettivo non è simulare una prenotazione complessa,
+                        ma mostrare un primo contatto pulito e coerente con il brand della struttura.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative overflow-hidden" id="contatti">
+        <div class="container mx-auto px-4 md:px-8">
+            <div
+                class="hotel-demo-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
+                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Vuoi questo flusso sul tuo sito?</h2>
+                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Parliamone in 15 minuti.</p>
+                <div class="flex justify-center">
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Prenota una demo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing-hotel.html">Pricing Hotel</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Scrivi alla reception dell'Hotel Rivamare. 🏨
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+
+            <!-- Widget Header -->
+            <div id="widget-header" class="brand-gradient px-5 py-4 text-white flex items-center gap-4"
+                style="background: #FF8C42;">
+                <div id="widget-icon-container"
+                    class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    🏨
+                </div>
+                <div class="flex-grow">
+                    <h6 id="widget-title-text" class="font-bold text-base leading-tight">Hotel Rivamare</h6>
+                    <p id="widget-subtitle-text" class="text-[11px] text-white/75 mt-0.5">Reception online dell'hotel</p>
+                </div>
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Benvenuti! 👋 Sono la reception online dell'<strong
+                            class="text-brand-orange font-sans">Hotel Rivamare</strong>.</p>
+                    <p>Ti aiuto con camere, servizi e richieste soggiorno. Da dove vuoi iniziare?</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🛏️ Vorrei informazioni sulle camere')">
+                        🛏️ Informazioni camere
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🕒 Quali sono gli orari di check-in e check-out?')">
+                        🕒 Orari check-in/out
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚗 Avete parcheggio e servizi inclusi?')">
+                        🚗 Parcheggio e servizi
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📩 Vorrei fare una richiesta soggiorno')">
+                        📩 Richiesta soggiorno
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi alla reception..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            🏨
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'hotel_rivamare_demo_001',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        window.ZirelWidgetConfig = {
+            widget_title: 'Hotel Rivamare',
+            widget_subtitle: "Reception online dell'hotel",
+            widget_color: '#FF8C42',
+            widget_icon: '🏨'
+        };
+
+        window.zirelTooltipMessages = [
+            "Benvenuti all'Hotel Rivamare. 🏨",
+            'Siamo online. Come possiamo aiutarvi? ✨',
+            'Informazioni su camere e servizi. 📩',
+            'Richiedi informazioni in pochi secondi. 🚀',
+        ];
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="hotel_rivamare_demo_001"></script>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

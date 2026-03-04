@@ -7,7 +7,7 @@ Questa scheda raccoglie i contenuti pronti da copiare nel tenant `zirel_official
 ### `prezzo_medio`
 
 ```text
-Piani da EUR39/mese a EUR79/mese + setup iniziale. Soluzioni custom su richiesta.
+Piani da EUR49/mese a EUR99/mese + attivazione iniziale. Soluzioni custom su richiesta. Con annuale: -50% sull'attivazione iniziale.
 ```
 
 ### `servizi_inclusi`
@@ -85,22 +85,22 @@ La demo serve a mostrare come Zirèl si comporterebbe nel contesto reale del cli
 
 ### Piani
 
-#### Piano Bagnino
+#### Piano Entry
 
-- EUR39/mese
-- EUR299 setup una tantum
+- EUR49/mese
+- EUR349 attivazione assistita una tantum
 - Risposte AI h24
-- Informazioni su orari e menu
+- Informazioni operative e richieste frequenti
 - 1 lingua (Italiano)
 - Widget chat personalizzato
 
-#### Piano Azdora
+#### Piano Intermedio
 
-- EUR79/mese
-- EUR499 setup una tantum
-- Tutto del piano Bagnino
+- EUR99/mese
+- EUR599 setup e configurazione iniziale una tantum
+- Tutto del piano Entry
 - 10 lingue incluse
-- Prenotazione tavoli e camere
+- Flussi operativi piu completi
 - Integrazione dashboard
 - Piano consigliato per la maggior parte delle attivita
 
@@ -115,7 +115,7 @@ La demo serve a mostrare come Zirèl si comporterebbe nel contesto reale del cli
 
 ### Differenze tra i piani
 
-Il piano Bagnino copre l'accoglienza digitale di base. Il piano Azdora aggiunge la parte operativa piu rilevante, con automazioni e multilingua. Gran Turismo e pensato per chi vuole un progetto su misura, integrazioni avanzate e supporto piu stretto.
+Il piano Entry copre l'accoglienza digitale di base. Il piano Intermedio aggiunge la parte operativa piu rilevante, con automazioni e multilingua. Il piano Custom e pensato per chi vuole un progetto su misura, integrazioni avanzate e supporto piu stretto.
 
 ### FAQ commerciali
 

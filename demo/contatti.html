@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatti | Zirèl</title>
+    <meta name="description"
+        content="Contatta Zirèl per informazioni, demo guidate, supporto all'attivazione e richieste commerciali.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+
+    <style>
+        .contacts-shell {
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .contact-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(203, 213, 225, 0.75);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+
+<body class="font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-24 contacts-shell min-h-screen">
+        <div class="container mx-auto px-4 md:px-8 max-w-6xl">
+            <div class="text-center mb-16">
+                <span
+                    class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-slate-200 shadow-sm">
+                    Contatti Zirèl
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black mb-6">Parliamone in <span
+                        class="text-brand-orange">15 minuti</span></h1>
+                <p class="text-lg md:text-xl text-brand-blue/70 max-w-3xl mx-auto leading-relaxed">
+                    Tu porti il contesto. Noi ti mostriamo la soluzione.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-16">
+                <div class="contact-card rounded-[2.5rem] p-8">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Contatto diretto</p>
+                    <h2 class="text-2xl font-black mb-4">WhatsApp</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Per risposte rapide su demo, attivazione e pricing.</p>
+                    <a href="https://wa.me/393461027447"
+                        class="inline-flex items-center justify-center bg-zirel-gradient text-white px-6 py-3 rounded-full text-base font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                        Scrivi su WhatsApp
+                    </a>
+                </div>
+
+                <div class="contact-card rounded-[2.5rem] p-8">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Email</p>
+                    <h2 class="text-2xl font-black mb-4">Supporto e info</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Per richieste commerciali e follow-up strutturati.</p>
+                    <div class="space-y-3 text-sm">
+                        <a href="mailto:info@zirel.org" class="block text-brand-orange font-bold hover:underline">info@zirel.org</a>
+                        <a href="mailto:bronovito@gmail.com" class="block text-brand-blue/70 hover:text-brand-orange transition-colors">bronovito@gmail.com</a>
+                    </div>
+                </div>
+
+                <div class="contact-card rounded-[2.5rem] p-8">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Telefono</p>
+                    <h2 class="text-2xl font-black mb-4">Parliamoci</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Per un confronto rapido sul settore giusto per te.</p>
+                    <a href="tel:+3934368335677"
+                        class="inline-flex items-center justify-center bg-zirel-gradient text-white px-6 py-3 rounded-full text-base font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                        Chiama ora
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="contact-card rounded-[2.5rem] p-8 md:p-10">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Prenotare una demo
+                    </p>
+                    <h2 class="text-3xl font-black mb-4">Vedi Zirèl in azione</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-8">
+                        Ti mostriamo il flusso più adatto al tuo settore. Senza giri lunghi.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="https://wa.me/393461027447?text=Ciao%2C%20vorrei%20prenotare%20una%20demo%20guidata%20di%20Zir%C3%A8l"
+                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                            Richiedi demo
+                        </a>
+                        <a href="demo.html"
+                            class="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 text-brand-blue shadow-sm transition-all">
+                            Apri demo live
+                        </a>
+                    </div>
+                </div>
+
+                <div class="contact-card rounded-[2.5rem] p-8 md:p-10">
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Accesso e setup</p>
+                    <h2 class="text-3xl font-black mb-4">Sei pronto a partire?</h2>
+                    <p class="text-brand-blue/70 leading-relaxed mb-8">
+                        Login o registrazione, senza attrito.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="login.html"
+                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
+                            Vai al login
+                        </a>
+                        <a href="register.html"
+                            class="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 text-brand-blue shadow-sm transition-all">
+                            Registrati
+                        </a>
+                    </div>
+                    <p class="text-sm text-brand-blue/55 mt-6 leading-relaxed">
+                        Se vuoi chiarirti prima il piano giusto, apri il
+                        <a href="pricing.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">pricing per settore</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live e
+                        accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Ti aiuto a metterti in contatto in 1 minuto 💬
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    💬
+                </div>
+                <div class="flex-grow">
+                    <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
+                    <p class="text-[11px] text-white/75 mt-0.5">Orientamento e demo commerciale</p>
+                </div>
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
+                    <p>Posso aiutarti a scegliere il canale giusto per contattarci, prenotare una demo o orientarti su
+                        login e attivazione.</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei un contatto rapido')">
+                        📞 Contatto rapido
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Voglio prenotare una demo guidata')">
+                        🚀 Prenota demo
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('💶 Ho dubbi su prezzi e attivazione')">
+                        💶 Prezzi e attivazione
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🔐 Come accedo alla dashboard?')">
+                        🔐 Login dashboard
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            💬
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <script>
+        window.zirelTooltipMessages = [
+            'Vuoi parlare con noi in modo rapido? 💬',
+            'Ti aiutiamo a prenotare una demo 🚀',
+            'Dubbi su login o attivazione? 🔐',
+            'Posso indirizzarti al canale giusto 📞',
+        ];
+    </script>
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_official',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Assistant',
+            widget_subtitle: 'Orientamento e demo commerciale',
+            widget_color: '#FF8C42',
+            widget_icon: '💬'
+        };
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="zirel_official"></script>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

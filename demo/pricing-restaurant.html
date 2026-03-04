@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Restaurant | Zirèl - Piani per ristoranti</title>
+    <meta name="description"
+        content="Pricing Zirèl Restaurant: tre piani pensati per ristoranti e locali. Stessi prezzi, naming e vantaggi orientati a prenotazioni tavoli, FAQ e richieste.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        .pricing-restaurant-page {
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 22%);
+        }
+
+        .pricing-restaurant-page .pricing-hero {
+            background:
+                radial-gradient(circle at top right, rgba(255, 140, 66, 0.18), transparent 28%),
+                linear-gradient(135deg, #6b3416 0%, #8f4a1b 52%, #b15c1f 100%);
+        }
+
+        .pricing-restaurant-page .pricing-section {
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
+        }
+
+        .pricing-restaurant-page .pricing-card {
+            border: 1px solid rgba(253, 224, 190, 0.95);
+            box-shadow: 0 24px 62px rgba(124, 45, 18, 0.08);
+        }
+
+        .pricing-restaurant-page .pricing-card.recommended {
+            border-color: rgba(255, 140, 66, 0.9) !important;
+        }
+
+        .pricing-restaurant-page .badge-recommended {
+            background: #FF8C42;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+
+        .pricing-restaurant-page .psychological-tag {
+            background: rgba(255, 140, 66, 0.1);
+            color: #c25b18 !important;
+        }
+
+        .pricing-restaurant-page .pricing-features li::before {
+            color: #FF8C42 !important;
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="pricing-restaurant-page">
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Restaurant</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="index.html" class="nav-link">HOME</a></li>
+            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="pricing-restaurant.html" class="nav-link">PRICING</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li><a href="faq.html" class="nav-link">FAQ</a></li>
+            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pricing-hero">
+        <div class="container">
+            <h1><span class="zirel-brand">Zirèl</span> Restaurant</h1>
+            <p>Tre piani. Un obiettivo: più tavoli confermati, meno caos.</p>
+        </div>
+    </header>
+
+    <section class="pricing-section">
+        <div class="container">
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="card-icon">🍽️</div>
+                    <h3>Servizio</h3>
+                    <p>La base giusta per iniziare con ordine.</p>
+                    <div class="price-box">
+                        <span class="price-main">€49<small>/mese</small></span>
+                        <span class="price-setup">+ €349 attivazione assistita una tantum</span>
+                        <span class="price-setup text-brand-blue/60">Con annuale: -50% sull'attivazione iniziale</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Risposte AI h24 per il locale</li>
+                        <li>FAQ su orari, menu e contatti</li>
+                        <li>1 lingua (Italiano)</li>
+                        <li>Widget chat personalizzato</li>
+                        <li>Configurazione iniziale di flusso e contenuti</li>
+                    </ul>
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        Inizia ora
+                    </a>
+                </div>
+
+                <div class="pricing-card recommended">
+                    <span class="badge-recommended">Consigliato</span>
+                    <div class="card-icon">🥧</div>
+                    <h3>Azdora</h3>
+                    <p>Più conferme. Meno rincorse.</p>
+                    <div class="price-box">
+                        <span class="price-main">€99<small>/mese</small></span>
+                        <span class="price-setup text-brand-cyan">+ €599 setup e configurazione iniziale</span>
+                        <span class="price-setup text-brand-blue/60">Con annuale: -50% sull'attivazione iniziale</span>
+                    </div>
+                    <div class="psychological-tag">Il più scelto dai ristoratori</div>
+                    <ul class="pricing-features">
+                        <li>Tutto del piano Servizio</li>
+                        <li><strong>10 lingue</strong> incluse</li>
+                        <li>Prenotazioni tavolo piu' strutturate</li>
+                        <li>Dashboard con richieste piu' leggibili</li>
+                        <li>Ottimizzazione iniziale del flusso conversazionale</li>
+                    </ul>
+                    <a href="register.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        Scegli Azdora
+                    </a>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="card-icon">👨‍🍳</div>
+                    <h3>Maestro</h3>
+                    <p>Su misura per locali con esigenze avanzate.</p>
+                    <div class="price-box">
+                        <span class="price-main text-brand-blue">Custom</span>
+                        <span class="price-setup text-brand-cyan">Analisi, configurazione e progetto inclusi</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Tutto del piano Azdora</li>
+                        <li>Workflow e regole su misura</li>
+                        <li>Supporto prioritario al team</li>
+                        <li>Personalizzazioni dedicate</li>
+                    </ul>
+                    <a href="contatti.html"
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center">
+                        Parla del tuo locale
+                    </a>
+                </div>
+            </div>
+
+            <div
+                class="mt-20 bg-brand-blue text-white rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 max-w-5xl mx-auto shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/10 transition-colors duration-700">
+                </div>
+                <div class="relative z-10 space-y-4 text-center md:text-left">
+                    <h3 class="text-3xl font-black">Parliamone in 15 minuti.</h3>
+                    <p class="text-brand-sand/70 text-lg max-w-xl leading-relaxed">Tu porti il contesto del locale. Noi ti mostriamo il piano giusto.</p>
+                    <p class="text-brand-sand/70 text-base max-w-xl leading-relaxed">Con annuale: -50% sull'attivazione iniziale. Il canone mensile resta invariato.</p>
+                </div>
+                <div class="relative z-10 flex flex-col items-center gap-3">
+                    <a href="contatti.html"
+                        class="bg-brand-orange text-white px-10 py-5 rounded-full font-black text-lg hover:bg-white hover:text-brand-orange hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap shadow-xl shadow-brand-orange/20">
+                        Prenota una demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pb-20">
+        <div class="container">
+            <div class="zirel-card max-w-5xl mx-auto">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Chiaro dall'inizio</p>
+                <div class="grid md:grid-cols-2 gap-6 text-left">
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">L'attivazione iniziale e' sempre prevista.</strong> Si applica in partenza ed e' scontata del 50% con annuale.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Il canone mensile e' sempre attivo.</strong> Resta parte del servizio per tutto il periodo attivo.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Widget e implementazione standard sono gratuiti.</strong> Nessun costo tecnico aggiuntivo per l'integrazione base.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Annullamento gratuito e senza vincoli.</strong> Puoi interrompere quando vuoi. L'attivazione una tantum non e' rimborsabile.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Restaurant</span></a>
+                    <p>Un ecosistema di soluzioni AI per richieste, lead, prenotazioni e primo contatto, con demo live
+                        e accesso dedicato.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="restaurant.html">Restaurant</a></li>
+                        <li><a href="hotel.html">Hotel</a></li>
+                        <li><a href="professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Demo e Accesso</h4>
+                    <ul>
+                        <li><a href="demo.html">Demo Restaurant</a></li>
+                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
+                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registrati</a></li>
+                        <li><a href="contatti.html">Contatti</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pricing-restaurant.html">Pricing Restaurant</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
+                riservati.</p>
+        </div>
+    </footer>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>
