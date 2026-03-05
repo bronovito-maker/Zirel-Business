@@ -143,7 +143,7 @@ const DocumentManager = () => {
         <div className="space-y-8 animate-fade-in px-1">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-1">
-                    <h2 className="text-2xl md:text-3xl font-black tracking-tight text-gray-900 italic uppercase">Knowledge Base</h2>
+                    <h2 className="z-section-title">Knowledge Base</h2>
                     <p className="text-gray-500 font-medium">Carica menu, listini e PDF per istruire il tuo Concierge Digitale.</p>
                 </div>
 
@@ -169,7 +169,7 @@ const DocumentManager = () => {
             <div className="apple-card bg-white border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-5 md:p-6 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 italic text-zirel-orange-dark font-bold">
+                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-zirel-blue/10 text-zirel-blue font-bold">
                             KB
                         </div>
                         <h3 className="font-bold text-gray-800 tracking-tight">Archivio Documenti</h3>
@@ -201,7 +201,7 @@ const DocumentManager = () => {
                         documents.map((doc) => (
                             <div key={doc.id} className="p-5 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:bg-orange-50/10 transition-colors group">
                                 <div className="flex items-start gap-4 flex-1">
-                                    <div className="p-3 bg-white text-blue-500 rounded-2xl border border-blue-50 group-hover:bg-blue-50 transition-colors shadow-sm hidden xs:block shrink-0">
+                                    <div className="p-3 bg-white text-zirel-blue rounded-2xl border border-zirel-blue/10 group-hover:bg-zirel-blue/5 transition-colors shadow-sm hidden xs:block shrink-0">
                                         <FileText className="w-6 h-6" />
                                     </div>
                                     <div className="min-w-0 flex-1">
@@ -215,7 +215,7 @@ const DocumentManager = () => {
                                 <div className="flex items-center gap-3 self-end sm:self-auto w-full sm:w-auto">
                                     <button
                                         onClick={() => handleViewDocument(doc.name)}
-                                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all active:scale-95"
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 text-sm font-bold text-zirel-blue bg-zirel-blue/10 hover:bg-zirel-blue/15 rounded-xl transition-all active:scale-95"
                                     >
                                         <ExternalLink className="w-4 h-4" />
                                         Apri
@@ -239,7 +239,7 @@ const DocumentManager = () => {
             </div>
 
             {!INGESTION_WEBHOOK_URL && (
-                <div className="p-5 bg-amber-50 rounded-3xl border border-amber-100 flex gap-4 animate-pulse">
+                <div className="p-5 bg-amber-50 rounded-3xl border border-amber-100 flex gap-4">
                     <div className="p-2 bg-white rounded-full shrink-0"><Info className="w-5 h-5 text-amber-500" /></div>
                     <div className="text-sm">
                         <p className="font-bold text-amber-900 mb-1">Modalità Semplificata</p>

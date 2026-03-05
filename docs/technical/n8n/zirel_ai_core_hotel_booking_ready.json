@@ -1,0 +1,824 @@
+{
+  "name": "Zirèl - AI Core (3072) - Hotel Booking Ready",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tenant_id",
+              "name": "tenant_id",
+              "value": "={{ $json.metadata.tenant_id }}",
+              "type": "string"
+            },
+            {
+              "id": "sessionId",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6512,
+        1200
+      ],
+      "id": "17f9105a-59f6-4cd0-ba42-c9030f561301",
+      "name": "Crystalize Context"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check_tenant",
+              "leftValue": "={{ $json.tenant_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        6736,
+        1200
+      ],
+      "id": "4e014d9b-de85-4904-bfc1-8660fb94bb0f",
+      "name": "Security: Tenant Check"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant_id",
+              "keyValue": "={{ $('Crystalize Context').item.json.tenant_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        6960,
+        1200
+      ],
+      "id": "77f0047d-9b7a-46cc-9eee-e040eacf04d8",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Crystalize Context').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "={{ $json.final_system_prompt }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        7680,
+        1200
+      ],
+      "id": "f5e2bfbf-9e65-4fb8-85ca-270de35a96da",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Crystalize Context').item.json.sessionId }}",
+        "contextWindowLength": 8
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        7536,
+        1424
+      ],
+      "id": "b4d03bd3-1cfc-47ed-a9d1-1b99127fbfc9",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "company_knowledge_base",
+        "toolDescription": "Strumento per cercare documenti lunghi, listini e menu completi del locale. Se fallisce o non trova nulla, dì semplicemente che non hai l'informazione.",
+        "tableName": {
+          "__rl": true,
+          "value": "zirel_vectors",
+          "mode": "list",
+          "cachedResultName": "zirel_vectors"
+        },
+        "options": {
+          "queryName": "match_documents",
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "tenant_id",
+                "value": "={{ $('Crystalize Context').item.json.tenant_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        7664,
+        1424
+      ],
+      "id": "5c0f73c2-45bc-4e9d-baf9-bd13f10e127c",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        7408,
+        1424
+      ],
+      "id": "835bb4a4-04cc-4869-badf-e8ccc24d469b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        7744,
+        1632
+      ],
+      "id": "a2f71038-00ae-4ed6-8dab-86ac20f3dd9c",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        6288,
+        1200
+      ],
+      "id": "eba411f4-808b-48fa-9be6-9ca2a2c110c6",
+      "name": "When chat message received",
+      "webhookId": "d9e10e54-2d61-4643-98ed-7bbe6221699e",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code Node: Build Prompt (HARDENED)\n * Composes the modular system prompt for the AI Agent.\n */\n\n// 0. Use $json to reduce fragility (no dependency on node name)\nconst tenant = $json;\n\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome',\n});\n\n// 1. Normalization of business_type\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\n\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) {\n  businessType = 'restaurant';\n} else if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) {\n  businessType = 'hotel';\n} else if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) {\n  businessType = 'medical';\n} else if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) {\n  businessType = 'legal';\n} else if (['professional', 'consulente', 'professionista'].includes(rawType)) {\n  businessType = 'professional';\n}\n\n// 2. Core Prompt: Universal Rules\nconst core_prompt = `\nOggi è il giorno: ${dateStr}\nOra attuale: ${timeStr}\nFuso orario: Europe/Rome\n\n[IDENTITÀ PRINCIPALE]\n${tenant.prompt_base || 'Sei un assistente AI professionale, cordiale e affidabile.'}\n\n[RULES: PRIORITÀ ASSOLUTE]\n1. Non inventare mai informazioni, disponibilità o conferme.\n2. Rispondi sempre alla richiesta attuale dell'utente.\n3. Usa solo dati realmente disponibili nei campi del tenant o negli strumenti.\n4. Mantieni tono naturale, utile, breve e umano.\n5. Se una prenotazione o appuntamento richiede azione reale, non confermare nulla prima dell'esecuzione del tool corretto.\n6. Non dire mai che una prenotazione o un appuntamento è stato preso, segnato, registrato o confermato prima dell'esecuzione riuscita del tool corretto.\n7. Non menzionare mai id tecnici (es. tenant_id) all'utente.\n8. Se l'utente fa due domande simili consecutive, non ripetere la stessa risposta quasi identica: riformula e aggiungi valore nuovo.\n9. Se l'utente cambia argomento, tratta il nuovo messaggio come una nuova richiesta.\n\n[MISSIONE OPERATIVA]\nSei l'assistente ufficiale di ${tenant.nome_attivita || 'questa attività'}.\nIl tuo compito è aiutare gli utenti in modo naturale e affidabile:\n- fornire informazioni, FAQ e orientare il cliente\n- gestire richieste di prenotazione o appuntamento solo quando possibile\n- proporre il prossimo passo utile senza essere aggressivo\n\n[INTENT FIRST]\nPrima di rispondere, identifica il tipo di richiesta:\n- saluto o messaggio sociale\n- informazione semplice\n- richiesta complessa o di dettaglio\n- richiesta di prenotazione o appuntamento\n- richiesta fuori ambito\n\nUsa solo la modalità adatta e non mischiare modalità diverse se non necessario.\n\n[COME USARE I DATI DEL TENANT]\n- Usa prima i dati strutturati del tenant (orari, contatti, policy, link, servizi).\n- Non riversare automaticamente campi lunghi o testuali.\n- Riassumi solo ciò che è direttamente rilevante per la domanda dell'utente.\n- Quando un dato strutturato è presente, usalo in modo fedele.\n\n[GESTIONE MESSAGGI SOCIALI E CHIUSURA FLUSSO]\n- Se l'ultimo evento è stata una conferma finale di prenotazione o appuntamento già registrato, considera il flusso chiuso.\n- Dopo la conferma finale, non ripetere di nuovo i dettagli della prenotazione o dell'appuntamento salvo richiesta esplicita dell'utente.\n- Se l'utente scrive messaggi brevi o sociali come \"grazie\", \"perfetto\", \"ok\", \"ci penso io\", rispondi in modo breve e naturale, senza ripetere la conferma precedente.\n- Se l'utente cambia argomento dopo una prenotazione o un appuntamento conclusi, tratta il nuovo messaggio come una nuova richiesta.\n\n[FALLBACK]\n- Se non hai un'informazione, dillo con chiarezza e tono umano.\n- Non inventare.\n- Se utile, proponi il prossimo passo utile: contatto, link, richiesta di dettaglio o approfondimento.\n\n[STILE]\n- Tono cortese, caldo, professionale.\n- Massima brevità: 2-4 frasi, salvo richiesta esplicita di dettaglio.\n- Saluta solo all'inizio della conversazione.\n- Non fare riassunti automatici non richiesti.\n- Non usare formule rigide o ripetitive.\n`;\n\n// 3. Sector Prompts\nconst sector_prompts = {\n  restaurant: `\n[SETTORE: RISTORAZIONE]\n- Usa linguaggio da ristorante: tavolo, coperti, menu, allergie, note tavolo.\n- Attiva la modalità prenotazione solo se l'utente sta chiaramente cercando di prenotare un tavolo.\n- Se il cliente vuole prenotare, raccogli: Nome, Telefono, Data, Ora, Persone.\n- Se l'utente comunica allergie o note speciali, salvale nel campo note_prenotazione.\n- Se l'utente fornisce più dati nello stesso messaggio, estrai tutti i dati utili presenti.\n- Se un messaggio contiene un numero di telefono ma anche altri dati utili (es. nome, giorno, ora o note), estrai tutti i dati e non limitarti al solo telefono.\n- Quando hai già raccolto Nome, Telefono, Data, Ora e Persone, NON confermare ancora la prenotazione.\n- In quel momento devi fare un solo riepilogo chiaro e chiedere esplicitamente: \"Confermi?\"\n- Usa il tool Registra_Prenotazione SOLO dopo una conferma esplicita del cliente (es. \"sì\", \"si\", \"confermo\", \"ok\").\n- NON dire mai che hai registrato, segnato o confermato la prenotazione prima dell'esecuzione del tool.\n- Dopo il successo del tool, usa la risposta del tool come conferma finale e non fare altre domande.\n- Se la richiesta è per 10 o più persone, NON usare il tool di prenotazione.\n- In quel caso invita cortesemente il cliente a chiamare direttamente il locale al numero ${tenant.telefono || 'aziendale'} per organizzare al meglio tavolo ed eventuale menu dedicato.\n- Se il gruppo scende sotto le 10 persone, puoi tornare a gestire la prenotazione via chat.\n- Quando l'utente chiede di parcheggio o animali ammessi, rispondi usando in modo fedele i dati strutturati del tenant se presenti.\n- Non riformulare in modo troppo libero policy o limitazioni specifiche.\n- Dopo che il tool ha avuto successo e hai dato la conferma finale, considera chiuso il flusso di prenotazione.\n- Nei messaggi successivi non ripetere il riepilogo o la conferma, a meno che l'utente lo chieda esplicitamente.\n- Quando l'utente corregge un dato già raccolto (es. ora, persone, giorno, nome, telefono), il valore più recente sostituisce sempre quello precedente.\n- Nel riepilogo finale e in ogni risposta successiva, usa solo il valore più recente.\n- Non riutilizzare versioni precedenti di orario, giorno o numero persone dopo una correzione esplicita.\n- Se l'utente smette di fornire dati o cambia argomento, esci dalla modalità prenotazione e torna alla modalità concierge.\n`,\n\n  hotel: `\n[SETTORE: HOTEL / RICETTIVITÀ]\n- Usa linguaggio da struttura ricettiva: camera, ospiti, notti, soggiorno, check-in, check-out, servizi inclusi.\n- Gestisci richieste informative su camere, soggiorni, servizi e logistica.\n- Informa sull'orario di check-in/check-out: ${tenant.orari_checkin_checkout || 'non specificato'}.\n- Non confermare disponibilità reale di camere senza consultare i link ufficiali o un tool dedicato.\n- Se è presente un link booking: ${tenant.link_booking_esterno || 'non disponibile'}.\n- Se l'utente vuole prenotare, raccogli in modo ordinato: Nome, Telefono, Email, Check-in, Check-out, Numero ospiti, tipologia camera, eventuali servizi richiesti.\n- Per richieste hotel non confermare mai disponibilita, prezzo o prenotazione prima dell'esecuzione riuscita del tool Registra_Prenotazione_Hotel.\n- Quando hai i dati obbligatori, fai un solo riepilogo finale e chiedi esplicitamente: \"Confermi?\".\n- Usa il tool Registra_Prenotazione_Hotel SOLO dopo conferma esplicita dell'utente.\n- Se il tool segnala pagamento richiesto, condividi il link pagamento restituito e spiega che la prenotazione resta in attesa fino a pagamento completato.\n- Se il tool non e disponibile o fallisce, spiega chiaramente che hai raccolto i dati ma non hai ancora registrato la prenotazione.\n- Se mancano dati, chiedi solo il prossimo dato utile.\n- Se l'utente chiede di parcheggio, animali, WiFi o servizi inclusi, usa in modo fedele i dati strutturati del tenant.\n`,\n\n  medical: `\n[SETTORE: MEDICO / SANITARIO]\n- Usa linguaggio da appuntamento medico: visita, appuntamento, disponibilità, durata.\n- Gestisci solo informazioni logistiche, organizzative e richieste di appuntamento.\n- Non fornire mai diagnosi mediche o consigli terapeutici.\n- Se l'utente descrive un'urgenza clinica, invita a chiamare subito il 118 o a recarsi al pronto soccorso.\n- Se l'utente vuole fissare un appuntamento, raccogli: Nome, Telefono, Giorno/Data, Fascia oraria.\n- Se mancano dati, chiedi solo il prossimo dato utile.\n- Non promettere disponibilità cliniche reali senza un tool o una conferma operativa.\n`,\n\n  legal: `\n[SETTORE: LEGALE / CONSULENZA]\n- Usa linguaggio da consulenza professionale: appuntamento, consulenza, call, incontro.\n- Gestisci richieste informative e organizzative.\n- Non fornire pareri legali sostanziali o soluzioni definitive via chat.\n- Spiega che l'incontro serve a inquadrare il caso con il professionista.\n- Se disponibile, puoi menzionare il costo della prima consulenza in modo chiaro e sobrio.\n- Se l'utente vuole fissare un appuntamento, raccogli: Nome, Telefono, Giorno/Data, Fascia oraria.\n- Se mancano dati, chiedi solo il prossimo dato utile.\n`,\n\n  professional: `\n[SETTORE: PROFESSIONISTI / CONSULENTI]\n- Gestisci appuntamenti, call conoscitive o incontri.\n- Tono neutro, affidabile e focalizzato sulla risoluzione della richiesta informativa.\n- Durata media appuntamento: ${tenant.durata_media_appuntamento || '30-60 min'}.\n- Gestisci richieste informative, commerciali e di orientamento.\n- Se l'utente chiede \"cos'è\", spiega in modo semplice e chiaro che cos'è il prodotto o servizio.\n- Se l'utente chiede \"come funziona\", spiega il funzionamento pratico e i benefici concreti.\n- Se l'utente chiede \"quanto costa\", rispondi con i dati disponibili; se non hai un prezzo preciso, proponi il prossimo passo utile (demo, contatto, pagina prezzi).\n- Non ripetere sempre la stessa frase introduttiva.\n- Se l'utente fa domande diverse, ogni risposta deve aggiungere un'informazione nuova e pertinente.\n- Se l'utente mostra interesse commerciale, guida in modo naturale verso demo, contatto o approfondimento.\n- Tono brillante, chiaro, premium, orientato alla conversione ma non aggressivo.\n- Non proporre esempi di date con giorno della settimana (es. \"lunedì 10 marzo\") se non sei certo della corrispondenza reale.\n- Se devi chiedere una data più precisa, chiedila in modo neutro: \"Puoi indicarmi una data precisa e un orario?\".\n- Se l'utente vuole una demo o un incontro commerciale, identifica il tipo di appuntamento come \"demo_request\".\n- Raccogli i dati in modo progressivo: nome, telefono, email, data, orario, note.\n- Non chiedere tutti i dati insieme se non necessario.\n- Quando hai tutti i dati obbligatori, fai un solo riepilogo finale e chiedi esplicitamente: \"Confermi?\".\n- Usa il tool Registra_Appuntamento SOLO dopo una conferma esplicita del cliente (es. \"sì\", \"si\", \"confermo\", \"ok\").\n- NON dire mai che hai registrato, prenotato, fissato o inoltrato la demo prima dell'esecuzione del tool.\n- Se il tool non è disponibile o fallisce, spiega chiaramente che hai raccolto i dati ma non hai ancora registrato la richiesta.\n- Se l'utente usa richieste vaghe come \"settimana prossima\", \"di mattina\" o simili, chiedi una data precisa e un orario preciso prima di procedere.\n- Dopo il successo del tool, usa la risposta del tool come conferma finale e non fare altre domande.\n`,\n};\n\n// 4. Tenant Context\nconst fields = [];\nconst addField = (label, value) => {\n  if (value && String(value).trim() !== '') {\n    fields.push(`- ${label}: ${value}`);\n  }\n};\n\n// Common Fields\naddField('Nome Attività', tenant.nome_attivita);\naddField('Settore', businessType);\naddField('Specializzazione', tenant.settore_specializzazione);\naddField('Telefono', tenant.telefono);\naddField('Email', tenant.mail);\naddField('Indirizzo', tenant.indirizzo);\naddField('Google Maps', tenant.google_maps_link);\naddField('Orari Apertura', tenant.orari_apertura);\naddField('Giorni Chiusura', tenant.giorni_chiusura);\naddField('Sito Web', tenant.sito_web_url);\naddField('Metodi di Pagamento', tenant.metodi_pagamento);\naddField('Politica Cancellazione', tenant.politica_cancellazione);\naddField('Target Clientela', tenant.target_clientela);\n\n// Social & Reviews\naddField('Instagram', tenant.instagram_url);\naddField('Facebook', tenant.facebook_url);\naddField('TripAdvisor', tenant.tripadvisor_url);\naddField('Recensioni', tenant.recensioni_url);\n\n// Sector Specific Fields\nif (businessType === 'restaurant') {\n  addField('Tipo Cucina', tenant.tipo_cucina);\n  addField('Specialità', tenant.specialita_casa);\n  addField('Link Prenotazione', tenant.link_prenotazione_tavoli);\n  addField('Allergie Policy', tenant.allergie_policy);\n  addField('Prezzo Medio', tenant.prezzo_medio);\n  addField('Animali Ammessi', tenant.animali_ammessi);\n  addField('Parcheggio', tenant.parcheggio_info);\n  addField('Promozione Attiva', tenant.promozione_attiva);\n} else if (businessType === 'hotel') {\n  addField('Check-in/out', tenant.orari_checkin_checkout);\n  addField('Tassa Soggiorno', tenant.tassa_soggiorno);\n  addField('Animali Ammessi', tenant.animali_ammessi);\n  addField('WiFi', tenant.wifi_password);\n  addField('Parcheggio', tenant.parcheggio_info);\n  addField('Servizi Inclusi', tenant.servizi_inclusi);\n  addField('Link Booking', tenant.link_booking_esterno);\n} else if (businessType === 'medical') {\n  addField('Durata Appuntamento', tenant.durata_media_appuntamento);\n  addField('Istruzioni Emergenze', tenant.emergenze_istruzioni);\n  addField('Servizi Offerti', tenant.servizi_inclusi);\n} else if (businessType === 'legal') {\n  addField('Costo Prima Consulenza', tenant.prima_consulenza_costo);\n  addField('Durata Appuntamento', tenant.durata_media_appuntamento);\n  addField('Servizi Offerti', tenant.servizi_inclusi);\n} else if (businessType === 'professional') {\n  addField('Durata Appuntamento', tenant.durata_media_appuntamento);\n  addField('Servizi Offerti', tenant.servizi_inclusi);\n  addField('Promozione Attiva', tenant.promozione_attiva);\n  addField('Prezzi', tenant.prezzo_medio);\n}\n\naddField('Info Utili', tenant.dati_testuali_brevi);\n\nconst tenant_context = `\n[CONTESTO ATTIVITÀ]\n${fields.join('\\n')}\n`;\n\n// 5. Final Compilation\nconst final_system_prompt = `\n${core_prompt}\n${sector_prompts[businessType] || sector_prompts.professional}\n${tenant_context}\n\n[UTILIZZO TOOLS]\n- company_knowledge_base:\n  - Usalo per domande su menu, prezzi, dettagli tecnici, FAQ complesse o contenuti lunghi.\n  - Se la richiesta richiede precisione documentale, preferisci questo strumento al solo contesto base.\n- Registra_Prenotazione:\n  - Usalo solo per il settore restaurant.\n  - Usalo solo quando hai già raccolto Nome, Telefono, Data, Ora e Persone.\n  - Prima del tool devi sempre fare un riepilogo e chiedere conferma esplicita.\n  - Non usare il tool se manca anche uno solo dei dati.\n  - Non usare il tool per gruppi di 10 o più persone.\n  - Non dire mai che la prenotazione è confermata prima che il tool abbia restituito successo.\n- Registra_Appuntamento:\n  - Usalo solo per i settori supportati diversi da restaurant.\n  - Per ora il tipo attivo è solo \"demo_request\".\n  - Usalo solo quando hai già raccolto il tipo di appuntamento e tutti i dati obbligatori.\n  - Per \"demo_request\", Email è obbligatoria.\n  - Le note sono opzionali ma utili.\n  - Prima del tool devi sempre fare un riepilogo e chiedere conferma esplicita.\n  - Non usare il tool se manca anche uno solo dei dati obbligatori.\n  - Non dire mai che l'appuntamento è confermato prima che il tool abbia restituito successo.\n- Registra_Prenotazione_Hotel:\n  - Usalo solo per il settore hotel.\n  - Usalo solo quando hai gia raccolto Nome, Telefono, Email, Check-in, Check-out e Numero ospiti.\n  - Tipologia camera e servizi richiesti sono opzionali ma raccomandati.\n  - Prima del tool devi sempre fare un riepilogo e chiedere conferma esplicita.\n  - Il tool deve verificare disponibilita e condizioni tramite booking manager adapter.\n  - Se il tool ritorna pagamento richiesto, condividi il link pagamento senza dichiarare prenotazione confermata.\n  - Considera la prenotazione confermata solo se il tool ritorna successo con stato confermato.\n  - In caso di errore tool, comunica chiaramente che la prenotazione non e stata registrata.\n`;\n\nreturn {\n  normalized_business_type: businessType,\n  core_prompt,\n  sector_prompt: sector_prompts[businessType] || sector_prompts.professional,\n  tenant_context,\n  final_system_prompt,\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7184,
+        1200
+      ],
+      "id": "fe791a10-dd03-4c96-8f1e-c514fafbbf04",
+      "name": "Build Prompt"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "d1LLF4mnxHeKcDJC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/d1LLF4mnxHeKcDJC",
+          "cachedResultName": "Zirèl - Registra_Appuntamento"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+            "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', ``, 'string') }}",
+            "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
+            "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
+            "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+            "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "appointment_type",
+              "displayName": "appointment_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "data_input",
+              "displayName": "data_input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "orario",
+              "displayName": "orario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "note",
+              "displayName": "note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        7952,
+        1424
+      ],
+      "id": "0e58e403-9551-4f43-a33e-b4553fc403c1",
+      "name": "Registra_Appuntamento"
+    },
+    {
+      "parameters": {
+        "description": "Salva una prenotazione reale nel database. Usalo solo quando hai nome_cliente, telefono, data_input, ora, persone e tenant_id.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "6ZLyZmg4iLuF4YGr",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/6ZLyZmg4iLuF4YGr",
+          "cachedResultName": "Zirèl - Registra_Prenotazione"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "nome_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome_cliente', ``, 'string') }}",
+            "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+            "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
+            "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
+            "persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('persone', ``, 'string') }}",
+            "ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ora', ``, 'string') }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nome_cliente",
+              "displayName": "nome_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "data_input",
+              "displayName": "data_input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ora",
+              "displayName": "ora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "persone",
+              "displayName": "persone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "note_prenotazione",
+              "displayName": "note_prenotazione",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        8096,
+        1456
+      ],
+      "id": "dfa6a933-fe83-4842-925a-211c3afbba86",
+      "name": "Registra_Prenotazione"
+    },
+    {
+      "parameters": {
+        "description": "Registra una prenotazione camera hotel reale. Usa questo tool solo dopo conferma esplicita del cliente e con i dati obbligatori completi.",
+        "workflowId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_HOTEL_BOOKING_WORKFLOW_ID",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+            "booking_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('booking_type', `standard_room_booking`, 'string') }}",
+            "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
+            "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "checkin_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('checkin_input', ``, 'string') }}",
+            "checkout_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('checkout_input', ``, 'string') }}",
+            "ospiti_adulti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ospiti_adulti', ``, 'string') }}",
+            "ospiti_bambini": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ospiti_bambini', `0`, 'string') }}",
+            "room_type_requested": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('room_type_requested', ``, 'string') }}",
+            "servizi_richiesti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servizi_richiesti', ``, 'string') }}",
+            "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
+            "lingua_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('lingua_cliente', `it`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "booking_type",
+              "displayName": "booking_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "checkin_input",
+              "displayName": "checkin_input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "checkout_input",
+              "displayName": "checkout_input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ospiti_adulti",
+              "displayName": "ospiti_adulti",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ospiti_bambini",
+              "displayName": "ospiti_bambini",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "room_type_requested",
+              "displayName": "room_type_requested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "servizi_richiesti",
+              "displayName": "servizi_richiesti",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "note_prenotazione",
+              "displayName": "note_prenotazione",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "lingua_cliente",
+              "displayName": "lingua_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        8240,
+        1456
+      ],
+      "id": "de6e9978-d9ca-4e3c-bff1-6c70a04aab22",
+      "name": "Registra_Prenotazione_Hotel"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Crystalize Context": {
+      "main": [
+        [
+          {
+            "node": "Security: Tenant Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Security: Tenant Check": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Crystalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registra_Appuntamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registra_Prenotazione": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registra_Prenotazione_Hotel": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "21b6b1a8-f414-44e1-b0ea-2043687ccd89",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "vfYYOYyiEcSIzuze",
+  "tags": []
+}

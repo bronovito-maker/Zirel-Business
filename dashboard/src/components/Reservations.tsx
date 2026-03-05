@@ -76,7 +76,7 @@ const Reservations = () => {
     return (
         <div className="space-y-6 animate-fade-in px-1">
             <div className="flex flex-row items-center justify-between mb-8 gap-4">
-                <h2 className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">Le Tue Prenotazioni</h2>
+                <h2 className="z-panel-title">Le Tue Prenotazioni</h2>
                 <button
                     onClick={() => fetchReservations(true)}
                     disabled={isRefreshing}
@@ -125,7 +125,7 @@ const Reservations = () => {
                                         </div>
                                         <div className="flex items-center gap-2.5 bg-gray-50/50 p-2 rounded-xl border border-gray-50">
                                             <Phone className="w-4 h-4 text-zirel-orange-dark mt-0.5" />
-                                            <a href={`tel:${res.telefono}`} className="text-blue-600 hover:text-blue-700 underline font-bold transition-colors">
+                                            <a href={`tel:${res.telefono}`} className="text-zirel-blue hover:text-zirel-orange-dark underline font-bold transition-colors">
                                                 {res.telefono}
                                             </a>
                                         </div>

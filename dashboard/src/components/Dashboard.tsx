@@ -134,8 +134,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             setEditForm(prev => ({ ...prev, tenant_id: tenantId, api_token: newToken, api_token_revealed: false }));
             saveAuthToken(newToken);
 
-            toast.success('Token aggiornato con successo!', { id: loadingToast });
-            setIsTokenVisible(true);
+            toast.success('Token aggiornato. Ora è nascosto: usa "Rivela Token" per visualizzarlo.', { id: loadingToast });
         } catch {
             toast.error('Errore durante la generazione del token.', { id: loadingToast });
         } finally {
@@ -145,6 +144,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
     const handleConfirmTokenRevealed = async () => {
         if (!tenantId) return;
+        if (formData?.api_token_revealed) {
+            toast('Il token è già stato rivelato in precedenza.');
+            return;
+        }
         try {
             await markApiTokenRevealed(tenantId);
 
@@ -187,7 +190,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             <p className="text-sm opacity-90">Ti rimangono {trialDays} giorni per esplorare tutte le potenzialità di Zirèl.</p>
                         </div>
                     </div>
-                    <button className="bg-white text-brand-blue px-6 py-2.5 rounded-full font-bold hover:bg-orange-50 transition-colors shadow-sm text-sm whitespace-nowrap w-full md:w-auto">
+                    <button className="bg-white text-zirel-blue px-6 py-2.5 rounded-full font-bold hover:bg-orange-50 transition-colors shadow-sm text-sm whitespace-nowrap w-full md:w-auto">
                         Attiva Abbonamento
                     </button>
                 </div>
@@ -214,7 +217,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
                         <div className="mt-2 md:mt-0 relative z-20">
                             <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-                                Benvenuto, <span className="text-brand-orange-dark">{formData.nome_ristorante || tenantId}</span>
+                                Benvenuto, <span className="text-zirel-orange-dark">{formData.nome_ristorante || tenantId}</span>
                             </h1>
                             <p className="text-gray-500 text-sm md:text-base">Pannello di controllo</p>
                         </div>
@@ -272,7 +275,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         <div className="max-w-4xl mx-auto animate-fade-in">
                             <section className="apple-card p-8 md:p-12 space-y-8">
                                 <div className="flex items-center gap-4 mb-2">
-                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Shield className="w-6 h-6" /></div>
+                                    <div className="z-icon-chip-lg"><Shield className="w-6 h-6" /></div>
                                     <div>
                                         <h2 className="text-2xl font-bold">Sicurezza & Accesso API</h2>
                                         <p className="text-gray-500">Gestisci le chiavi di accesso per il tuo Concierge</p>
@@ -306,13 +309,21 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                         <Copy size={18} />
                                                         Copia
                                                     </button>
-                                                ) : (
+                                                ) : !formData.api_token_revealed ? (
                                                     <button
                                                         onClick={handleConfirmTokenRevealed}
-                                                        className="apple-button bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 h-12 px-6"
+                                                        className="apple-button text-white flex items-center justify-center gap-2 h-12 px-6"
                                                     >
                                                         <Eye size={18} />
                                                         Rivela Token
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        disabled
+                                                        className="apple-button-secondary flex items-center justify-center gap-2 h-12 px-6 opacity-60 cursor-not-allowed"
+                                                    >
+                                                        <EyeOff size={18} />
+                                                        Già rivelato
                                                     </button>
                                                 )}
                                             </div>
@@ -356,13 +367,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 </div>
 
                                 {/* Opzione 1: Installazione Assistita */}
-                                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2rem] p-8 md:p-10 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                                <div className="bg-gradient-to-br from-zirel-blue to-[#0B4A6A] rounded-[2rem] p-8 md:p-10 text-white shadow-xl shadow-zirel-blue/20 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
                                     <div className="relative z-10 space-y-6">
                                         <div className="space-y-2">
                                             <span className="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Consigliato</span>
                                             <h3 className="text-3xl font-black">Serve aiuto? Ci pensiamo noi.</h3>
-                                            <p className="text-indigo-100 text-lg opacity-90 max-w-2xl leading-relaxed">
+                                            <p className="text-white/80 text-lg opacity-90 max-w-2xl leading-relaxed">
                                                 Non sai come fare? Contatta il tuo webmaster o chiedi a noi.
                                                 Per garantirti un'attivazione perfetta, il team di Zirèl può occuparsi dell'installazione per te.
                                             </p>
@@ -372,11 +383,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 href="https://wa.me/393461027447"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="bg-white text-indigo-600 px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-2"
+                                                className="bg-white text-zirel-blue px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-2"
                                             >
                                                 Richiedi installazione assistita →
                                             </a>
-                                            <div className="text-indigo-100 text-sm opacity-80 space-y-1 text-center md:text-left">
+                                            <div className="text-white/80 text-sm opacity-80 space-y-1 text-center md:text-left">
                                                 <p className="font-bold">Contatto di Urgenza:</p>
                                                 <p>Niki: (+39) 346 1027447</p>
                                                 <p>Email: bronovito@gmail.com</p>
@@ -388,7 +399,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Widget Customization Section */}
                                 <div className="apple-card p-8 md:p-10 space-y-8 border-t-4 border-zirel-orange-dark">
                                     <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
-                                        <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl">
+                                        <div className="z-icon-chip-lg">
                                             <Settings className="w-6 h-6" />
                                         </div>
                                         <div>
@@ -486,7 +497,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    const snippet = `<!-- Zirèl Chat Widget -->\n<script \n  src="https://cdn.zirel.org/widget.js" \n  data-tenant-id="${tenantId}"\n  async>\n</script>`;
+                                                    const snippet = `<!-- Zirèl Chat Widget -->\n<script \n  src="https://www.zirel.org/widget.js" \n  data-tenant-id="${tenantId}"\n  async>\n</script>`;
                                                     navigator.clipboard.writeText(snippet);
                                                     toast.success('Snippet copiato!');
                                                 }}
@@ -498,10 +509,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         </div>
 
                                         <div className="bg-slate-900 rounded-3xl p-6 md:p-8 relative overflow-hidden">
-                                            <pre className="text-indigo-300 font-mono text-xs md:text-sm leading-relaxed overflow-x-auto whitespace-pre">
+                                            <pre className="text-cyan-300 font-mono text-xs md:text-sm leading-relaxed overflow-x-auto whitespace-pre">
                                                 {`<!-- Zirèl Chat Widget -->
 <script 
-  src="https://cdn.zirel.org/widget.js" 
+  src="https://www.zirel.org/widget.js" 
   data-tenant-id="${tenantId}"
   async>
 </script>`}
@@ -523,7 +534,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             {/* Premium Header for Impostazioni */}
                             <div className="apple-card p-8 md:p-12 mb-0">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl"><Settings className="w-8 h-8" /></div>
+                                    <div className="z-icon-chip-lg"><Settings className="w-8 h-8" /></div>
                                     <div>
                                         <h2 className="text-3xl font-black text-gray-800">Impostazioni Assistente</h2>
                                         <p className="text-gray-500 text-lg">Personalizza l'identità e la conoscenza del tuo Concierge AI</p>
@@ -535,7 +546,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 1: Contatti */}
                                 <section className="apple-card p-6 space-y-4">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Store className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><Store className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Contatti & Info Base</h2>
                                     </div>
                                     <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" />
@@ -548,7 +559,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 2: Orari */}
                                 <section className="apple-card p-6 space-y-4">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Clock className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><Clock className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Orari & Tempistiche</h2>
                                     </div>
                                     <TextareaField label="Orari di Apertura" value={formData.orari_apertura} onChange={updateField('orari_apertura')} rows={2} />
@@ -560,7 +571,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 3: Social */}
                                 <section className="apple-card p-6 space-y-4">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-pink-50 text-pink-600 rounded-xl"><LinkIcon className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><LinkIcon className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Social & Link</h2>
                                     </div>
                                     <InputField label="Link Prenotazione Tavoli" value={formData.link_prenotazione_tavoli} onChange={updateField('link_prenotazione_tavoli')} />
@@ -574,7 +585,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 4: Offerta */}
                                 <section className="apple-card p-6 space-y-4 lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                     <div className="col-span-1 md:col-span-2 flex items-center gap-3 mb-2">
-                                        <div className="p-2 bg-green-50 text-green-600 rounded-xl"><Utensils className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><Utensils className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Dettagli Offerta (Menu, Servizi, Costi)</h2>
                                     </div>
                                     <div className="space-y-4">
@@ -592,7 +603,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 5: Info Pratiche */}
                                 <section className="apple-card p-6 space-y-4 lg:col-span-2">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-purple-50 text-purple-600 rounded-xl"><Info className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><Info className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Info Pratiche & Regole</h2>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -608,7 +619,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 {/* Section 6: Marketing */}
                                 <section className="apple-card p-6 space-y-4 xl:col-span-1">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-orange-50 text-orange-600 rounded-xl"><Megaphone className="w-5 h-5" /></div>
+                                        <div className="z-icon-chip"><Megaphone className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Marketing & Custom AI</h2>
                                     </div>
                                     <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} />

@@ -13,7 +13,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb;
+  background: linear-gradient(180deg, #f6f9fc 0%, #fbfcfe 40%, #ffffff 100%);
   color: #111827;
 }
 
@@ -30,11 +30,11 @@ body {
 
 @layer components {
   .apple-card {
-    @apply bg-white/80 backdrop-blur-md border border-gray-200/50 rounded-3xl shadow-sm;
+    @apply bg-white/90 backdrop-blur-md border border-gray-200/70 rounded-3xl shadow-[0_8px_30px_rgba(0,48,73,0.06)];
   }
 
   .apple-input {
-    @apply w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-zirel-blue/20 focus:border-zirel-blue outline-none transition-all duration-200 text-lg;
+    @apply w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-2 focus:ring-zirel-blue/15 focus:border-zirel-blue/40 outline-none transition-all duration-200 text-base;
   }
 
   .apple-button {
@@ -43,6 +43,22 @@ body {
 
   .apple-button-secondary {
     @apply px-8 py-4 bg-white text-gray-900 font-semibold border border-gray-200 rounded-2xl hover:bg-gray-50 active:scale-95 transition-all duration-200 shadow-sm;
+  }
+
+  .z-section-title {
+    @apply text-2xl md:text-3xl font-black tracking-tight text-zirel-blue;
+  }
+
+  .z-panel-title {
+    @apply text-xl md:text-2xl font-bold tracking-tight text-zirel-blue;
+  }
+
+  .z-icon-chip {
+    @apply p-2 bg-zirel-orange/10 text-zirel-orange-dark rounded-xl;
+  }
+
+  .z-icon-chip-lg {
+    @apply p-3 bg-zirel-orange/10 text-zirel-orange-dark rounded-2xl;
   }
 }
 

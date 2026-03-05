@@ -12,7 +12,24 @@
     'use strict';
 
     // Nuova logica SaaS: Legge dal tag <script src=".../chat.js" data-tenant-id="...">
-    const me = document.currentScript;
+    function resolveChatScriptTag() {
+        // In script type="module", document.currentScript può essere null.
+        if (document.currentScript) return document.currentScript;
+
+        const scripts = Array.from(document.querySelectorAll('script[src]'));
+        const chatCandidates = scripts.filter((s) => {
+            const src = s.getAttribute('src') || '';
+            return /(^|\/)chat\.js(\?|$)/.test(src);
+        });
+
+        // Preferisci quello con data-tenant-id esplicito.
+        const withTenant = chatCandidates.filter((s) => s.hasAttribute('data-tenant-id'));
+        if (withTenant.length > 0) return withTenant[withTenant.length - 1];
+        if (chatCandidates.length > 0) return chatCandidates[chatCandidates.length - 1];
+        return null;
+    }
+
+    const me = resolveChatScriptTag();
     const cfg = window.ZirelConfig || {};
 
     function sanitizeTenantId(value) {

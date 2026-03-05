@@ -67,7 +67,34 @@ This workflow is the shared appointment engine for non-restaurant tenants. It sh
 
 ---
 
-## 4. Webhook Integration Details
+## 4. Hotel Booking Workflow (`Registra_Prenotazione_Hotel`)
+
+Workflow dedicato alle richieste soggiorno hotel dal widget chat.
+
+### Recommended Trigger
+`When Executed by Another Workflow`
+
+### Purpose
+- Raccogliere e validare dati prenotazione camera (check-in/check-out, ospiti, contatti).
+- Innescare integrazione booking manager (availability, room type, servizi inclusi).
+- Gestire pagamento (payment intent / link pagamento) e creazione prenotazione.
+- Salvare esito strutturato in Supabase (`hotel_bookings`).
+- Inviare notifiche operative (Telegram + email cliente best-effort).
+
+### Booking manager predisposti
+- `mews`
+- `cloudbeds`
+- `siteminder`
+- `cinque_stelle`
+- fallback manuale con `link_booking_esterno`
+
+### Operational Note
+- Il workflow usa endpoint adapter via env (`HOTEL_MIDDLEWARE_*`) per disaccoppiare la logica provider-specific dall'orchestrazione n8n.
+- Il chatbot deve considerare la prenotazione confermata solo quando il tool ritorna successo con stato `confirmed`.
+
+---
+
+## 5. Webhook Integration Details
 - **Environment Variables:** All base URLs and keys are stored in n8n/Railway environment variables.
 - **Fail-Safe:** If the webhook is unreachable, the widget should gracefully handle errors or switch to a fallback "Sito in manutenzione" message.
 - **Scalability:** Hosted on Railway for predictable auto-scaling and high availability.

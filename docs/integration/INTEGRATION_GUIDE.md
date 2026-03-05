@@ -11,7 +11,7 @@ Copia e incolla questo snippet di codice subito prima del tag di chiusura `</bod
 ```html
 <!-- Zirèl Chat Widget -->
 <script 
-  src="https://cdn.zirel.org/widget.js" 
+  src="https://www.zirel.org/widget.js" 
   data-tenant-id="TUO_TENANT_ID"
   async>
 </script>
