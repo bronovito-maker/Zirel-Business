@@ -11,7 +11,7 @@ Copia e incolla questo snippet di codice subito prima del tag di chiusura `</bod
 ```html
 <!-- Zirèl Chat Widget -->
 <script 
-  src="https://www.zirel.org/widget.js" 
+  src="https://cdn.zirel.org/widget.js" 
   data-tenant-id="TUO_TENANT_ID"
   async>
 </script>
@@ -19,6 +19,7 @@ Copia e incolla questo snippet di codice subito prima del tag di chiusura `</bod
 
 > [!TIP]
 > Puoi trovare il tuo `data-tenant-id` personale nella sezione **Integrazione** della tua Dashboard.
+> Se il CDN fosse temporaneamente non disponibile, usa `https://www.zirel.org/widget.js` come fallback.
 
 ---
 

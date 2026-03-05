@@ -497,7 +497,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    const snippet = `<!-- Zirèl Chat Widget -->\n<script \n  src="https://www.zirel.org/widget.js" \n  data-tenant-id="${tenantId}"\n  async>\n</script>`;
+                                                    const snippet = `<!-- Zirèl Chat Widget -->\n<script \n  src="https://cdn.zirel.org/widget.js" \n  data-tenant-id="${tenantId}"\n  async>\n</script>`;
                                                     navigator.clipboard.writeText(snippet);
                                                     toast.success('Snippet copiato!');
                                                 }}
@@ -512,7 +512,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             <pre className="text-cyan-300 font-mono text-xs md:text-sm leading-relaxed overflow-x-auto whitespace-pre">
                                                 {`<!-- Zirèl Chat Widget -->
 <script 
-  src="https://www.zirel.org/widget.js" 
+  src="https://cdn.zirel.org/widget.js" 
   data-tenant-id="${tenantId}"
   async>
 </script>`}
