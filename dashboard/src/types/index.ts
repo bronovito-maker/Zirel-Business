@@ -16,6 +16,11 @@ export interface TenantData {
     // Trial & Subscription
     trial_ends_at?: string;
     subscription_status?: string;
+    stripe_customer_id?: string;
+    stripe_subscription_id?: string;
+    stripe_checkout_url?: string;
+    stripe_customer_portal_url?: string;
+    billing_email?: string;
 
     // Business Info
     nome_ristorante?: string;

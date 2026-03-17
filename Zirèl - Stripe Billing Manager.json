@@ -1,0 +1,350 @@
+{
+  "name": "Zirèl - Stripe Billing Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-billing/create-checkout",
+        "options": {}
+      },
+      "name": "Webhook: Create Checkout",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        400,
+        200
+      ],
+      "id": "checkout-trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-billing/create-portal",
+        "options": {}
+      },
+      "name": "Webhook: Create Portal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        400,
+        400
+      ],
+      "id": "portal-trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-webhook",
+        "options": {}
+      },
+      "name": "Webhook: Stripe Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        400,
+        700
+      ],
+      "id": "stripe-events-trigger"
+    },
+    {
+      "parameters": {
+        "keepOnlySpecified": true,
+        "values": {
+          "string": [
+            {
+              "name": "tenant_id",
+              "value": "={{ $json.body.tenantId }}"
+            },
+            {
+              "name": "price_id",
+              "value": "={{ $json.body.priceId }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Params: Checkout",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        600,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "checkoutSession",
+        "operation": "create",
+        "successUrl": "https://dashboard.zirel.org?status=success",
+        "cancelUrl": "https://dashboard.zirel.org?status=cancel",
+        "mode": "subscription",
+        "customerEmail": "={{ $json.email }}",
+        "lineItems": {
+          "items": [
+            {
+              "price": "={{ $json.price_id }}",
+              "quantity": 1
+            }
+          ]
+        },
+        "additionalFields": {
+          "clientReferenceId": "={{ $json.tenant_id }}",
+          "metadata": {
+            "metadata": [
+              {
+                "key": "tenant_id",
+                "value": "={{ $json.tenant_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Stripe: Create Checkout",
+      "type": "n8n-nodes-base.stripe",
+      "typeVersion": 1,
+      "position": [
+        800,
+        200
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "stripe-cred-id",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        },
+        "responseBody": "={\n  \"url\": \"{{ $json.url }}\"\n}"
+      },
+      "name": "Response: Checkout URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySpecified": true,
+        "values": {
+          "string": [
+            {
+              "name": "customer_id",
+              "value": "={{ $json.body.stripeCustomerId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Params: Portal",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        600,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "customerPortalSession",
+        "operation": "create",
+        "customer": "={{ $json.customer_id }}",
+        "returnUrl": "https://dashboard.zirel.org"
+      },
+      "name": "Stripe: Create Portal",
+      "type": "n8n-nodes-base.stripe",
+      "typeVersion": 1,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "stripe-cred-id",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        },
+        "responseBody": "={\n  \"url\": \"{{ $json.url }}\"\n}"
+      },
+      "name": "Response: Portal URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.type }}",
+              "value2": "checkout.session.completed"
+            }
+          ]
+        }
+      },
+      "name": "Is Checkout Completed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant_id",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.client_reference_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "stripe_customer_id",
+              "fieldValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.customer }}"
+            },
+            {
+              "fieldId": "stripe_subscription_id",
+              "fieldValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.subscription }}"
+            },
+            {
+              "fieldId": "subscription_status",
+              "fieldValue": "active"
+            },
+            {
+              "fieldId": "stripe_customer_portal_url",
+              "fieldValue": "https://billing.stripe.com/p/session/{{ $node[\"Is Checkout Completed?\"].json.body.data.object.customer }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase: Sync Tenant Info",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        850,
+        700
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-cred-id",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Create Checkout": {
+      "main": [
+        [
+          {
+            "node": "Params: Checkout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Params: Checkout": {
+      "main": [
+        [
+          {
+            "node": "Stripe: Create Checkout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe: Create Checkout": {
+      "main": [
+        [
+          {
+            "node": "Response: Checkout URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Create Portal": {
+      "main": [
+        [
+          {
+            "node": "Params: Portal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Params: Portal": {
+      "main": [
+        [
+          {
+            "node": "Stripe: Create Portal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe: Create Portal": {
+      "main": [
+        [
+          {
+            "node": "Response: Portal URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Stripe Events": {
+      "main": [
+        [
+          {
+            "node": "Is Checkout Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Checkout Completed?": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Sync Tenant Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

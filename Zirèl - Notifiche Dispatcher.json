@@ -1,0 +1,751 @@
+{
+  "name": "Zirèl - Notifiche Dispatcher",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2928,
+        688
+      ],
+      "id": "dd63ed00-96ee-4ebe-a825-bd67dfff5367"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "notification_outbox",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "pending"
+            }
+          ]
+        }
+      },
+      "name": "Get Pending Outbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2672,
+        688
+      ],
+      "id": "2d8a874f-a86f-4bd0-9ea5-d68c06bba502",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = Date.now();\nreturn items.filter((item) => {\n  const nextRetry = item.json.next_retry_at;\n  if (!nextRetry) return true;\n  const ts = new Date(nextRetry).getTime();\n  return !Number.isNaN(ts) && ts <= now;\n});"
+      },
+      "name": "Filter Due Now",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2400,
+        688
+      ],
+      "id": "9f3d9302-a66b-4961-a40d-fbf576b0af1b"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = typeof $json.payload === 'string' ? JSON.parse($json.payload) : ($json.payload || {});\nconst template = String($json.template_key || '').trim();\nconst channel = String($json.channel || '').trim();\nconst activity = payload.nome_struttura || payload.nome_attivita || 'Zirèl';\nconst recipientEmail = String($json.recipient_email || payload.internal_email || payload.email || '').trim().toLowerCase();\nconst statusLabel = ({\n  confirmed: 'Confermata',\n  manual_review: 'Verifica manuale',\n  rejected: 'Non disponibile',\n  pending: 'In lavorazione',\n})[String(payload.booking_status || payload.status || payload.availability_status || '').trim()] || 'In lavorazione';\n\nconst renderShell = (title, intro, bodyRows, outro) => {\n  const rows = bodyRows.filter(Boolean).map((row) => `<tr><td style=\"padding:12px 14px;border-bottom:1px solid #e5e7eb;width:38%;font-weight:600;color:#0f172a;\">${row.label}</td><td style=\"padding:12px 14px;border-bottom:1px solid #e5e7eb;color:#334155;\">${row.value}</td></tr>`).join('');\n  return `<div style=\"font-family:Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;color:#0f172a;\">\n    <div style=\"max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;\">\n      <div style=\"padding:24px 28px;background:linear-gradient(135deg,#0f3b52 0%,#ff8c42 100%);color:#ffffff;\">\n        <p style=\"margin:0 0 8px;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.82;\">Zirèl Notification Center</p>\n        <h1 style=\"margin:0;font-size:28px;line-height:1.15;\">${title}</h1>\n      </div>\n      <div style=\"padding:28px;\">\n        <p style=\"margin:0 0 18px;font-size:16px;line-height:1.6;color:#334155;\">${intro}</p>\n        <table style=\"width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff;\">${rows}</table>\n        <p style=\"margin:18px 0 0;font-size:15px;line-height:1.7;color:#334155;\">${outro}</p>\n      </div>\n    </div>\n  </div>`;\n};\n\nlet subject = 'Aggiornamento Zirèl';\nlet text = '';\nlet html = '';\n\nif (template === 'hotel_guest_confirmation' || channel === 'email_guest_hotel') {\n  subject = `Richiesta soggiorno ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta di soggiorno presso ${activity}.\\n\\nCheck-in: ${payload.checkin_date || 'N/D'}\\nCheck-out: ${payload.checkout_date || 'N/D'}\\nOspiti: ${payload.ospiti_totali || 'N/D'}\\nCamera: ${payload.room_type_requested || 'Da definire'}\\nStato: ${statusLabel}\\n\\nIl nostro team ti contatterà a breve con il prossimo aggiornamento.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta soggiorno ricevuta',\n    `Ciao <strong>${payload.nome || 'Cliente'}</strong>, abbiamo ricevuto correttamente la tua richiesta di soggiorno presso <strong>${activity}</strong>.`,\n    [\n      { label: 'Check-in', value: payload.checkin_date || 'N/D' },\n      { label: 'Check-out', value: payload.checkout_date || 'N/D' },\n      { label: 'Ospiti', value: String(payload.ospiti_totali || 'N/D') },\n      { label: 'Camera richiesta', value: payload.room_type_requested || 'Da definire' },\n      { label: 'Servizi richiesti', value: payload.servizi_richiesti || 'Nessuno' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Il nostro team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'\n  );\n} else if (template === 'restaurant_guest_confirmation' || channel === 'email_guest_restaurant') {\n  subject = `Richiesta tavolo ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome_cliente || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta di prenotazione presso ${activity}.\\n\\nData: ${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra: ${payload.ora || 'N/D'}\\nPersone: ${payload.persone || 'N/D'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\n\\nTi aggiorneremo al più presto.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta tavolo ricevuta',\n    `Ciao <strong>${payload.nome_cliente || 'Cliente'}</strong>, abbiamo preso in carico la tua richiesta di prenotazione presso <strong>${activity}</strong>.`,\n    [\n      { label: 'Data', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },\n      { label: 'Ora', value: payload.ora || 'N/D' },\n      { label: 'Persone', value: String(payload.persone || 'N/D') },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Lo staff verificherà la disponibilità del tavolo e ti confermerà al più presto.'\n  );\n} else if (template === 'appointment_guest_confirmation' || channel === 'email_guest_appointment') {\n  subject = `Richiesta ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta con ${activity}.\\n\\nData: ${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra: ${payload.orario || 'N/D'}\\nMotivo: ${payload.motivo || 'N/D'}\\nStato: ${statusLabel}\\n\\nTi contatteremo a breve con conferma e dettagli.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta ricevuta',\n    `Ciao <strong>${payload.nome || 'Cliente'}</strong>, abbiamo preso in carico la tua richiesta con <strong>${activity}</strong>.`,\n    [\n      { label: 'Data', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },\n      { label: 'Ora', value: payload.orario || 'N/D' },\n      { label: 'Motivo', value: payload.motivo || 'N/D' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Il team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'\n  );\n} else if (template === 'hotel_internal_alert' || channel === 'email_internal_hotel') {\n  subject = `Nuova richiesta soggiorno interna • ${activity}`;\n  text = `Nuova richiesta soggiorno\\n\\nStruttura: ${activity}\\nCliente: ${payload.nome || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nEmail: ${payload.email || 'N/D'}\\nCheck-in: ${payload.checkin_date || 'N/D'}\\nCheck-out: ${payload.checkout_date || 'N/D'}\\nCamera: ${payload.room_type_requested || 'Da definire'}\\nServizi: ${payload.servizi_richiesti || 'Nessuno'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta soggiorno',\n    `È stata ricevuta una nuova richiesta per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Email', value: payload.email || 'N/D' },\n      { label: 'Check-in', value: payload.checkin_date || 'N/D' },\n      { label: 'Check-out', value: payload.checkout_date || 'N/D' },\n      { label: 'Camera', value: payload.room_type_requested || 'Da definire' },\n      { label: 'Servizi', value: payload.servizi_richiesti || 'Nessuno' },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Apri il dashboard o il thread operativo per gestire la richiesta.'\n  );\n} else if (template === 'restaurant_internal_alert' || channel === 'email_internal_restaurant') {\n  subject = `Nuova richiesta tavolo interna • ${activity}`;\n  text = `Nuova richiesta tavolo\\n\\nAttività: ${activity}\\nCliente: ${payload.nome_cliente || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nData: ${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra: ${payload.ora || 'N/D'}\\nPersone: ${payload.persone || 'N/D'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta tavolo',\n    `È arrivata una nuova richiesta tavolo per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome_cliente || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Data', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },\n      { label: 'Ora', value: payload.ora || 'N/D' },\n      { label: 'Persone', value: String(payload.persone || 'N/D') },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Verifica la disponibilità e conferma la gestione appena possibile.'\n  );\n} else {\n  subject = `Nuova richiesta interna • ${activity}`;\n  text = `Nuova richiesta appuntamento\\n\\nAttività: ${activity}\\nCliente: ${payload.nome || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nEmail: ${payload.email || 'N/D'}\\nData: ${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra: ${payload.orario || 'N/D'}\\nMotivo: ${payload.motivo || 'N/D'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta appuntamento',\n    `È stata ricevuta una nuova richiesta da gestire per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Email', value: payload.email || 'N/D' },\n      { label: 'Data', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },\n      { label: 'Ora', value: payload.orario || 'N/D' },\n      { label: 'Motivo', value: payload.motivo || 'N/D' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Apri il dashboard o il thread operativo per gestire la richiesta.'\n  );\n}\n\nreturn [{\n  json: {\n    ...$json,\n    rendered_email: {\n      from: 'Zirèl <noreply@zirel.org>',\n      to: recipientEmail ? [recipientEmail] : [],\n      subject,\n      text,\n      html,\n    },\n  },\n}];"
+      },
+      "name": "Render Email Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2144,
+        496
+      ],
+      "id": "1a2ae90c-1003-4ccc-a6b4-ec5f329218f0"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = typeof $json.payload === 'string' ? JSON.parse($json.payload) : ($json.payload || {});\nconst template = String($json.template_key || '').trim();\nconst relatedType = String($json.related_entity_type || '').trim();\nconst relatedId = String($json.related_entity_id || '').trim();\nconst statusLabel = ({\n  confirmed: 'Confermata',\n  manual_review: 'Verifica manuale',\n  rejected: 'Non disponibile',\n  pending: 'In lavorazione',\n})[String(payload.booking_status || payload.status || payload.availability_status || '').trim()] || 'In lavorazione';\nconst phoneRaw = String(payload.telefono || '').trim();\nconst emailRaw = String(payload.email || '').trim().toLowerCase();\nconst sanitizedPhone = phoneRaw.replace(/[^\\d+]/g, '');\nconst phoneAction = sanitizedPhone ? 'tel:' + sanitizedPhone : '';\nconst emailAction = emailRaw ? 'mailto:' + emailRaw : '';\nlet text = 'Nuova richiesta Zirèl';\nif (template === 'hotel_internal_alert') {\n  text = [\n    'Nuova richiesta soggiorno',\n    '',\n    'Struttura: ' + (payload.nome_struttura || 'Hotel'),\n    'Cliente: ' + (payload.nome || 'N/D'),\n    'Telefono: ' + (phoneRaw || 'N/D'),\n    'Email: ' + (emailRaw || 'N/D'),\n    '',\n    'Soggiorno: ' + (payload.checkin_date || 'N/D') + ' -> ' + (payload.checkout_date || 'N/D'),\n    'Ospiti: ' + String(payload.ospiti_totali || 'N/D'),\n    'Camera: ' + (payload.room_type_requested || 'Da definire'),\n    'Servizi: ' + (payload.servizi_richiesti || 'Nessuno'),\n    'Note: ' + (payload.note_prenotazione || 'Nessuna'),\n    '',\n    'Stato: ' + statusLabel,\n    'Trace: ' + (payload.trace_id || 'N/D'),\n  ].join('\\n');\n} else if (template === 'restaurant_internal_alert') {\n  text = [\n    'Nuova richiesta tavolo',\n    '',\n    'Cliente: ' + (payload.nome_cliente || 'N/D'),\n    'Telefono: ' + (phoneRaw || 'N/D'),\n    ...(emailRaw ? ['Email: ' + emailRaw] : []),\n    'Data: ' + (payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'),\n    'Ora: ' + (payload.ora || 'N/D'),\n    'Persone: ' + String(payload.persone || 'N/D'),\n    'Note: ' + (payload.note_prenotazione || 'Nessuna'),\n    '',\n    'Stato: ' + statusLabel,\n    'Trace: ' + (payload.trace_id || 'N/D'),\n  ].join('\\n');\n} else {\n  text = [\n    'Nuova richiesta appuntamento',\n    '',\n    'Cliente: ' + (payload.nome || 'N/D'),\n    'Telefono: ' + (phoneRaw || 'N/D'),\n    'Email: ' + (emailRaw || 'N/D'),\n    'Data: ' + (payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'),\n    'Ora: ' + (payload.orario || 'N/D'),\n    'Motivo: ' + (payload.motivo || 'N/D'),\n    '',\n    'Stato: ' + statusLabel,\n    'Trace: ' + (payload.trace_id || 'N/D'),\n  ].join('\\n');\n}\n\nconst callbackData = relatedType && relatedId ? ['accept', relatedType, relatedId].join('|') : '';\nreturn [{\n  json: {\n    ...$json,\n    rendered_telegram_text: text,\n    telegram_accept_callback_data: callbackData,\n  },\n}];"
+      },
+      "name": "Render Telegram Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2144,
+        880
+      ],
+      "id": "dc19ea71-bed2-46d1-bc1a-4713c056c9db"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1986a968-b451-4636-8405-45a4bf2bd3d4",
+              "leftValue": "={{ String($json.channel || \"\").startsWith(\"email_\") }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Email Channel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1872,
+        496
+      ],
+      "id": "605a948f-5505-49c6-9162-8b356d7c0e86"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.rendered_email }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "name": "Send Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1616,
+        496
+      ],
+      "id": "ebf78ff9-19ca-476e-b760-8ad48f98117a",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "o5v5J8779y7QCWIE",
+          "name": "Header Auth account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7c8fa8b1-cd34-4e8e-a893-caf5d20fa5cb",
+              "leftValue": "={{ !!String($json.id || \"\").trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Email Sent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1360,
+        496
+      ],
+      "id": "67bb3fcf-2993-4b3d-a906-02c05ce81d29"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('If Email Channel?').item.json;\nreturn [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];"
+      },
+      "name": "Prepare Email Sent Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        384
+      ],
+      "id": "eb01119c-1891-4d82-8e17-64b80620bd01"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('If Email Channel?').item.json;\nconst retry = Number(src.retry_count || 0) + 1;\nconst max = Number(src.max_retries || 5);\nconst failed = retry >= max;\nconst backoffMin = Math.min(60, Math.pow(2, retry));\nreturn [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'EMAIL_SEND_FAILED' } }];"
+      },
+      "name": "Prepare Email Retry Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        608
+      ],
+      "id": "935c2628-a81f-48fb-b857-e3ae41aa9fe7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "notification_outbox",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $json.sent_at || null }}"
+            },
+            {
+              "fieldId": "last_error",
+              "fieldValue": "={{ $json.last_error }}"
+            }
+          ]
+        }
+      },
+      "name": "Update Outbox Email Sent",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        384
+      ],
+      "id": "51eb4536-60ec-4c1e-964a-7b1baf3927b1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "notification_outbox",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "retry_count",
+              "fieldValue": "={{ $json.retry_count }}"
+            },
+            {
+              "fieldId": "next_retry_at",
+              "fieldValue": "={{ $json.next_retry_at }}"
+            },
+            {
+              "fieldId": "last_error",
+              "fieldValue": "={{ $json.last_error }}"
+            }
+          ]
+        }
+      },
+      "name": "Update Outbox Email Retry",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        608
+      ],
+      "id": "c8b6c266-4581-4b05-b0c7-e5e6277337c0",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39910752-bbb3-4145-a854-d9bdc66055a4",
+              "leftValue": "={{ String($json.channel || \"\").startsWith(\"telegram_\") }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Telegram Channel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1872,
+        880
+      ],
+      "id": "08f749ec-45e3-4418-979a-becb76ca89f5"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.telegram_chat_id || $json.payload?.telegram_chat_id || $env.ZIREL_INTERNAL_TELEGRAM_CHAT_ID || \"112661106\" }}",
+        "text": "={{ $json.rendered_telegram_text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Accetta",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.telegram_accept_callback_data || \"\" }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parseMode": "HTML",
+          "disableWebPagePreview": true
+        }
+      },
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1616,
+        880
+      ],
+      "id": "c16f1196-507c-4dc5-bf39-fd498c94a51a",
+      "credentials": {
+        "telegramApi": {
+          "id": "MHrNkPgbqU0Q6vyM",
+          "name": "TG_Zirèl"
+        }
+      },
+      "webhookId": "7456a1d2-129e-4de4-b430-03ab679d931b",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fae188dd-42b8-4740-9c30-430d309ca5eb",
+              "leftValue": "={{ !!String($json.message_id || $json.result?.message_id || \"\").trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Telegram Sent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1360,
+        880
+      ],
+      "id": "211dd61d-fe3a-44b7-a8f0-11142b455489"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('If Telegram Channel?').item.json;\nreturn [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];"
+      },
+      "name": "Prepare Telegram Sent Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        768
+      ],
+      "id": "bb8edd5c-ea9a-475a-9058-763607d832a5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('If Telegram Channel?').item.json;\nconst retry = Number(src.retry_count || 0) + 1;\nconst max = Number(src.max_retries || 5);\nconst failed = retry >= max;\nconst backoffMin = Math.min(60, Math.pow(2, retry));\nreturn [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'TELEGRAM_SEND_FAILED' } }];"
+      },
+      "name": "Prepare Telegram Retry Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        992
+      ],
+      "id": "147423d9-9091-4f79-a011-444e3eca8985"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "notification_outbox",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $json.sent_at || null }}"
+            },
+            {
+              "fieldId": "last_error",
+              "fieldValue": "={{ $json.last_error }}"
+            }
+          ]
+        }
+      },
+      "name": "Update Outbox Telegram Sent",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        768
+      ],
+      "id": "c740f7cb-bdd8-47ce-99ab-7c2f6a25fdb2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "notification_outbox",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "retry_count",
+              "fieldValue": "={{ $json.retry_count }}"
+            },
+            {
+              "fieldId": "next_retry_at",
+              "fieldValue": "={{ $json.next_retry_at }}"
+            },
+            {
+              "fieldId": "last_error",
+              "fieldValue": "={{ $json.last_error }}"
+            }
+          ]
+        }
+      },
+      "name": "Update Outbox Telegram Retry",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        992
+      ],
+      "id": "2a1df08c-ab52-4d0e-9053-ea6af8909cde",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Outbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Outbox": {
+      "main": [
+        [
+          {
+            "node": "Filter Due Now",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Due Now": {
+      "main": [
+        [
+          {
+            "node": "Render Email Payload",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Render Telegram Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Email Payload": {
+      "main": [
+        [
+          {
+            "node": "If Email Channel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Email Channel?": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "If Email Sent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Email Sent?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Sent Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Email Retry Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Sent Update": {
+      "main": [
+        [
+          {
+            "node": "Update Outbox Email Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Retry Update": {
+      "main": [
+        [
+          {
+            "node": "Update Outbox Email Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Telegram Payload": {
+      "main": [
+        [
+          {
+            "node": "If Telegram Channel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Telegram Channel?": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram": {
+      "main": [
+        [
+          {
+            "node": "If Telegram Sent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Telegram Sent?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Telegram Sent Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Telegram Retry Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Telegram Sent Update": {
+      "main": [
+        [
+          {
+            "node": "Update Outbox Telegram Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Telegram Retry Update": {
+      "main": [
+        [
+          {
+            "node": "Update Outbox Telegram Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c48c4dd6-cf87-4a53-817c-2c4375794db7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "ZirelNotificheDispatcher",
+  "tags": [],
+  "pinData": {}
+}

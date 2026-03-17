@@ -5,6 +5,9 @@
     "scripts": {
         "dev:dashboard": "cd dashboard && npm run dev",
         "dev:landing": "cd demo && npm run dev",
-        "dev": "npm run dev:landing & npm run dev:dashboard"
+        "dev": "npm run dev:landing & npm run dev:dashboard",
+        "build:workflows": "node scripts/build_zirel_workflows.mjs",
+        "test:workflows": "node tests/workflow_contracts.mjs",
+        "test:chat": "node tests/chat_webhook_e2e.mjs"
     }
 }

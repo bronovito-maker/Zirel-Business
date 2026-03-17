@@ -1,0 +1,545 @@
+{
+  "name": "Zirèl - Telegram Callback Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1184,
+        -224
+      ],
+      "id": "86c3037c-efdf-4e82-8dbb-d92091f39994",
+      "credentials": {
+        "telegramApi": {
+          "id": "MHrNkPgbqU0Q6vyM",
+          "name": "TG_Zirèl"
+        }
+      },
+      "webhookId": "fd1d2c92-80ee-4fc2-a423-78fb68f5fb45"
+    },
+    {
+      "parameters": {
+        "jsCode": "const callback = $json.callback_query || {};\nconst data = String(callback.data || '').trim();\nconst [action, related_entity_type, related_entity_id] = data.split('|');\n\nconst mapping = {\n  restaurant_booking: {\n    table_name: 'prenotazioni',\n    field_name: 'stato',\n    new_status: 'CONFERMATA',\n    status_label: 'Prenotazione ristorante confermata',\n  },\n  hotel_booking: {\n    table_name: 'hotel_bookings',\n    field_name: 'booking_status',\n    new_status: 'confirmed',\n    status_label: 'Richiesta soggiorno confermata',\n  },\n  appointment: {\n    table_name: 'appointments',\n    field_name: 'stato',\n    new_status: 'confirmed',\n    status_label: 'Appuntamento confermato',\n  },\n};\n\nconst target = mapping[related_entity_type] || null;\nconst operatorName = callback.from?.first_name || 'Team';\nconst originalText = callback.message?.text || 'Messaggio non disponibile';\n\nreturn [{\n  json: {\n    ...$json,\n    callback_action: action || '',\n    related_entity_type: related_entity_type || '',\n    related_entity_id: related_entity_id || '',\n    operator_name: operatorName,\n    original_text: originalText,\n    ...target,\n    is_supported: Boolean(target && action === 'accept' && related_entity_id),\n  },\n}];"
+      },
+      "name": "Parse Callback Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        -224
+      ],
+      "id": "e72d6bb9-349d-4abd-9117-ae3015542700"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "83ef3d35-e4fa-46a0-959e-3c2b0b22c34f",
+              "leftValue": "={{ $json.is_supported }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Check Supported Callback",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -224
+      ],
+      "id": "7cf77108-369f-4099-bbb6-d2c86d983e2c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ea0b85df-5ed8-4d20-9522-8a7d22e82502",
+              "leftValue": "={{ $json.related_entity_type === \"restaurant_booking\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Restaurant Booking",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        -416
+      ],
+      "id": "4d5fdf6b-dee8-438b-9985-bdbe98f1ee37"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prenotazioni",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.related_entity_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "stato",
+              "fieldValue": "CONFERMATA"
+            }
+          ]
+        }
+      },
+      "name": "Confirm Restaurant Booking",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -480
+      ],
+      "id": "c136fb09-9568-4dc3-9d4d-09b6ae486554",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63d1b413-93c4-4b09-8c17-164b6eff63f1",
+              "leftValue": "={{ $json.related_entity_type === \"hotel_booking\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Hotel Booking",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        -224
+      ],
+      "id": "e6403eec-50e8-47d1-969b-a91c2553b833"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "hotel_bookings",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.related_entity_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "booking_status",
+              "fieldValue": "confirmed"
+            }
+          ]
+        }
+      },
+      "name": "Confirm Hotel Booking",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -288
+      ],
+      "id": "1e2a9a23-ca6c-404f-b87c-1e073c27952b",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6532496-9348-48c3-b7e6-f21354391fd0",
+              "leftValue": "={{ $json.related_entity_type === \"appointment\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Appointment",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        -32
+      ],
+      "id": "011403c4-b811-4678-8cdc-fdacdffca0cb"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.related_entity_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "stato",
+              "fieldValue": "confirmed"
+            }
+          ]
+        }
+      },
+      "name": "Confirm Appointment",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -96
+      ],
+      "id": "cec6844b-62a1-41e0-8b1b-6ccc1a3aa03d",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Parse Callback Data').item.json;\nreturn [{\n  json: {\n    ...input,\n    callback_answer_text: input.status_label + ' da ' + input.operator_name,\n    edited_message_text: [\n      input.original_text,\n      '',\n      'Aggiornamento: accettata',\n      'Accettata da: ' + input.operator_name,\n    ].join('\\n'),\n  },\n}];"
+      },
+      "name": "Build Accepted Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -288
+      ],
+      "id": "7355c8a8-e536-4a26-8a48-444959639cb0"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nreturn [{\n  json: {\n    ...input,\n    callback_answer_text: 'Azione non supportata o dati callback non validi.',\n    edited_message_text: input.original_text || 'Azione non supportata.',\n  },\n}];"
+      },
+      "name": "Build Unsupported Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        32
+      ],
+      "id": "8f4550cc-2ead-4b7f-bb81-49fee6cc0fd7"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $(\"Telegram Trigger\").item.json.callback_query.id }}",
+        "additionalFields": {
+          "text": "={{ $json.callback_answer_text }}"
+        }
+      },
+      "name": "Answer Callback",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -160
+      ],
+      "id": "2cb08cea-471d-4289-b236-5979905c5d71",
+      "credentials": {
+        "telegramApi": {
+          "id": "MHrNkPgbqU0Q6vyM",
+          "name": "TG_Zirèl"
+        }
+      },
+      "webhookId": "abd248d7-be13-48d5-8e2a-a5ffb8a4bc7b"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $(\"Telegram Trigger\").item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $(\"Telegram Trigger\").item.json.callback_query.message.message_id }}",
+        "text": "={{ $(\"Build Accepted Response\").item.json.edited_message_text || $(\"Build Unsupported Response\").item.json.edited_message_text || \"Aggiornamento non disponibile.\" }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": []
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "disableWebPagePreview": true
+        }
+      },
+      "name": "Edit Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -160
+      ],
+      "id": "633e5572-423e-40e0-9e1c-b1a48c923cbf",
+      "credentials": {
+        "telegramApi": {
+          "id": "MHrNkPgbqU0Q6vyM",
+          "name": "TG_Zirèl"
+        }
+      },
+      "webhookId": "68b12c2c-1683-4bce-9924-5c9aab2d129a"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Callback Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Callback Data": {
+      "main": [
+        [
+          {
+            "node": "Check Supported Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Supported Callback": {
+      "main": [
+        [
+          {
+            "node": "If Restaurant Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Unsupported Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Restaurant Booking": {
+      "main": [
+        [
+          {
+            "node": "Confirm Restaurant Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Hotel Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Restaurant Booking": {
+      "main": [
+        [
+          {
+            "node": "Build Accepted Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Hotel Booking": {
+      "main": [
+        [
+          {
+            "node": "Confirm Hotel Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Appointment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Hotel Booking": {
+      "main": [
+        [
+          {
+            "node": "Build Accepted Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Appointment": {
+      "main": [
+        [
+          {
+            "node": "Confirm Appointment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Unsupported Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Appointment": {
+      "main": [
+        [
+          {
+            "node": "Build Accepted Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Accepted Response": {
+      "main": [
+        [
+          {
+            "node": "Answer Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Unsupported Response": {
+      "main": [
+        [
+          {
+            "node": "Answer Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Callback": {
+      "main": [
+        [
+          {
+            "node": "Edit Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a2df3bc3-a366-4400-9824-af59a928a648",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "ZirelTelegramCallbackHandler",
+  "tags": [],
+  "pinData": {}
+}
