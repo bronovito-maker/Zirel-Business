@@ -2,213 +2,283 @@
   "name": "Zirèl - Stripe Billing Manager",
   "nodes": [
     {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "stripe-billing/create-checkout",
-        "options": {}
-      },
       "name": "Webhook: Create Checkout",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        400,
-        200
+        160,
+        140
       ],
-      "id": "checkout-trigger"
-    },
-    {
       "parameters": {
         "httpMethod": "POST",
-        "path": "stripe-billing/create-portal",
+        "path": "stripe-billing/create-checkout",
+        "responseMode": "responseNode",
         "options": {}
-      },
-      "name": "Webhook: Create Portal",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [
-        400,
-        400
-      ],
-      "id": "portal-trigger"
+      }
     },
     {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "stripe-webhook",
-        "options": {}
-      },
-      "name": "Webhook: Stripe Events",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [
-        400,
-        700
-      ],
-      "id": "stripe-events-trigger"
-    },
-    {
-      "parameters": {
-        "keepOnlySpecified": true,
-        "values": {
-          "string": [
-            {
-              "name": "tenant_id",
-              "value": "={{ $json.body.tenantId }}"
-            },
-            {
-              "name": "price_id",
-              "value": "={{ $json.body.priceId }}"
-            },
-            {
-              "name": "email",
-              "value": "={{ $json.body.email }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "name": "Params: Checkout",
-      "type": "n8n-nodes-base.set",
+      "name": "Normalize Checkout Request",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        600,
-        200
-      ]
+        420,
+        140
+      ],
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nconst normalize = (v) => String(v || '').trim();\nconst tenant_id = normalize(body.tenant_id || body.tenantId);\nconst api_token = normalize(body.api_token || body.apiToken);\nconst price_id = normalize(body.price_id || body.priceId);\nconst email = normalize(body.email).toLowerCase();\nconst business_name = normalize(body.hotel_name || body.business_name || body.nome_attivita);\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nif (!price_id) missing.push('price_id');\nif (!email) missing.push('email');\nreturn [{ json: { tenant_id, api_token, price_id, email, business_name, is_valid_request: missing.length === 0, missing_fields: missing, http_status: missing.length ? 400 : 200 } }];"
+      }
     },
     {
+      "name": "Verify Checkout Tenant",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        140
+      ],
       "parameters": {
-        "resource": "checkoutSession",
-        "operation": "create",
-        "successUrl": "https://dashboard.zirel.org?status=success",
-        "cancelUrl": "https://dashboard.zirel.org?status=cancel",
-        "mode": "subscription",
-        "customerEmail": "={{ $json.email }}",
-        "lineItems": {
-          "items": [
-            {
-              "price": "={{ $json.price_id }}",
-              "quantity": 1
-            }
-          ]
-        },
-        "additionalFields": {
-          "clientReferenceId": "={{ $json.tenant_id }}",
-          "metadata": {
-            "metadata": [
-              {
-                "key": "tenant_id",
-                "value": "={{ $json.tenant_id }}"
-              }
-            ]
-          }
-        }
-      },
-      "name": "Stripe: Create Checkout",
-      "type": "n8n-nodes-base.stripe",
+        "jsCode": "const input = $json;\nif (!input.is_valid_request) {\n  return [{ json: { ...input, authorized: false, http_status: 400, error: 'Missing required fields', details: input.missing_fields } }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{ json: { ...input, authorized: false, http_status: 500, error: 'Missing Supabase env for billing auth' } }];\n}\n\nconst qs = new URLSearchParams({\n  select: 'tenant_id,api_token,mail,billing_email,stripe_customer_id',\n  tenant_id: 'eq.' + input.tenant_id,\n  api_token: 'eq.' + input.api_token,\n  limit: '1',\n});\n\nconst response = await fetch(`${supabaseUrl}/rest/v1/tenants?${qs.toString()}`, {\n  headers: {\n    apikey: serviceKey,\n    Authorization: `Bearer ${serviceKey}`,\n  },\n});\n\nif (!response.ok) {\n  const text = await response.text();\n  return [{ json: { ...input, authorized: false, http_status: 502, error: 'Tenant auth lookup failed', provider_error: text.slice(0, 500) } }];\n}\n\nconst rows = await response.json();\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{ json: { ...input, authorized: false, http_status: 401, error: 'Unauthorized tenant or api_token' } }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  },\n}];"
+      }
+    },
+    {
+      "name": "If Checkout Authorized",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        800,
-        200
+        930,
+        140
       ],
-      "credentials": {
-        "stripeApi": {
-          "id": "stripe-cred-id",
-          "name": "Stripe account"
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.authorized) }}",
+              "value2": true
+            }
+          ]
         }
       }
     },
     {
+      "name": "Stripe: Create Checkout",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1190,
+        60
+      ],
       "parameters": {
-        "options": {
-          "responseCode": 200
-        },
-        "responseBody": "={\n  \"url\": \"{{ $json.url }}\"\n}"
-      },
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\nif (!secretKey) {\n  return [{ json: { ...input, http_status: 500, error: 'Missing STRIPE_SECRET_KEY' } }];\n}\n\nconst params = new URLSearchParams();\nparams.set('mode', 'subscription');\nparams.set('success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?status=success'));\nparams.set('cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?status=cancel'));\nparams.set('customer_email', input.billing_email || input.email);\nparams.set('client_reference_id', input.tenant_id);\nparams.set('line_items[0][price]', input.price_id);\nparams.set('line_items[0][quantity]', '1');\nparams.set('metadata[tenant_id]', input.tenant_id);\nparams.set('metadata[billing_email]', input.billing_email || input.email || '');\nparams.set('metadata[business_name]', input.business_name || '');\n\nconst response = await fetch('https://api.stripe.com/v1/checkout/sessions', {\n  method: 'POST',\n  headers: {\n    Authorization: 'Bearer ' + secretKey,\n    'Content-Type': 'application/x-www-form-urlencoded',\n  },\n  body: params.toString(),\n});\n\nconst data = await response.json();\nif (!response.ok) {\n  return [{ json: { ...input, http_status: response.status || 502, error: 'Stripe checkout creation failed', stripe_error: data } }];\n}\n\nreturn [{ json: { ...input, url: data.url, stripe_checkout_session_id: data.id, stripe_raw: data, http_status: 200 } }];"
+      }
+    },
+    {
       "name": "Response: Checkout URL",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1000,
-        200
-      ]
-    },
-    {
+        1430,
+        60
+      ],
       "parameters": {
-        "keepOnlySpecified": true,
-        "values": {
-          "string": [
-            {
-              "name": "customer_id",
-              "value": "={{ $json.body.stripeCustomerId }}"
-            }
-          ]
+        "options": {
+          "responseCode": "200"
         },
-        "options": {}
-      },
-      "name": "Params: Portal",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 2,
-      "position": [
-        600,
-        400
-      ]
+        "responseBody": "={{ JSON.stringify({ url: $json.url }, null, 2) }}"
+      }
     },
     {
-      "parameters": {
-        "resource": "customerPortalSession",
-        "operation": "create",
-        "customer": "={{ $json.customer_id }}",
-        "returnUrl": "https://dashboard.zirel.org"
-      },
-      "name": "Stripe: Create Portal",
-      "type": "n8n-nodes-base.stripe",
+      "name": "Response: Checkout Error",
+      "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        800,
-        400
+        1190,
+        220
       ],
-      "credentials": {
-        "stripeApi": {
-          "id": "stripe-cred-id",
-          "name": "Stripe account"
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.http_status || 200 }}"
+        },
+        "responseBody": "={{ JSON.stringify({ error: $json.error || \"Unauthorized\", details: $json.details || $json.missing_fields || [] }, null, 2) }}"
+      }
+    },
+    {
+      "name": "Webhook: Create Portal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        160,
+        420
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-billing/create-portal",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "name": "Normalize Portal Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        420
+      ],
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nconst normalize = (v) => String(v || '').trim();\nconst tenant_id = normalize(body.tenant_id || body.tenantId);\nconst api_token = normalize(body.api_token || body.apiToken);\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nreturn [{ json: { tenant_id, api_token, is_valid_request: missing.length === 0, missing_fields: missing, http_status: missing.length ? 400 : 200 } }];"
+      }
+    },
+    {
+      "name": "Verify Portal Tenant",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        420
+      ],
+      "parameters": {
+        "jsCode": "const input = $json;\nif (!input.is_valid_request) {\n  return [{ json: { ...input, authorized: false, http_status: 400, error: 'Missing required fields', details: input.missing_fields } }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{ json: { ...input, authorized: false, http_status: 500, error: 'Missing Supabase env for billing auth' } }];\n}\n\nconst qs = new URLSearchParams({\n  select: 'tenant_id,api_token,mail,billing_email,stripe_customer_id',\n  tenant_id: 'eq.' + input.tenant_id,\n  api_token: 'eq.' + input.api_token,\n  limit: '1',\n});\n\nconst response = await fetch(`${supabaseUrl}/rest/v1/tenants?${qs.toString()}`, {\n  headers: {\n    apikey: serviceKey,\n    Authorization: `Bearer ${serviceKey}`,\n  },\n});\n\nif (!response.ok) {\n  const text = await response.text();\n  return [{ json: { ...input, authorized: false, http_status: 502, error: 'Tenant auth lookup failed', provider_error: text.slice(0, 500) } }];\n}\n\nconst rows = await response.json();\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{ json: { ...input, authorized: false, http_status: 401, error: 'Unauthorized tenant or api_token' } }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  },\n}];"
+      }
+    },
+    {
+      "name": "If Portal Authorized",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        930,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.authorized && $json.stripe_customer_id) }}",
+              "value2": true
+            }
+          ]
         }
       }
     },
     {
+      "name": "Stripe: Create Portal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1190,
+        340
+      ],
       "parameters": {
-        "options": {
-          "responseCode": 200
-        },
-        "responseBody": "={\n  \"url\": \"{{ $json.url }}\"\n}"
-      },
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\nif (!secretKey) {\n  return [{ json: { ...input, http_status: 500, error: 'Missing STRIPE_SECRET_KEY' } }];\n}\nif (!input.stripe_customer_id) {\n  return [{ json: { ...input, http_status: 400, error: 'Missing stripe_customer_id for portal session' } }];\n}\n\nconst params = new URLSearchParams();\nparams.set('customer', input.stripe_customer_id);\nparams.set('return_url', String($env.STRIPE_PORTAL_RETURN_URL || $env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org/abbonamento'));\n\nconst response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {\n  method: 'POST',\n  headers: {\n    Authorization: 'Bearer ' + secretKey,\n    'Content-Type': 'application/x-www-form-urlencoded',\n  },\n  body: params.toString(),\n});\n\nconst data = await response.json();\nif (!response.ok) {\n  return [{ json: { ...input, http_status: response.status || 502, error: 'Stripe portal creation failed', stripe_error: data } }];\n}\n\nreturn [{ json: { ...input, url: data.url, stripe_portal_session_id: data.id, stripe_raw: data, http_status: 200 } }];"
+      }
+    },
+    {
       "name": "Response: Portal URL",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1000,
-        400
-      ]
+        1430,
+        340
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": "200"
+        },
+        "responseBody": "={{ JSON.stringify({ url: $json.url }, null, 2) }}"
+      }
     },
     {
+      "name": "Response: Portal Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1190,
+        500
+      ],
       "parameters": {
-        "conditions": {
-          "string": [
+        "options": {
+          "responseCode": "={{ $json.http_status || 200 }}"
+        },
+        "responseBody": "={{ JSON.stringify({ error: $json.error || \"Unauthorized or missing Stripe customer\", details: $json.details || $json.missing_fields || [] }, null, 2) }}"
+      }
+    },
+    {
+      "name": "Webhook: Stripe Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        160,
+        760
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-webhook",
+        "options": {
+          "noResponse": true,
+          "verifyStripeSignature": true
+        }
+      }
+    },
+    {
+      "name": "Normalize Stripe Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        760
+      ],
+      "parameters": {
+        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\nconst planCode = priceId && priceId === String($env.STRIPE_PRICE_PREMIUM_ID || '') ? 'premium'\n  : priceId && priceId === String($env.STRIPE_PRICE_BASE_ID || '') ? 'base'\n  : '';\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
+      }
+    },
+    {
+      "name": "Switch: Event Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        680,
+        760
+      ],
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.event_type }}",
+        "rules": {
+          "rules": [
             {
-              "value1": "={{ $json.body.type }}",
-              "value2": "checkout.session.completed"
+              "value2": "checkout.session.completed",
+              "output": 0
+            },
+            {
+              "value2": "customer.subscription.created",
+              "output": 1
+            },
+            {
+              "value2": "customer.subscription.updated",
+              "output": 1
+            },
+            {
+              "value2": "customer.subscription.deleted",
+              "output": 1
+            },
+            {
+              "value2": "invoice.paid",
+              "output": 1
+            },
+            {
+              "value2": "invoice.payment_failed",
+              "output": 1
             }
           ]
         }
-      },
-      "name": "Is Checkout Completed?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
-      "position": [
-        600,
-        700
-      ]
+      }
     },
     {
+      "name": "Supabase: Sync Checkout",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        980,
+        680
+      ],
       "parameters": {
         "operation": "update",
         "tableId": "tenants",
@@ -217,7 +287,7 @@
             {
               "keyName": "tenant_id",
               "condition": "eq",
-              "keyValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.client_reference_id }}"
+              "keyValue": "={{ $json.tenant_id }}"
             }
           ]
         },
@@ -225,30 +295,87 @@
           "fieldValues": [
             {
               "fieldId": "stripe_customer_id",
-              "fieldValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.customer }}"
+              "fieldValue": "={{ $json.customer_id }}"
             },
             {
               "fieldId": "stripe_subscription_id",
-              "fieldValue": "={{ $node[\"Is Checkout Completed?\"].json.body.data.object.subscription }}"
+              "fieldValue": "={{ $json.subscription_id }}"
             },
             {
               "fieldId": "subscription_status",
               "fieldValue": "active"
             },
             {
-              "fieldId": "stripe_customer_portal_url",
-              "fieldValue": "https://billing.stripe.com/p/session/{{ $node[\"Is Checkout Completed?\"].json.body.data.object.customer }}"
+              "fieldId": "billing_email",
+              "fieldValue": "={{ $json.billing_email || null }}"
+            },
+            {
+              "fieldId": "billing_last_event_id",
+              "fieldValue": "={{ $json.event_id }}"
             }
           ]
         }
       },
-      "name": "Supabase: Sync Tenant Info",
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-cred-id",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "name": "Supabase: Sync Sub/Invoice",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        850,
-        700
+        980,
+        860
       ],
+      "parameters": {
+        "operation": "update",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "stripe_customer_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.customer_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "subscription_status",
+              "fieldValue": "={{ $json.subscription_status }}"
+            },
+            {
+              "fieldId": "stripe_subscription_id",
+              "fieldValue": "={{ $json.subscription_id || null }}"
+            },
+            {
+              "fieldId": "stripe_price_id",
+              "fieldValue": "={{ $json.stripe_price_id || null }}"
+            },
+            {
+              "fieldId": "stripe_product_id",
+              "fieldValue": "={{ $json.stripe_product_id || null }}"
+            },
+            {
+              "fieldId": "billing_plan_code",
+              "fieldValue": "={{ $json.billing_plan_code || null }}"
+            },
+            {
+              "fieldId": "billing_email",
+              "fieldValue": "={{ $json.billing_email || null }}"
+            },
+            {
+              "fieldId": "billing_last_event_id",
+              "fieldValue": "={{ $json.event_id }}"
+            }
+          ]
+        }
+      },
       "credentials": {
         "supabaseApi": {
           "id": "supabase-cred-id",
@@ -262,18 +389,47 @@
       "main": [
         [
           {
-            "node": "Params: Checkout",
+            "node": "Normalize Checkout Request",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Params: Checkout": {
+    "Normalize Checkout Request": {
+      "main": [
+        [
+          {
+            "node": "Verify Checkout Tenant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Checkout Tenant": {
+      "main": [
+        [
+          {
+            "node": "If Checkout Authorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Checkout Authorized": {
       "main": [
         [
           {
             "node": "Stripe: Create Checkout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response: Checkout Error",
             "type": "main",
             "index": 0
           }
@@ -295,18 +451,47 @@
       "main": [
         [
           {
-            "node": "Params: Portal",
+            "node": "Normalize Portal Request",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Params: Portal": {
+    "Normalize Portal Request": {
+      "main": [
+        [
+          {
+            "node": "Verify Portal Tenant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Portal Tenant": {
+      "main": [
+        [
+          {
+            "node": "If Portal Authorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Portal Authorized": {
       "main": [
         [
           {
             "node": "Stripe: Create Portal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response: Portal Error",
             "type": "main",
             "index": 0
           }
@@ -328,23 +513,46 @@
       "main": [
         [
           {
-            "node": "Is Checkout Completed?",
+            "node": "Normalize Stripe Event",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Is Checkout Completed?": {
+    "Normalize Stripe Event": {
       "main": [
         [
           {
-            "node": "Supabase: Sync Tenant Info",
+            "node": "Switch: Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch: Event Type": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Sync Checkout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase: Sync Sub/Invoice",
             "type": "main",
             "index": 0
           }
         ]
       ]
     }
-  }
+  },
+  "settings": {},
+  "pinData": {},
+  "meta": null,
+  "active": false,
+  "versionId": "stripe-billing-manager-v2"
 }

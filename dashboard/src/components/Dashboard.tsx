@@ -6,6 +6,7 @@ import { syncTenantFieldState } from '../lib/tenant-form';
 import type { TenantData } from '../types';
 import Reservations from './Reservations';
 import DocumentManager from './DocumentManager';
+import BillingSection from './BillingSection';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
@@ -58,7 +59,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'abbonamento'>('prenotazioni');
     const [isTokenVisible, setIsTokenVisible] = useState(false);
     const [editForm, setEditForm] = useState<Partial<TenantData>>({});
     const [isBillingLoading, setIsBillingLoading] = useState(false);
@@ -86,6 +87,34 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        const status = params.get('status');
+
+        if (tab === 'abbonamento') {
+            setActiveTab('abbonamento');
+        }
+
+        if (status === 'success') {
+            toast.success('Abbonamento attivato correttamente. Stripe sta completando la sincronizzazione.', {
+                duration: 5000,
+            });
+        } else if (status === 'cancel') {
+            toast('Checkout annullato. Nessun addebito e` stato effettuato.', {
+                duration: 4000,
+                icon: <Info className="text-zirel-orange-dark" />,
+            });
+        }
+
+        if (tab || status) {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.delete('tab');
+            nextUrl.searchParams.delete('status');
+            window.history.replaceState({}, '', nextUrl.toString());
+        }
+    }, []);
 
     const handleUpdate = async () => {
         if (!tenantId) return;
@@ -174,14 +203,17 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         const loadingToast = toast.loading('Preparazione checkout sicuro...');
 
         try {
-            const webhookUrl = import.meta.env.VITE_N8N_STRIPE_MANAGER_URL || 'https://primary-production-b2af.up.railway.app/webhook/stripe-billing/create-checkout';
-            const response = await fetch(webhookUrl, {
+            const response = await fetch(import.meta.env.VITE_N8N_STRIPE_MANAGER_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
-                    tenantId,
-                    priceId,
-                    email: formData.mail
+                    tenant_id: formData.tenant_id,
+                    api_token: formData.api_token,
+                    price_id: priceId,
+                    email: formData.mail || formData.billing_email,
+                    hotel_name: formData.hotel_name || formData.nome_ristorante
                 })
             });
 
@@ -206,12 +238,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         const loadingToast = toast.loading('Accesso al portale Stripe...');
 
         try {
-            const webhookUrl = import.meta.env.VITE_N8N_STRIPE_PORTAL_URL || 'https://primary-production-b2af.up.railway.app/webhook/stripe-billing/create-portal';
-            const response = await fetch(webhookUrl, {
+            const response = await fetch(import.meta.env.VITE_N8N_STRIPE_PORTAL_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
-                    stripeCustomerId: formData.stripe_customer_id
+                    tenant_id: formData.tenant_id,
+                    api_token: formData.api_token
                 })
             });
 
@@ -230,47 +264,6 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         }
     };
 
-    const getTrialDaysRemaining = () => {
-        if (!formData?.trial_ends_at) return null;
-        const end = new Date(formData.trial_ends_at);
-        const now = new Date();
-        const diff = end.getTime() - now.getTime();
-        return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-    };
-
-    const trialDays = getTrialDaysRemaining();
-    const subscriptionStatusLabel = formData?.subscription_status
-        ? ({
-            trialing: 'Trial attivo',
-            active: 'Abbonamento attivo',
-            past_due: 'Pagamento da aggiornare',
-            canceled: 'Abbonamento annullato',
-        }[String(formData.subscription_status)] || String(formData.subscription_status))
-        : 'Non configurato';
-
-    const TrialBanner = () => {
-        if (trialDays === null || formData?.subscription_status !== 'trialing') return null;
-
-        return (
-            <div className="mb-8 animate-fade-in px-4 sm:px-0">
-                <div className="bg-zirel-gradient text-white p-4 md:p-6 rounded-3xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/20 p-2 rounded-full shrink-0"><Clock size={20} /></div>
-                        <div>
-                            <p className="font-bold">Periodo di Prova Attivo</p>
-                            <p className="text-sm opacity-90">Ti rimangono {trialDays} giorni per esplorare tutte le potenzialità di Zirèl.</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => handleStripeCheckout('price_1TBjT7Cqed9cgnvFgU9udoFX')} // Default to Base Plan
-                        className="bg-white text-zirel-blue px-6 py-2.5 rounded-full font-bold hover:bg-orange-50 transition-colors shadow-sm text-sm whitespace-nowrap w-full md:w-auto"
-                    >
-                        Attiva Abbonamento
-                    </button>
-                </div>
-            </div>
-        );
-    };
 
     if (isLoadingInitial || !formData) {
         return (
@@ -319,6 +312,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     {[
                         { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
                         { id: 'documenti', label: 'Documenti', icon: FileText },
+                        { id: 'abbonamento', label: 'Abbonamento', icon: CreditCard },
                         { id: 'sicurezza', label: 'Sicurezza', icon: Shield },
                         { id: 'integrazione', label: 'Integrazione', icon: LinkIcon },
                         { id: 'impostazioni', label: 'Impostazioni', icon: Settings },
@@ -337,7 +331,6 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     ))}
                 </div>
 
-                <TrialBanner />
 
                 {/* Tab Content */}
                 <div className="min-h-[600px]">
@@ -345,6 +338,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         <Reservations />
                     ) : activeTab === 'documenti' ? (
                         <DocumentManager />
+                    ) : activeTab === 'abbonamento' ? (
+                        <BillingSection 
+                            formData={formData} 
+                            isBillingLoading={isBillingLoading} 
+                            onCheckout={handleStripeCheckout} 
+                            onPortal={handleStripePortal} 
+                        />
                     ) : activeTab === 'sicurezza' ? (
                         <div className="max-w-4xl mx-auto animate-fade-in">
                             <section className="apple-card p-8 md:p-12 space-y-8">
@@ -437,73 +437,6 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     <div>
                                         <h2 className="text-2xl font-bold">Attivazione Assistente</h2>
                                         <p className="text-gray-500">Scegli come installare Zirèl sul tuo sito</p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-gray-100 rounded-[2rem] p-8 shadow-sm">
-                                    <div className="flex items-start gap-4">
-                                        <div className="z-icon-chip-lg">
-                                            <CreditCard className="w-6 h-6" />
-                                        </div>
-                                        <div className="space-y-5 flex-1">
-                                            <div>
-                                                <h3 className="text-2xl font-black text-gray-800">Billing SaaS</h3>
-                                                <p className="text-gray-500">Stato abbonamento e accessi rapidi Stripe</p>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Stato</p>
-                                                    <p className="font-bold text-gray-800">{subscriptionStatusLabel}</p>
-                                                </div>
-                                                <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Customer</p>
-                                                    <p className="font-mono text-sm text-gray-700 break-all">{formData.stripe_customer_id || 'Non collegato'}</p>
-                                                </div>
-                                                <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Subscription</p>
-                                                    <p className="font-mono text-sm text-gray-700 break-all">{formData.stripe_subscription_id || 'Non collegata'}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex flex-col md:flex-row gap-3">
-                                                {!formData.stripe_subscription_id || formData.subscription_status === 'canceled' ? (
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleStripeCheckout('price_1TBjT7Cqed9cgnvFgU9udoFX')}
-                                                            disabled={isBillingLoading}
-                                                            className="apple-button flex items-center justify-center gap-2"
-                                                        >
-                                                            {isBillingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard size={16} />}
-                                                            Attiva Piano Base
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStripeCheckout('price_1TBjVwCqed9cgnvFcZ6s16Mt')}
-                                                            disabled={isBillingLoading}
-                                                            className="apple-button-secondary flex items-center justify-center gap-2 border-zirel-orange-dark text-zirel-orange-dark"
-                                                        >
-                                                            {isBillingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard size={16} />}
-                                                            Attiva Piano Premium
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        onClick={handleStripePortal}
-                                                        disabled={isBillingLoading}
-                                                        className="apple-button-secondary flex items-center justify-center gap-2"
-                                                    >
-                                                        {isBillingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink size={16} />}
-                                                        Gestisci Abbonamento (Portal)
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {!formData.stripe_subscription_id && (
-                                                <p className="text-sm text-gray-500">
-                                                    Scegli il piano più adatto alla tua attività per sbloccare tutte le funzionalità di Zirèl.
-                                                </p>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
 

@@ -18,9 +18,13 @@ export interface TenantData {
     subscription_status?: string;
     stripe_customer_id?: string;
     stripe_subscription_id?: string;
+    stripe_price_id?: string;
+    stripe_product_id?: string;
     stripe_checkout_url?: string;
     stripe_customer_portal_url?: string;
     billing_email?: string;
+    billing_plan_code?: string;
+    billing_last_event_id?: string;
 
     // Business Info
     nome_ristorante?: string;
