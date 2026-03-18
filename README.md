@@ -1,6 +1,6 @@
 # Zirèl
 
-Piattaforma AI multi-tenant per gestione richieste, lead, prenotazioni e primo contatto.
+Piattaforma AI multi-tenant per gestione richieste, lead, prenotazioni e primo contatto..
 
 ## Workspace
 
