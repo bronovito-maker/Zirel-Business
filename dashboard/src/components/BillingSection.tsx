@@ -19,38 +19,48 @@ interface BillingSectionProps {
 
 type BillingUiStatus = 'trialing' | 'expired_trial' | 'active' | 'past_due' | 'canceled' | 'unpaid';
 
-const monthlyPlans = [
-    {
-        key: 'base',
-        label: 'Zirel Core Base',
-        price: 'EUR49',
-        cadence: '/mese',
-        setup: 'EUR349 una tantum',
-        annualSetup: 'Con annuale: -50% sul setup iniziale',
-        description: 'Per attivazioni rapide e gestione quotidiana essenziale.',
-        features: [
-            'Assistente AI attivo 24/7',
-            'Gestione richieste, menu, FAQ e orari',
-            'Prenotazioni e appuntamenti dal sito',
-            'Una lingua inclusa',
-            'Supporto via email',
-        ],
-        priceEnv: 'VITE_STRIPE_PRICE_BASE_ID',
-        priceYearlyEnv: 'VITE_STRIPE_PRICE_BASE_YEARLY_ID',
-        setupEnv: 'VITE_STRIPE_SETUP_BASE_ID',
-        setupYearlyEnv: 'VITE_STRIPE_SETUP_BASE_YEARLY_ID',
-        accent: 'text-zirel-blue',
-        buttonClass: 'apple-button-secondary',
-        setupAccent: 'text-zirel-blue',
+const statusAccessMeta: Record<BillingUiStatus, { label: string; tone: string; description: string }> = {
+    trialing: {
+        label: 'Accesso completo',
+        tone: 'bg-green-50 text-green-700 border-green-100',
+        description: 'Il concierge e tutte le funzioni operative restano disponibili durante la prova.',
     },
+    expired_trial: {
+        label: 'Accesso limitato',
+        tone: 'bg-amber-50 text-amber-700 border-amber-100',
+        description: 'La prova e terminata: il servizio va riattivato con un piano per tornare operativo senza limiti.',
+    },
+    active: {
+        label: 'Accesso completo',
+        tone: 'bg-green-50 text-green-700 border-green-100',
+        description: 'Il servizio e attivo e puo essere gestito liberamente dal portale Stripe.',
+    },
+    past_due: {
+        label: 'Accesso a rischio',
+        tone: 'bg-red-50 text-red-700 border-red-100',
+        description: 'Serve aggiornare il pagamento per evitare la sospensione del concierge e dei flussi operativi.',
+    },
+    canceled: {
+        label: 'Servizio sospeso',
+        tone: 'bg-slate-50 text-slate-700 border-slate-200',
+        description: 'I dati restano disponibili, ma l’accesso operativo deve essere riattivato con un nuovo piano.',
+    },
+    unpaid: {
+        label: 'Accesso limitato',
+        tone: 'bg-orange-50 text-orange-700 border-orange-100',
+        description: 'La fatturazione e in sospeso: controlla i pagamenti per riportare il servizio in stato attivo.',
+    },
+};
+
+const monthlyPlans = [
     {
         key: 'premium',
         label: 'Zirel Core Premium',
         price: 'EUR99',
-        cadence: '/mese',
-        setup: 'EUR599 configurazione iniziale',
-        annualSetup: 'Con annuale: -50% sull’attivazione iniziale',
-        description: 'Per attivita che vogliono piu conversione, piu lingue e piu supporto.',
+        cadence: '/ mese',
+        setup: 'Setup iniziale: € 599 (una tantum)',
+        annualSetup: 'Risparmi il 50% sul setup scegliendo l\'Annuale (€ 299,50)',
+        description: 'L\'esperienza di concierge AI più completa e personalizzata, multilingua e con suggerimenti proattivi.',
         features: [
             'Tutto del piano Base',
             'Concierge multilingua',
@@ -58,13 +68,36 @@ const monthlyPlans = [
             'Analisi richieste in tempo reale',
             'Supporto prioritario',
         ],
-        priceEnv: 'VITE_STRIPE_PRICE_PREMIUM_ID',
-        priceYearlyEnv: 'VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID',
-        setupEnv: 'VITE_STRIPE_SETUP_PREMIUM_ID',
-        setupYearlyEnv: 'VITE_STRIPE_SETUP_PREMIUM_YEARLY_ID',
+        priceEnv: ['VITE_STRIPE_PRICE_PREMIUM_ID', 'VITE_STRIPE_PRICE_PREMIUM_MONTHLY_ID'],
+        priceYearlyEnv: ['VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID', 'VITE_STRIPE_PRICE_PREMIUM_ANNUAL_ID'],
+        setupEnv: ['VITE_STRIPE_SETUP_PREMIUM_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY'],
+        setupYearlyEnv: ['VITE_STRIPE_SETUP_PREMIUM_YEARLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_YEARLY', 'VITE_STRIPE_SETUP_PREMIUM_ANNUAL_ID'],
         accent: 'text-zirel-orange-dark',
         buttonClass: 'apple-button bg-zirel-gradient',
         setupAccent: 'text-zirel-orange-dark',
+    },
+    {
+        key: 'base',
+        label: 'Zirèl Core Base',
+        price: '€ 49',
+        cadence: '/ mese',
+        setup: 'Setup iniziale: € 349 (una tantum)',
+        annualSetup: 'Risparmi il 50% sul setup scegliendo l\'Annuale (€ 174,50)',
+        description: 'Per attivazioni rapide e per automatizzare immediatamente la gestione operativa essenziale.',
+        features: [
+            'Assistente AI operativo 24/7',
+            'Gestione automatica richieste, orari e menu',
+            'Intercettazione prenotazioni dal sito',
+            'Una lingua inclusa',
+            'Supporto via email',
+        ],
+        priceEnv: ['VITE_STRIPE_PRICE_BASE_ID', 'VITE_STRIPE_PRICE_BASE_MONTHLY_ID'],
+        priceYearlyEnv: ['VITE_STRIPE_PRICE_BASE_YEARLY_ID', 'VITE_STRIPE_PRICE_BASE_ANNUAL_ID'],
+        setupEnv: ['VITE_STRIPE_SETUP_BASE_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY'],
+        setupYearlyEnv: ['VITE_STRIPE_SETUP_BASE_YEARLY_ID', 'VITE_STRIPE_SETUP_BASE_YEARLY', 'VITE_STRIPE_SETUP_BASE_ANNUAL_ID'],
+        accent: 'text-zirel-blue',
+        buttonClass: 'apple-button-secondary',
+        setupAccent: 'text-zirel-blue',
     },
 ];
 
@@ -124,6 +157,19 @@ const formatDate = (value?: string | null) => {
     });
 };
 
+const formatCycle = (value?: string | null) => {
+    if (!value) return 'Mensile';
+    return String(value).toLowerCase() === 'yearly' ? 'Annuale' : 'Mensile';
+};
+
+const resolveEnv = (keys: string[]) => {
+    for (const key of keys) {
+        const value = import.meta.env[key] as string | undefined;
+        if (value && String(value).trim()) return value;
+    }
+    return undefined;
+};
+
 const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: BillingSectionProps) => {
     const trialEndsAt = formData.trial_ends_at ? new Date(formData.trial_ends_at) : null;
     const now = new Date();
@@ -141,17 +187,35 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                             : 'trialing';
 
     const currentPlanLabel =
-        (formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ID || formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID)
+        (
+            formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ID ||
+            formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_MONTHLY_ID ||
+            formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID ||
+            formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ANNUAL_ID
+        )
             ? 'Zirel Core Premium'
-            : (formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_ID || formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_YEARLY_ID)
+            : (
+                formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_ID ||
+                formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_MONTHLY_ID ||
+                formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_YEARLY_ID ||
+                formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_ANNUAL_ID
+            )
                 ? 'Zirel Core Base'
                 : currentStatus === 'expired_trial'
                     ? 'Nessun piano attivo'
                     : 'Periodo di prova';
 
     const hero = statusMeta[currentStatus];
+    const accessState = statusAccessMeta[currentStatus];
     const billingEmail = formData.billing_email || formData.mail || 'Non impostata';
     const businessName = formData.hotel_name || formData.nome_ristorante || formData.tenant_id || 'Zirel';
+    const billingCycleLabel = formatCycle(formData.billing_cycle);
+    const renewalLabel = currentStatus === 'trialing' || currentStatus === 'expired_trial'
+        ? formatDate(formData.trial_ends_at)
+        : formatDate(formData.current_period_end);
+    const renewalTitle = currentStatus === 'trialing' || currentStatus === 'expired_trial'
+        ? 'Fine prova'
+        : 'Prossimo rinnovo';
 
     const showCheckoutCards = currentStatus !== 'active';
     const showPortal = Boolean(formData.stripe_customer_id);
@@ -187,6 +251,10 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                                 <p className="mt-1 font-semibold text-gray-800">{businessName}</p>
                             </div>
                             <div className="rounded-2xl bg-gray-50 border border-gray-100 px-4 py-3">
+                                <p className="text-gray-400 uppercase tracking-[0.18em] text-[10px] font-bold">Ciclo attuale</p>
+                                <p className="mt-1 font-semibold text-gray-800">{currentStatus === 'expired_trial' ? 'Da attivare' : billingCycleLabel}</p>
+                            </div>
+                            <div className="rounded-2xl bg-gray-50 border border-gray-100 px-4 py-3">
                                 <p className="text-gray-400 uppercase tracking-[0.18em] text-[10px] font-bold">Email fatturazione</p>
                                 <p className="mt-1 font-semibold text-gray-800 break-all">{billingEmail}</p>
                             </div>
@@ -212,10 +280,10 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                         </div>
                         <div className="rounded-3xl border border-gray-100 bg-gray-50 px-5 py-4">
                             <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">
-                                {currentStatus === 'trialing' || currentStatus === 'expired_trial' ? 'Fine prova' : 'Ultimo stato'}
+                                {renewalTitle}
                             </p>
                             <p className="mt-2 text-lg font-black text-gray-900">
-                                {trialEndsAt ? formatDate(formData.trial_ends_at) : hero.label}
+                                {renewalLabel}
                             </p>
                             {currentStatus === 'trialing' && typeof trialDaysRemaining === 'number' && trialDaysRemaining > 0 && (
                                 <p className="mt-1 text-sm font-medium text-gray-500">{trialDaysRemaining} giorni rimanenti</p>
@@ -224,6 +292,12 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                                 <p className="mt-1 text-sm font-medium text-amber-700">La prova e terminata: per proseguire serve un piano attivo.</p>
                             )}
                         </div>
+                    </div>
+
+                    <div className={`rounded-[1.75rem] border px-5 py-4 ${accessState.tone}`}>
+                        <p className="text-[10px] uppercase tracking-[0.22em] font-black opacity-80">Operativita del servizio</p>
+                        <p className="mt-2 text-lg font-black">{accessState.label}</p>
+                        <p className="mt-1 text-sm leading-relaxed opacity-90">{accessState.description}</p>
                     </div>
 
                     <div className={`rounded-[2rem] border px-6 py-5 ${hero.tone}`}>
@@ -262,11 +336,15 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                     <div className="space-y-4 text-sm">
                         <div className="rounded-3xl border border-gray-100 bg-gray-50 px-5 py-4">
                             <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">Gestione pagamenti</p>
-                            <p className="mt-2 text-gray-700 leading-relaxed">I pagamenti sono gestiti in modo sicuro tramite Stripe. Il contributo iniziale di attivazione verra applicato al primo checkout, mentre i rinnovi successivi saranno ricorrenti.</p>
+                            <p className="mt-2 text-gray-700 leading-relaxed">I pagamenti sono sicuri tramite Stripe. Il contributo di setup iniziale viene versato <strong>solo con il primo piano</strong>. I successivi rinnovi comprenderanno esclusivamente il canone ricorrente prescelto.</p>
                         </div>
                         <div className="rounded-3xl border border-gray-100 bg-gray-50 px-5 py-4">
                             <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">Email amministrativa</p>
                             <p className="mt-2 font-semibold text-gray-900 break-all">{billingEmail}</p>
+                        </div>
+                        <div className="rounded-3xl border border-gray-100 bg-gray-50 px-5 py-4">
+                            <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">Status Setup Iniziale</p>
+                            <p className="mt-2 font-semibold text-gray-900">{formData.setup_fee_paid ? '✅ Pagato e fatturato' : 'Da versare al primo pagamento'}</p>
                         </div>
                         <div className="rounded-3xl border border-gray-100 bg-gray-50 px-5 py-4">
                             <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">Portale di fatturazione</p>
@@ -278,23 +356,27 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
 
             {showCheckoutCards && (
                 <section className="space-y-6">
-                    <div className="space-y-2">
-                        <h3 className="text-2xl md:text-3xl font-black text-gray-900">Scegli il tuo piano</h3>
-                        <p className="text-gray-500 max-w-3xl">
-                            Il primo pagamento include il canone del piano scelto e il contributo iniziale di attivazione. La versione annuale verra collegata al checkout Stripe nel prossimo step, mantenendo il 50% di sconto sul setup.
-                        </p>
+                    <div className="space-y-4">
+                        <h3 className="text-2xl md:text-3xl font-black text-gray-900">Configura l'abbonamento</h3>
+                        <div className="p-5 rounded-2xl bg-zirel-blue/5 border border-zirel-blue/20 max-w-4xl text-sm md:text-base text-gray-700 leading-relaxed shadow-sm">
+                            <p>
+                                <strong className="text-gray-900">Come funziona il pagamento:</strong><br/>
+                                <span className="inline-block mt-2">La prima attivazione include il <strong className="text-gray-900">canone del piano scelto</strong> e un <strong className="text-gray-900">contributo di setup iniziale</strong> (una tantum). I rinnovi successivi includeranno esclusivamente il canone ricorrente. Scegliendo la frequenza annuale ottieni immediatamente uno <strong className="text-zirel-blue">sconto del 50% sulla quota di setup</strong> e garantisci l'operatività per 12 mesi in un’unica soluzione.</span>
+                            </p>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                         {monthlyPlans.map((plan) => {
-                            const priceId = import.meta.env[plan.priceEnv] as string | undefined;
-                            const setupId = import.meta.env[plan.setupEnv] as string | undefined;
-                            const priceYearlyId = import.meta.env[plan.priceYearlyEnv] as string | undefined;
-                            const setupYearlyId = import.meta.env[plan.setupYearlyEnv] as string | undefined;
+                            const priceId = resolveEnv(plan.priceEnv);
+                            const setupId = resolveEnv(plan.setupEnv);
+                            const priceYearlyId = resolveEnv(plan.priceYearlyEnv);
+                            const setupYearlyId = resolveEnv(plan.setupYearlyEnv);
                             
                             const isCurrentPlanMonthly = formData.stripe_price_id === priceId;
                             const isCurrentPlanYearly = formData.stripe_price_id === priceYearlyId;
                             const isCurrentPlan = isCurrentPlanMonthly || isCurrentPlanYearly;
+                            const canStartYearly = Boolean(priceYearlyId && setupYearlyId);
 
                             return (
                                 <article
@@ -328,9 +410,9 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                                             </div>
                                         </div>
 
-                                        <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 space-y-2">
-                                            <p className={`text-base font-black ${plan.setupAccent}`}>{plan.setup}</p>
-                                            <p className="text-sm text-gray-500">{plan.annualSetup}</p>
+                                        <div className="rounded-[1.75rem] border border-orange-100 bg-orange-50/50 px-5 py-5 space-y-1">
+                                            <p className={`text-sm font-black tracking-wide ${plan.setupAccent}`}>{plan.setup}</p>
+                                            <p className="text-xs font-semibold text-gray-500">{plan.annualSetup}</p>
                                         </div>
 
                                         <ul className="space-y-3">
@@ -344,21 +426,25 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
                                             <button
-                                                onClick={() => priceId && onCheckout(priceId, setupId)}
+                                                onClick={() => priceId && onCheckout(priceId, formData.setup_fee_paid ? undefined : setupId)}
                                                 disabled={isBillingLoading || !priceId || isCurrentPlanMonthly}
-                                                className={`${plan.buttonClass} w-full h-13 font-bold flex items-center justify-center gap-2 ${(!priceId || isCurrentPlanMonthly) ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                                className={`${plan.buttonClass} w-full h-13 font-bold flex flex-col items-center justify-center transition-all focus:ring-2 ${(!priceId || isCurrentPlanMonthly) ? 'opacity-60 cursor-not-allowed' : 'hover:scale-[1.02]'}`}
                                             >
-                                                {isBillingLoading ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
-                                                Attiva mensile
+                                                <div className="flex items-center gap-2">
+                                                    {isBillingLoading ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+                                                    <span>Attiva Mensile</span>
+                                                </div>
                                             </button>
                                             <button
-                                                onClick={() => priceYearlyId && onCheckout(priceYearlyId, setupYearlyId)}
-                                                disabled={isBillingLoading || !priceYearlyId || isCurrentPlanYearly}
-                                                className="apple-button-secondary border border-gray-200 text-gray-800 bg-white w-full h-13 font-bold flex items-center justify-center gap-2 transition-all hover:bg-gray-50 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                title="Risparmia il 50% sul setup e paghi una volta all'anno"
+                                                onClick={() => priceYearlyId && onCheckout(priceYearlyId, formData.setup_fee_paid ? undefined : setupYearlyId)}
+                                                disabled={isBillingLoading || !canStartYearly || isCurrentPlanYearly}
+                                                className="apple-button-secondary border border-gray-200 text-gray-800 bg-white w-full h-13 font-bold flex flex-col items-center justify-center transition-all hover:bg-gray-50 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                title={canStartYearly ? "Risparmia il 50% sul setup e paghi 1 volta all'anno" : 'Configura price e setup annuale nelle env per attivare questo checkout'}
                                             >
-                                                {isBillingLoading ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
-                                                Attiva annuale
+                                                <div className="flex items-center gap-2">
+                                                    {isBillingLoading ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+                                                    <span className="text-zirel-blue">Attiva Annuale</span>
+                                                </div>
                                             </button>
                                         </div>
                                     </div>
@@ -376,7 +462,7 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                 <div className="space-y-1">
                     <p className="text-sm text-gray-800 font-bold">Promemoria e gestione rinnovi</p>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                        Nel prossimo step collegheremo i reminder automatici per fine prova, rinnovo mensile, pagamento fallito e rinnovo annuale, insieme alla disattivazione controllata del servizio in caso di mancato pagamento.
+                        La dashboard e pronta a riflettere stati di prova, rinnovo, mancato pagamento e riattivazione. Nel prossimo blocco collegheremo i reminder automatici e la disattivazione controllata del servizio lato prodotto.
                     </p>
                 </div>
             </section>

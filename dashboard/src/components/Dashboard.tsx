@@ -65,7 +65,10 @@ const formatBillingDate = (value?: string | null) => {
     });
 };
 
+type ProductAccessState = 'open' | 'warning' | 'limited' | 'suspended';
+
 const Dashboard = ({ onLogout }: DashboardProps) => {
+
     const [formData, setFormData] = useState<TenantData | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
@@ -81,6 +84,15 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const normalizedSubscriptionStatus = String(formData?.subscription_status || 'trialing').trim().toLowerCase();
     const hasActiveSubscription = Boolean(formData?.stripe_subscription_id);
     const isExpiredTrial = normalizedSubscriptionStatus === 'trialing' && !!trialEndsAt && trialEndsAt.getTime() <= Date.now() && !hasActiveSubscription;
+    const productAccessState: ProductAccessState = isExpiredTrial
+        ? 'limited'
+        : normalizedSubscriptionStatus === 'canceled'
+            ? 'suspended'
+            : normalizedSubscriptionStatus === 'past_due'
+                ? 'warning'
+                : 'open';
+    const operationalTabs = new Set(['prenotazioni', 'documenti', 'integrazione', 'impostazioni']);
+    const shouldLockActiveTab = operationalTabs.has(activeTab) && (productAccessState === 'limited' || productAccessState === 'suspended');
 
     const dashboardBillingBanner = isExpiredTrial
         ? {
@@ -432,7 +444,27 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 onClick={() => setActiveTab('abbonamento')}
                                 className="shrink-0 bg-white text-gray-900 hover:bg-white/90 px-6 py-4 rounded-full font-bold shadow-sm transition-all active:scale-[0.98]"
                             >
-                                {dashboardBillingBanner.cta}
+                    {dashboardBillingBanner.cta}
+                </button>
+            </div>
+        </section>
+    )}
+
+                {productAccessState === 'warning' && activeTab !== 'abbonamento' && (
+                    <section className="rounded-[1.75rem] border border-red-100 bg-red-50 px-6 py-5 md:px-7 md:py-6 mb-6 animate-fade-in">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                            <div className="space-y-2">
+                                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-red-500">Pagamento da aggiornare</p>
+                                <h3 className="text-xl md:text-2xl font-black text-red-900">Il servizio resta disponibile, ma e necessario aggiornare il metodo di pagamento.</h3>
+                                <p className="text-red-800/80 max-w-3xl leading-relaxed">
+                                    Per evitare la sospensione delle funzioni operative, apri il tab Abbonamento e accedi al portale Stripe.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setActiveTab('abbonamento')}
+                                className="shrink-0 apple-button bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-full font-bold shadow-sm transition-all active:scale-[0.98]"
+                            >
+                                Vai al portale di fatturazione
                             </button>
                         </div>
                     </section>
@@ -441,19 +473,63 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
                 {/* Tab Content */}
                 <div className="min-h-[600px]">
-                    {activeTab === 'prenotazioni' ? (
-                        <Reservations />
-                    ) : activeTab === 'documenti' ? (
-                        <DocumentManager />
-                    ) : activeTab === 'abbonamento' ? (
-                        <BillingSection 
-                            formData={formData} 
-                            isBillingLoading={isBillingLoading} 
-                            onCheckout={handleStripeCheckout} 
-                            onPortal={handleStripePortal} 
-                        />
-                    ) : activeTab === 'sicurezza' ? (
-                        <div className="max-w-4xl mx-auto animate-fade-in">
+                    <div className="relative">
+                        {shouldLockActiveTab && (
+                            <div className="absolute inset-0 z-20 flex items-start justify-center px-4 pt-6 md:px-8 md:pt-8">
+                                <div className={`w-full max-w-3xl rounded-[2rem] border px-6 py-6 md:px-8 md:py-7 shadow-xl ${productAccessState === 'suspended'
+                                        ? 'border-slate-200 bg-white'
+                                        : 'border-amber-100 bg-white'
+                                    }`}>
+                                    <div className="space-y-3">
+                                        <p className={`text-[11px] font-black uppercase tracking-[0.22em] ${productAccessState === 'suspended' ? 'text-slate-500' : 'text-amber-500'}`}>
+                                            {productAccessState === 'suspended' ? 'Servizio sospeso' : 'Periodo di prova terminato'}
+                                        </p>
+                                        <h3 className="text-2xl md:text-3xl font-black text-gray-900">
+                                            {productAccessState === 'suspended'
+                                                ? 'I dati restano visibili, ma le azioni operative sono state sospese.'
+                                                : 'Puoi consultare i dati, ma per tornare operativo devi attivare un piano.'}
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            {productAccessState === 'suspended'
+                                                ? 'Prenotazioni, documenti e impostazioni restano consultabili, ma le modifiche e le azioni operative vanno riattivate dal tab Abbonamento.'
+                                                : 'Il periodo di prova e terminato. Manteniamo visibili le informazioni principali, ma blocchiamo l’operativita finche non viene attivato un piano.'}
+                                        </p>
+                                    </div>
+                                    <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                                        <button
+                                            onClick={() => setActiveTab('abbonamento')}
+                                            className="apple-button bg-zirel-gradient text-white px-6 py-4 rounded-full font-bold"
+                                        >
+                                            Vai ad Abbonamento
+                                        </button>
+                                        {showPortalFallbackLabel(formData) ? (
+                                            <button
+                                                onClick={handleStripePortal}
+                                                disabled={isBillingLoading || !formData?.stripe_customer_id}
+                                                className="apple-button-secondary border-gray-200 text-gray-800 bg-white px-6 py-4 rounded-full font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                                            >
+                                                Gestisci su Stripe
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className={shouldLockActiveTab ? 'pointer-events-none select-none opacity-60 blur-[1.5px]' : ''}>
+                            {activeTab === 'prenotazioni' ? (
+                                <Reservations />
+                            ) : activeTab === 'documenti' ? (
+                                <DocumentManager />
+                            ) : activeTab === 'abbonamento' ? (
+                                <BillingSection
+                                    formData={formData}
+                                    isBillingLoading={isBillingLoading}
+                                    onCheckout={handleStripeCheckout}
+                                    onPortal={handleStripePortal}
+                                />
+                            ) : activeTab === 'sicurezza' ? (
+                                <div className="max-w-4xl mx-auto animate-fade-in">
                             <section className="apple-card p-8 md:p-12 space-y-8">
                                 <div className="flex items-center gap-4 mb-2">
                                     <div className="z-icon-chip-lg"><Shield className="w-6 h-6" /></div>
@@ -535,9 +611,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     </div>
                                 </div>
                             </section>
-                        </div>
-                    ) : activeTab === 'integrazione' ? (
-                        <div className="max-w-4xl mx-auto animate-fade-in">
+                                </div>
+                            ) : activeTab === 'integrazione' ? (
+                                <div className="max-w-4xl mx-auto animate-fade-in">
                             <section className="apple-card p-8 md:p-12 space-y-12">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-orange-50 text-zirel-orange-dark rounded-2xl"><LinkIcon className="w-6 h-6" /></div>
@@ -578,14 +654,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 </div>
 
                                 {/* Widget Customization Section */}
-                                <div className="apple-card p-8 md:p-10 space-y-8 border-t-4 border-zirel-orange-dark">
-                                    <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
-                                        <div className="z-icon-chip-lg">
+                                <div className="apple-card overflow-hidden p-6 md:p-10 space-y-8 border-t-4 border-zirel-orange-dark">
+                                    <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center">
+                                        <div className="z-icon-chip-lg shrink-0">
                                             <Settings className="w-6 h-6" />
                                         </div>
-                                        <div>
-                                            <h3 className="text-2xl font-black text-gray-800">Personalizzazione Widget</h3>
-                                            <p className="text-gray-500">Rendi il widget chat unico per il tuo brand</p>
+                                        <div className="min-w-0">
+                                            <h3 className="text-xl sm:text-2xl font-black text-gray-800 leading-tight break-words">Personalizzazione Widget</h3>
+                                            <p className="text-gray-500 break-words">Rendi il widget chat unico per il tuo brand</p>
                                         </div>
                                     </div>
 
@@ -607,12 +683,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <div className="space-y-6">
                                             <div>
                                                 <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 ml-1">Colore Brand (Hex)</label>
-                                                <div className="flex gap-3">
+                                                <div className="flex flex-col gap-3 xs:flex-row">
                                                     <input
                                                         type="color"
                                                         value={formData.widget_color || '#FF8C42'}
                                                         onChange={(e) => updateField('widget_color')(e.target.value)}
-                                                        className="w-14 h-14 rounded-xl cursor-pointer border-none p-0 overflow-hidden shadow-sm"
+                                                        className="w-14 h-14 rounded-xl cursor-pointer border-none p-0 overflow-hidden shadow-sm shrink-0"
                                                     />
                                                     <input
                                                         type="text"
@@ -635,16 +711,16 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     {/* Simple Preview */}
                                     <div className="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-6">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Anteprima Rapida</p>
-                                        <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 max-w-sm mx-auto">
+                                        <div className="flex flex-col gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 max-w-sm mx-auto text-center xs:flex-row xs:items-center xs:text-left">
                                             <div
-                                                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl text-white shadow-lg"
+                                                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl text-white shadow-lg mx-auto shrink-0 xs:mx-0"
                                                 style={{ backgroundColor: formData.widget_color || '#FF8C42' }}
                                             >
                                                 {formData.widget_icon || '💬'}
                                             </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-800">{formData.widget_title || 'Zirèl Assistant'}</h4>
-                                                <p className="text-xs text-gray-500">{formData.widget_subtitle || 'Concierge AI h24'}</p>
+                                            <div className="min-w-0">
+                                                <h4 className="font-bold text-gray-800 break-words">{formData.widget_title || 'Zirèl Assistant'}</h4>
+                                                <p className="text-xs text-gray-500 break-words">{formData.widget_subtitle || 'Concierge AI h24'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -709,11 +785,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     </div>
                                 </div>
                             </section>
-                        </div>
-                    ) : (
-                        <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-32">
+                                </div>
+                            ) : (
+                                <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-32">
                             {/* Premium Header for Impostazioni */}
-                            <div className="apple-card p-8 md:p-12 mb-0">
+                            <div className="apple-card p-8 md:p-12">
                                 <div className="flex items-center gap-4">
                                     <div className="z-icon-chip-lg"><Settings className="w-8 h-8" /></div>
                                     <div>
@@ -723,7 +799,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-9">
                                 {/* Section 1: Contatti */}
                                 <section className="apple-card p-6 space-y-4">
                                     <div className="flex items-center gap-3 mb-4">
@@ -823,12 +899,16 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     <span className="text-lg font-bold">Salva e Aggiorna AI</span>
                                 </button>
                             </footer>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
             </main>
         </div>
     );
 };
+
+const showPortalFallbackLabel = (formData: TenantData | null) => Boolean(formData?.stripe_customer_id);
 
 export default Dashboard;
