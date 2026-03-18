@@ -25,6 +25,9 @@ export interface TenantData {
     billing_email?: string;
     billing_plan_code?: string;
     billing_last_event_id?: string;
+    billing_cycle?: string;
+    current_period_end?: string;
+    setup_fee_paid?: boolean;
 
     // Business Info
     nome_ristorante?: string;

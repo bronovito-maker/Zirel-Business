@@ -54,6 +54,17 @@ const TextareaField = ({ label, value, onChange, placeholder = '', rows = 3 }: T
     </div>
 );
 
+const formatBillingDate = (value?: string | null) => {
+    if (!value) return 'data non disponibile';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'data non disponibile';
+    return date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+    });
+};
+
 const Dashboard = ({ onLogout }: DashboardProps) => {
     const [formData, setFormData] = useState<TenantData | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -65,6 +76,43 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const [isBillingLoading, setIsBillingLoading] = useState(false);
 
     const tenantId = formData?.tenant_id || getCurrentTenantId();
+    const trialEndsAt = formData?.trial_ends_at ? new Date(formData.trial_ends_at) : null;
+    const trialDaysRemaining = trialEndsAt ? Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+    const normalizedSubscriptionStatus = String(formData?.subscription_status || 'trialing').trim().toLowerCase();
+    const hasActiveSubscription = Boolean(formData?.stripe_subscription_id);
+    const isExpiredTrial = normalizedSubscriptionStatus === 'trialing' && !!trialEndsAt && trialEndsAt.getTime() <= Date.now() && !hasActiveSubscription;
+
+    const dashboardBillingBanner = isExpiredTrial
+        ? {
+            tone: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-orange-200/50',
+            title: 'Periodo di prova terminato',
+            description: 'Per continuare a usare Zirèl senza interruzioni devi attivare un piano dal tab Abbonamento.',
+            cta: 'Vai ad Abbonamento',
+        }
+        : normalizedSubscriptionStatus === 'past_due'
+            ? {
+                tone: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-200/50',
+                title: 'Pagamento da aggiornare',
+                description: 'Abbiamo rilevato un problema sul rinnovo. Aggiorna il metodo di pagamento per evitare la sospensione del servizio.',
+                cta: 'Gestisci pagamento',
+            }
+            : normalizedSubscriptionStatus === 'canceled'
+                ? {
+                    tone: 'bg-gradient-to-r from-slate-700 to-slate-800 text-white shadow-lg shadow-slate-200/50',
+                    title: 'Abbonamento annullato',
+                    description: 'Il servizio non è attivo. Puoi riattivarlo in qualsiasi momento dal tab Abbonamento.',
+                    cta: 'Riattiva servizio',
+                }
+                : normalizedSubscriptionStatus === 'active'
+                    ? null
+                    : {
+                        tone: 'bg-gradient-to-r from-zirel-orange-dark to-[#ff9b52] text-white shadow-lg shadow-orange-200/50',
+                        title: 'Periodo di prova attivo',
+                        description: trialDaysRemaining && trialDaysRemaining > 0
+                            ? `Ti rimangono ${trialDaysRemaining} giorni per completare l’attivazione del piano senza interrompere il servizio.`
+                            : `La prova termina il ${formatBillingDate(formData?.trial_ends_at)}. Attiva il piano quando vuoi per evitare interruzioni.`,
+                        cta: 'Scopri i piani',
+                    };
 
     const fetchData = useCallback(async () => {
         try {
@@ -197,7 +245,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         setEditForm(nextState.editForm);
     };
 
-    const handleStripeCheckout = async (priceId: string) => {
+    const handleStripeCheckout = async (priceId: string, setupPriceId?: string) => {
         if (!tenantId || !formData?.mail) return;
         setIsBillingLoading(true);
         const loadingToast = toast.loading('Preparazione checkout sicuro...');
@@ -206,18 +254,33 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             const response = await fetch(import.meta.env.VITE_N8N_STRIPE_MANAGER_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Zirel-Billing-Key': import.meta.env.VITE_ZIREL_BILLING_KEY || '',
                 },
                 body: JSON.stringify({
                     tenant_id: formData.tenant_id,
                     api_token: formData.api_token,
                     price_id: priceId,
+                    setup_price_id: setupPriceId,
                     email: formData.mail || formData.billing_email,
                     hotel_name: formData.hotel_name || formData.nome_ristorante
                 })
             });
 
-            if (!response.ok) throw new Error('BACKEND_ERROR');
+            if (!response.ok) {
+                let backendMessage = 'BACKEND_ERROR';
+                try {
+                    const body = await response.json();
+                    backendMessage = body?.error || body?.message || body?.provider_error || backendMessage;
+                } catch {
+                    try {
+                        backendMessage = await response.text();
+                    } catch {
+                        // ignore response parsing fallback errors
+                    }
+                }
+                throw new Error(backendMessage);
+            }
             const { url } = await response.json();
             if (url) {
                 window.location.href = url;
@@ -226,7 +289,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             }
         } catch (err) {
             console.error('Checkout error:', err);
-            toast.error('Errore durante la creazione del checkout.', { id: loadingToast });
+            const message = err instanceof Error ? err.message : '';
+            toast.error(
+                message && message !== 'BACKEND_ERROR'
+                    ? `Checkout non riuscito: ${message}`
+                    : 'Errore durante la creazione del checkout.',
+                { id: loadingToast }
+            );
         } finally {
             setIsBillingLoading(false);
         }
@@ -241,7 +310,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             const response = await fetch(import.meta.env.VITE_N8N_STRIPE_PORTAL_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Zirel-Billing-Key': import.meta.env.VITE_ZIREL_BILLING_KEY || '',
                 },
                 body: JSON.stringify({
                     tenant_id: formData.tenant_id,
@@ -249,7 +319,20 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 })
             });
 
-            if (!response.ok) throw new Error('BACKEND_ERROR');
+            if (!response.ok) {
+                let backendMessage = 'BACKEND_ERROR';
+                try {
+                    const body = await response.json();
+                    backendMessage = body?.error || body?.message || body?.provider_error || backendMessage;
+                } catch {
+                    try {
+                        backendMessage = await response.text();
+                    } catch {
+                        // ignore response parsing fallback errors
+                    }
+                }
+                throw new Error(backendMessage);
+            }
             const { url } = await response.json();
             if (url) {
                 window.location.href = url;
@@ -258,7 +341,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             }
         } catch (err) {
             console.error('Portal error:', err);
-            toast.error('Errore durante l\'apertura del portale.', { id: loadingToast });
+            const message = err instanceof Error ? err.message : '';
+            toast.error(
+                message && message !== 'BACKEND_ERROR'
+                    ? `Portale Stripe non disponibile: ${message}`
+                    : 'Errore durante l\'apertura del portale.',
+                { id: loadingToast }
+            );
         } finally {
             setIsBillingLoading(false);
         }
@@ -308,7 +397,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 </header>
 
                 {/* Tab Navigation - Mobile Scrollable */}
-                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-5 gap-2 animate-fade-in delay-100 pb-2">
+                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-6 gap-2 animate-fade-in delay-100 pb-2">
                     {[
                         { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
                         { id: 'documenti', label: 'Documenti', icon: FileText },
@@ -330,6 +419,24 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         </button>
                     ))}
                 </div>
+
+                {dashboardBillingBanner && (
+                    <section className={`${dashboardBillingBanner.tone} rounded-[2rem] px-6 py-6 md:px-8 md:py-7 mb-8 animate-fade-in delay-150`}>
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                            <div className="space-y-2">
+                                <p className="text-sm font-black uppercase tracking-[0.22em] text-white/80">Billing alert</p>
+                                <h2 className="text-2xl md:text-3xl font-black tracking-tight">{dashboardBillingBanner.title}</h2>
+                                <p className="max-w-3xl text-white/85 leading-relaxed">{dashboardBillingBanner.description}</p>
+                            </div>
+                            <button
+                                onClick={() => setActiveTab('abbonamento')}
+                                className="shrink-0 bg-white text-gray-900 hover:bg-white/90 px-6 py-4 rounded-full font-bold shadow-sm transition-all active:scale-[0.98]"
+                            >
+                                {dashboardBillingBanner.cta}
+                            </button>
+                        </div>
+                    </section>
+                )}
 
 
                 {/* Tab Content */}

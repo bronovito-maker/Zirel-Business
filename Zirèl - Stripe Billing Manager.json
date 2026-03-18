@@ -25,7 +25,7 @@
         140
       ],
       "parameters": {
-        "jsCode": "const body = $json.body || {};\nconst normalize = (v) => String(v || '').trim();\nconst tenant_id = normalize(body.tenant_id || body.tenantId);\nconst api_token = normalize(body.api_token || body.apiToken);\nconst price_id = normalize(body.price_id || body.priceId);\nconst email = normalize(body.email).toLowerCase();\nconst business_name = normalize(body.hotel_name || body.business_name || body.nome_attivita);\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nif (!price_id) missing.push('price_id');\nif (!email) missing.push('email');\nreturn [{ json: { tenant_id, api_token, price_id, email, business_name, is_valid_request: missing.length === 0, missing_fields: missing, http_status: missing.length ? 400 : 200 } }];"
+        "jsCode": "const source = $json.body || $json || {};\nconst normalize = (v) => String(v || '').trim();\n\nconst tenant_id = normalize(source.tenant_id || source.tenantId);\nconst api_token = normalize(source.api_token || source.apiToken);\nconst price_id = normalize(source.price_id || source.priceId);\nconst setup_price_id = normalize(source.setup_price_id || source.setupPriceId);\nconst email = normalize(source.email).toLowerCase();\nconst business_name = normalize(source.hotel_name || source.business_name || source.nome_attivita);\n\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nif (!price_id) missing.push('price_id');\nif (!email) missing.push('email');\n\nreturn [{\n  json: {\n    tenant_id,\n    api_token,\n    price_id,\n    setup_price_id,\n    email,\n    business_name,\n    is_valid_request: missing.length === 0,\n    missing_fields: missing,\n    http_status: missing.length ? 400 : 200,\n  }\n}];"
       }
     },
     {
@@ -37,7 +37,7 @@
         140
       ],
       "parameters": {
-        "jsCode": "const input = $json;\nif (!input.is_valid_request) {\n  return [{ json: { ...input, authorized: false, http_status: 400, error: 'Missing required fields', details: input.missing_fields } }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{ json: { ...input, authorized: false, http_status: 500, error: 'Missing Supabase env for billing auth' } }];\n}\n\nconst qs = new URLSearchParams({\n  select: 'tenant_id,api_token,mail,billing_email,stripe_customer_id',\n  tenant_id: 'eq.' + input.tenant_id,\n  api_token: 'eq.' + input.api_token,\n  limit: '1',\n});\n\nconst response = await fetch(`${supabaseUrl}/rest/v1/tenants?${qs.toString()}`, {\n  headers: {\n    apikey: serviceKey,\n    Authorization: `Bearer ${serviceKey}`,\n  },\n});\n\nif (!response.ok) {\n  const text = await response.text();\n  return [{ json: { ...input, authorized: false, http_status: 502, error: 'Tenant auth lookup failed', provider_error: text.slice(0, 500) } }];\n}\n\nconst rows = await response.json();\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{ json: { ...input, authorized: false, http_status: 401, error: 'Unauthorized tenant or api_token' } }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  },\n}];"
+        "jsCode": "const input = $json;\n\nif (!input.is_valid_request) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 400,\n      error: 'Missing required fields',\n      details: input.missing_fields,\n    }\n  }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 500,\n      error: 'Missing Supabase env for billing auth',\n    }\n  }];\n}\n\nconst qs = [\n  ['select', 'tenant_id,api_token,mail,billing_email,stripe_customer_id'],\n  ['tenant_id', 'eq.' + input.tenant_id],\n  ['api_token', 'eq.' + input.api_token],\n  ['limit', '1'],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))\n  .join('&');\n\nlet rows;\ntry {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: supabaseUrl + '/rest/v1/tenants?' + qs,\n    headers: {\n      apikey: serviceKey,\n      Authorization: 'Bearer ' + serviceKey,\n    },\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 502,\n      error: 'Tenant auth lookup failed',\n      provider_error: String(error?.message || error).slice(0, 500),\n    }\n  }];\n}\n\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 401,\n      error: 'Unauthorized tenant or api_token',\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  }\n}];"
       }
     },
     {
@@ -68,7 +68,7 @@
         60
       ],
       "parameters": {
-        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\nif (!secretKey) {\n  return [{ json: { ...input, http_status: 500, error: 'Missing STRIPE_SECRET_KEY' } }];\n}\n\nconst params = new URLSearchParams();\nparams.set('mode', 'subscription');\nparams.set('success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?status=success'));\nparams.set('cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?status=cancel'));\nparams.set('customer_email', input.billing_email || input.email);\nparams.set('client_reference_id', input.tenant_id);\nparams.set('line_items[0][price]', input.price_id);\nparams.set('line_items[0][quantity]', '1');\nparams.set('metadata[tenant_id]', input.tenant_id);\nparams.set('metadata[billing_email]', input.billing_email || input.email || '');\nparams.set('metadata[business_name]', input.business_name || '');\n\nconst response = await fetch('https://api.stripe.com/v1/checkout/sessions', {\n  method: 'POST',\n  headers: {\n    Authorization: 'Bearer ' + secretKey,\n    'Content-Type': 'application/x-www-form-urlencoded',\n  },\n  body: params.toString(),\n});\n\nconst data = await response.json();\nif (!response.ok) {\n  return [{ json: { ...input, http_status: response.status || 502, error: 'Stripe checkout creation failed', stripe_error: data } }];\n}\n\nreturn [{ json: { ...input, url: data.url, stripe_checkout_session_id: data.id, stripe_raw: data, http_status: 200 } }];"
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\n\nif (!secretKey) {\n  return [{\n    json: {\n      ...input,\n      http_status: 500,\n      error: 'Missing STRIPE_SECRET_KEY'\n    }\n  }];\n}\n\nconst formBodyArr = [\n  ['mode', 'subscription'],\n  ['success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=success')],\n  ['cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=cancel')],\n  ['customer_email', input.billing_email || input.email || ''],\n  ['client_reference_id', input.tenant_id || ''],\n  ['line_items[0][price]', input.price_id || ''],\n  ['line_items[0][quantity]', '1'],\n  ['metadata[tenant_id]', input.tenant_id || ''],\n  ['metadata[billing_email]', input.billing_email || input.email || ''],\n  ['metadata[business_name]', input.business_name || ''],\n];\n\nif (input.setup_price_id) {\n  formBodyArr.push(['line_items[1][price]', input.setup_price_id]);\n  formBodyArr.push(['line_items[1][quantity]', '1']);\n}\n\nconst formBody = formBodyArr\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))\n  .join('&');\n\nlet data;\ntry {\n  data = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.stripe.com/v1/checkout/sessions',\n    headers: {\n      Authorization: 'Bearer ' + secretKey,\n      'Content-Type': 'application/x-www-form-urlencoded',\n    },\n    body: formBody,\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      http_status: 502,\n      error: 'Stripe checkout creation failed',\n      stripe_error: String(error?.message || error).slice(0, 1000),\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    url: data.url,\n    stripe_checkout_session_id: data.id,\n    stripe_raw: data,\n    http_status: 200,\n  }\n}];"
       }
     },
     {
@@ -81,7 +81,7 @@
       ],
       "parameters": {
         "options": {
-          "responseCode": "200"
+          "responseCode": "={{ parseInt($json.http_status || 200, 10) }}"
         },
         "responseBody": "={{ JSON.stringify({ url: $json.url }, null, 2) }}"
       }
@@ -96,7 +96,7 @@
       ],
       "parameters": {
         "options": {
-          "responseCode": "={{ $json.http_status || 200 }}"
+          "responseCode": "={{ parseInt($json.http_status || 200, 10) }}"
         },
         "responseBody": "={{ JSON.stringify({ error: $json.error || \"Unauthorized\", details: $json.details || $json.missing_fields || [] }, null, 2) }}"
       }
@@ -125,7 +125,7 @@
         420
       ],
       "parameters": {
-        "jsCode": "const body = $json.body || {};\nconst normalize = (v) => String(v || '').trim();\nconst tenant_id = normalize(body.tenant_id || body.tenantId);\nconst api_token = normalize(body.api_token || body.apiToken);\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nreturn [{ json: { tenant_id, api_token, is_valid_request: missing.length === 0, missing_fields: missing, http_status: missing.length ? 400 : 200 } }];"
+        "jsCode": "const source = $json.body || $json || {};\nconst normalize = (v) => String(v || '').trim();\n\nconst tenant_id = normalize(source.tenant_id || source.tenantId);\nconst api_token = normalize(source.api_token || source.apiToken);\n\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\n\nreturn [{\n  json: {\n    tenant_id,\n    api_token,\n    is_valid_request: missing.length === 0,\n    missing_fields: missing,\n    http_status: missing.length ? 400 : 200,\n  }\n}];"
       }
     },
     {
@@ -137,7 +137,7 @@
         420
       ],
       "parameters": {
-        "jsCode": "const input = $json;\nif (!input.is_valid_request) {\n  return [{ json: { ...input, authorized: false, http_status: 400, error: 'Missing required fields', details: input.missing_fields } }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{ json: { ...input, authorized: false, http_status: 500, error: 'Missing Supabase env for billing auth' } }];\n}\n\nconst qs = new URLSearchParams({\n  select: 'tenant_id,api_token,mail,billing_email,stripe_customer_id',\n  tenant_id: 'eq.' + input.tenant_id,\n  api_token: 'eq.' + input.api_token,\n  limit: '1',\n});\n\nconst response = await fetch(`${supabaseUrl}/rest/v1/tenants?${qs.toString()}`, {\n  headers: {\n    apikey: serviceKey,\n    Authorization: `Bearer ${serviceKey}`,\n  },\n});\n\nif (!response.ok) {\n  const text = await response.text();\n  return [{ json: { ...input, authorized: false, http_status: 502, error: 'Tenant auth lookup failed', provider_error: text.slice(0, 500) } }];\n}\n\nconst rows = await response.json();\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{ json: { ...input, authorized: false, http_status: 401, error: 'Unauthorized tenant or api_token' } }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  },\n}];"
+        "jsCode": "const input = $json;\n\nif (!input.is_valid_request) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 400,\n      error: 'Missing required fields',\n      details: input.missing_fields,\n    }\n  }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 500,\n      error: 'Missing Supabase env for billing auth',\n    }\n  }];\n}\n\nconst qs = [\n  ['select', 'tenant_id,api_token,mail,billing_email,stripe_customer_id'],\n  ['tenant_id', 'eq.' + input.tenant_id],\n  ['api_token', 'eq.' + input.api_token],\n  ['limit', '1'],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))\n  .join('&');\n\nlet rows;\ntry {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: supabaseUrl + '/rest/v1/tenants?' + qs,\n    headers: {\n      apikey: serviceKey,\n      Authorization: 'Bearer ' + serviceKey,\n    },\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 502,\n      error: 'Tenant auth lookup failed',\n      provider_error: String(error?.message || error).slice(0, 500),\n    }\n  }];\n}\n\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 401,\n      error: 'Unauthorized tenant or api_token',\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  }\n}];"
       }
     },
     {
@@ -168,7 +168,7 @@
         340
       ],
       "parameters": {
-        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\nif (!secretKey) {\n  return [{ json: { ...input, http_status: 500, error: 'Missing STRIPE_SECRET_KEY' } }];\n}\nif (!input.stripe_customer_id) {\n  return [{ json: { ...input, http_status: 400, error: 'Missing stripe_customer_id for portal session' } }];\n}\n\nconst params = new URLSearchParams();\nparams.set('customer', input.stripe_customer_id);\nparams.set('return_url', String($env.STRIPE_PORTAL_RETURN_URL || $env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org/abbonamento'));\n\nconst response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {\n  method: 'POST',\n  headers: {\n    Authorization: 'Bearer ' + secretKey,\n    'Content-Type': 'application/x-www-form-urlencoded',\n  },\n  body: params.toString(),\n});\n\nconst data = await response.json();\nif (!response.ok) {\n  return [{ json: { ...input, http_status: response.status || 502, error: 'Stripe portal creation failed', stripe_error: data } }];\n}\n\nreturn [{ json: { ...input, url: data.url, stripe_portal_session_id: data.id, stripe_raw: data, http_status: 200 } }];"
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\n\nif (!secretKey) {\n  return [{\n    json: {\n      ...input,\n      http_status: 500,\n      error: 'Missing STRIPE_SECRET_KEY'\n    }\n  }];\n}\n\nif (!input.stripe_customer_id) {\n  return [{\n    json: {\n      ...input,\n      http_status: 400,\n      error: 'Missing stripe_customer_id for portal session'\n    }\n  }];\n}\n\nconst formBody = [\n  ['customer', input.stripe_customer_id],\n  ['return_url', String($env.STRIPE_PORTAL_RETURN_URL || $env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?tab=abbonamento')],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))\n  .join('&');\n\nlet data;\ntry {\n  data = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.stripe.com/v1/billing_portal/sessions',\n    headers: {\n      Authorization: 'Bearer ' + secretKey,\n      'Content-Type': 'application/x-www-form-urlencoded',\n    },\n    body: formBody,\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      http_status: 502,\n      error: 'Stripe portal creation failed',\n      stripe_error: String(error?.message || error).slice(0, 1000),\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    url: data.url,\n    stripe_portal_session_id: data.id,\n    stripe_raw: data,\n    http_status: 200,\n  }\n}];"
       }
     },
     {
@@ -181,7 +181,7 @@
       ],
       "parameters": {
         "options": {
-          "responseCode": "200"
+          "responseCode": "={{ parseInt($json.http_status || 200, 10) }}"
         },
         "responseBody": "={{ JSON.stringify({ url: $json.url }, null, 2) }}"
       }
@@ -196,7 +196,7 @@
       ],
       "parameters": {
         "options": {
-          "responseCode": "={{ $json.http_status || 200 }}"
+          "responseCode": "={{ parseInt($json.http_status || 200, 10) }}"
         },
         "responseBody": "={{ JSON.stringify({ error: $json.error || \"Unauthorized or missing Stripe customer\", details: $json.details || $json.missing_fields || [] }, null, 2) }}"
       }
@@ -227,7 +227,7 @@
         760
       ],
       "parameters": {
-        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\nconst planCode = priceId && priceId === String($env.STRIPE_PRICE_PREMIUM_ID || '') ? 'premium'\n  : priceId && priceId === String($env.STRIPE_PRICE_BASE_ID || '') ? 'base'\n  : '';\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
+        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\n\nlet planCode = '';\nlet billingCycle = 'monthly';\n\nconst priceBaseMonthly = String($env.STRIPE_PRICE_BASE_ID || $env.STRIPE_PRICE_BASE_MONTHLY_ID || '');\nconst pricePremiumMonthly = String($env.STRIPE_PRICE_PREMIUM_ID || $env.STRIPE_PRICE_PREMIUM_MONTHLY_ID || '');\nconst priceBaseYearly = String($env.STRIPE_PRICE_BASE_YEARLY_ID || '');\nconst pricePremiumYearly = String($env.STRIPE_PRICE_PREMIUM_YEARLY_ID || '');\n\nif (priceId) {\n  if (priceId === pricePremiumMonthly) planCode = 'premium';\n  else if (priceId === priceBaseMonthly) planCode = 'base';\n  else if (priceId === pricePremiumYearly) { planCode = 'premium'; billingCycle = 'yearly'; }\n  else if (priceId === priceBaseYearly) { planCode = 'base'; billingCycle = 'yearly'; }\n}\n\nconst currentPeriodEnd = object.current_period_end ? new Date(object.current_period_end * 1000).toISOString() : null;\nconst isSetupFeePaid = event.type === 'checkout.session.completed' ? true : undefined;\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    billing_cycle: billingCycle,\n    current_period_end: currentPeriodEnd,\n    setup_fee_paid: isSetupFeePaid,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
       }
     },
     {
@@ -266,6 +266,10 @@
             {
               "value2": "invoice.payment_failed",
               "output": 1
+            },
+            {
+              "value2": "customer.subscription.trial_will_end",
+              "output": 2
             }
           ]
         }
@@ -312,6 +316,18 @@
             {
               "fieldId": "billing_last_event_id",
               "fieldValue": "={{ $json.event_id }}"
+            },
+            {
+              "fieldId": "billing_cycle",
+              "fieldValue": "={{ $json.billing_cycle || null }}"
+            },
+            {
+              "fieldId": "current_period_end",
+              "fieldValue": "={{ $json.current_period_end || null }}"
+            },
+            {
+              "fieldId": "setup_fee_paid",
+              "fieldValue": "={{ $json.setup_fee_paid === true ? true : false }}"
             }
           ]
         }
@@ -372,6 +388,14 @@
             {
               "fieldId": "billing_last_event_id",
               "fieldValue": "={{ $json.event_id }}"
+            },
+            {
+              "fieldId": "billing_cycle",
+              "fieldValue": "={{ $json.billing_cycle || null }}"
+            },
+            {
+              "fieldId": "current_period_end",
+              "fieldValue": "={{ $json.current_period_end || null }}"
             }
           ]
         }
