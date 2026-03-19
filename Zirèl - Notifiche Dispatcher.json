@@ -19,7 +19,7 @@
         -2928,
         688
       ],
-      "id": "dd63ed00-96ee-4ebe-a825-bd67dfff5367"
+      "id": "2c1b5df7-fed2-4f8d-b104-15127cb29199"
     },
     {
       "parameters": {
@@ -42,7 +42,7 @@
         -2672,
         688
       ],
-      "id": "2d8a874f-a86f-4bd0-9ea5-d68c06bba502",
+      "id": "8734a806-ca0d-4aa6-8078-a1ed0f0824fd",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -61,11 +61,10 @@
         -2400,
         688
       ],
-      "id": "9f3d9302-a66b-4961-a40d-fbf576b0af1b"
+      "id": "e205ab17-92b9-444a-aed3-e109f935ca7c"
     },
     {
       "parameters": {
-        "jsCode": "const payload = typeof $json.payload === 'string' ? JSON.parse($json.payload) : ($json.payload || {});\nconst template = String($json.template_key || '').trim();\nconst channel = String($json.channel || '').trim();\nconst activity = payload.nome_struttura || payload.nome_attivita || 'Zirèl';\nconst recipientEmail = String($json.recipient_email || payload.internal_email || payload.email || '').trim().toLowerCase();\nconst statusLabel = ({\n  confirmed: 'Confermata',\n  manual_review: 'Verifica manuale',\n  rejected: 'Non disponibile',\n  pending: 'In lavorazione',\n})[String(payload.booking_status || payload.status || payload.availability_status || '').trim()] || 'In lavorazione';\n\nconst renderShell = (title, intro, bodyRows, outro) => {\n  const rows = bodyRows.filter(Boolean).map((row) => `<tr><td style=\"padding:12px 14px;border-bottom:1px solid #e5e7eb;width:38%;font-weight:600;color:#0f172a;\">${row.label}</td><td style=\"padding:12px 14px;border-bottom:1px solid #e5e7eb;color:#334155;\">${row.value}</td></tr>`).join('');\n  return `<div style=\"font-family:Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;color:#0f172a;\">\n    <div style=\"max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;\">\n      <div style=\"padding:24px 28px;background:linear-gradient(135deg,#0f3b52 0%,#ff8c42 100%);color:#ffffff;\">\n        <p style=\"margin:0 0 8px;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.82;\">Zirèl Notification Center</p>\n        <h1 style=\"margin:0;font-size:28px;line-height:1.15;\">${title}</h1>\n      </div>\n      <div style=\"padding:28px;\">\n        <p style=\"margin:0 0 18px;font-size:16px;line-height:1.6;color:#334155;\">${intro}</p>\n        <table style=\"width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff;\">${rows}</table>\n        <p style=\"margin:18px 0 0;font-size:15px;line-height:1.7;color:#334155;\">${outro}</p>\n      </div>\n    </div>\n  </div>`;\n};\n\nlet subject = 'Aggiornamento Zirèl';\nlet text = '';\nlet html = '';\n\nif (template === 'hotel_guest_confirmation' || channel === 'email_guest_hotel') {\n  subject = `Richiesta soggiorno ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta di soggiorno presso ${activity}.\\n\\nCheck-in: ${payload.checkin_date || 'N/D'}\\nCheck-out: ${payload.checkout_date || 'N/D'}\\nOspiti: ${payload.ospiti_totali || 'N/D'}\\nCamera: ${payload.room_type_requested || 'Da definire'}\\nStato: ${statusLabel}\\n\\nIl nostro team ti contatterà a breve con il prossimo aggiornamento.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta soggiorno ricevuta',\n    `Ciao <strong>${payload.nome || 'Cliente'}</strong>, abbiamo ricevuto correttamente la tua richiesta di soggiorno presso <strong>${activity}</strong>.`,\n    [\n      { label: 'Check-in', value: payload.checkin_date || 'N/D' },\n      { label: 'Check-out', value: payload.checkout_date || 'N/D' },\n      { label: 'Ospiti', value: String(payload.ospiti_totali || 'N/D') },\n      { label: 'Camera richiesta', value: payload.room_type_requested || 'Da definire' },\n      { label: 'Servizi richiesti', value: payload.servizi_richiesti || 'Nessuno' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Il nostro team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'\n  );\n} else if (template === 'restaurant_guest_confirmation' || channel === 'email_guest_restaurant') {\n  subject = `Richiesta tavolo ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome_cliente || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta di prenotazione presso ${activity}.\\n\\nData: ${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra: ${payload.ora || 'N/D'}\\nPersone: ${payload.persone || 'N/D'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\n\\nTi aggiorneremo al più presto.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta tavolo ricevuta',\n    `Ciao <strong>${payload.nome_cliente || 'Cliente'}</strong>, abbiamo preso in carico la tua richiesta di prenotazione presso <strong>${activity}</strong>.`,\n    [\n      { label: 'Data', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },\n      { label: 'Ora', value: payload.ora || 'N/D' },\n      { label: 'Persone', value: String(payload.persone || 'N/D') },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Lo staff verificherà la disponibilità del tavolo e ti confermerà al più presto.'\n  );\n} else if (template === 'appointment_guest_confirmation' || channel === 'email_guest_appointment') {\n  subject = `Richiesta ricevuta • ${activity}`;\n  text = `Ciao ${payload.nome || 'Cliente'},\\n\\nabbiamo ricevuto la tua richiesta con ${activity}.\\n\\nData: ${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra: ${payload.orario || 'N/D'}\\nMotivo: ${payload.motivo || 'N/D'}\\nStato: ${statusLabel}\\n\\nTi contatteremo a breve con conferma e dettagli.\\n\\nA presto,\\n${activity}`;\n  html = renderShell(\n    'Richiesta ricevuta',\n    `Ciao <strong>${payload.nome || 'Cliente'}</strong>, abbiamo preso in carico la tua richiesta con <strong>${activity}</strong>.`,\n    [\n      { label: 'Data', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },\n      { label: 'Ora', value: payload.orario || 'N/D' },\n      { label: 'Motivo', value: payload.motivo || 'N/D' },\n      { label: 'Stato richiesta', value: statusLabel },\n    ],\n    'Il team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'\n  );\n} else if (template === 'hotel_internal_alert' || channel === 'email_internal_hotel') {\n  subject = `Nuova richiesta soggiorno interna • ${activity}`;\n  text = `Nuova richiesta soggiorno\\n\\nStruttura: ${activity}\\nCliente: ${payload.nome || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nEmail: ${payload.email || 'N/D'}\\nCheck-in: ${payload.checkin_date || 'N/D'}\\nCheck-out: ${payload.checkout_date || 'N/D'}\\nCamera: ${payload.room_type_requested || 'Da definire'}\\nServizi: ${payload.servizi_richiesti || 'Nessuno'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta soggiorno',\n    `È stata ricevuta una nuova richiesta per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Email', value: payload.email || 'N/D' },\n      { label: 'Check-in', value: payload.checkin_date || 'N/D' },\n      { label: 'Check-out', value: payload.checkout_date || 'N/D' },\n      { label: 'Camera', value: payload.room_type_requested || 'Da definire' },\n      { label: 'Servizi', value: payload.servizi_richiesti || 'Nessuno' },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Apri il dashboard o il thread operativo per gestire la richiesta.'\n  );\n} else if (template === 'restaurant_internal_alert' || channel === 'email_internal_restaurant') {\n  subject = `Nuova richiesta tavolo interna • ${activity}`;\n  text = `Nuova richiesta tavolo\\n\\nAttività: ${activity}\\nCliente: ${payload.nome_cliente || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nData: ${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra: ${payload.ora || 'N/D'}\\nPersone: ${payload.persone || 'N/D'}\\nNote: ${payload.note_prenotazione || 'Nessuna'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta tavolo',\n    `È arrivata una nuova richiesta tavolo per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome_cliente || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Data', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },\n      { label: 'Ora', value: payload.ora || 'N/D' },\n      { label: 'Persone', value: String(payload.persone || 'N/D') },\n      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Verifica la disponibilità e conferma la gestione appena possibile.'\n  );\n} else {\n  subject = `Nuova richiesta interna • ${activity}`;\n  text = `Nuova richiesta appuntamento\\n\\nAttività: ${activity}\\nCliente: ${payload.nome || 'N/D'}\\nTelefono: ${payload.telefono || 'N/D'}\\nEmail: ${payload.email || 'N/D'}\\nData: ${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra: ${payload.orario || 'N/D'}\\nMotivo: ${payload.motivo || 'N/D'}\\nStato: ${statusLabel}\\nTrace: ${payload.trace_id || 'N/D'}`;\n  html = renderShell(\n    'Nuova richiesta appuntamento',\n    `È stata ricevuta una nuova richiesta da gestire per <strong>${activity}</strong>.`,\n    [\n      { label: 'Cliente', value: payload.nome || 'N/D' },\n      { label: 'Telefono', value: payload.telefono || 'N/D' },\n      { label: 'Email', value: payload.email || 'N/D' },\n      { label: 'Data', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },\n      { label: 'Ora', value: payload.orario || 'N/D' },\n      { label: 'Motivo', value: payload.motivo || 'N/D' },\n      { label: 'Stato', value: statusLabel },\n      { label: 'Trace', value: payload.trace_id || 'N/D' },\n    ],\n    'Apri il dashboard o il thread operativo per gestire la richiesta.'\n  );\n}\n\nreturn [{\n  json: {\n    ...$json,\n    rendered_email: {\n      from: 'Zirèl <noreply@zirel.org>',\n      to: recipientEmail ? [recipientEmail] : [],\n      subject,\n      text,\n      html,\n    },\n  },\n}];"
       },
       "name": "Render Email Payload",
       "type": "n8n-nodes-base.code",
@@ -74,7 +73,7 @@
         -2144,
         496
       ],
-      "id": "1a2ae90c-1003-4ccc-a6b4-ec5f329218f0"
+      "id": "69c65b76-31ae-4ca2-ad22-e034ac212726"
     },
     {
       "parameters": {
@@ -87,7 +86,7 @@
         -2144,
         880
       ],
-      "id": "dc19ea71-bed2-46d1-bc1a-4713c056c9db"
+      "id": "4f201d8e-3ed2-41bb-b35e-3bda1eac3c3e"
     },
     {
       "parameters": {
@@ -100,7 +99,7 @@
           },
           "conditions": [
             {
-              "id": "1986a968-b451-4636-8405-45a4bf2bd3d4",
+              "id": "4cc4a869-12f5-494c-a789-57baf2d45f86",
               "leftValue": "={{ String($json.channel || \"\").startsWith(\"email_\") }}",
               "rightValue": true,
               "operator": {
@@ -121,7 +120,7 @@
         -1872,
         496
       ],
-      "id": "605a948f-5505-49c6-9162-8b356d7c0e86"
+      "id": "8a9a55a2-689d-41fc-a5e7-16774b8f42bb"
     },
     {
       "parameters": {
@@ -152,7 +151,7 @@
         -1616,
         496
       ],
-      "id": "ebf78ff9-19ca-476e-b760-8ad48f98117a",
+      "id": "416fdb2c-c869-4d44-9c2b-ae22bcd04469",
       "credentials": {
         "httpHeaderAuth": {
           "id": "o5v5J8779y7QCWIE",
@@ -172,7 +171,7 @@
           },
           "conditions": [
             {
-              "id": "7c8fa8b1-cd34-4e8e-a893-caf5d20fa5cb",
+              "id": "7e634fe3-cb42-412c-ad48-512be60653a5",
               "leftValue": "={{ !!String($json.id || \"\").trim() }}",
               "rightValue": true,
               "operator": {
@@ -193,11 +192,11 @@
         -1360,
         496
       ],
-      "id": "67bb3fcf-2993-4b3d-a906-02c05ce81d29"
+      "id": "260e66bd-2a69-4c2d-b0ec-86ce450ceccf"
     },
     {
       "parameters": {
-        "jsCode": "const src = $('If Email Channel?').item.json;\nreturn [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];"
+        "jsCode": "const sources = $('If Email Channel?').all();\nreturn items.map((item, index) => {\n  const src = sources[index]?.json || {};\n  return { json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } };\n});"
       },
       "name": "Prepare Email Sent Update",
       "type": "n8n-nodes-base.code",
@@ -206,11 +205,11 @@
         -1104,
         384
       ],
-      "id": "eb01119c-1891-4d82-8e17-64b80620bd01"
+      "id": "02cce769-bd6e-4207-96ee-27085b693606"
     },
     {
       "parameters": {
-        "jsCode": "const src = $('If Email Channel?').item.json;\nconst retry = Number(src.retry_count || 0) + 1;\nconst max = Number(src.max_retries || 5);\nconst failed = retry >= max;\nconst backoffMin = Math.min(60, Math.pow(2, retry));\nreturn [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'EMAIL_SEND_FAILED' } }];"
+        "jsCode": "const sources = $('If Email Channel?').all();\nreturn items.map((item, index) => {\n  const src = sources[index]?.json || {};\n  const retry = Number(src.retry_count || 0) + 1;\n  const max = Number(src.max_retries || 5);\n  const failed = retry >= max;\n  const backoffMin = Math.min(60, Math.pow(2, retry));\n  return { json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'EMAIL_SEND_FAILED' } };\n});"
       },
       "name": "Prepare Email Retry Update",
       "type": "n8n-nodes-base.code",
@@ -219,7 +218,7 @@
         -1104,
         608
       ],
-      "id": "935c2628-a81f-48fb-b857-e3ae41aa9fe7"
+      "id": "7a1f51a9-a297-46a3-a849-6d0b260ff7e6"
     },
     {
       "parameters": {
@@ -258,7 +257,7 @@
         -832,
         384
       ],
-      "id": "51eb4536-60ec-4c1e-964a-7b1baf3927b1",
+      "id": "12cd6524-cbb1-4c38-8bce-35bb499a8f17",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -307,7 +306,7 @@
         -832,
         608
       ],
-      "id": "c8b6c266-4581-4b05-b0c7-e5e6277337c0",
+      "id": "299d92a6-db3c-4aab-a212-e0c06aca15ef",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -326,7 +325,7 @@
           },
           "conditions": [
             {
-              "id": "39910752-bbb3-4145-a854-d9bdc66055a4",
+              "id": "54d191f7-7c7f-4291-afa6-456d6847e662",
               "leftValue": "={{ String($json.channel || \"\").startsWith(\"telegram_\") }}",
               "rightValue": true,
               "operator": {
@@ -347,7 +346,7 @@
         -1872,
         880
       ],
-      "id": "08f749ec-45e3-4418-979a-becb76ca89f5"
+      "id": "51f7ac8a-d9d8-4a52-87ec-19dfb082bb03"
     },
     {
       "parameters": {
@@ -383,7 +382,7 @@
         -1616,
         880
       ],
-      "id": "c16f1196-507c-4dc5-bf39-fd498c94a51a",
+      "id": "17a637a1-ff71-48b2-a252-9ee0b7314934",
       "credentials": {
         "telegramApi": {
           "id": "MHrNkPgbqU0Q6vyM",
@@ -404,7 +403,7 @@
           },
           "conditions": [
             {
-              "id": "fae188dd-42b8-4740-9c30-430d309ca5eb",
+              "id": "7b9f94fb-881d-4475-8448-7f881b7a9f28",
               "leftValue": "={{ !!String($json.message_id || $json.result?.message_id || \"\").trim() }}",
               "rightValue": true,
               "operator": {
@@ -425,11 +424,11 @@
         -1360,
         880
       ],
-      "id": "211dd61d-fe3a-44b7-a8f0-11142b455489"
+      "id": "8c8f1a8d-0fba-4e5e-873b-65cc7a75727a"
     },
     {
       "parameters": {
-        "jsCode": "const src = $('If Telegram Channel?').item.json;\nreturn [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];"
+        "jsCode": "const sources = $('If Telegram Channel?').all();\nreturn items.map((item, index) => {\n  const src = sources[index]?.json || {};\n  return { json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } };\n});"
       },
       "name": "Prepare Telegram Sent Update",
       "type": "n8n-nodes-base.code",
@@ -438,11 +437,11 @@
         -1104,
         768
       ],
-      "id": "bb8edd5c-ea9a-475a-9058-763607d832a5"
+      "id": "5cde71fb-0969-4cf9-a965-6489fac6fe28"
     },
     {
       "parameters": {
-        "jsCode": "const src = $('If Telegram Channel?').item.json;\nconst retry = Number(src.retry_count || 0) + 1;\nconst max = Number(src.max_retries || 5);\nconst failed = retry >= max;\nconst backoffMin = Math.min(60, Math.pow(2, retry));\nreturn [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'TELEGRAM_SEND_FAILED' } }];"
+        "jsCode": "const sources = $('If Telegram Channel?').all();\nreturn items.map((item, index) => {\n  const src = sources[index]?.json || {};\n  const retry = Number(src.retry_count || 0) + 1;\n  const max = Number(src.max_retries || 5);\n  const failed = retry >= max;\n  const backoffMin = Math.min(60, Math.pow(2, retry));\n  return { json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'TELEGRAM_SEND_FAILED' } };\n});"
       },
       "name": "Prepare Telegram Retry Update",
       "type": "n8n-nodes-base.code",
@@ -451,7 +450,7 @@
         -1104,
         992
       ],
-      "id": "147423d9-9091-4f79-a011-444e3eca8985"
+      "id": "8dea451a-add2-4325-b055-9a7034aa86e5"
     },
     {
       "parameters": {
@@ -490,7 +489,7 @@
         -832,
         768
       ],
-      "id": "c740f7cb-bdd8-47ce-99ab-7c2f6a25fdb2",
+      "id": "e65f8ab8-6ce4-4eae-b9e7-b3d901372a8e",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -539,7 +538,7 @@
         -832,
         992
       ],
-      "id": "2a1df08c-ab52-4d0e-9053-ea6af8909cde",
+      "id": "1c420687-035b-41d0-80d0-fa731f352394",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -740,7 +739,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c48c4dd6-cf87-4a53-817c-2c4375794db7",
+  "versionId": "3f649cbf-42cc-4b6e-bf6f-6dc3af52865c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

@@ -15,7 +15,7 @@
         -1184,
         -224
       ],
-      "id": "86c3037c-efdf-4e82-8dbb-d92091f39994",
+      "id": "42607bc1-6a96-4d95-bfc9-dd410cf3f6d0",
       "credentials": {
         "telegramApi": {
           "id": "MHrNkPgbqU0Q6vyM",
@@ -35,7 +35,7 @@
         -928,
         -224
       ],
-      "id": "e72d6bb9-349d-4abd-9117-ae3015542700"
+      "id": "77c848ec-4813-4fd0-bb2c-e5e69d9c44c6"
     },
     {
       "parameters": {
@@ -48,7 +48,7 @@
           },
           "conditions": [
             {
-              "id": "83ef3d35-e4fa-46a0-959e-3c2b0b22c34f",
+              "id": "6591612c-e83f-4a0f-a2ad-b09eab20fbfe",
               "leftValue": "={{ $json.is_supported }}",
               "rightValue": true,
               "operator": {
@@ -69,7 +69,7 @@
         -688,
         -224
       ],
-      "id": "7cf77108-369f-4099-bbb6-d2c86d983e2c"
+      "id": "8f9d8266-c82f-42cb-8944-e40b1c9ef3fc"
     },
     {
       "parameters": {
@@ -82,7 +82,7 @@
           },
           "conditions": [
             {
-              "id": "ea0b85df-5ed8-4d20-9522-8a7d22e82502",
+              "id": "2fa085f2-5d74-4d5d-a1c9-3ca5bc0533e2",
               "leftValue": "={{ $json.related_entity_type === \"restaurant_booking\" }}",
               "rightValue": true,
               "operator": {
@@ -103,7 +103,7 @@
         -448,
         -416
       ],
-      "id": "4d5fdf6b-dee8-438b-9985-bdbe98f1ee37"
+      "id": "01a9cd42-8696-4118-9955-be8bd6aa0f3f"
     },
     {
       "parameters": {
@@ -134,7 +134,7 @@
         -192,
         -480
       ],
-      "id": "c136fb09-9568-4dc3-9d4d-09b6ae486554",
+      "id": "39ce9731-ec65-4bd3-a815-6a2ac280172b",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -153,7 +153,7 @@
           },
           "conditions": [
             {
-              "id": "63d1b413-93c4-4b09-8c17-164b6eff63f1",
+              "id": "25529a78-81fe-4c03-a877-ec179d20cb16",
               "leftValue": "={{ $json.related_entity_type === \"hotel_booking\" }}",
               "rightValue": true,
               "operator": {
@@ -174,7 +174,7 @@
         -448,
         -224
       ],
-      "id": "e6403eec-50e8-47d1-969b-a91c2553b833"
+      "id": "f180dd31-f99e-45e8-84b9-bfdb174fee34"
     },
     {
       "parameters": {
@@ -205,7 +205,7 @@
         -192,
         -288
       ],
-      "id": "1e2a9a23-ca6c-404f-b87c-1e073c27952b",
+      "id": "3a1055e1-c782-4764-8c8d-c002cfbaed29",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -224,7 +224,7 @@
           },
           "conditions": [
             {
-              "id": "e6532496-9348-48c3-b7e6-f21354391fd0",
+              "id": "53bc0f66-e529-47d8-9296-0a1a9c72256f",
               "leftValue": "={{ $json.related_entity_type === \"appointment\" }}",
               "rightValue": true,
               "operator": {
@@ -245,7 +245,7 @@
         -448,
         -32
       ],
-      "id": "011403c4-b811-4678-8cdc-fdacdffca0cb"
+      "id": "fa38c8cf-9813-4dbe-b17b-0d66c6568c33"
     },
     {
       "parameters": {
@@ -276,7 +276,7 @@
         -192,
         -96
       ],
-      "id": "cec6844b-62a1-41e0-8b1b-6ccc1a3aa03d",
+      "id": "dbcbfbb0-e606-45cc-9b41-0544154ec3ae",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -295,7 +295,7 @@
         64,
         -288
       ],
-      "id": "7355c8a8-e536-4a26-8a48-444959639cb0"
+      "id": "0dc120dd-8330-48d5-b3f3-84d580e5e887"
     },
     {
       "parameters": {
@@ -308,7 +308,7 @@
         64,
         32
       ],
-      "id": "8f4550cc-2ead-4b7f-bb81-49fee6cc0fd7"
+      "id": "061f01ce-bc9c-420c-b1d2-3d8cfb77e339"
     },
     {
       "parameters": {
@@ -325,7 +325,7 @@
         320,
         -160
       ],
-      "id": "2cb08cea-471d-4289-b236-5979905c5d71",
+      "id": "81cb830c-e155-45bf-b258-df3b9ca98390",
       "credentials": {
         "telegramApi": {
           "id": "MHrNkPgbqU0Q6vyM",
@@ -356,7 +356,7 @@
         576,
         -160
       ],
-      "id": "633e5572-423e-40e0-9e1c-b1a48c923cbf",
+      "id": "2b4c058f-00d7-4a7f-ae6d-3b9a245f9e1b",
       "credentials": {
         "telegramApi": {
           "id": "MHrNkPgbqU0Q6vyM",
@@ -534,7 +534,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "a2df3bc3-a366-4400-9824-af59a928a648",
+  "versionId": "c585e661-c719-400d-9d35-b6d515da7165",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

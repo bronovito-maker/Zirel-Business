@@ -69,6 +69,8 @@ Canali iniziali implementati:
 - `email_guest_hotel`
 - `email_guest_restaurant`
 - `email_guest_appointment`
+- `email_billing_customer`
+- `email_billing_internal`
 - `telegram_internal_hotel`
 - `telegram_internal_restaurant`
 - `telegram_internal_appointment`

@@ -119,13 +119,31 @@ const dispatcherRenderEmail = `const payload = typeof $json.payload === 'string'
 const template = String($json.template_key || '').trim();
 const channel = String($json.channel || '').trim();
 const activity = payload.nome_struttura || payload.nome_attivita || 'Zirèl';
-const recipientEmail = String($json.recipient_email || payload.internal_email || payload.email || '').trim().toLowerCase();
+const businessName = payload.business_name || payload.hotel_name || payload.nome_attivita || payload.nome_struttura || payload.nome_ristorante || payload.tenant_id || activity;
+const recipientEmail = String($json.recipient_email || payload.internal_email || payload.billing_email || payload.email || '').trim().toLowerCase();
 const statusLabel = ({
   confirmed: 'Confermata',
   manual_review: 'Verifica manuale',
   rejected: 'Non disponibile',
   pending: 'In lavorazione',
 })[String(payload.booking_status || payload.status || payload.availability_status || '').trim()] || 'In lavorazione';
+const planCode = String(payload.billing_plan_code || '').trim().toLowerCase();
+const cycleCode = String(payload.billing_cycle || '').trim().toLowerCase();
+const planLabel = planCode === 'premium' ? 'Zirèl Core Premium' : planCode === 'base' ? 'Zirèl Core Base' : 'Piano Zirèl';
+const cycleLabel = cycleCode === 'yearly' ? 'Annuale' : cycleCode === 'monthly' ? 'Mensile' : 'Non definito';
+const dashboardUrl = String(payload.dashboard_url || 'https://dashboard.zirel.org?tab=abbonamento').trim();
+const portalUrl = String(payload.portal_url || 'https://dashboard.zirel.org?tab=abbonamento').trim();
+const formatDate = (value) => {
+  if (!value) return 'N/D';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString('it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Rome',
+  });
+};
 
 const renderShell = (title, intro, bodyRows, outro) => {
   const rows = bodyRows.filter(Boolean).map((row) => \`<tr><td style="padding:12px 14px;border-bottom:1px solid #e5e7eb;width:38%;font-weight:600;color:#0f172a;">\${row.label}</td><td style="padding:12px 14px;border-bottom:1px solid #e5e7eb;color:#334155;">\${row.value}</td></tr>\`).join('');
@@ -192,6 +210,99 @@ if (template === 'hotel_guest_confirmation' || channel === 'email_guest_hotel') 
       { label: 'Stato richiesta', value: statusLabel },
     ],
     'Il team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'
+  );
+} else if (template === 'billing_trial_ending') {
+  subject = \`Il periodo di prova di \${businessName} termina tra 3 giorni\`;
+  text = \`Ciao,\\n\\nil periodo di prova di \${businessName} terminerà il \${formatDate(payload.trial_ends_at)}.\\n\\nPer continuare a usare Zirèl senza interruzioni, scegli il tuo piano dal dashboard.\\n\\nDashboard: \${dashboardUrl}\\n\\nA presto,\\nTeam Zirèl\`;
+  html = renderShell(
+    'Il periodo di prova sta per terminare',
+    \`Il periodo di prova di <strong>\${businessName}</strong> terminerà il <strong>\${formatDate(payload.trial_ends_at)}</strong>.\`,
+    [
+      { label: 'Stato attuale', value: 'Periodo di prova' },
+      { label: 'Fine prova', value: formatDate(payload.trial_ends_at) },
+    ],
+    \`Per continuare a usare Zirèl senza interruzioni, accedi al <a href="\${dashboardUrl}" style="color:#ff8c42;font-weight:600;">tab Abbonamento</a> e completa l'attivazione del piano più adatto alla tua attività.\`
+  );
+} else if (template === 'billing_trial_expired') {
+  subject = \`Periodo di prova terminato • \${businessName}\`;
+  text = \`Ciao,\\n\\nil periodo di prova di \${businessName} è terminato il \${formatDate(payload.trial_ends_at)}.\\n\\nPer riattivare il servizio, completa l'attivazione dal dashboard.\\n\\nDashboard: \${dashboardUrl}\\n\\nTeam Zirèl\`;
+  html = renderShell(
+    'Periodo di prova terminato',
+    \`Il periodo di prova di <strong>\${businessName}</strong> è terminato.\`,
+    [
+      { label: 'Fine prova', value: formatDate(payload.trial_ends_at) },
+      { label: 'Stato servizio', value: 'Attivazione richiesta' },
+    ],
+    \`Per riprendere a usare Zirèl, accedi al <a href="\${dashboardUrl}" style="color:#ff8c42;font-weight:600;">dashboard</a> e attiva il tuo piano.\`
+  );
+} else if (template === 'billing_payment_failed') {
+  subject = \`Pagamento non riuscito • \${businessName}\`;
+  text = \`Ciao,\\n\\nnon siamo riusciti a completare il rinnovo del tuo piano \${planLabel} per \${businessName}.\\n\\nPer evitare interruzioni del servizio, aggiorna il metodo di pagamento dal portale di fatturazione.\\n\\nPortale di fatturazione: \${portalUrl}\\n\\nTeam Zirèl\`;
+  html = renderShell(
+    'Pagamento non riuscito',
+    \`Non siamo riusciti a completare il rinnovo del piano <strong>\${planLabel}</strong> per <strong>\${businessName}</strong>.\`,
+    [
+      { label: 'Piano', value: planLabel },
+      { label: 'Ciclo', value: cycleLabel },
+      { label: 'Data di rinnovo', value: formatDate(payload.current_period_end) },
+    ],
+    \`Aggiorna il metodo di pagamento dal <a href="\${portalUrl}" style="color:#ff8c42;font-weight:600;">portale di fatturazione</a> per evitare sospensioni del servizio.\`
+  );
+} else if (template === 'billing_payment_succeeded') {
+  subject = \`Pagamento confermato • \${businessName}\`;
+  text = \`Ciao,\\n\\nil pagamento del piano \${planLabel} per \${businessName} è stato confermato con successo.\\n\\nIl tuo servizio resta attivo senza interruzioni.\\n\\nProssimo rinnovo: \${formatDate(payload.current_period_end)}\\n\\nGrazie,\\nTeam Zirèl\`;
+  html = renderShell(
+    'Pagamento confermato',
+    \`Il pagamento del piano <strong>\${planLabel}</strong> è stato confermato con successo.\`,
+    [
+      { label: 'Piano', value: planLabel },
+      { label: 'Ciclo', value: cycleLabel },
+      { label: 'Prossimo rinnovo', value: formatDate(payload.current_period_end) },
+    ],
+    'Il tuo servizio resta attivo senza interruzioni. Grazie per aver scelto Zirèl.'
+  );
+} else if (template === 'billing_subscription_canceled') {
+  subject = \`Abbonamento annullato • \${businessName}\`;
+  text = \`Ciao,\\n\\nil tuo abbonamento \${planLabel} per \${businessName} è stato annullato.\\n\\nIl servizio resterà disponibile fino al \${formatDate(payload.current_period_end)}.\\n\\nSe desideri riattivarlo, puoi farlo in qualsiasi momento dal dashboard.\\n\\nDashboard: \${dashboardUrl}\\n\\nTeam Zirèl\`;
+  html = renderShell(
+    'Abbonamento annullato',
+    \`L'abbonamento di <strong>\${businessName}</strong> è stato annullato.\`,
+    [
+      { label: 'Piano', value: planLabel },
+      { label: 'Ciclo', value: cycleLabel },
+      { label: 'Servizio attivo fino al', value: formatDate(payload.current_period_end) },
+    ],
+    \`Puoi riattivare il servizio in qualsiasi momento dal <a href="\${dashboardUrl}" style="color:#ff8c42;font-weight:600;">dashboard Zirèl</a>.\`
+  );
+} else if (template === 'billing_payment_failed_internal') {
+  subject = \`[Billing] Azione richiesta • pagamento non riuscito • \${businessName}\`;
+  text = \`Il rinnovo del piano \${planLabel} per \${businessName} non è andato a buon fine.\\n\\nEmail di fatturazione: \${payload.billing_email || 'N/D'}\\nProssimo controllo: \${formatDate(payload.current_period_end)}\\n\\nSuggerimento: monitorare il grace period o contattare il cliente se necessario.\`;
+  html = renderShell(
+    'Pagamento non riuscito',
+    \`Il rinnovo del piano per <strong>\${businessName}</strong> richiede attenzione.\`,
+    [
+      { label: 'Cliente', value: businessName },
+      { label: 'Piano', value: planLabel },
+      { label: 'Ciclo', value: cycleLabel },
+      { label: 'Email di fatturazione', value: payload.billing_email || 'N/D' },
+      { label: 'Prossimo controllo', value: formatDate(payload.current_period_end) },
+    ],
+    'Puoi monitorare il grace period oppure contattare il cliente se il pagamento non viene aggiornato.'
+  );
+} else if (template === 'billing_subscription_canceled_internal') {
+  subject = \`[Billing] Abbonamento annullato • \${businessName}\`;
+  text = \`L'abbonamento \${planLabel} di \${businessName} è stato annullato.\\n\\nEmail di fatturazione: \${payload.billing_email || 'N/D'}\\nServizio attivo fino al: \${formatDate(payload.current_period_end)}\\n\\nValuta se avviare un follow-up commerciale o lasciare il tenant inattivo.\`;
+  html = renderShell(
+    'Abbonamento annullato',
+    \`L'abbonamento di <strong>\${businessName}</strong> è stato annullato.\`,
+    [
+      { label: 'Cliente', value: businessName },
+      { label: 'Piano', value: planLabel },
+      { label: 'Ciclo', value: cycleLabel },
+      { label: 'Email di fatturazione', value: payload.billing_email || 'N/D' },
+      { label: 'Servizio attivo fino al', value: formatDate(payload.current_period_end) },
+    ],
+    'I dati restano disponibili: valuta se avviare un follow-up commerciale o lasciare il tenant inattivo.'
   );
 } else if (template === 'hotel_internal_alert' || channel === 'email_internal_hotel') {
   subject = \`Nuova richiesta soggiorno interna • \${activity}\`;
@@ -440,14 +551,20 @@ return items.filter((item) => {
         options: { timeout: 15000 },
       }),
       ifNode('If Email Sent?', [-1360, 496], '={{ !!String($json.id || "").trim() }}', 'boolean', 'true', true, true),
-      codeNode('Prepare Email Sent Update', [-1104, 384], `const src = $('If Email Channel?').item.json;
-return [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];`),
-      codeNode('Prepare Email Retry Update', [-1104, 608], `const src = $('If Email Channel?').item.json;
-const retry = Number(src.retry_count || 0) + 1;
-const max = Number(src.max_retries || 5);
-const failed = retry >= max;
-const backoffMin = Math.min(60, Math.pow(2, retry));
-return [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'EMAIL_SEND_FAILED' } }];`),
+      codeNode('Prepare Email Sent Update', [-1104, 384], `const sources = $('If Email Channel?').all();
+return items.map((item, index) => {
+  const src = sources[index]?.json || {};
+  return { json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } };
+});`),
+      codeNode('Prepare Email Retry Update', [-1104, 608], `const sources = $('If Email Channel?').all();
+return items.map((item, index) => {
+  const src = sources[index]?.json || {};
+  const retry = Number(src.retry_count || 0) + 1;
+  const max = Number(src.max_retries || 5);
+  const failed = retry >= max;
+  const backoffMin = Math.min(60, Math.pow(2, retry));
+  return { json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'EMAIL_SEND_FAILED' } };
+});`),
       supabaseNode('Update Outbox Email Sent', [-832, 384], {
         operation: 'update',
         tableId: 'notification_outbox',
@@ -504,14 +621,20 @@ return [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count
         onError: 'continueRegularOutput',
       }),
       ifNode('If Telegram Sent?', [-1360, 880], '={{ !!String($json.message_id || $json.result?.message_id || "").trim() }}', 'boolean', 'true', true, true),
-      codeNode('Prepare Telegram Sent Update', [-1104, 768], `const src = $('If Telegram Channel?').item.json;
-return [{ json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } }];`),
-      codeNode('Prepare Telegram Retry Update', [-1104, 992], `const src = $('If Telegram Channel?').item.json;
-const retry = Number(src.retry_count || 0) + 1;
-const max = Number(src.max_retries || 5);
-const failed = retry >= max;
-const backoffMin = Math.min(60, Math.pow(2, retry));
-return [{ json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'TELEGRAM_SEND_FAILED' } }];`),
+      codeNode('Prepare Telegram Sent Update', [-1104, 768], `const sources = $('If Telegram Channel?').all();
+return items.map((item, index) => {
+  const src = sources[index]?.json || {};
+  return { json: { id: src.id, status: 'sent', sent_at: new Date().toISOString(), last_error: null } };
+});`),
+      codeNode('Prepare Telegram Retry Update', [-1104, 992], `const sources = $('If Telegram Channel?').all();
+return items.map((item, index) => {
+  const src = sources[index]?.json || {};
+  const retry = Number(src.retry_count || 0) + 1;
+  const max = Number(src.max_retries || 5);
+  const failed = retry >= max;
+  const backoffMin = Math.min(60, Math.pow(2, retry));
+  return { json: { id: src.id, status: failed ? 'failed' : 'pending', retry_count: retry, next_retry_at: new Date(Date.now() + backoffMin * 60 * 1000).toISOString(), last_error: 'TELEGRAM_SEND_FAILED' } };
+});`),
       supabaseNode('Update Outbox Telegram Sent', [-832, 768], {
         operation: 'update',
         tableId: 'notification_outbox',

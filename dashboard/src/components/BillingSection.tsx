@@ -19,6 +19,8 @@ interface BillingSectionProps {
 
 type BillingUiStatus = 'trialing' | 'expired_trial' | 'active' | 'past_due' | 'canceled' | 'unpaid';
 
+const BILLING_GRACE_DAYS = 7;
+
 const statusAccessMeta: Record<BillingUiStatus, { label: string; tone: string; description: string }> = {
     trialing: {
         label: 'Accesso completo',
@@ -172,11 +174,17 @@ const resolveEnv = (keys: string[]) => {
 
 const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: BillingSectionProps) => {
     const trialEndsAt = formData.trial_ends_at ? new Date(formData.trial_ends_at) : null;
+    const currentPeriodEnd = formData.current_period_end ? new Date(formData.current_period_end) : null;
     const now = new Date();
     const rawStatus = String(formData.subscription_status || 'trialing').trim().toLowerCase();
     const trialDaysRemaining = trialEndsAt ? Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null;
     const hasActiveStripePlan = Boolean(formData.stripe_subscription_id);
     const isExpiredTrial = rawStatus === 'trialing' && !!trialEndsAt && trialEndsAt.getTime() <= now.getTime() && !hasActiveStripePlan;
+    const graceEndsAt = currentPeriodEnd
+        ? new Date(currentPeriodEnd.getTime() + BILLING_GRACE_DAYS * 24 * 60 * 60 * 1000)
+        : null;
+    const graceDaysRemaining = graceEndsAt ? Math.ceil((graceEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null;
+    const isPastDueGraceExpired = rawStatus === 'past_due' && !!graceEndsAt && graceEndsAt.getTime() < now.getTime();
 
     const currentStatus: BillingUiStatus =
         rawStatus === 'active' ? 'active'
@@ -205,8 +213,21 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                     ? 'Nessun piano attivo'
                     : 'Periodo di prova';
 
-    const hero = statusMeta[currentStatus];
-    const accessState = statusAccessMeta[currentStatus];
+    const hero = currentStatus === 'past_due' && isPastDueGraceExpired
+        ? {
+            ...statusMeta.past_due,
+            title: 'Il grace period e terminato e il servizio e stato sospeso',
+            description: 'Per riattivare Zirèl e tornare operativo devi aggiornare il metodo di pagamento dal portale Stripe.',
+            cta: 'Riattiva il pagamento',
+        }
+        : statusMeta[currentStatus];
+    const accessState = currentStatus === 'past_due' && isPastDueGraceExpired
+        ? {
+            label: 'Servizio sospeso',
+            tone: 'bg-red-50 text-red-700 border-red-100',
+            description: 'Il grace period di 7 giorni e terminato. Le funzioni operative restano sospese finche il metodo di pagamento non viene aggiornato.',
+        }
+        : statusAccessMeta[currentStatus];
     const billingEmail = formData.billing_email || formData.mail || 'Non impostata';
     const businessName = formData.hotel_name || formData.nome_ristorante || formData.tenant_id || 'Zirel';
     const billingCycleLabel = formatCycle(formData.billing_cycle);
@@ -291,6 +312,17 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                             {currentStatus === 'expired_trial' && (
                                 <p className="mt-1 text-sm font-medium text-amber-700">La prova e terminata: per proseguire serve un piano attivo.</p>
                             )}
+                            {currentStatus === 'past_due' && graceEndsAt && !isPastDueGraceExpired && (
+                                <p className="mt-1 text-sm font-medium text-red-700">
+                                    Grace period attivo fino al {formatDate(graceEndsAt.toISOString())}
+                                    {typeof graceDaysRemaining === 'number' && graceDaysRemaining >= 0 ? ` (${graceDaysRemaining} giorni rimanenti)` : ''}.
+                                </p>
+                            )}
+                            {currentStatus === 'past_due' && isPastDueGraceExpired && (
+                                <p className="mt-1 text-sm font-medium text-red-700">
+                                    Il grace period e terminato: per tornare operativo devi aggiornare il pagamento.
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -350,6 +382,16 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                             <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-gray-400">Portale di fatturazione</p>
                             <p className="mt-2 text-gray-700 leading-relaxed">Dal portale Stripe potrai aggiornare la carta, consultare i pagamenti e gestire l’abbonamento in autonomia.</p>
                         </div>
+                        {currentStatus === 'past_due' && (
+                            <div className="rounded-3xl border border-red-100 bg-red-50 px-5 py-4">
+                                <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-red-500">Grace period pagamento</p>
+                                <p className="mt-2 text-gray-700 leading-relaxed">
+                                    {isPastDueGraceExpired
+                                        ? 'Il grace period di 7 giorni e terminato. Per riattivare il servizio devi aggiornare il metodo di pagamento dal portale Stripe.'
+                                        : `Il servizio resta accessibile durante il grace period di 7 giorni. Aggiorna il pagamento entro il ${formatDate(graceEndsAt?.toISOString() || null)} per evitare la sospensione.`}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -462,7 +504,7 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                 <div className="space-y-1">
                     <p className="text-sm text-gray-800 font-bold">Promemoria e gestione rinnovi</p>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                        La dashboard e pronta a riflettere stati di prova, rinnovo, mancato pagamento e riattivazione. Nel prossimo blocco collegheremo i reminder automatici e la disattivazione controllata del servizio lato prodotto.
+                        La dashboard riflette gia stati di prova, grace period, mancato pagamento e riattivazione. Il servizio resta consultabile, mentre le azioni operative seguono lo stato reale dell’abbonamento.
                     </p>
                 </div>
             </section>

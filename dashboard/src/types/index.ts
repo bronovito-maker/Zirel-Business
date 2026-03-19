@@ -106,3 +106,29 @@ export interface AuthResult {
     api_token: string;
     api_token_revealed?: boolean;
 }
+
+export interface AnalyticsTrendPoint {
+    date: string;
+    label: string;
+    total: number;
+    confirmed: number;
+}
+
+export interface AnalyticsSummary {
+    generated_at: string;
+    total_requests: number;
+    confirmed_requests: number;
+    pending_requests: number;
+    rejected_requests: number;
+    conversion_rate: number;
+    restaurant_requests: number;
+    hotel_requests: number;
+    appointment_requests: number;
+    notifications_sent: number;
+    notifications_pending: number;
+    notifications_failed: number;
+    recent_trend: AnalyticsTrendPoint[];
+    tracks_conversations: boolean;
+    tracks_messages: boolean;
+    tracks_abandonment: boolean;
+}

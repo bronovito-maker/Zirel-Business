@@ -227,7 +227,7 @@
         760
       ],
       "parameters": {
-        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\n\nlet planCode = '';\nlet billingCycle = 'monthly';\n\nconst priceBaseMonthly = String($env.STRIPE_PRICE_BASE_ID || $env.STRIPE_PRICE_BASE_MONTHLY_ID || '');\nconst pricePremiumMonthly = String($env.STRIPE_PRICE_PREMIUM_ID || $env.STRIPE_PRICE_PREMIUM_MONTHLY_ID || '');\nconst priceBaseYearly = String($env.STRIPE_PRICE_BASE_YEARLY_ID || '');\nconst pricePremiumYearly = String($env.STRIPE_PRICE_PREMIUM_YEARLY_ID || '');\n\nif (priceId) {\n  if (priceId === pricePremiumMonthly) planCode = 'premium';\n  else if (priceId === priceBaseMonthly) planCode = 'base';\n  else if (priceId === pricePremiumYearly) { planCode = 'premium'; billingCycle = 'yearly'; }\n  else if (priceId === priceBaseYearly) { planCode = 'base'; billingCycle = 'yearly'; }\n}\n\nconst currentPeriodEnd = object.current_period_end ? new Date(object.current_period_end * 1000).toISOString() : null;\nconst isSetupFeePaid = event.type === 'checkout.session.completed' ? true : undefined;\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    billing_cycle: billingCycle,\n    current_period_end: currentPeriodEnd,\n    setup_fee_paid: isSetupFeePaid,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
+        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\nconst businessName = object.metadata?.business_name || object.metadata?.hotel_name || object.metadata?.nome_attivita || tenantId || 'Zirèl';\nconst trialEndsAt = object.trial_end ? new Date(object.trial_end * 1000).toISOString() : null;\n\nlet planCode = '';\nlet billingCycle = 'monthly';\n\nconst priceBaseMonthly = String($env.STRIPE_PRICE_BASE_ID || $env.STRIPE_PRICE_BASE_MONTHLY_ID || '');\nconst pricePremiumMonthly = String($env.STRIPE_PRICE_PREMIUM_ID || $env.STRIPE_PRICE_PREMIUM_MONTHLY_ID || '');\nconst priceBaseYearly = String($env.STRIPE_PRICE_BASE_YEARLY_ID || '');\nconst pricePremiumYearly = String($env.STRIPE_PRICE_PREMIUM_YEARLY_ID || '');\n\nif (priceId) {\n  if (priceId === pricePremiumMonthly) planCode = 'premium';\n  else if (priceId === priceBaseMonthly) planCode = 'base';\n  else if (priceId === pricePremiumYearly) { planCode = 'premium'; billingCycle = 'yearly'; }\n  else if (priceId === priceBaseYearly) { planCode = 'base'; billingCycle = 'yearly'; }\n}\n\nconst currentPeriodEnd = object.current_period_end ? new Date(object.current_period_end * 1000).toISOString() : null;\nconst isSetupFeePaid = event.type === 'checkout.session.completed' ? true : undefined;\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    business_name: businessName,\n    trial_ends_at: trialEndsAt,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    billing_cycle: billingCycle,\n    current_period_end: currentPeriodEnd,\n    setup_fee_paid: isSetupFeePaid,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
       }
     },
     {
@@ -406,6 +406,92 @@
           "name": "Supabase account"
         }
       }
+    },
+    {
+      "name": "Build Billing Reminder Outbox Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        1000
+      ],
+      "parameters": {
+        "jsCode": "const input = $json || {};\nconst tenantId = String(input.tenant_id || '').trim();\nconst eventType = String(input.event_type || '').trim();\nconst billingEmail = String(input.billing_email || '').trim().toLowerCase();\nconst internalEmail = String($env.ZIREL_BILLING_ALERT_EMAIL || '').trim().toLowerCase();\nconst eventId = String(input.event_id || '').trim() || ('manual-' + Date.now());\nconst businessName = input.business_name || input.tenant_id || 'Zirèl';\n\nif (!tenantId || !eventType) {\n  return [];\n}\n\nconst basePayload = {\n  tenant_id: tenantId,\n  business_name: businessName,\n  billing_email: billingEmail || null,\n  billing_plan_code: input.billing_plan_code || null,\n  billing_cycle: input.billing_cycle || null,\n  current_period_end: input.current_period_end || null,\n  trial_ends_at: input.trial_ends_at || null,\n  subscription_status: input.subscription_status || null,\n  event_id: eventId,\n  dashboard_url: 'https://dashboard.zirel.org?tab=abbonamento',\n  portal_url: 'https://dashboard.zirel.org?tab=abbonamento',\n};\n\nconst makeRow = (channel, templateKey, recipient, suffix) => ({\n  json: {\n    tenant_id: tenantId,\n    channel,\n    template_key: templateKey,\n    related_entity_type: 'billing_subscription',\n    related_entity_id: input.subscription_id || tenantId,\n    status: 'pending',\n    retry_count: 0,\n    max_retries: 5,\n    next_retry_at: new Date().toISOString(),\n    trace_id: 'billing-event:' + eventType + ':' + eventId,\n    recipient_email: recipient,\n    dedupe_key: tenantId + ':' + eventType + ':' + suffix + ':' + eventId,\n    payload: basePayload,\n  },\n});\n\nconst rows = [];\n\nif (eventType === 'invoice.payment_failed') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_payment_failed', billingEmail, 'customer'));\n  if (internalEmail) rows.push(makeRow('email_billing_internal', 'billing_payment_failed_internal', internalEmail, 'internal'));\n} else if (eventType === 'invoice.paid') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_payment_succeeded', billingEmail, 'customer'));\n} else if (eventType === 'customer.subscription.deleted') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_subscription_canceled', billingEmail, 'customer'));\n  if (internalEmail) rows.push(makeRow('email_billing_internal', 'billing_subscription_canceled_internal', internalEmail, 'internal'));\n} else if (eventType === 'customer.subscription.trial_will_end') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_trial_ending', billingEmail, 'customer'));\n}\n\nreturn rows;"
+      }
+    },
+    {
+      "name": "Supabase: Insert Billing Reminder Outbox",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        1000
+      ],
+      "parameters": {
+        "tableId": "notification_outbox",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tenant_id",
+              "fieldValue": "={{ $json.tenant_id }}"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "={{ $json.channel }}"
+            },
+            {
+              "fieldId": "template_key",
+              "fieldValue": "={{ $json.template_key }}"
+            },
+            {
+              "fieldId": "related_entity_type",
+              "fieldValue": "={{ $json.related_entity_type }}"
+            },
+            {
+              "fieldId": "related_entity_id",
+              "fieldValue": "={{ $json.related_entity_id || null }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "retry_count",
+              "fieldValue": "={{ $json.retry_count }}"
+            },
+            {
+              "fieldId": "max_retries",
+              "fieldValue": "={{ $json.max_retries }}"
+            },
+            {
+              "fieldId": "next_retry_at",
+              "fieldValue": "={{ $json.next_retry_at }}"
+            },
+            {
+              "fieldId": "trace_id",
+              "fieldValue": "={{ $json.trace_id }}"
+            },
+            {
+              "fieldId": "recipient_email",
+              "fieldValue": "={{ $json.recipient_email || null }}"
+            },
+            {
+              "fieldId": "dedupe_key",
+              "fieldValue": "={{ $json.dedupe_key }}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{ $json.payload }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-cred-id",
+          "name": "Supabase account"
+        }
+      }
     }
   ],
   "connections": {
@@ -567,6 +653,29 @@
         [
           {
             "node": "Supabase: Sync Sub/Invoice",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Billing Reminder Outbox Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Billing Reminder Outbox Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Billing Reminder Outbox Rows": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Insert Billing Reminder Outbox",
             "type": "main",
             "index": 0
           }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3 } from 'lucide-react';
 import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
 import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
 import { syncTenantFieldState } from '../lib/tenant-form';
@@ -7,6 +7,7 @@ import type { TenantData } from '../types';
 import Reservations from './Reservations';
 import DocumentManager from './DocumentManager';
 import BillingSection from './BillingSection';
+import AnalyticsSection from './AnalyticsSection';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
@@ -67,29 +68,39 @@ const formatBillingDate = (value?: string | null) => {
 
 type ProductAccessState = 'open' | 'warning' | 'limited' | 'suspended';
 
+const BILLING_GRACE_DAYS = 7;
+
 const Dashboard = ({ onLogout }: DashboardProps) => {
 
     const [formData, setFormData] = useState<TenantData | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'abbonamento'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'abbonamento'>('prenotazioni');
     const [isTokenVisible, setIsTokenVisible] = useState(false);
     const [editForm, setEditForm] = useState<Partial<TenantData>>({});
     const [isBillingLoading, setIsBillingLoading] = useState(false);
 
     const tenantId = formData?.tenant_id || getCurrentTenantId();
     const trialEndsAt = formData?.trial_ends_at ? new Date(formData.trial_ends_at) : null;
+    const currentPeriodEnd = formData?.current_period_end ? new Date(formData.current_period_end) : null;
     const trialDaysRemaining = trialEndsAt ? Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
     const normalizedSubscriptionStatus = String(formData?.subscription_status || 'trialing').trim().toLowerCase();
     const hasActiveSubscription = Boolean(formData?.stripe_subscription_id);
     const isExpiredTrial = normalizedSubscriptionStatus === 'trialing' && !!trialEndsAt && trialEndsAt.getTime() <= Date.now() && !hasActiveSubscription;
+    const graceEndsAt = currentPeriodEnd
+        ? new Date(currentPeriodEnd.getTime() + BILLING_GRACE_DAYS * 24 * 60 * 60 * 1000)
+        : null;
+    const graceDaysRemaining = graceEndsAt
+        ? Math.ceil((graceEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+        : null;
+    const isPastDueGraceExpired = normalizedSubscriptionStatus === 'past_due' && !!graceEndsAt && graceEndsAt.getTime() < Date.now();
     const productAccessState: ProductAccessState = isExpiredTrial
         ? 'limited'
         : normalizedSubscriptionStatus === 'canceled'
             ? 'suspended'
             : normalizedSubscriptionStatus === 'past_due'
-                ? 'warning'
+                ? isPastDueGraceExpired ? 'suspended' : 'warning'
                 : 'open';
     const operationalTabs = new Set(['prenotazioni', 'documenti', 'integrazione', 'impostazioni']);
     const shouldLockActiveTab = operationalTabs.has(activeTab) && (productAccessState === 'limited' || productAccessState === 'suspended');
@@ -104,9 +115,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         : normalizedSubscriptionStatus === 'past_due'
             ? {
                 tone: 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-200/50',
-                title: 'Pagamento da aggiornare',
-                description: 'Abbiamo rilevato un problema sul rinnovo. Aggiorna il metodo di pagamento per evitare la sospensione del servizio.',
-                cta: 'Gestisci pagamento',
+                title: isPastDueGraceExpired ? 'Grace period terminato' : 'Pagamento da aggiornare',
+                description: isPastDueGraceExpired
+                    ? 'Il grace period di 7 giorni e terminato. Aggiorna il metodo di pagamento per riattivare il servizio.'
+                    : `Abbiamo rilevato un problema sul rinnovo. Aggiorna il pagamento entro il ${formatBillingDate(graceEndsAt?.toISOString())} per evitare la sospensione del servizio.`,
+                cta: isPastDueGraceExpired ? 'Riattiva pagamento' : 'Gestisci pagamento',
             }
             : normalizedSubscriptionStatus === 'canceled'
                 ? {
@@ -409,8 +422,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 </header>
 
                 {/* Tab Navigation - Mobile Scrollable */}
-                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-6 gap-2 animate-fade-in delay-100 pb-2">
+                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-7 gap-2 animate-fade-in delay-100 pb-2">
                     {[
+                        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
                         { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
                         { id: 'documenti', label: 'Documenti', icon: FileText },
                         { id: 'abbonamento', label: 'Abbonamento', icon: CreditCard },
@@ -458,6 +472,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 <h3 className="text-xl md:text-2xl font-black text-red-900">Il servizio resta disponibile, ma e necessario aggiornare il metodo di pagamento.</h3>
                                 <p className="text-red-800/80 max-w-3xl leading-relaxed">
                                     Per evitare la sospensione delle funzioni operative, apri il tab Abbonamento e accedi al portale Stripe.
+                                    {typeof graceDaysRemaining === 'number' && graceDaysRemaining >= 0 ? ` Ti restano circa ${graceDaysRemaining} giorni di grace period.` : ''}
                                 </p>
                             </div>
                             <button
@@ -486,12 +501,16 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         </p>
                                         <h3 className="text-2xl md:text-3xl font-black text-gray-900">
                                             {productAccessState === 'suspended'
-                                                ? 'I dati restano visibili, ma le azioni operative sono state sospese.'
+                                                ? normalizedSubscriptionStatus === 'past_due'
+                                                    ? 'Il grace period e terminato: le azioni operative sono sospese finche il pagamento non viene aggiornato.'
+                                                    : 'I dati restano visibili, ma le azioni operative sono state sospese.'
                                                 : 'Puoi consultare i dati, ma per tornare operativo devi attivare un piano.'}
                                         </h3>
                                         <p className="text-gray-600 leading-relaxed">
                                             {productAccessState === 'suspended'
-                                                ? 'Prenotazioni, documenti e impostazioni restano consultabili, ma le modifiche e le azioni operative vanno riattivate dal tab Abbonamento.'
+                                                ? normalizedSubscriptionStatus === 'past_due'
+                                                    ? 'Prenotazioni, documenti e impostazioni restano consultabili, ma il concierge e le azioni operative riprenderanno solo dopo l’aggiornamento del metodo di pagamento dal portale Stripe.'
+                                                    : 'Prenotazioni, documenti e impostazioni restano consultabili, ma le modifiche e le azioni operative vanno riattivate dal tab Abbonamento.'
                                                 : 'Il periodo di prova e terminato. Manteniamo visibili le informazioni principali, ma blocchiamo l’operativita finche non viene attivato un piano.'}
                                         </p>
                                     </div>
@@ -517,7 +536,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         )}
 
                         <div className={shouldLockActiveTab ? 'pointer-events-none select-none opacity-60 blur-[1.5px]' : ''}>
-                            {activeTab === 'prenotazioni' ? (
+                            {activeTab === 'analytics' ? (
+                                <AnalyticsSection />
+                            ) : activeTab === 'prenotazioni' ? (
                                 <Reservations />
                             ) : activeTab === 'documenti' ? (
                                 <DocumentManager />
