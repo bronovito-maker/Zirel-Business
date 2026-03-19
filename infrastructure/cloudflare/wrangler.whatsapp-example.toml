@@ -1,0 +1,11 @@
+name = "zirel-whatsapp-webhook"
+main = "whatsapp-webhook-worker.js"
+compatibility_date = "2026-03-19"
+
+[vars]
+N8N_WHATSAPP_WEBHOOK_URL = "https://YOUR_N8N_HOST/webhook/whatsapp/webhook"
+
+# Impostare come secret con:
+# wrangler secret put META_APP_SECRET
+# wrangler secret put META_VERIFY_TOKEN
+# wrangler secret put INTERNAL_FORWARD_SECRET

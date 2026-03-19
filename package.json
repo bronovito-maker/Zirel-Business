@@ -7,7 +7,9 @@
         "dev:landing": "cd demo && npm run dev",
         "dev": "npm run dev:landing & npm run dev:dashboard",
         "build:workflows": "node scripts/build_zirel_workflows.mjs",
+        "build:whatsapp-workflows": "node scripts/build_whatsapp_workflows.mjs",
         "test:billing": "node tests/billing_reminders_e2e.mjs",
+        "test:whatsapp-workflows": "node tests/whatsapp_workflows_contracts.mjs",
         "test:workflows": "node tests/workflow_contracts.mjs",
         "test:chat": "node tests/chat_webhook_e2e.mjs"
     }

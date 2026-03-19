@@ -1,0 +1,286 @@
+{
+  "name": "WhatsApp 1 - Webhook Ingestion (V3.2 Hardened)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "whatsapp/webhook",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Meta Challenge (GET)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "wa-get-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.query['hub.verify_token'] }}",
+              "value2": "={{ $env.META_VERIFY_TOKEN }}"
+            }
+          ]
+        }
+      },
+      "name": "If Verify Token Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "wa-if-verify-token",
+      "notesInFlow": true,
+      "notes": "Verifica il challenge GET contro META_VERIFY_TOKEN."
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "name": "Respond Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -80
+      ],
+      "id": "wa-respond-challenge"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Forbidden: Invalid Verify Token",
+        "status": 403,
+        "options": {}
+      },
+      "name": "Respond 403",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        460,
+        80
+      ],
+      "id": "wa-respond-forbidden"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp/webhook",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "name": "Inbound Webhook (POST)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        320
+      ],
+      "id": "wa-post-webhook",
+      "notesInFlow": true,
+      "notes": "rawBody=true aiuta il troubleshooting, ma non garantisce da solo una validazione HMAC affidabile in n8n."
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\nconst headersSource = input.headers || {};\nconst headers = Object.fromEntries(Object.entries(headersSource).map(([key, value]) => [String(key || '').toLowerCase(), value]));\nconst hmacMode = String($env.WHATSAPP_HMAC_MODE || 'proxy_required').trim().toLowerCase();\nconst requireProxyVerification = hmacMode === 'proxy_required';\nconst proxyVerified = String(headers['x-zirel-wa-verified'] || '').trim().toLowerCase() === 'true';\nconst rawBodyCandidate = input.rawBody || input.bodyRaw || input.raw_body || null;\nconst signatureHeader = headers['x-hub-signature-256'] || null;\n\nlet signatureVerificationStatus = 'not_verified_in_n8n';\nlet signatureVerificationReason = 'n8n non verifica in modo affidabile il raw body HMAC; usare preferibilmente un pre-handler esterno.';\n\nif (proxyVerified) {\n  signatureVerificationStatus = 'verified_by_proxy';\n  signatureVerificationReason = 'Header x-zirel-wa-verified=true ricevuto da pre-handler fidato.';\n} else if (requireProxyVerification) {\n  signatureVerificationStatus = 'missing_proxy_verification';\n  signatureVerificationReason = 'WHATSAPP_HMAC_MODE=proxy_required ma manca x-zirel-wa-verified=true.';\n}\n\nreturn [{\n  json: {\n    allow_persist: proxyVerified || !requireProxyVerification,\n    channel: 'whatsapp',\n    processed: false,\n    event_status: 'pending',\n    payload_json: {\n      body: input.body || null,\n      headers,\n      meta: {\n        received_at: new Date().toISOString(),\n        verification_mode: requireProxyVerification ? 'proxy_required' : 'warn_only',\n        signature_header: signatureHeader,\n        signature_verification_status: signatureVerificationStatus,\n        signature_verification_reason: signatureVerificationReason,\n        raw_body_present: Boolean(rawBodyCandidate),\n        raw_body_preview: typeof rawBodyCandidate === 'string' ? rawBodyCandidate.slice(0, 500) : null\n      }\n    }\n  }\n}];"
+      },
+      "name": "Build Persistable Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        320
+      ],
+      "id": "wa-build-event-payload",
+      "notesInFlow": true,
+      "notes": "Persistiamo il contesto di verifica. La modalita di default e proxy_required: senza pre-handler fidato il webhook non viene accettato."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.allow_persist) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "If Event Is Trusted Enough",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        500,
+        320
+      ],
+      "id": "wa-if-allow-persist"
+    },
+    {
+      "parameters": {
+        "tableId": "channel_webhook_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "channel",
+              "fieldValue": "={{ $json.channel }}"
+            },
+            {
+              "fieldId": "payload_json",
+              "fieldValue": "={{ $json.payload_json }}"
+            },
+            {
+              "fieldId": "processed",
+              "fieldValue": "={{ $json.processed }}"
+            },
+            {
+              "fieldId": "event_status",
+              "fieldValue": "={{ $json.event_status }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase: Persist Event",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "id": "wa-persist-event",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "Persistenza sincrona del webhook. tenant_id resta volutamente NULL in questa fase."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'ok', verification_mode: $json.payload_json?.meta?.verification_mode || null, signature_verification_status: $json.payload_json?.meta?.signature_verification_status || null }, null, 2) }}",
+        "options": {}
+      },
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1010,
+        240
+      ],
+      "id": "wa-respond-ok",
+      "notesInFlow": true,
+      "notes": "Meta riceve 200 solo dopo persistenza riuscita."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ error: 'Proxy signature verification required', mode: $env.WHATSAPP_HMAC_MODE || 'proxy_required' }, null, 2) }}",
+        "options": {}
+      },
+      "name": "Respond 503 Unverified",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        760,
+        400
+      ],
+      "id": "wa-respond-unverified",
+      "notesInFlow": true,
+      "notes": "Per default il webhook deve arrivare gia pre-validato da proxy o edge handler."
+    }
+  ],
+  "connections": {
+    "Meta Challenge (GET)": {
+      "main": [
+        [
+          {
+            "node": "If Verify Token Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Verify Token Valid": {
+      "main": [
+        [
+          {
+            "node": "Respond Challenge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 403",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inbound Webhook (POST)": {
+      "main": [
+        [
+          {
+            "node": "Build Persistable Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Persistable Event": {
+      "main": [
+        [
+          {
+            "node": "If Event Is Trusted Enough",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Event Is Trusted Enough": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Persist Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 503 Unverified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Persist Event": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
