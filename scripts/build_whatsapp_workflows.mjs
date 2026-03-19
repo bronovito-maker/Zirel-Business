@@ -6,16 +6,14 @@ const root = '/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl';
 const paths = {
   ingestion: `${root}/n8n_workflows/whatsapp_v3_ingestion.json`,
   processor: `${root}/n8n_workflows/whatsapp_v3_processor.json`,
+  outboundSender: `${root}/n8n_workflows/whatsapp_v3_outbound_sender.json`,
+  aiOrchestrator: `${root}/n8n_workflows/whatsapp_v3_ai_orchestrator.json`,
 };
 
 const credentials = {
   supabaseApi: {
     id: 'bEyN805IWleebXdC',
     name: 'Supabase account - Zirèl',
-  },
-  postgres: {
-    id: 'y26w3cf5oDEAQXdB',
-    name: 'Postgres account',
   },
 };
 
@@ -83,12 +81,6 @@ const supabaseNode = (name, position, parameters, extras = {}) =>
     ...extras,
   });
 
-const postgresNode = (name, position, parameters, extras = {}) =>
-  nodeBase(name, 'n8n-nodes-base.postgres', 2, position, parameters, {
-    credentials: { postgres: credentials.postgres },
-    ...extras,
-  });
-
 const buildConnections = (defs) => {
   const connections = {};
   for (const def of defs) {
@@ -130,6 +122,7 @@ return [{
   json: {
     allow_persist: proxyVerified || !requireProxyVerification,
     channel: 'whatsapp',
+    event_type: input.body?.object || 'webhook',
     processed: false,
     event_status: 'pending',
     payload_json: {
@@ -148,28 +141,24 @@ return [{
   }
 }];`;
 
-const processorCode = String.raw`const claimedRows = $input.all().map((item) => item.json || {}).filter((row) => row && row.id);
-if (!claimedRows.length) {
-  return [];
-}
-
+const processorCode = String.raw`const claimedRows = [];
 const supabaseUrl = String($env.SUPABASE_URL || '').trim();
 const serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 if (!supabaseUrl || !serviceKey) {
-      return claimedRows.map((row) => ({
-        json: {
-          id: row.id,
-          processed: false,
-          event_status: 'failed',
-          error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
-        }
-      }));
+  return [{
+    json: {
+      id: 'missing-env',
+      processed: false,
+      event_status: 'failed',
+      error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+    }
+  }];
 }
 
 const defaultHeaders = {
   apikey: serviceKey,
-  Authorization: \`Bearer \${serviceKey}\`,
+  Authorization: 'Bearer ' + serviceKey,
   'Content-Type': 'application/json',
   Prefer: 'return=representation',
 };
@@ -179,27 +168,46 @@ const normalizePhone = (value) => String(value || '').replace(/[^\d+]/g, '');
 const truncate = (value, max = 500) => String(value || '').slice(0, max);
 
 const rest = async (method, path, body) => {
-  const response = await fetch(\`\${supabaseUrl}/rest/v1/\${path}\`, {
-    method,
-    headers: defaultHeaders,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  try {
+    return await this.helpers.httpRequest({
+      method,
+      url: supabaseUrl + '/rest/v1/' + path,
+      headers: defaultHeaders,
+      body: body === undefined ? undefined : body,
+      json: true,
+    });
+  } catch (error) {
+    const responseBody =
+      error?.response?.body === undefined
+        ? ''
+        : typeof error.response.body === 'string'
+          ? error.response.body
+          : JSON.stringify(error.response.body);
+    const details = truncate(responseBody || error?.message || error);
+    throw new Error('Supabase ' + method + ' ' + path + ' failed: ' + details);
+  }
+};
 
-  const text = await response.text();
-  let data = null;
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = text;
+const selectCandidates = async () => {
+  const rows = await rest(
+    'GET',
+    'channel_webhook_events?select=id,payload_json,processed,event_status,error_message,created_at&event_status=in.(pending,failed)&order=created_at.asc&limit=50'
+  );
+  return Array.isArray(rows) ? rows : [];
+};
+
+const claimRow = async (rowId) => {
+  const claimedAt = new Date().toISOString();
+  const rows = await rest(
+    'PATCH',
+    'channel_webhook_events?id=eq.' + encode(rowId) + '&event_status=in.(pending,failed)',
+    {
+      event_status: 'processing',
+      error_message: 'PROCESSING:' + claimedAt,
+      processed: false,
     }
-  }
-
-  if (!response.ok) {
-    throw new Error(\`Supabase \${method} \${path} failed: \${response.status} \${truncate(typeof data === 'string' ? data : JSON.stringify(data))}\`);
-  }
-
-  return data;
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 };
 
 const extractText = (message) => {
@@ -265,22 +273,27 @@ const flattenWebhookRow = (row) => {
 
 const getSingleTenantAccount = async (phoneNumberId) => {
   if (!phoneNumberId) return null;
-  const rows = await rest('GET', \`tenant_whatsapp_accounts?select=id,tenant_id,meta_phone_number_id,credential_mode,credential_provider&meta_phone_number_id=eq.\${encode(phoneNumberId)}&limit=1\`);
+  const rows = await rest(
+    'GET',
+    'tenant_whatsapp_accounts?select=id,tenant_id,meta_phone_number_id,credential_mode,credential_provider&meta_phone_number_id=eq.' +
+      encode(phoneNumberId) +
+      '&limit=1'
+  );
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 };
 
 const getExistingConversation = async (tenantId, externalContactId, normalizedPhone) => {
   if (!tenantId) return null;
   const orConditions = [];
-  if (externalContactId) orConditions.push(\`external_contact_id.eq.\${externalContactId}\`);
-  if (normalizedPhone) orConditions.push(\`customer_phone_normalized.eq.\${normalizedPhone}\`);
+  if (externalContactId) orConditions.push('external_contact_id.eq.' + externalContactId);
+  if (normalizedPhone) orConditions.push('customer_phone_normalized.eq.' + normalizedPhone);
   if (!orConditions.length) return null;
 
   const query = [
     'tenant_conversations?select=id,last_inbound_message_id,last_outbound_message_id,last_message_at,ai_processing_status',
-    \`tenant_id=eq.\${encode(tenantId)}\`,
+    'tenant_id=eq.' + encode(tenantId),
     'channel=eq.whatsapp',
-    \`or=\${encode(\`(\${orConditions.join(',')})\`)}\`,
+    'or=' + encode('(' + orConditions.join(',') + ')'),
     'order=last_message_at.desc.nullslast',
     'limit=1',
   ].join('&');
@@ -296,8 +309,9 @@ const createConversation = async (tenantAccount, event) => {
     external_contact_id: event.customer_phone_raw || event.customer_phone_normalized || null,
     customer_phone_normalized: event.customer_phone_normalized || null,
     customer_name: event.customer_name || null,
-    ai_processing_status: 'pending_ai',
+    first_message_at: event.message_timestamp || new Date().toISOString(),
     last_message_at: event.message_timestamp || new Date().toISOString(),
+    last_inbound_at: event.message_timestamp || new Date().toISOString(),
   };
 
   const rows = await rest('POST', 'tenant_conversations', body);
@@ -306,7 +320,14 @@ const createConversation = async (tenantAccount, event) => {
 
 const getExistingMessage = async (tenantId, wamid) => {
   if (!tenantId || !wamid) return null;
-  const rows = await rest('GET', \`conversation_messages?select=id,conversation_id,external_message_id,delivery_status&tenant_id=eq.\${encode(tenantId)}&external_message_id=eq.\${encode(wamid)}&limit=1\`);
+  const rows = await rest(
+    'GET',
+    'conversation_messages?select=id,conversation_id,external_message_id,delivery_status&tenant_id=eq.' +
+      encode(tenantId) +
+      '&external_message_id=eq.' +
+      encode(wamid) +
+      '&limit=1'
+  );
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 };
 
@@ -334,15 +355,64 @@ const insertMessage = async (conversationId, tenantId, event) => {
 
 const patchConversation = async (conversationId, body) => {
   if (!conversationId) return [];
-  return rest('PATCH', \`tenant_conversations?id=eq.\${encode(conversationId)}\`, body);
+  return rest(
+    'PATCH',
+    'tenant_conversations?id=eq.' +
+      encode(conversationId) +
+      '&select=id,last_inbound_message_id,last_message_at,last_inbound_at',
+    body
+  );
 };
 
 const patchMessage = async (messageId, body) => {
   if (!messageId) return [];
-  return rest('PATCH', \`conversation_messages?id=eq.\${encode(messageId)}\`, body);
+  return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);
+};
+
+const buildStatusPatch = (event) => {
+  const patch = {
+    delivery_status: event.delivery_status || null,
+  };
+
+  const statusTimestamp = event.status_timestamp || new Date().toISOString();
+
+  if (event.delivery_status === 'sent') {
+    patch.sent_at = statusTimestamp;
+  } else if (event.delivery_status === 'delivered') {
+    patch.delivered_at = statusTimestamp;
+  } else if (event.delivery_status === 'read') {
+    patch.read_at = statusTimestamp;
+  } else if (event.delivery_status === 'failed') {
+    patch.failed_at = statusTimestamp;
+  }
+
+  const providerErrors = Array.isArray(event?.event_data?.errors) ? event.event_data.errors : [];
+  if (providerErrors.length) {
+    const firstError = providerErrors[0] || {};
+    patch.error_code = firstError.code ? String(firstError.code) : null;
+    patch.error_message =
+      firstError.title ||
+      firstError.message ||
+      firstError.details ||
+      patch.error_message ||
+      null;
+  }
+
+  return patch;
 };
 
 const outcomes = [];
+
+for (const candidate of await selectCandidates()) {
+  const claimed = await claimRow(candidate.id);
+  if (claimed?.id) {
+    claimedRows.push(claimed);
+  }
+}
+
+if (!claimedRows.length) {
+  return [];
+}
 
 for (const row of claimedRows) {
   try {
@@ -359,7 +429,7 @@ for (const row of claimedRows) {
     for (const event of flattenedEvents) {
       const tenantAccount = await getSingleTenantAccount(event.phone_number_id);
       if (!tenantAccount?.tenant_id) {
-        rowNotes.push(\`ORPHAN_TENANT:\${event.phone_number_id || 'missing_phone_number_id'}\`);
+        rowNotes.push('ORPHAN_TENANT:' + (event.phone_number_id || 'missing_phone_number_id'));
         continue;
       }
 
@@ -370,7 +440,7 @@ for (const row of claimedRows) {
 
       if (event.type === 'message') {
         if (!event.customer_phone_raw && !event.customer_phone_normalized) {
-          rowNotes.push(\`INVALID_MESSAGE_PHONE:\${event.wamid}\`);
+          rowNotes.push('INVALID_MESSAGE_PHONE:' + event.wamid);
           continue;
         }
 
@@ -395,29 +465,41 @@ for (const row of claimedRows) {
         }
 
         if (!message?.id) {
-          retryReason = \`message_insert_failed:\${event.wamid}\`;
+          retryReason = 'message_insert_failed:' + event.wamid;
           break;
         }
 
-        await patchConversation(conversation.id, {
+        let patchedConversationRows = await patchConversation(conversation.id, {
           last_message_at: event.message_timestamp,
+          last_inbound_at: event.message_timestamp,
           customer_phone_normalized: event.customer_phone_normalized || null,
           external_contact_id: event.customer_phone_raw || event.customer_phone_normalized || null,
           customer_name: event.customer_name || null,
-          ai_processing_status: 'pending_ai',
           last_inbound_message_id: message.id,
         });
+        let patchedConversation = Array.isArray(patchedConversationRows) ? patchedConversationRows[0] : null;
+
+        if (patchedConversation?.last_inbound_message_id !== message.id) {
+          patchedConversationRows = await patchConversation(conversation.id, {
+            last_inbound_message_id: message.id,
+            last_inbound_at: event.message_timestamp,
+          });
+          patchedConversation = Array.isArray(patchedConversationRows) ? patchedConversationRows[0] : null;
+        }
+
+        if (patchedConversation?.last_inbound_message_id !== message.id) {
+          retryReason = 'conversation_pointer_update_failed:' + event.wamid;
+          break;
+        }
         hadSuccessfulMutation = true;
       } else if (event.type === 'status') {
         const message = await getExistingMessage(tenantAccount.tenant_id, event.wamid);
         if (!message?.id) {
-          rowNotes.push(\`ORPHAN_STATUS:\${event.wamid}\`);
+          rowNotes.push('ORPHAN_STATUS:' + event.wamid);
           continue;
         }
 
-        await patchMessage(message.id, {
-          delivery_status: event.delivery_status || null,
-        });
+        await patchMessage(message.id, buildStatusPatch(event));
         hadSuccessfulMutation = true;
       }
     }
@@ -428,7 +510,7 @@ for (const row of claimedRows) {
           id: row.id,
           processed: false,
           event_status: 'failed',
-          error_message: \`RETRY: \${truncate(retryReason)}\`,
+          error_message: 'RETRY: ' + truncate(retryReason),
         },
       });
       continue;
@@ -448,7 +530,691 @@ for (const row of claimedRows) {
         id: row.id,
         processed: false,
         event_status: 'failed',
-        error_message: \`RETRY: \${truncate(error.message || error)}\`,
+        error_message: 'RETRY: ' + truncate(error.message || error),
+      },
+    });
+  }
+}
+
+return outcomes;`;
+
+const outboundSenderCode = String.raw`const claimedRows = [];
+const supabaseUrl = String($env.SUPABASE_URL || '').trim();
+const serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+const graphVersion = String($env.WHATSAPP_GRAPH_VERSION || 'v23.0').trim();
+
+if (!supabaseUrl || !serviceKey) {
+  return [{
+    json: {
+      id: 'missing-env',
+      processing_status: 'error',
+      delivery_status: 'failed',
+      error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+    }
+  }];
+}
+
+const defaultHeaders = {
+  apikey: serviceKey,
+  Authorization: 'Bearer ' + serviceKey,
+  'Content-Type': 'application/json',
+  Prefer: 'return=representation',
+};
+
+const encode = (value) => encodeURIComponent(String(value ?? ''));
+const truncate = (value, max = 1000) => String(value || '').slice(0, max);
+const sanitizeRef = (value) => String(value || '').trim().replace(/[^A-Za-z0-9_]/g, '_').toUpperCase();
+
+const rest = async (method, path, body) => {
+  try {
+    return await this.helpers.httpRequest({
+      method,
+      url: supabaseUrl + '/rest/v1/' + path,
+      headers: defaultHeaders,
+      body: body === undefined ? undefined : body,
+      json: true,
+    });
+  } catch (error) {
+    const responseBody =
+      error?.response?.body === undefined
+        ? ''
+        : typeof error.response.body === 'string'
+          ? error.response.body
+          : JSON.stringify(error.response.body);
+    const details = truncate(responseBody || error?.message || error);
+    throw new Error('Supabase ' + method + ' ' + path + ' failed: ' + details);
+  }
+};
+
+const graphRequest = async (phoneNumberId, accessToken, body) => {
+  try {
+    return await this.helpers.httpRequest({
+      method: 'POST',
+      url: 'https://graph.facebook.com/' + graphVersion + '/' + encode(phoneNumberId) + '/messages',
+      headers: {
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+      },
+      body,
+      json: true,
+    });
+  } catch (error) {
+    const responseBody =
+      error?.response?.body === undefined
+        ? ''
+        : typeof error.response.body === 'string'
+          ? error.response.body
+          : JSON.stringify(error.response.body);
+    const details = truncate(responseBody || error?.message || error);
+    throw new Error('Meta send failed: ' + details);
+  }
+};
+
+const selectCandidates = async () => {
+  const rows = await rest(
+    'GET',
+    'conversation_messages?select=id,conversation_id,tenant_id,channel,direction,external_message_id,delivery_status,processing_status,content_text,provider_payload_json,created_at,sender_role,message_type&direction=eq.outbound&channel=eq.whatsapp&external_message_id=is.null&processing_status=eq.done&order=created_at.asc&limit=50'
+  );
+  return Array.isArray(rows) ? rows : [];
+};
+
+const claimRow = async (rowId) => {
+  const rows = await rest(
+    'PATCH',
+    'conversation_messages?id=eq.' + encode(rowId) + '&external_message_id=is.null&processing_status=eq.done',
+    {
+      processing_status: 'processing',
+    }
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const getTenantAccount = async (tenantId) => {
+  if (!tenantId) return null;
+  const rows = await rest(
+    'GET',
+    'tenant_whatsapp_accounts?select=id,tenant_id,meta_phone_number_id,credential_mode,credential_provider,access_token_ref&tenant_id=eq.' +
+      encode(tenantId) +
+      '&order=created_at.asc.nullslast&limit=1'
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const getConversation = async (conversationId) => {
+  if (!conversationId) return null;
+  const rows = await rest(
+    'GET',
+    'tenant_conversations?select=id,tenant_id,external_contact_id,customer_phone_normalized,last_outbound_message_id,last_message_at,last_outbound_at&' +
+      'id=eq.' +
+      encode(conversationId) +
+      '&limit=1'
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const resolveRecipient = (conversation, message) => {
+  const explicitRecipient = message?.provider_payload_json?.recipient_phone || message?.provider_payload_json?.to || null;
+  return explicitRecipient || conversation?.customer_phone_normalized || conversation?.external_contact_id || null;
+};
+
+const resolveTextBody = (message) => {
+  const body =
+    message?.content_text ||
+    message?.provider_payload_json?.text_content ||
+    message?.provider_payload_json?.text?.body ||
+    null;
+  return typeof body === 'string' ? body.trim() : null;
+};
+
+const resolveAccessToken = (account) => {
+  if (!account) return null;
+
+  const accessTokenRef = String(account.access_token_ref || '').trim();
+  const directPlatform =
+    String($env.WHATSAPP_PLATFORM_ACCESS_TOKEN || '').trim() ||
+    String($env.WHATSAPP_ACCESS_TOKEN || '').trim() ||
+    '';
+
+  if (String(account.credential_mode || '') === 'platform_managed') {
+    if (directPlatform) return directPlatform;
+  }
+
+  if (accessTokenRef) {
+    if (accessTokenRef.startsWith('env:')) {
+      const envName = accessTokenRef.slice(4).trim();
+      if (envName && String($env[envName] || '').trim()) {
+        return String($env[envName]).trim();
+      }
+    }
+
+    const refEnvName = 'WHATSAPP_TOKEN_REF_' + sanitizeRef(accessTokenRef);
+    if (String($env[refEnvName] || '').trim()) {
+      return String($env[refEnvName]).trim();
+    }
+  }
+
+  return directPlatform || null;
+};
+
+const patchMessage = async (messageId, body) => {
+  if (!messageId) return [];
+  return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);
+};
+
+const patchConversation = async (conversationId, body) => {
+  if (!conversationId) return [];
+  return rest('PATCH', 'tenant_conversations?id=eq.' + encode(conversationId), body);
+};
+
+const outcomes = [];
+
+for (const candidate of await selectCandidates()) {
+  const claimed = await claimRow(candidate.id);
+  if (claimed?.id) {
+    claimedRows.push({ ...candidate, ...claimed });
+  }
+}
+
+if (!claimedRows.length) {
+  return [];
+}
+
+for (const row of claimedRows) {
+  try {
+    if (!row?.tenant_id || !row?.conversation_id) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing tenant_id or conversation_id',
+        },
+      });
+      continue;
+    }
+
+    const tenantAccount = await getTenantAccount(row.tenant_id);
+    if (!tenantAccount?.meta_phone_number_id) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing tenant whatsapp account',
+        },
+      });
+      continue;
+    }
+
+    const accessToken = resolveAccessToken(tenantAccount);
+    if (!accessToken) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing access token for sender',
+        },
+      });
+      continue;
+    }
+
+    const conversation = await getConversation(row.conversation_id);
+    const recipientPhone = resolveRecipient(conversation, row);
+    const bodyText = resolveTextBody(row);
+
+    if (!recipientPhone) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing outbound recipient phone',
+        },
+      });
+      continue;
+    }
+
+    if (!bodyText) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing outbound text body',
+        },
+      });
+      continue;
+    }
+
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: recipientPhone,
+      type: 'text',
+      text: { body: bodyText },
+    };
+
+    const response = await graphRequest(tenantAccount.meta_phone_number_id, accessToken, payload);
+    const externalMessageId = Array.isArray(response?.messages) && response.messages[0]?.id ? response.messages[0].id : null;
+
+    if (!externalMessageId) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          delivery_status: 'failed',
+          error_message: 'RETRY: missing external_message_id from Meta',
+        },
+      });
+      continue;
+    }
+
+    await patchConversation(row.conversation_id, {
+      last_message_at: new Date().toISOString(),
+      last_outbound_at: new Date().toISOString(),
+      last_outbound_message_id: row.id,
+    });
+
+    outcomes.push({
+      json: {
+        id: row.id,
+        processing_status: 'done',
+        delivery_status: 'sent',
+        sent_at: new Date().toISOString(),
+        failed_at: null,
+        external_message_id: externalMessageId,
+        provider_payload_json: {
+          ...(row.provider_payload_json || {}),
+          sender_meta_phone_number_id: tenantAccount.meta_phone_number_id,
+          sender_account_id: tenantAccount.id,
+          sender_payload: payload,
+          sender_response: response,
+        },
+        error_message: null,
+      },
+    });
+  } catch (error) {
+    outcomes.push({
+      json: {
+        id: row.id,
+        processing_status: 'error',
+        delivery_status: 'failed',
+        failed_at: new Date().toISOString(),
+        error_message: 'RETRY: ' + truncate(error.message || error),
+      },
+    });
+  }
+}
+
+return outcomes;`;
+
+const aiOrchestratorCode = String.raw`const claimedRows = [];
+const supabaseUrl = String($env.SUPABASE_URL || '').trim();
+const serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+const aiCoreUrl = String($env.ZIREL_AI_CORE_WEBHOOK_URL || $env.AI_CORE_WEBHOOK_URL || '').trim();
+const aiCoreBearerToken = String($env.ZIREL_AI_CORE_BEARER_TOKEN || $env.AI_CORE_BEARER_TOKEN || '').trim();
+
+if (!supabaseUrl || !serviceKey) {
+  return [{
+    json: {
+      id: 'missing-env',
+      processing_status: 'error',
+      conversation_ai_processing_status: 'error',
+      error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+    }
+  }];
+}
+
+if (!aiCoreUrl) {
+  return [{
+    json: {
+      id: 'missing-ai-core-url',
+      processing_status: 'error',
+      conversation_ai_processing_status: 'error',
+      error_message: 'RETRY: missing ZIREL_AI_CORE_WEBHOOK_URL or AI_CORE_WEBHOOK_URL'
+    }
+  }];
+}
+
+const defaultHeaders = {
+  apikey: serviceKey,
+  Authorization: 'Bearer ' + serviceKey,
+  'Content-Type': 'application/json',
+  Prefer: 'return=representation',
+};
+
+const encode = (value) => encodeURIComponent(String(value ?? ''));
+const truncate = (value, max = 1000) => String(value || '').slice(0, max);
+
+const rest = async (method, path, body) => {
+  try {
+    return await this.helpers.httpRequest({
+      method,
+      url: supabaseUrl + '/rest/v1/' + path,
+      headers: defaultHeaders,
+      body: body === undefined ? undefined : body,
+      json: true,
+    });
+  } catch (error) {
+    const responseBody =
+      error?.response?.body === undefined
+        ? ''
+        : typeof error.response.body === 'string'
+          ? error.response.body
+          : JSON.stringify(error.response.body);
+    const details = truncate(responseBody || error?.message || error);
+    throw new Error('Supabase ' + method + ' ' + path + ' failed: ' + details);
+  }
+};
+
+const callAiCore = async (body) => {
+  try {
+    const headers = aiCoreBearerToken
+      ? {
+          Authorization: 'Bearer ' + aiCoreBearerToken,
+          'Content-Type': 'application/json',
+        }
+      : {
+          'Content-Type': 'application/json',
+        };
+
+    return await this.helpers.httpRequest({
+      method: 'POST',
+      url: aiCoreUrl,
+      headers,
+      body,
+      json: true,
+    });
+  } catch (error) {
+    const responseBody =
+      error?.response?.body === undefined
+        ? ''
+        : typeof error.response.body === 'string'
+          ? error.response.body
+          : JSON.stringify(error.response.body);
+    const details = truncate(responseBody || error?.message || error);
+    throw new Error('AI Core call failed: ' + details);
+  }
+};
+
+const selectCandidates = async () => {
+  const rows = await rest(
+    'GET',
+    'conversation_messages?select=id,conversation_id,tenant_id,channel,direction,sender_role,external_message_id,processing_status,content_text,provider_payload_json,created_at&direction=eq.inbound&channel=eq.whatsapp&processing_status=eq.pending_ai&order=created_at.asc&limit=25'
+  );
+  return Array.isArray(rows) ? rows : [];
+};
+
+const claimRow = async (rowId) => {
+  const rows = await rest(
+    'PATCH',
+    'conversation_messages?id=eq.' + encode(rowId) + '&processing_status=eq.pending_ai',
+    {
+      processing_status: 'processing',
+    }
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const getConversation = async (conversationId) => {
+  if (!conversationId) return null;
+  const rows = await rest(
+    'GET',
+    'tenant_conversations?select=id,tenant_id,status,ai_processing_status,customer_name,customer_phone_normalized,external_contact_id,last_inbound_message_id,last_outbound_message_id&' +
+      'id=eq.' +
+      encode(conversationId) +
+      '&limit=1'
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const getRecentMessages = async (conversationId) => {
+  if (!conversationId) return [];
+  const rows = await rest(
+    'GET',
+    'conversation_messages?select=id,direction,sender_role,content_text,created_at,provider_payload_json,message_type&conversation_id=eq.' +
+      encode(conversationId) +
+      '&order=created_at.desc&limit=12'
+  );
+  return Array.isArray(rows) ? rows.reverse() : [];
+};
+
+const getExistingOutboundForInbound = async (conversationId, inboundMessageId) => {
+  if (!conversationId || !inboundMessageId) return null;
+  const rows = await rest(
+    'GET',
+    'conversation_messages?select=id,external_message_id,processing_status,delivery_status,provider_payload_json,created_at&conversation_id=eq.' +
+      encode(conversationId) +
+      '&direction=eq.outbound&sender_role=eq.ai&order=created_at.desc&limit=20'
+  );
+
+  const matches = Array.isArray(rows) ? rows : [];
+  return (
+    matches.find(
+      (item) => String(item?.provider_payload_json?.source_inbound_message_id || '') === String(inboundMessageId)
+    ) || null
+  );
+};
+
+const extractInboundText = (row) => {
+  const provider = row?.provider_payload_json || {};
+  return (
+    row?.content_text ||
+    provider?.text_content ||
+    provider?.message_payload?.text?.body ||
+    null
+  );
+};
+
+const normalizeContextMessages = (rows) =>
+  rows.map((item) => ({
+    id: item.id,
+    direction: item.direction,
+    sender_role: item.sender_role,
+    message_type: item.message_type || null,
+    content_text:
+      item.content_text ||
+      item?.provider_payload_json?.text_content ||
+      item?.provider_payload_json?.message_payload?.text?.body ||
+      null,
+    created_at: item.created_at,
+  }));
+
+const resolveAiReply = (response) => {
+  const candidates = [
+    response?.final_reply,
+    response?.reply,
+    response?.message,
+    response?.text,
+    response?.output,
+    response?.data?.final_reply,
+    response?.data?.reply,
+    response?.data?.message,
+    response?.result?.final_reply,
+    response?.result?.reply,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return null;
+};
+
+const patchMessage = async (messageId, body) => {
+  if (!messageId) return [];
+  return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);
+};
+
+const patchConversation = async (conversationId, body) => {
+  if (!conversationId) return [];
+  return rest('PATCH', 'tenant_conversations?id=eq.' + encode(conversationId), body);
+};
+
+const insertOutboundMessage = async (conversation, inboundRow, replyText, aiResponse) => {
+  const body = {
+    conversation_id: conversation.id,
+    tenant_id: conversation.tenant_id,
+    channel: 'whatsapp',
+    direction: 'outbound',
+    sender_role: 'ai',
+    message_type: 'text',
+    content_text: replyText,
+    processing_status: 'done',
+    provider_payload_json: {
+      text_content: replyText,
+      recipient_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,
+      source_inbound_message_id: inboundRow.id,
+      ai_response: aiResponse,
+    },
+  };
+
+  const rows = await rest('POST', 'conversation_messages', body);
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
+const outcomes = [];
+
+for (const candidate of await selectCandidates()) {
+  const claimed = await claimRow(candidate.id);
+  if (claimed?.id) {
+    claimedRows.push({ ...candidate, ...claimed });
+  }
+}
+
+if (!claimedRows.length) {
+  return [];
+}
+
+for (const row of claimedRows) {
+  try {
+    const conversation = await getConversation(row.conversation_id);
+    if (!conversation?.id) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          conversation_ai_processing_status: 'error',
+          error_message: 'RETRY: conversation not found',
+        },
+      });
+      continue;
+    }
+
+    if (conversation.status === 'human_handoff' || conversation.status === 'closed') {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'skipped_hho',
+          conversation_ai_processing_status: 'skipped',
+          error_message: 'SKIPPED:' + conversation.status,
+        },
+      });
+      continue;
+    }
+
+    await patchConversation(conversation.id, {
+      ai_processing_status: 'processing',
+    });
+
+    const recentMessages = await getRecentMessages(conversation.id);
+    const inboundText = extractInboundText(row);
+
+    if (!inboundText) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          conversation_ai_processing_status: 'error',
+          error_message: 'RETRY: missing inbound text content',
+        },
+      });
+      continue;
+    }
+
+    const aiPayload = {
+      chatInput: inboundText,
+      metadata: {
+        tenant_id: conversation.tenant_id,
+        session_id: conversation.id,
+        trace_id: row.id,
+        source: 'whatsapp',
+        channel: 'whatsapp',
+        conversation_id: conversation.id,
+        inbound_message_id: row.id,
+        external_message_id: row.external_message_id || null,
+        customer_name: conversation.customer_name || null,
+        customer_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,
+        recent_messages: normalizeContextMessages(recentMessages),
+      },
+    };
+
+    const aiResponse = await callAiCore(aiPayload);
+    const replyText = resolveAiReply(aiResponse);
+
+    if (!replyText) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          conversation_ai_processing_status: 'error',
+          error_message: 'RETRY: AI Core returned no usable reply text',
+        },
+      });
+      continue;
+    }
+
+    const existingOutbound = await getExistingOutboundForInbound(conversation.id, row.id);
+    if (existingOutbound?.id) {
+      await patchConversation(conversation.id, {
+        ai_processing_status: 'done',
+      });
+
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'done',
+          conversation_ai_processing_status: 'done',
+          error_message: 'DEDUP: existing outbound ' + existingOutbound.id,
+        },
+      });
+      continue;
+    }
+
+    const outboundMessage = await insertOutboundMessage(conversation, row, replyText, aiResponse);
+    if (!outboundMessage?.id) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'error',
+          conversation_ai_processing_status: 'error',
+          error_message: 'RETRY: failed to create outbound message row',
+        },
+      });
+      continue;
+    }
+
+    await patchConversation(conversation.id, {
+      ai_processing_status: 'done',
+    });
+
+    outcomes.push({
+      json: {
+        id: row.id,
+        processing_status: 'done',
+        conversation_ai_processing_status: 'done',
+        error_message: null,
+      },
+    });
+  } catch (error) {
+    outcomes.push({
+      json: {
+        id: row.id,
+        processing_status: 'error',
+        conversation_ai_processing_status: 'error',
+        error_message: 'RETRY: ' + truncate(error.message || error),
       },
     });
   }
@@ -512,6 +1278,7 @@ const buildIngestionWorkflow = () => ({
       fieldsUi: {
         fieldValues: [
           { fieldId: 'channel', fieldValue: '={{ $json.channel }}' },
+          { fieldId: 'event_type', fieldValue: '={{ $json.event_type }}' },
           { fieldId: 'payload_json', fieldValue: '={{ $json.payload_json }}' },
           { fieldId: 'processed', fieldValue: '={{ $json.processed }}' },
           { fieldId: 'event_status', fieldValue: '={{ $json.event_status }}' },
@@ -557,40 +1324,12 @@ const buildProcessorWorkflow = () => ({
   name: 'WhatsApp 2 - Event Processor (V3.2 Hardened)',
   nodes: [
     scheduleNode('Cron (1 min)', [0, 200], 1),
-    postgresNode('Postgres: Claim Pending Events', [240, 200], {
-      operation: 'executeQuery',
-      query: `UPDATE public.channel_webhook_events
-SET event_status = 'processing',
-    error_message = CONCAT('PROCESSING:', NOW() AT TIME ZONE 'UTC')
-WHERE id IN (
-  SELECT id
-  FROM public.channel_webhook_events
-  WHERE event_status IN ('pending', 'failed')
-     OR (
-       event_status = 'processing'
-       AND (
-         error_message IS NULL
-         OR error_message NOT LIKE 'PROCESSING:%'
-         OR COALESCE(NULLIF(split_part(error_message, 'PROCESSING:', 2), ''), '1970-01-01 00:00:00')::timestamp <= ((NOW() AT TIME ZONE 'UTC') - INTERVAL '15 minutes')
-       )
-     )
-  ORDER BY created_at ASC
-  LIMIT 50
-  FOR UPDATE SKIP LOCKED
-)
-RETURNING id, payload_json, processed, event_status, error_message;`,
-      options: {},
-    }, {
-      id: 'wa-processor-claim',
-      notesInFlow: true,
-      notes: 'Claim queue basato su event_status, con requeue automatico dei record processing stantii dopo 15 minuti. processed resta per compatibilita e audit semplice.',
-    }),
-    codeNode('Code: Process Claimed Events', [560, 200], processorCode, {
+    codeNode('Code: Claim + Process Events', [360, 200], processorCode, {
       id: 'wa-processor-code',
       notesInFlow: true,
-      notes: 'Esegue parsing Meta, tenant resolution, conversation match/create, inbound insert idempotente, status update e produce un outcome per webhook row.',
+      notes: 'Claima la coda via Supabase REST usando event_status, poi esegue parsing Meta, tenant resolution, conversation match/create, inbound insert idempotente e status update.',
     }),
-    supabaseNode('Supabase: Persist Event Outcome', [920, 200], {
+    supabaseNode('Supabase: Persist Event Outcome', [720, 200], {
       operation: 'update',
       tableId: 'channel_webhook_events',
       filters: {
@@ -616,15 +1355,124 @@ RETURNING id, payload_json, processed, event_status, error_message;`,
     }),
   ],
   connections: buildConnections([
-    { from: 'Cron (1 min)', to: 'Postgres: Claim Pending Events', type: 'main', branch: 0 },
-    { from: 'Postgres: Claim Pending Events', to: 'Code: Process Claimed Events', type: 'main', branch: 0 },
-    { from: 'Code: Process Claimed Events', to: 'Supabase: Persist Event Outcome', type: 'main', branch: 0 },
+    { from: 'Cron (1 min)', to: 'Code: Claim + Process Events', type: 'main', branch: 0 },
+    { from: 'Code: Claim + Process Events', to: 'Supabase: Persist Event Outcome', type: 'main', branch: 0 },
+  ]),
+});
+
+const buildOutboundSenderWorkflow = () => ({
+  name: 'WhatsApp 3 - Outbound Sender (V3.2 Hardened)',
+  nodes: [
+    scheduleNode('Cron (1 min)', [0, 200], 1),
+    codeNode('Code: Claim + Send Outbound', [360, 200], outboundSenderCode, {
+      id: 'wa-sender-code',
+      notesInFlow: true,
+      notes: 'Legge la queue outbound, risolve account/token, invia via Meta Cloud API e aggiorna messaggi/conversazioni.',
+    }),
+    supabaseNode('Supabase: Persist Send Outcome', [760, 200], {
+      operation: 'update',
+      tableId: 'conversation_messages',
+      filters: {
+        conditions: [
+          {
+            keyName: 'id',
+            condition: 'eq',
+            keyValue: '={{ $json.id }}',
+          },
+        ],
+      },
+      fieldsUi: {
+        fieldValues: [
+          { fieldId: 'processing_status', fieldValue: '={{ $json.processing_status }}' },
+          { fieldId: 'delivery_status', fieldValue: '={{ $json.delivery_status }}' },
+          { fieldId: 'external_message_id', fieldValue: '={{ $json.external_message_id || null }}' },
+          { fieldId: 'sent_at', fieldValue: '={{ $json.sent_at || null }}' },
+          { fieldId: 'failed_at', fieldValue: '={{ $json.failed_at || null }}' },
+          { fieldId: 'provider_payload_json', fieldValue: '={{ $json.provider_payload_json || null }}' },
+          { fieldId: 'error_message', fieldValue: '={{ $json.error_message || null }}' },
+        ],
+      },
+    }, {
+      id: 'wa-sender-update',
+      notesInFlow: true,
+      notes: 'Persistenza finale dell’esito outbound. La queue e definita dai messaggi outbound con external_message_id nullo.',
+    }),
+  ],
+  connections: buildConnections([
+    { from: 'Cron (1 min)', to: 'Code: Claim + Send Outbound', type: 'main', branch: 0 },
+    { from: 'Code: Claim + Send Outbound', to: 'Supabase: Persist Send Outcome', type: 'main', branch: 0 },
+  ]),
+});
+
+const buildAiOrchestratorWorkflow = () => ({
+  name: 'WhatsApp 4 - AI Orchestrator (V3.2 Hardened)',
+  nodes: [
+    scheduleNode('Cron (1 min)', [0, 200], 1),
+    codeNode('Code: Claim + Orchestrate AI', [360, 200], aiOrchestratorCode, {
+      id: 'wa-ai-code',
+      notesInFlow: true,
+      notes: 'Legge inbound pending_ai, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender.',
+    }),
+    supabaseNode('Supabase: Persist AI Outcome', [760, 200], {
+      operation: 'update',
+      tableId: 'conversation_messages',
+      filters: {
+        conditions: [
+          {
+            keyName: 'id',
+            condition: 'eq',
+            keyValue: '={{ $json.id }}',
+          },
+        ],
+      },
+      fieldsUi: {
+        fieldValues: [
+          { fieldId: 'processing_status', fieldValue: '={{ $json.processing_status }}' },
+          { fieldId: 'error_message', fieldValue: '={{ $json.error_message || null }}' },
+        ],
+      },
+    }, {
+      id: 'wa-ai-update-message',
+      notesInFlow: true,
+      notes: 'Aggiorna lo stato del messaggio inbound processato dall’orchestrator.',
+    }),
+    supabaseNode('Supabase: Persist Conversation AI Status', [1120, 200], {
+      operation: 'update',
+      tableId: 'tenant_conversations',
+      filters: {
+        conditions: [
+          {
+            keyName: 'last_inbound_message_id',
+            condition: 'eq',
+            keyValue: '={{ $json.id }}',
+          },
+        ],
+      },
+      fieldsUi: {
+        fieldValues: [
+          { fieldId: 'ai_processing_status', fieldValue: '={{ $json.conversation_ai_processing_status || "done" }}' },
+        ],
+      },
+    }, {
+      id: 'wa-ai-update-conversation',
+      notesInFlow: true,
+      notes: 'Persistenza finale sullo stato AI della conversation.',
+    }),
+  ],
+  connections: buildConnections([
+    { from: 'Cron (1 min)', to: 'Code: Claim + Orchestrate AI', type: 'main', branch: 0 },
+    { from: 'Code: Claim + Orchestrate AI', to: 'Supabase: Persist AI Outcome', type: 'main', branch: 0 },
+    { from: 'Supabase: Persist AI Outcome', to: 'Supabase: Persist Conversation AI Status', type: 'main', branch: 0 },
   ]),
 });
 
 writeJson(paths.ingestion, buildIngestionWorkflow());
 writeJson(paths.processor, buildProcessorWorkflow());
+writeJson(paths.outboundSender, buildOutboundSenderWorkflow());
+writeJson(paths.aiOrchestrator, buildAiOrchestratorWorkflow());
 
 console.log('Built WhatsApp workflows:');
 console.log(`- ${paths.ingestion}`);
 console.log(`- ${paths.processor}`);
+console.log(`- ${paths.outboundSender}`);
+console.log(`- ${paths.aiOrchestrator}`);

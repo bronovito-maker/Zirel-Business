@@ -9,7 +9,15 @@
   - billing Stripe
 - Billing e reminder sono già stati sistemati e verificati.
 - Le analytics base del dashboard sono state aggiunte e la build passa.
-- La fase attuale riguarda la progettazione e futura implementazione dell'integrazione WhatsApp Cloud API ufficiale in ottica multi-tenant.
+- La pipeline WhatsApp V3 non e piu solo progettata: il loop tecnico base e stato implementato e validato in ambiente reale.
+- Ad oggi risultano confermati:
+  - webhook Meta verificato tramite pre-handler Railway
+  - persistenza inbound in Supabase
+  - processor multi-tenant
+  - creazione conversation e inbound message
+  - AI Orchestrator collegato ad AI Core
+  - Outbound Sender collegato a Meta Cloud API
+  - test reale end-to-end riuscito con reply automatica
 
 ## Decisione architetturale approvata
 La direzione ufficiale approvata è:
@@ -78,8 +86,8 @@ L'architettura deve supportare entrambi i modelli:
 - la risoluzione del token deve avvenire solo nel sender
 - `access_token_ref` è solo un riferimento
 
-## Workflow n8n da implementare
-Ordine consigliato:
+## Workflow n8n implementati
+Ordine implementato:
 
 1. `WhatsApp Webhook Ingestion`
 2. `WhatsApp Event Processor`
@@ -89,7 +97,7 @@ Ordine consigliato:
 ## Specifica V3 approvata
 
 ### 1. WhatsApp Webhook Ingestion
-- verifica firma Meta
+- verifica trusted handoff dal pre-handler
 - persistenza sincrona in `channel_webhook_events`
 - risposta `200 OK` solo dopo persistenza riuscita
 
@@ -102,7 +110,7 @@ Ordine consigliato:
 - marca `processed = true`
 
 ### 3. WhatsApp Outbound Sender
-- legge messaggi outbound in coda
+- legge messaggi outbound pronti in coda
 - risolve credenziali in modo agnostico
 - invia via Cloud API
 - aggiorna `external_message_id` e `delivery_status`
@@ -111,7 +119,7 @@ Ordine consigliato:
 - legge inbound `pending_ai`
 - evita risposta se `human_handoff` o `closed`
 - passa ad AI Core
-- crea outbound `pending_send`
+- crea outbound AI nel formato compatibile con il sender
 
 ## Regole runtime importanti
 - mai chiamare AI Core direttamente dal webhook Meta
@@ -119,6 +127,31 @@ Ordine consigliato:
 - queue async per robustezza e replay
 - handoff umano come stato conversazione
 - fallback conversation matching su `customer_phone_normalized`
+
+## Stato runtime validato
+
+I file workflow consolidati nel repo sono:
+
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/n8n_workflows/whatsapp_v3_ingestion.json`
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/n8n_workflows/whatsapp_v3_processor.json`
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/n8n_workflows/whatsapp_v3_outbound_sender.json`
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/n8n_workflows/whatsapp_v3_ai_orchestrator.json`
+
+Builder e test locali:
+
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/scripts/build_whatsapp_workflows.mjs`
+- `/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl/tests/whatsapp_workflows_contracts.mjs`
+
+Polling validato sul campo:
+
+- configurazione iniziale: 1 minuto per processor, orchestrator, sender
+- configurazione testata poi: 30 secondi per tutti e tre
+- latenza osservata con cron a 30 secondi: circa 1 minuto e 30 secondi end-to-end
+
+Nota:
+
+- questa latenza e coerente col design a polling e non indica un bug
+- per scendere ulteriormente va valutato se spingere a 15 secondi o introdurre trigger piu reattivi
 
 ## Stato dashboard e prodotto generale
 - Dashboard billing wiring completato:
@@ -157,15 +190,16 @@ Motivo:
 - Antigravity è utile per operare con MCP e creare rapidamente struttura
 - Codex è più preciso nella revisione architetturale e nella correzione dei dettagli delicati
 
-## Prossimo step raccomandato
-Procedere con:
+## Prossimi step raccomandati
 
-- implementazione dei workflow n8n WhatsApp:
-  - `Webhook Ingestion`
-  - `Event Processor`
+Da qui in avanti non serve piu costruire il motore base, ma rifinire la produzione:
 
-e solo dopo:
-
-- `Outbound Sender`
-- `AI Orchestrator`
-
+1. status update completi
+   - `sent_at`
+   - `delivered_at`
+   - `read_at`
+   - `failed_at`
+2. retry policy piu rigorosa per sender e orchestrator
+3. monitoring query / vista operativa
+4. test approfondito di `human_handoff` e `closed`
+5. eventuale riduzione polling da 30 a 15 secondi solo dopo osservazione stabile
