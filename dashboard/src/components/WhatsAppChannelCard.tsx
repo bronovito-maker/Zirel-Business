@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Activity, CheckCircle2, ChevronDown, ChevronUp, Copy, Loader2, MessageSquare, RefreshCw, ShieldCheck, Smartphone, Sparkles, TriangleAlert, Unplug, Webhook } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { completeWhatsAppEmbeddedSignup, disconnectWhatsAppChannel, getWhatsAppChannelOpsSummary, getWhatsAppChannelSummary } from '../lib/supabase-helpers';
+import { completeWhatsAppEmbeddedSignup, disconnectWhatsAppChannel, getWhatsAppChannelOpsSummary, getWhatsAppChannelSummary, syncWhatsAppChannel } from '../lib/supabase-helpers';
 import {
     extractEmbeddedSignupIdentifiers,
     isEmbeddedSignupConfigured,
@@ -145,6 +145,20 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
             toast.error('Non siamo riusciti a caricare lo stato del canale WhatsApp.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleRefreshStatus = async () => {
+        try {
+            setIsLoading(true);
+            const syncResult = await syncWhatsAppChannel(tenantId);
+            if (syncResult.synced) {
+                toast.success('Dettagli WhatsApp sincronizzati da Meta.');
+            }
+        } catch (error) {
+            console.warn('WhatsApp channel sync warning:', error);
+        } finally {
+            await loadSummary();
         }
     };
 
@@ -298,7 +312,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                         </div>
                     </div>
                     <button
-                        onClick={() => void loadSummary()}
+                        onClick={() => void handleRefreshStatus()}
                         disabled={isLoading}
                         className="apple-button-secondary flex items-center justify-center gap-2 w-full md:w-auto"
                     >

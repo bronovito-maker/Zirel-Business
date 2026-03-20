@@ -228,6 +228,15 @@ export interface DisconnectWhatsAppChannelResult {
     error_message?: string;
 }
 
+export interface SyncWhatsAppChannelResult {
+    ok: boolean;
+    synced?: boolean;
+    reason?: string;
+    account?: Partial<WhatsAppChannelSummary> | null;
+    error_code?: string;
+    error_message?: string;
+}
+
 export interface WhatsAppFailedOutboundItem {
     id: string;
     conversation_id?: string | null;

@@ -8,6 +8,7 @@ import type {
     CompleteWhatsAppEmbeddedSignupPayload,
     CompleteWhatsAppEmbeddedSignupResult,
     DisconnectWhatsAppChannelResult,
+    SyncWhatsAppChannelResult,
     WhatsAppChannelOpsSummary,
     WhatsAppConversationSummary,
     WhatsAppConversationStatus,
@@ -404,6 +405,39 @@ export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<What
         tenant_id: summary.tenant_id || tid,
         connection_status: normalizeWhatsAppConnectionStatus(summary),
     } as WhatsAppChannelSummary;
+};
+
+export const syncWhatsAppChannel = async (tenantId?: string): Promise<SyncWhatsAppChannelResult> => {
+    const tid = ensureTenantId(tenantId);
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+
+    const response = await fetch('/api/whatsapp/sync', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tid,
+        },
+        body: JSON.stringify({
+            tenant_id: tid,
+            tenant_api_token: authToken,
+        }),
+    });
+
+    let body: SyncWhatsAppChannelResult | null = null;
+    try {
+        body = await response.json() as SyncWhatsAppChannelResult;
+    } catch {
+        body = null;
+    }
+
+    if (!response.ok || !body?.ok) {
+        throw new Error(body?.error_message || body?.error_code || `WHATSAPP_SYNC_HTTP_${response.status}`);
+    }
+
+    return body;
 };
 
 export const completeWhatsAppEmbeddedSignup = async (

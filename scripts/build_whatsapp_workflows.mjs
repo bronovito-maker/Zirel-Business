@@ -275,7 +275,7 @@ const getSingleTenantAccount = async (phoneNumberId) => {
   if (!phoneNumberId) return null;
   const rows = await rest(
     'GET',
-    'tenant_whatsapp_accounts?select=id,tenant_id,meta_phone_number_id,credential_mode,credential_provider&meta_phone_number_id=eq.' +
+    'tenant_whatsapp_accounts?select=id,tenant_id,meta_phone_number_id,credential_mode,credential_provider,webhook_verified_at,last_webhook_at&meta_phone_number_id=eq.' +
       encode(phoneNumberId) +
       '&limit=1'
   );
@@ -369,6 +369,11 @@ const patchMessage = async (messageId, body) => {
   return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);
 };
 
+const patchTenantAccount = async (tenantAccountId, body) => {
+  if (!tenantAccountId) return [];
+  return rest('PATCH', 'tenant_whatsapp_accounts?id=eq.' + encode(tenantAccountId), body);
+};
+
 const buildStatusPatch = (event) => {
   const patch = {
     delivery_status: event.delivery_status || null,
@@ -432,6 +437,19 @@ for (const row of claimedRows) {
         rowNotes.push('ORPHAN_TENANT:' + (event.phone_number_id || 'missing_phone_number_id'));
         continue;
       }
+
+      const webhookTimestamp =
+        event.message_timestamp ||
+        event.status_timestamp ||
+        new Date().toISOString();
+      const tenantAccountPatch = {
+        last_webhook_at: webhookTimestamp,
+      };
+      if (!tenantAccount.webhook_verified_at) {
+        tenantAccountPatch.webhook_verified_at = webhookTimestamp;
+        tenantAccount.webhook_verified_at = webhookTimestamp;
+      }
+      await patchTenantAccount(tenantAccount.id, tenantAccountPatch);
 
       if (!event.wamid) {
         rowNotes.push('INVALID_EVENT:missing_wamid');

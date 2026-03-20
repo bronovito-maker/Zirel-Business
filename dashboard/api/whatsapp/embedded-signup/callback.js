@@ -3,6 +3,7 @@ import {
     extractBearerToken,
     normalizeEmbeddedSignupPayload,
 } from '../../_lib/whatsapp-embedded-signup.js';
+import { syncTenantWhatsAppAccount } from '../../_lib/whatsapp-channel-sync.js';
 
 function json(res, status, body) {
     res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -185,11 +186,25 @@ export default async function handler(req, res) {
             .upsert(payload, {
                 onConflict: 'id',
             })
-            .select('id, tenant_id, meta_phone_number_id, waba_id, display_phone_number, verified_name, connection_status')
+            .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref, waba_id, display_phone_number, verified_name, quality_rating, connection_status, last_sync_at, last_webhook_at, webhook_verified_at, onboarding_error')
             .single();
 
         if (error || !data) {
             throw error || new Error('UPSERT_FAILED');
+        }
+
+        let enriched = data;
+        try {
+            const syncResult = await syncTenantWhatsAppAccount(supabase, data, process.env);
+            if (syncResult.ok && syncResult.data) {
+                enriched = syncResult.data;
+            }
+        } catch (syncError) {
+            console.warn('[whatsapp-embedded-signup] post-upsert sync skipped', {
+                tenant_id: tenant.tenant_id,
+                meta_phone_number_id: normalized.data.meta_phone_number_id,
+                error: syncError instanceof Error ? syncError.message : String(syncError),
+            });
         }
 
         console.info('[whatsapp-embedded-signup] completed', {
@@ -201,12 +216,12 @@ export default async function handler(req, res) {
 
         return json(res, 200, {
             ok: true,
-            tenant_id: String(data.tenant_id),
-            connection_status: String(data.connection_status || normalized.data.connection_status),
-            meta_phone_number_id: String(data.meta_phone_number_id || normalized.data.meta_phone_number_id),
-            waba_id: String(data.waba_id || normalized.data.waba_id),
-            display_phone_number: data.display_phone_number || normalized.data.display_phone_number,
-            verified_name: data.verified_name || normalized.data.verified_name,
+            tenant_id: String(enriched.tenant_id),
+            connection_status: String(enriched.connection_status || normalized.data.connection_status),
+            meta_phone_number_id: String(enriched.meta_phone_number_id || normalized.data.meta_phone_number_id),
+            waba_id: String(enriched.waba_id || normalized.data.waba_id),
+            display_phone_number: enriched.display_phone_number || normalized.data.display_phone_number,
+            verified_name: enriched.verified_name || normalized.data.verified_name,
             next_step: 'refresh_channel_status',
         });
     } catch (error) {
