@@ -367,28 +367,37 @@ const normalizeWhatsAppConnectionStatus = (
 
 export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<WhatsAppChannelSummary> => {
     const tid = ensureTenantId(tenantId);
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
 
-    const { data, error } = await supabase
-        .from('tenant_whatsapp_accounts')
-        .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref')
-        .eq('tenant_id', tid)
-        .order('created_at', { ascending: false, nullsFirst: false })
-        .limit(1)
-        .maybeSingle();
+    const response = await fetch(`/api/whatsapp/channel-summary?tenant_id=${encodeURIComponent(tid)}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tid,
+        },
+    });
 
-    if (error) throw error;
+    let body: { ok?: boolean; summary?: Partial<WhatsAppChannelSummary>; error_message?: string; error_code?: string } | null = null;
 
-    if (!data) {
-        return {
-            tenant_id: tid,
-            connection_status: 'not_connected',
-        };
+    try {
+        body = await response.json() as { ok?: boolean; summary?: Partial<WhatsAppChannelSummary>; error_message?: string; error_code?: string };
+    } catch {
+        body = null;
     }
 
+    if (!response.ok || !body?.ok) {
+        throw new Error(body?.error_message || body?.error_code || `WHATSAPP_SUMMARY_HTTP_${response.status}`);
+    }
+
+    const summary = body.summary || { tenant_id: tid, connection_status: 'not_connected' };
     return {
-        ...(data as Partial<WhatsAppChannelSummary>),
-        connection_status: normalizeWhatsAppConnectionStatus(data as Partial<WhatsAppChannelSummary>),
-    };
+        ...(summary as Partial<WhatsAppChannelSummary>),
+        tenant_id: summary.tenant_id || tid,
+        connection_status: normalizeWhatsAppConnectionStatus(summary),
+    } as WhatsAppChannelSummary;
 };
 
 export const completeWhatsAppEmbeddedSignup = async (
