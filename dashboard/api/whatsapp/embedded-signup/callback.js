@@ -30,16 +30,22 @@ async function resolveTenantId(supabase, req) {
     const apiToken =
         extractBearerToken(authHeader) ||
         extractBearerToken(req.headers['x-zirel-api-token']);
+    const expectedTenantId = String(req.headers['x-zirel-tenant-id'] || '').trim() || null;
 
     if (!apiToken) {
         return { ok: false, status: 401, error_code: 'WHATSAPP_SIGNUP_UNAUTHORIZED', error_message: 'Missing tenant API token' };
     }
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('tenants')
         .select('tenant_id')
-        .eq('api_token', apiToken)
-        .single();
+        .eq('api_token', apiToken);
+
+    if (expectedTenantId) {
+        query = query.eq('tenant_id', expectedTenantId);
+    }
+
+    const { data, error } = await query.single();
 
     if (error || !data?.tenant_id) {
         return { ok: false, status: 401, error_code: 'WHATSAPP_SIGNUP_UNAUTHORIZED', error_message: 'Invalid tenant API token' };

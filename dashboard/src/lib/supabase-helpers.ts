@@ -395,6 +395,7 @@ export const completeWhatsAppEmbeddedSignup = async (
     payload: CompleteWhatsAppEmbeddedSignupPayload
 ): Promise<CompleteWhatsAppEmbeddedSignupResult> => {
     const authToken = getAuthToken();
+    const tenantId = getTenantId();
     if (!authToken) throw new Error('NOT_AUTHENTICATED');
 
     const response = await fetch('/api/whatsapp/embedded-signup/callback', {
@@ -402,6 +403,8 @@ export const completeWhatsAppEmbeddedSignup = async (
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            ...(tenantId ? { 'X-Zirel-Tenant-Id': tenantId } : {}),
         },
         body: JSON.stringify(payload),
     });
