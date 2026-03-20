@@ -638,12 +638,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 </aside>
 
                 <div className="min-w-0">
-                    <header className="sticky top-0 z-40 border-b border-gray-200/70 bg-white/85 backdrop-blur-xl">
+                    <header className="fixed left-0 right-0 top-0 z-40 border-b border-gray-200/70 bg-white/92 backdrop-blur-xl lg:sticky lg:left-auto lg:right-auto lg:top-0">
                         <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-5 px-4 py-3 sm:px-6 lg:px-8">
                             <div className="flex min-w-0 items-center gap-3">
                                 <button
                                     onClick={() => setIsMobileNavOpen(true)}
-                                    className="apple-button-secondary flex h-11 w-11 items-center justify-center rounded-2xl border-gray-200 bg-white lg:hidden"
+                                    className="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-white text-zirel-orange-dark shadow-sm transition hover:border-orange-200 hover:shadow-md lg:hidden"
                                     aria-label="Apri menu"
                                 >
                                     <Menu className="h-5 w-5" />
@@ -725,65 +725,69 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     {isMobileNavOpen ? (
                         <div className="fixed inset-0 z-50 bg-slate-950/45 lg:hidden" onClick={() => setIsMobileNavOpen(false)}>
                             <div
-                                className="h-full w-[88vw] max-w-sm overflow-y-auto border-r border-gray-200/80 bg-white px-4 py-5 shadow-2xl"
+                                className="flex h-full w-[88vw] max-w-sm flex-col border-r border-gray-200/80 bg-white px-4 py-4 shadow-2xl"
                                 onClick={(event) => event.stopPropagation()}
                             >
-                                <div className="mb-5 flex items-center justify-between gap-3">
-                                    <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-14 w-auto" />
+                                <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+                                    <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-16 w-auto -ml-1" />
                                     <button
                                         onClick={() => setIsMobileNavOpen(false)}
-                                        className="apple-button-secondary flex h-10 w-10 items-center justify-center rounded-2xl border-gray-200 bg-white"
+                                        className="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 to-white text-zirel-orange-dark shadow-sm transition hover:border-orange-200"
                                         aria-label="Chiudi menu"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
 
-                                <div className="mb-5 rounded-[1.5rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-4 shadow-sm">
+                                <div className="mb-4 shrink-0 rounded-[1.5rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-4 shadow-sm">
                                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Tenant attivo</p>
                                     <p className="mt-2 text-lg font-black tracking-tight text-zirel-blue">{formData.nome_ristorante || tenantId}</p>
                                     <p className="mt-1 text-sm text-gray-500">Pannello di controllo</p>
                                 </div>
 
-                                <nav className="space-y-2">
-                                    {DASHBOARD_TABS.map((tab) => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => setActiveTab(tab.id)}
-                                            className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all ${activeTab === tab.id
-                                                ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50'
-                                                : 'border border-transparent bg-white text-gray-600 hover:border-orange-100 hover:bg-orange-50/70'
-                                                }`}
-                                        >
-                                            <tab.icon className={`h-5 w-5 shrink-0 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`} />
-                                            <div className="min-w-0">
-                                                <div className="font-bold">{tab.shortLabel}</div>
-                                                <div className={`truncate text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-gray-400'}`}>{tab.description}</div>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </nav>
+                                <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                                    <nav className="space-y-2">
+                                        {DASHBOARD_TABS.map((tab) => (
+                                            <button
+                                                key={tab.id}
+                                                onClick={() => setActiveTab(tab.id)}
+                                                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all ${activeTab === tab.id
+                                                    ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50'
+                                                    : 'border border-transparent bg-white text-gray-600 hover:border-orange-100 hover:bg-orange-50/70'
+                                                    }`}
+                                            >
+                                                <tab.icon className={`h-5 w-5 shrink-0 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`} />
+                                                <div className="min-w-0">
+                                                    <div className="font-bold">{tab.shortLabel}</div>
+                                                    <div className={`truncate text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-gray-400'}`}>{tab.description}</div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </nav>
+                                </div>
 
-                                <div className="mt-6 space-y-3">
-                                    <a
-                                        href="https://zirel.org"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-5 py-3"
-                                    >
-                                        <House className="h-4 w-4" />
-                                        Torna alla Home
-                                    </a>
-                                    <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-5 py-3">
-                                        <LogOut className="h-4 w-4 text-gray-400" />
-                                        Esci
-                                    </button>
+                                <div className="mt-4 shrink-0 border-t border-gray-200/80 pt-4">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <a
+                                            href="https://zirel.org"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-4 py-3"
+                                        >
+                                            <House className="h-4 w-4" />
+                                            Home
+                                        </a>
+                                        <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-4 py-3">
+                                            <LogOut className="h-4 w-4 text-gray-400" />
+                                            Esci
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ) : null}
 
-                    <main className="mx-auto max-w-[1680px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+                    <main className="mx-auto max-w-[1680px] px-4 pb-5 pt-24 sm:px-6 lg:px-8 lg:py-6 lg:pt-6">
 
                 {dashboardBillingBanner && (
                     <section className={`${dashboardBillingBanner.tone} mb-5 rounded-[1.75rem] px-5 py-5 md:px-7 md:py-6 animate-fade-in delay-150`}>

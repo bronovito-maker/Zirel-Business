@@ -430,7 +430,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     <MessageSquare className="h-4 w-4" />
                                     Automazione WhatsApp
                                 </div>
-                                <div className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
+                                <div className="flex flex-col items-start gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm font-semibold text-gray-800">
                                             {automationEnabled ? 'Risposte automatiche attive' : 'Risposte automatiche sospese'}
@@ -444,7 +444,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     <button
                                         onClick={() => void handleToggleAutomation()}
                                         disabled={isAutomationSaving}
-                                        className={`inline-flex items-center justify-center rounded-2xl border px-4 py-3 transition ${
+                                        className={`inline-flex w-full items-center justify-center rounded-2xl border px-4 py-3 transition sm:w-auto ${
                                             automationEnabled
                                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                                 : 'border-slate-200 bg-slate-50 text-slate-600'
