@@ -132,3 +132,87 @@ export interface AnalyticsSummary {
     tracks_messages: boolean;
     tracks_abandonment: boolean;
 }
+
+export type WhatsAppConversationStatus = 'ai_active' | 'human_handoff' | 'closed';
+
+export interface WhatsAppConversationSummary {
+    id: string;
+    tenant_id: string;
+    channel: string;
+    status: WhatsAppConversationStatus | string;
+    ai_processing_status?: string | null;
+    customer_name?: string | null;
+    customer_phone_normalized?: string | null;
+    external_contact_id?: string | null;
+    last_message_at?: string | null;
+    updated_at?: string | null;
+    last_inbound_message_id?: string | null;
+    last_outbound_message_id?: string | null;
+}
+
+export interface WhatsAppMessageSummary {
+    id: string;
+    conversation_id: string;
+    tenant_id: string;
+    channel: string;
+    direction: 'inbound' | 'outbound' | string;
+    sender_role: 'customer' | 'ai' | 'human' | 'system' | string;
+    message_type?: string | null;
+    content_text?: string | null;
+    external_message_id?: string | null;
+    delivery_status?: string | null;
+    processing_status?: string | null;
+    error_message?: string | null;
+    provider_payload_json?: Record<string, unknown> | null;
+    created_at?: string | null;
+    sent_at?: string | null;
+    delivered_at?: string | null;
+    read_at?: string | null;
+    failed_at?: string | null;
+}
+
+export type WhatsAppConnectionStatus =
+    | 'not_connected'
+    | 'connection_in_progress'
+    | 'connected'
+    | 'requires_attention'
+    | 'error';
+
+export interface WhatsAppChannelSummary {
+    id?: string;
+    tenant_id?: string;
+    meta_phone_number_id?: string | null;
+    credential_mode?: string | null;
+    credential_provider?: string | null;
+    access_token_ref?: string | null;
+    waba_id?: string | null;
+    display_phone_number?: string | null;
+    verified_name?: string | null;
+    connection_status: WhatsAppConnectionStatus;
+    last_sync_at?: string | null;
+    onboarding_error?: string | null;
+}
+
+export interface CompleteWhatsAppEmbeddedSignupPayload {
+    meta_phone_number_id: string;
+    waba_id: string;
+    display_phone_number?: string | null;
+    verified_name?: string | null;
+    connection_status?: WhatsAppConnectionStatus | string;
+    business_id?: string | null;
+    signup_session_id?: string | null;
+    replace_existing?: boolean;
+}
+
+export interface CompleteWhatsAppEmbeddedSignupResult {
+    ok: boolean;
+    tenant_id?: string;
+    connection_status?: WhatsAppConnectionStatus | string;
+    meta_phone_number_id?: string;
+    waba_id?: string;
+    display_phone_number?: string | null;
+    verified_name?: string | null;
+    next_step?: string;
+    error_code?: string;
+    error_message?: string;
+}

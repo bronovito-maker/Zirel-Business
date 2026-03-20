@@ -1,5 +1,18 @@
 import { supabase } from './supabaseClient';
-import type { TenantData, Reservation, DocumentFile, AnalyticsSummary, AnalyticsTrendPoint } from '../types';
+import type {
+    TenantData,
+    Reservation,
+    DocumentFile,
+    AnalyticsSummary,
+    AnalyticsTrendPoint,
+    CompleteWhatsAppEmbeddedSignupPayload,
+    CompleteWhatsAppEmbeddedSignupResult,
+    WhatsAppConversationSummary,
+    WhatsAppConversationStatus,
+    WhatsAppMessageSummary,
+    WhatsAppChannelSummary,
+    WhatsAppConnectionStatus,
+} from '../types';
 import { getAuthToken, getTenantId } from './auth/storage';
 import { sanitizeFilename } from './validators';
 
@@ -275,6 +288,137 @@ export const triggerIngestion = async (filename: string, fileUrl: string, tenant
     }
 
     return { success: true };
+};
+
+export const getWhatsAppConversations = async (tenantId?: string): Promise<WhatsAppConversationSummary[]> => {
+    const tid = ensureTenantId(tenantId);
+
+    const { data, error } = await supabase
+        .from('tenant_conversations')
+        .select('id, tenant_id, channel, status, ai_processing_status, customer_name, customer_phone_normalized, external_contact_id, last_message_at, updated_at, last_inbound_message_id, last_outbound_message_id')
+        .eq('tenant_id', tid)
+        .eq('channel', 'whatsapp')
+        .order('last_message_at', { ascending: false, nullsFirst: false })
+        .limit(25);
+
+    if (error) throw error;
+    return (data || []) as WhatsAppConversationSummary[];
+};
+
+export const updateWhatsAppConversationStatus = async (
+    conversationId: string,
+    action: 'human_handoff' | 'resume_ai' | 'close',
+    tenantId?: string
+) => {
+    const tid = ensureTenantId(tenantId);
+    if (!conversationId) throw new Error('INVALID_PARAMS');
+
+    const nextStatus: WhatsAppConversationStatus =
+        action === 'human_handoff'
+            ? 'human_handoff'
+            : action === 'resume_ai'
+                ? 'ai_active'
+                : 'closed';
+
+    const { data, error } = await supabase
+        .from('tenant_conversations')
+        .update({ status: nextStatus })
+        .eq('id', conversationId)
+        .eq('tenant_id', tid)
+        .eq('channel', 'whatsapp')
+        .select('id, tenant_id, channel, status, ai_processing_status, customer_name, customer_phone_normalized, external_contact_id, last_message_at, updated_at, last_inbound_message_id, last_outbound_message_id')
+        .single();
+
+    if (error) throw error;
+    return data as WhatsAppConversationSummary;
+};
+
+export const getWhatsAppConversationMessages = async (
+    conversationId: string,
+    tenantId?: string
+): Promise<WhatsAppMessageSummary[]> => {
+    const tid = ensureTenantId(tenantId);
+    if (!conversationId) throw new Error('INVALID_PARAMS');
+
+    const { data, error } = await supabase
+        .from('conversation_messages')
+        .select('id, conversation_id, tenant_id, channel, direction, sender_role, message_type, content_text, external_message_id, delivery_status, processing_status, error_message, provider_payload_json, created_at, sent_at, delivered_at, read_at, failed_at')
+        .eq('tenant_id', tid)
+        .eq('conversation_id', conversationId)
+        .eq('channel', 'whatsapp')
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+    if (error) throw error;
+    return (data || []) as WhatsAppMessageSummary[];
+};
+
+const normalizeWhatsAppConnectionStatus = (
+    row: Partial<WhatsAppChannelSummary> | null
+): WhatsAppConnectionStatus => {
+    const explicit = String(row?.connection_status || '').trim().toLowerCase();
+    if (['not_connected', 'connection_in_progress', 'connected', 'requires_attention', 'error'].includes(explicit)) {
+        return explicit as WhatsAppConnectionStatus;
+    }
+
+    if (row?.meta_phone_number_id) return 'connected';
+    return 'not_connected';
+};
+
+export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<WhatsAppChannelSummary> => {
+    const tid = ensureTenantId(tenantId);
+
+    const { data, error } = await supabase
+        .from('tenant_whatsapp_accounts')
+        .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref')
+        .eq('tenant_id', tid)
+        .order('created_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+        return {
+            tenant_id: tid,
+            connection_status: 'not_connected',
+        };
+    }
+
+    return {
+        ...(data as Partial<WhatsAppChannelSummary>),
+        connection_status: normalizeWhatsAppConnectionStatus(data as Partial<WhatsAppChannelSummary>),
+    };
+};
+
+export const completeWhatsAppEmbeddedSignup = async (
+    payload: CompleteWhatsAppEmbeddedSignupPayload
+): Promise<CompleteWhatsAppEmbeddedSignupResult> => {
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+
+    const response = await fetch('/api/whatsapp/embedded-signup/callback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    let data: CompleteWhatsAppEmbeddedSignupResult | null = null;
+
+    try {
+        data = await response.json() as CompleteWhatsAppEmbeddedSignupResult;
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok || !data?.ok) {
+        throw new Error(data?.error_message || data?.error_code || `EMBEDDED_SIGNUP_HTTP_${response.status}`);
+    }
+
+    return data;
 };
 
 export const regenerateTenantToken = async (tenantId?: string): Promise<string> => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3 } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare } from 'lucide-react';
 import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
 import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
 import { syncTenantFieldState } from '../lib/tenant-form';
@@ -8,6 +8,8 @@ import Reservations from './Reservations';
 import DocumentManager from './DocumentManager';
 import BillingSection from './BillingSection';
 import AnalyticsSection from './AnalyticsSection';
+import WhatsAppHandoffPanel from './WhatsAppHandoffPanel';
+import WhatsAppChannelCard from './WhatsAppChannelCard';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
@@ -76,7 +78,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'abbonamento'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'conversazioni' | 'abbonamento'>('prenotazioni');
     const [isTokenVisible, setIsTokenVisible] = useState(false);
     const [editForm, setEditForm] = useState<Partial<TenantData>>({});
     const [isBillingLoading, setIsBillingLoading] = useState(false);
@@ -102,7 +104,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             : normalizedSubscriptionStatus === 'past_due'
                 ? isPastDueGraceExpired ? 'suspended' : 'warning'
                 : 'open';
-    const operationalTabs = new Set(['prenotazioni', 'documenti', 'integrazione', 'impostazioni']);
+    const operationalTabs = new Set(['prenotazioni', 'documenti', 'integrazione', 'conversazioni', 'impostazioni']);
     const shouldLockActiveTab = operationalTabs.has(activeTab) && (productAccessState === 'limited' || productAccessState === 'suspended');
 
     const dashboardBillingBanner = isExpiredTrial
@@ -422,10 +424,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 </header>
 
                 {/* Tab Navigation - Mobile Scrollable */}
-                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-7 gap-2 animate-fade-in delay-100 pb-2">
+                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-8 gap-2 animate-fade-in delay-100 pb-2">
                     {[
                         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
                         { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
+                        { id: 'conversazioni', label: 'Conversazioni', icon: MessageSquare },
                         { id: 'documenti', label: 'Documenti', icon: FileText },
                         { id: 'abbonamento', label: 'Abbonamento', icon: CreditCard },
                         { id: 'sicurezza', label: 'Sicurezza', icon: Shield },
@@ -540,6 +543,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 <AnalyticsSection />
                             ) : activeTab === 'prenotazioni' ? (
                                 <Reservations />
+                            ) : activeTab === 'conversazioni' ? (
+                                <div className="max-w-7xl mx-auto animate-fade-in">
+                                    <WhatsAppHandoffPanel tenantId={tenantId || undefined} />
+                                </div>
                             ) : activeTab === 'documenti' ? (
                                 <DocumentManager />
                             ) : activeTab === 'abbonamento' ? (
@@ -643,6 +650,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <p className="text-gray-500">Scegli come installare Zirèl sul tuo sito</p>
                                     </div>
                                 </div>
+
+                                <WhatsAppChannelCard
+                                    tenantId={tenantId || undefined}
+                                    onOpenConversations={() => setActiveTab('conversazioni')}
+                                />
 
                                 {/* Opzione 1: Installazione Assistita */}
                                 <div className="bg-gradient-to-br from-zirel-blue to-[#0B4A6A] rounded-[2rem] p-8 md:p-10 text-white shadow-xl shadow-zirel-blue/20 relative overflow-hidden group">
@@ -805,6 +817,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         </div>
                                     </div>
                                 </div>
+
                             </section>
                                 </div>
                             ) : (
