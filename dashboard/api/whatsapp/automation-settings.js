@@ -40,19 +40,25 @@ export default async function handler(req, res) {
     const aiEnabled = normalizeBoolean(body.ai_enabled, true);
 
     try {
-        const { data, error } = await supabase
+        const { error: updateError } = await supabase
             .from('tenant_whatsapp_accounts')
             .update({
                 ai_enabled: aiEnabled,
                 updated_at: new Date().toISOString(),
             })
-            .eq('tenant_id', tenant.tenant_id)
+            .eq('tenant_id', tenant.tenant_id);
+
+        if (updateError) throw updateError;
+
+        const { data, error: readError } = await supabase
+            .from('tenant_whatsapp_accounts')
             .select('tenant_id, ai_enabled, human_handoff_enabled')
+            .eq('tenant_id', tenant.tenant_id)
             .order('updated_at', { ascending: false, nullsFirst: false })
             .limit(1)
             .maybeSingle();
 
-        if (error) throw error;
+        if (readError) throw readError;
 
         return json(res, 200, {
             ok: true,
