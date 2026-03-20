@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, ExternalLink, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare, House, Menu, X, Search } from 'lucide-react';
 import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
 import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
 import { syncTenantFieldState } from '../lib/tenant-form';
@@ -14,6 +14,15 @@ import toast from 'react-hot-toast';
 
 interface DashboardProps {
     onLogout: () => void;
+}
+
+interface WorkspaceSearchItem {
+    id: string;
+    title: string;
+    subtitle: string;
+    tab: DashboardTab;
+    keywords: string[];
+    settingsQuery?: string;
 }
 
 interface InputFieldProps {
@@ -69,8 +78,20 @@ const formatBillingDate = (value?: string | null) => {
 };
 
 type ProductAccessState = 'open' | 'warning' | 'limited' | 'suspended';
+type DashboardTab = 'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'conversazioni' | 'abbonamento';
 
 const BILLING_GRACE_DAYS = 7;
+
+const DASHBOARD_TABS: Array<{ id: DashboardTab; label: string; shortLabel: string; icon: typeof BarChart3; description: string }> = [
+    { id: 'analytics', label: 'Analytics', shortLabel: 'Analytics', icon: BarChart3, description: 'Metriche, trend e stato operativo del concierge.' },
+    { id: 'prenotazioni', label: 'Prenotazioni', shortLabel: 'Prenotazioni', icon: CalendarDays, description: 'Richieste ricevute, conferme e operatività quotidiana.' },
+    { id: 'conversazioni', label: 'Conversazioni', shortLabel: 'Conversazioni', icon: MessageSquare, description: 'Thread WhatsApp, handoff umano e controlli live.' },
+    { id: 'documenti', label: 'Documenti', shortLabel: 'Documenti', icon: FileText, description: 'Knowledge base, materiali e ingestione documentale.' },
+    { id: 'abbonamento', label: 'Abbonamento', shortLabel: 'Abbonamento', icon: CreditCard, description: 'Billing, prova, rinnovi e stato del servizio.' },
+    { id: 'sicurezza', label: 'Sicurezza', shortLabel: 'Sicurezza', icon: Shield, description: 'Token API, accessi e operazioni sensibili.' },
+    { id: 'integrazione', label: 'Integrazione', shortLabel: 'Integrazione', icon: LinkIcon, description: 'WhatsApp, widget e configurazioni di collegamento.' },
+    { id: 'impostazioni', label: 'Impostazioni', shortLabel: 'Impostazioni', icon: Settings, description: 'Profilo attività, regole e dati usati dall’assistente.' },
+];
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
 
@@ -78,10 +99,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-    const [activeTab, setActiveTab] = useState<'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'conversazioni' | 'abbonamento'>('prenotazioni');
+    const [activeTab, setActiveTab] = useState<DashboardTab>('prenotazioni');
     const [isTokenVisible, setIsTokenVisible] = useState(false);
     const [editForm, setEditForm] = useState<Partial<TenantData>>({});
     const [isBillingLoading, setIsBillingLoading] = useState(false);
+    const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+    const [settingsSearch, setSettingsSearch] = useState('');
+    const [workspaceSearch, setWorkspaceSearch] = useState('');
+    const [isWorkspaceSearchFocused, setIsWorkspaceSearchFocused] = useState(false);
 
     const tenantId = formData?.tenant_id || getCurrentTenantId();
     const trialEndsAt = formData?.trial_ends_at ? new Date(formData.trial_ends_at) : null;
@@ -106,6 +131,156 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 : 'open';
     const operationalTabs = new Set(['prenotazioni', 'documenti', 'integrazione', 'conversazioni', 'impostazioni']);
     const shouldLockActiveTab = operationalTabs.has(activeTab) && (productAccessState === 'limited' || productAccessState === 'suspended');
+    const activeTabMeta = DASHBOARD_TABS.find((tab) => tab.id === activeTab) || DASHBOARD_TABS[0];
+    const normalizedSettingsSearch = settingsSearch.trim().toLowerCase();
+    const matchesSettingsSearch = (...values: Array<string | undefined | null>) => {
+        if (!normalizedSettingsSearch) return true;
+        return values.some((value) => String(value ?? '').toLowerCase().includes(normalizedSettingsSearch));
+    };
+    const showSettingsField = (sectionTitle: string, label: string, value?: string | null) =>
+        matchesSettingsSearch(sectionTitle, label, value);
+    const showContactSection = [
+        showSettingsField('Contatti & Info Base', 'Telefono', formData?.telefono),
+        showSettingsField('Contatti & Info Base', 'Email', formData?.mail),
+        showSettingsField('Contatti & Info Base', 'Indirizzo', formData?.indirizzo),
+        showSettingsField('Contatti & Info Base', 'Sito Web URL', formData?.sito_web_url),
+        showSettingsField('Contatti & Info Base', 'Google Maps Link', formData?.google_maps_link),
+    ].some(Boolean);
+    const showScheduleSection = [
+        showSettingsField('Orari & Tempistiche', 'Orari di Apertura', formData?.orari_apertura),
+        showSettingsField('Orari & Tempistiche', 'Giorni di Chiusura', formData?.giorni_chiusura),
+        showSettingsField('Orari & Tempistiche', 'Orari Check-in / Check-out', formData?.orari_checkin_checkout),
+        showSettingsField('Orari & Tempistiche', 'Durata Media Appuntamento', formData?.durata_media_appuntamento),
+    ].some(Boolean);
+    const showSocialSection = [
+        showSettingsField('Social & Link', 'Link Prenotazione Tavoli', formData?.link_prenotazione_tavoli),
+        showSettingsField('Social & Link', 'Link Booking/Calendario', formData?.link_booking_esterno),
+        showSettingsField('Social & Link', 'Instagram URL', formData?.instagram_url),
+        showSettingsField('Social & Link', 'Facebook URL', formData?.facebook_url),
+        showSettingsField('Social & Link', 'TripAdvisor URL', formData?.tripadvisor_url),
+        showSettingsField('Social & Link', 'Link Recensioni (Google)', formData?.recensioni_url),
+    ].some(Boolean);
+    const showOfferSection = [
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Tipo Cucina / Categoria', formData?.tipo_cucina),
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Specialità della Casa', formData?.specialita_casa),
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Prezzo Medio', formData?.prezzo_medio),
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Costo Prima Consulenza', formData?.prima_consulenza_costo),
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Servizi Inclusi', formData?.servizi_inclusi),
+        showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', "Testo del Menu Ridotto o Tariffario (Extra info per l'assistente)", formData?.menu_testo),
+    ].some(Boolean);
+    const showPracticalSection = [
+        showSettingsField('Info Pratiche & Regole', 'WiFi Password', formData?.wifi_password),
+        showSettingsField('Info Pratiche & Regole', 'Info Parcheggio', formData?.parcheggio_info),
+        showSettingsField('Info Pratiche & Regole', 'Animali Ammessi', formData?.animali_ammessi),
+        showSettingsField('Info Pratiche & Regole', 'Metodi di Pagamento', formData?.metodi_pagamento),
+        showSettingsField('Info Pratiche & Regole', 'Tassa di Soggiorno', formData?.tassa_soggiorno),
+        showSettingsField('Info Pratiche & Regole', 'Policy Allergie', formData?.allergie_policy),
+    ].some(Boolean);
+    const showMarketingSection = [
+        showSettingsField('Marketing & Messaggi', 'Promozione Attiva Oggi', formData?.promozione_attiva),
+        showSettingsField('Marketing & Messaggi', 'Informazioni Aggiuntive Rapide', formData?.dati_testuali_brevi),
+    ].some(Boolean);
+    const hasVisibleSettingsResults = [
+        showContactSection,
+        showScheduleSection,
+        showSocialSection,
+        showOfferSection,
+        showPracticalSection,
+        showMarketingSection,
+    ].some(Boolean);
+    const workspaceSearchItems: WorkspaceSearchItem[] = [
+        ...DASHBOARD_TABS.map((tab) => ({
+            id: `tab-${tab.id}`,
+            title: tab.label,
+            subtitle: tab.description,
+            tab: tab.id,
+            keywords: [tab.label, tab.shortLabel, tab.description],
+        })),
+        {
+            id: 'settings-contacts',
+            title: 'Contatti e info base',
+            subtitle: 'Telefono, email, indirizzo e sito',
+            tab: 'impostazioni',
+            settingsQuery: 'contatti',
+            keywords: ['contatti', 'telefono', 'email', 'indirizzo', 'sito', 'google maps'],
+        },
+        {
+            id: 'settings-hours',
+            title: 'Orari e tempistiche',
+            subtitle: 'Apertura, chiusura, check-in e durata',
+            tab: 'impostazioni',
+            settingsQuery: 'orari',
+            keywords: ['orari', 'check-in', 'checkout', 'giorni chiusura', 'durata'],
+        },
+        {
+            id: 'settings-social',
+            title: 'Social e link',
+            subtitle: 'Instagram, Facebook, prenotazioni e recensioni',
+            tab: 'impostazioni',
+            settingsQuery: 'instagram',
+            keywords: ['social', 'instagram', 'facebook', 'tripadvisor', 'recensioni', 'booking', 'prenotazione'],
+        },
+        {
+            id: 'settings-offer',
+            title: 'Dettagli offerta',
+            subtitle: 'Prezzi, servizi, menu e categoria',
+            tab: 'impostazioni',
+            settingsQuery: 'prezzo',
+            keywords: ['offerta', 'prezzo', 'servizi', 'menu', 'categoria', 'specialita'],
+        },
+        {
+            id: 'settings-practical',
+            title: 'Info pratiche e regole',
+            subtitle: 'WiFi, parcheggio, metodi di pagamento e policy',
+            tab: 'impostazioni',
+            settingsQuery: 'wifi',
+            keywords: ['wifi', 'parcheggio', 'animali', 'pagamento', 'allergie', 'tassa soggiorno'],
+        },
+        {
+            id: 'settings-marketing',
+            title: 'Marketing e messaggi',
+            subtitle: 'Promozioni e testo rapido',
+            tab: 'impostazioni',
+            settingsQuery: 'promozione',
+            keywords: ['marketing', 'messaggi', 'promozione', 'testo rapido'],
+        },
+        {
+            id: 'integration-whatsapp',
+            title: 'Canale WhatsApp',
+            subtitle: 'Collegamento, stato e diagnostica canale',
+            tab: 'integrazione',
+            keywords: ['whatsapp', 'waba', 'numero collegato', 'canale', 'webhook'],
+        },
+        {
+            id: 'integration-widget',
+            title: 'Widget sito',
+            subtitle: 'Titolo, sottotitolo, colore e snippet',
+            tab: 'integrazione',
+            keywords: ['widget', 'snippet', 'colore', 'sito', 'installazione'],
+        },
+        {
+            id: 'security-token',
+            title: 'Token API e sicurezza',
+            subtitle: 'Visibilità, rigenerazione e accessi',
+            tab: 'sicurezza',
+            keywords: ['token', 'api', 'sicurezza', 'rigenera', 'accessi'],
+        },
+        {
+            id: 'billing-overview',
+            title: 'Abbonamento e fatturazione',
+            subtitle: 'Piano, rinnovi e portale Stripe',
+            tab: 'abbonamento',
+            keywords: ['abbonamento', 'stripe', 'fatturazione', 'rinnovo', 'prova'],
+        },
+    ];
+    const normalizedWorkspaceSearch = workspaceSearch.trim().toLowerCase();
+    const workspaceSearchResults = normalizedWorkspaceSearch
+        ? workspaceSearchItems.filter((item) =>
+            [item.title, item.subtitle, ...item.keywords].some((value) =>
+                value.toLowerCase().includes(normalizedWorkspaceSearch)
+            )
+        ).slice(0, 6)
+        : [];
 
     const dashboardBillingBanner = isExpiredTrial
         ? {
@@ -164,6 +339,21 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     }, [fetchData]);
 
     useEffect(() => {
+        setIsMobileNavOpen(false);
+    }, [activeTab]);
+
+    const handleWorkspaceSearchSelect = (item: WorkspaceSearchItem) => {
+        setActiveTab(item.tab);
+        if (item.tab === 'impostazioni') {
+            setSettingsSearch(item.settingsQuery || workspaceSearch);
+        } else {
+            setSettingsSearch('');
+        }
+        setWorkspaceSearch('');
+        setIsWorkspaceSearchFocused(false);
+    };
+
+    useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab');
         const status = params.get('status');
@@ -194,14 +384,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const handleUpdate = async () => {
         if (!tenantId) return;
         setIsUpdating(true);
-        const loadingToast = toast.loading('Aggiorno l\'Intelligenza Artificiale...');
+        const loadingToast = toast.loading('Salvo le impostazioni...');
 
         try {
             await updateTenantData(editForm);
             const nextFormData = formData ? { ...formData, ...editForm } : null;
             setFormData(nextFormData);
             setEditForm(nextFormData || {});
-            toast.success('Il tuo assistente ha imparato le nuove regole!', {
+            toast.success('Le impostazioni sono state aggiornate correttamente.', {
                 id: loadingToast,
                 duration: 5000,
                 icon: <CheckCircle2 className="text-green-500" />,
@@ -391,66 +581,212 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-                {/* Header */}
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-16 animate-fade-in">
-                    <div className="flex flex-col md:flex-row items-center gap-0 md:gap-6 text-center md:text-left">
-                        <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-28 md:h-40 w-auto drop-shadow-sm -mb-4 md:mb-0 relative z-10" />
-                        <div className="hidden md:block md:h-12 md:w-px bg-gray-200"></div>
-                        <div className="mt-2 md:mt-0 relative z-20">
-                            <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-                                Benvenuto, <span className="text-zirel-orange-dark">{formData.nome_ristorante || tenantId}</span>
-                            </h1>
-                            <p className="text-gray-500 text-sm md:text-base">Pannello di controllo</p>
+        <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(255,140,66,0.09),_transparent_32%),linear-gradient(180deg,#f6f9fc_0%,#fbfcfe_55%,#ffffff_100%)] text-gray-900">
+            <div className="lg:grid lg:min-h-screen lg:grid-cols-[280px_minmax(0,1fr)]">
+                <aside className="hidden h-screen border-r border-gray-200/80 bg-white/88 backdrop-blur-xl lg:sticky lg:top-0 lg:flex lg:flex-col">
+                    <div className="flex h-full min-h-0 flex-col px-5 py-4">
+                        <div className="shrink-0 space-y-2 pb-3">
+                            <div className="-mt-4 -mb-1 overflow-hidden">
+                                <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-24 w-auto drop-shadow-sm" />
+                            </div>
+                            <div className="rounded-[1.6rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-3.5 shadow-sm">
+                                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Tenant attivo</p>
+                                <p className="mt-1.5 text-lg font-black tracking-tight text-zirel-blue">{formData.nome_ristorante || tenantId}</p>
+                                <p className="mt-0.5 text-sm text-gray-500">Pannello di controllo Zirèl</p>
+                            </div>
+                        </div>
+
+                        <div className="min-h-0 flex-1 overflow-y-auto py-2 pr-1">
+                            <nav className="space-y-2">
+                                {DASHBOARD_TABS.map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all ${activeTab === tab.id
+                                            ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50'
+                                            : 'border border-transparent bg-white/70 text-gray-600 hover:border-orange-100 hover:bg-orange-50/70 hover:text-zirel-orange-dark'
+                                            }`}
+                                    >
+                                        <tab.icon className={`h-5 w-5 shrink-0 ${activeTab === tab.id ? 'text-white' : 'text-gray-400 group-hover:text-zirel-orange-dark'}`} />
+                                        <div className="min-w-0">
+                                            <div className="font-bold">{tab.label}</div>
+                                            <div className={`truncate text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-gray-400'}`}>{tab.description}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+
+                        <div className="shrink-0 border-t border-gray-200/80 pt-4">
+                            <div className="grid grid-cols-2 gap-3">
+                            <a
+                                href="https://zirel.org"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white/90 px-4 py-3"
+                            >
+                                <House className="h-4 w-4" />
+                                Home
+                            </a>
+                            <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white/90 px-4 py-3 group">
+                                <LogOut className="h-4 w-4 text-gray-400 group-hover:text-red-500 transition-colors" />
+                                Esci
+                            </button>
+                            </div>
                         </div>
                     </div>
+                </aside>
 
-                    <div className="flex flex-col md:flex-row items-center gap-4">
-                        <a
-                            href="https://zirel.org"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-500 hover:text-zirel-orange-dark text-sm font-medium flex items-center gap-2 transition-colors px-4 py-2 rounded-xl hover:bg-orange-50"
-                        >
-                            <ExternalLink size={16} />
-                            Torna alla Home
-                        </a>
-                        <button onClick={onLogout} className="apple-button-secondary flex items-center justify-center gap-2 group w-full md:w-auto border-gray-200">
-                            <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
-                            Esci
-                        </button>
-                    </div>
-                </header>
+                <div className="min-w-0">
+                    <header className="sticky top-0 z-40 border-b border-gray-200/70 bg-white/85 backdrop-blur-xl">
+                        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-5 px-4 py-3 sm:px-6 lg:px-8">
+                            <div className="flex min-w-0 items-center gap-3">
+                                <button
+                                    onClick={() => setIsMobileNavOpen(true)}
+                                    className="apple-button-secondary flex h-11 w-11 items-center justify-center rounded-2xl border-gray-200 bg-white lg:hidden"
+                                    aria-label="Apri menu"
+                                >
+                                    <Menu className="h-5 w-5" />
+                                </button>
+                                <div className="min-w-0">
+                                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Workspace</p>
+                                    <div className="flex items-center gap-2">
+                                        <h1 className="truncate text-xl font-black tracking-tight text-zirel-blue">{activeTabMeta.label}</h1>
+                                        <span className="hidden rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-xs font-bold text-zirel-orange-dark sm:inline-flex">
+                                            {formData.nome_ristorante || tenantId}
+                                        </span>
+                                    </div>
+                                    <p className="hidden text-sm text-gray-500 md:block">{activeTabMeta.description}</p>
+                                </div>
+                            </div>
 
-                {/* Tab Navigation - Mobile Scrollable */}
-                <div className="flex overflow-x-auto no-scrollbar -mx-4 px-4 mb-8 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-8 gap-2 animate-fade-in delay-100 pb-2">
-                    {[
-                        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-                        { id: 'prenotazioni', label: 'Prenotazioni', icon: CalendarDays },
-                        { id: 'conversazioni', label: 'Conversazioni', icon: MessageSquare },
-                        { id: 'documenti', label: 'Documenti', icon: FileText },
-                        { id: 'abbonamento', label: 'Abbonamento', icon: CreditCard },
-                        { id: 'sicurezza', label: 'Sicurezza', icon: Shield },
-                        { id: 'integrazione', label: 'Integrazione', icon: LinkIcon },
-                        { id: 'impostazioni', label: 'Impostazioni', icon: Settings },
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                            className={`flex-1 min-w-[140px] sm:min-w-0 flex items-center justify-center gap-2 p-4 rounded-2xl font-bold transition-all ${activeTab === tab.id
-                                ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50 scale-[1.02]'
-                                : 'bg-white text-gray-500 hover:bg-orange-50 border border-gray-100'
-                                }`}
-                        >
-                            <tab.icon size={20} />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                            <div className="hidden min-w-0 items-center gap-4 lg:flex">
+                                <div className="relative w-[380px] xl:w-[460px] 2xl:w-[520px]">
+                                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        value={workspaceSearch}
+                                        onChange={(e) => setWorkspaceSearch(e.target.value)}
+                                        onFocus={() => setIsWorkspaceSearchFocused(true)}
+                                        onBlur={() => setTimeout(() => setIsWorkspaceSearchFocused(false), 120)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && workspaceSearchResults[0]) {
+                                                e.preventDefault();
+                                                handleWorkspaceSearchSelect(workspaceSearchResults[0]);
+                                            }
+                                        }}
+                                        placeholder="Cerca in dashboard, impostazioni, WhatsApp..."
+                                        className="apple-input h-12 rounded-[1.45rem] pl-11 pr-4 text-sm"
+                                    />
+                                    {isWorkspaceSearchFocused && normalizedWorkspaceSearch ? (
+                                        <div className="absolute left-0 right-0 top-[calc(100%+0.6rem)] z-50 overflow-hidden rounded-[1.4rem] border border-gray-200 bg-white/98 p-2 shadow-2xl shadow-slate-200/70 backdrop-blur-xl">
+                                            {workspaceSearchResults.length > 0 ? (
+                                                <div className="space-y-1">
+                                                    {workspaceSearchResults.map((item) => (
+                                                        <button
+                                                            key={item.id}
+                                                            type="button"
+                                                            onMouseDown={(e) => e.preventDefault()}
+                                                            onClick={() => handleWorkspaceSearchSelect(item)}
+                                                            className="flex w-full items-start justify-between gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-orange-50/70"
+                                                        >
+                                                            <div className="min-w-0">
+                                                                <div className="font-bold text-gray-800">{item.title}</div>
+                                                                <div className="truncate text-sm text-gray-500">{item.subtitle}</div>
+                                                            </div>
+                                                            <span className="shrink-0 rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zirel-orange-dark">
+                                                                {DASHBOARD_TABS.find((tab) => tab.id === item.tab)?.shortLabel}
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="px-3 py-4 text-sm text-gray-500">
+                                                    Nessun risultato. Prova con “whatsapp”, “stripe”, “wifi” o “prenotazioni”.
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : null}
+                                </div>
+                                {activeTab === 'impostazioni' ? (
+                                    <button
+                                        onClick={handleUpdate}
+                                        disabled={isUpdating}
+                                        className="apple-button flex h-12 min-w-[190px] items-center justify-center gap-2 rounded-[1.45rem] px-6 py-3 text-sm text-white disabled:opacity-60"
+                                    >
+                                        {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                        Salva modifiche
+                                    </button>
+                                ) : null}
+                            </div>
+                        </div>
+                    </header>
+
+                    {isMobileNavOpen ? (
+                        <div className="fixed inset-0 z-50 bg-slate-950/45 lg:hidden" onClick={() => setIsMobileNavOpen(false)}>
+                            <div
+                                className="h-full w-[88vw] max-w-sm overflow-y-auto border-r border-gray-200/80 bg-white px-4 py-5 shadow-2xl"
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                <div className="mb-5 flex items-center justify-between gap-3">
+                                    <img src="/zirel_logo_esteso.svg" alt="Zirèl Logo" className="h-14 w-auto" />
+                                    <button
+                                        onClick={() => setIsMobileNavOpen(false)}
+                                        className="apple-button-secondary flex h-10 w-10 items-center justify-center rounded-2xl border-gray-200 bg-white"
+                                        aria-label="Chiudi menu"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+                                </div>
+
+                                <div className="mb-5 rounded-[1.5rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-4 shadow-sm">
+                                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Tenant attivo</p>
+                                    <p className="mt-2 text-lg font-black tracking-tight text-zirel-blue">{formData.nome_ristorante || tenantId}</p>
+                                    <p className="mt-1 text-sm text-gray-500">Pannello di controllo</p>
+                                </div>
+
+                                <nav className="space-y-2">
+                                    {DASHBOARD_TABS.map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id)}
+                                            className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all ${activeTab === tab.id
+                                                ? 'bg-zirel-gradient text-white shadow-lg shadow-orange-200/50'
+                                                : 'border border-transparent bg-white text-gray-600 hover:border-orange-100 hover:bg-orange-50/70'
+                                                }`}
+                                        >
+                                            <tab.icon className={`h-5 w-5 shrink-0 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`} />
+                                            <div className="min-w-0">
+                                                <div className="font-bold">{tab.shortLabel}</div>
+                                                <div className={`truncate text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-gray-400'}`}>{tab.description}</div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </nav>
+
+                                <div className="mt-6 space-y-3">
+                                    <a
+                                        href="https://zirel.org"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-5 py-3"
+                                    >
+                                        <House className="h-4 w-4" />
+                                        Torna alla Home
+                                    </a>
+                                    <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-5 py-3">
+                                        <LogOut className="h-4 w-4 text-gray-400" />
+                                        Esci
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+
+                    <main className="mx-auto max-w-[1680px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
 
                 {dashboardBillingBanner && (
-                    <section className={`${dashboardBillingBanner.tone} rounded-[2rem] px-6 py-6 md:px-8 md:py-7 mb-8 animate-fade-in delay-150`}>
+                    <section className={`${dashboardBillingBanner.tone} mb-5 rounded-[1.75rem] px-5 py-5 md:px-7 md:py-6 animate-fade-in delay-150`}>
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
                             <div className="space-y-2">
                                 <p className="text-sm font-black uppercase tracking-[0.22em] text-white/80">Billing alert</p>
@@ -468,7 +804,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     )}
 
                 {productAccessState === 'warning' && activeTab !== 'abbonamento' && (
-                    <section className="rounded-[1.75rem] border border-red-100 bg-red-50 px-6 py-5 md:px-7 md:py-6 mb-6 animate-fade-in">
+                    <section className="mb-5 rounded-[1.5rem] border border-red-100 bg-red-50 px-5 py-5 md:px-6 md:py-6 animate-fade-in">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                             <div className="space-y-2">
                                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-red-500">Pagamento da aggiornare</p>
@@ -544,7 +880,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             ) : activeTab === 'prenotazioni' ? (
                                 <Reservations />
                             ) : activeTab === 'conversazioni' ? (
-                                <div className="max-w-7xl mx-auto animate-fade-in">
+                                <div className="animate-fade-in">
                                     <WhatsAppHandoffPanel tenantId={tenantId || undefined} />
                                 </div>
                             ) : activeTab === 'documenti' ? (
@@ -557,8 +893,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     onPortal={handleStripePortal}
                                 />
                             ) : activeTab === 'sicurezza' ? (
-                                <div className="max-w-4xl mx-auto animate-fade-in">
-                            <section className="apple-card p-8 md:p-12 space-y-8">
+                                <div className="max-w-5xl animate-fade-in">
+                            <section className="apple-card p-6 md:p-8 space-y-6">
                                 <div className="flex items-center gap-4 mb-2">
                                     <div className="z-icon-chip-lg"><Shield className="w-6 h-6" /></div>
                                     <div>
@@ -567,7 +903,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-6 bg-gray-50 p-6 md:p-8 rounded-3xl border border-gray-100">
+                                <div className="space-y-6 bg-gray-50 p-5 md:p-6 rounded-[1.75rem] border border-gray-100">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Il tuo API Token</label>
                                         <div className="flex flex-col md:flex-row gap-4">
@@ -641,8 +977,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             </section>
                                 </div>
                             ) : activeTab === 'integrazione' ? (
-                                <div className="max-w-4xl mx-auto animate-fade-in">
-                            <section className="apple-card p-8 md:p-12 space-y-12">
+                                <div className="max-w-6xl animate-fade-in">
+                            <section className="apple-card p-6 md:p-8 space-y-8">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-orange-50 text-zirel-orange-dark rounded-2xl"><LinkIcon className="w-6 h-6" /></div>
                                     <div>
@@ -657,7 +993,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 />
 
                                 {/* Opzione 1: Installazione Assistita */}
-                                <div className="bg-gradient-to-br from-zirel-blue to-[#0B4A6A] rounded-[2rem] p-8 md:p-10 text-white shadow-xl shadow-zirel-blue/20 relative overflow-hidden group">
+                                <div className="bg-gradient-to-br from-zirel-blue to-[#0B4A6A] rounded-[1.75rem] p-6 md:p-8 text-white shadow-xl shadow-zirel-blue/20 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
                                     <div className="relative z-10 space-y-6">
                                         <div className="space-y-2">
@@ -687,7 +1023,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 </div>
 
                                 {/* Widget Customization Section */}
-                                <div className="apple-card overflow-hidden p-6 md:p-10 space-y-8 border-t-4 border-zirel-orange-dark">
+                                <div className="apple-card overflow-hidden p-5 md:p-6 space-y-6 border-t-4 border-zirel-orange-dark">
                                     <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-center">
                                         <div className="z-icon-chip-lg shrink-0">
                                             <Settings className="w-6 h-6" />
@@ -710,7 +1046,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 label="Sottotitolo Widget"
                                                 value={formData.widget_subtitle || ''}
                                                 onChange={updateField('widget_subtitle')}
-                                                placeholder="es. Concierge AI h24"
+                                                placeholder="es. Concierge h24"
                                             />
                                         </div>
                                         <div className="space-y-6">
@@ -753,7 +1089,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             </div>
                                             <div className="min-w-0">
                                                 <h4 className="font-bold text-gray-800 break-words">{formData.widget_title || 'Zirèl Assistant'}</h4>
-                                                <p className="text-xs text-gray-500 break-words">{formData.widget_subtitle || 'Concierge AI h24'}</p>
+                                                <p className="text-xs text-gray-500 break-words">{formData.widget_subtitle || 'Concierge h24'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -766,7 +1102,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             className="apple-button px-8 py-4 bg-zirel-gradient text-white flex items-center gap-3 shadow-lg shadow-orange-500/20"
                                         >
                                             {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                            <span className="font-bold">Salva Personalizzazione</span>
+                                            <span className="font-bold">Salva widget</span>
                                         </button>
                                     </div>
                                 </div>
@@ -821,124 +1157,154 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             </section>
                                 </div>
                             ) : (
-                                <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-32">
+                                <div className="space-y-8 animate-fade-in pb-28">
                             {/* Premium Header for Impostazioni */}
-                            <div className="apple-card p-8 md:p-12">
-                                <div className="flex items-center gap-4">
-                                    <div className="z-icon-chip-lg"><Settings className="w-8 h-8" /></div>
-                                    <div>
-                                        <h2 className="text-3xl font-black text-gray-800">Impostazioni Assistente</h2>
-                                        <p className="text-gray-500 text-lg">Personalizza l'identità e la conoscenza del tuo Concierge AI</p>
+                            <div className="apple-card p-6 md:p-7">
+                                <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="z-icon-chip-lg"><Settings className="w-8 h-8" /></div>
+                                        <div>
+                                        <h2 className="text-2xl md:text-3xl font-black text-gray-800">Impostazioni Assistente</h2>
+                                        <p className="text-gray-500">Personalizza identità, conoscenza e regole del tuo concierge</p>
+                                        </div>
+                                    </div>
+                                    <div className="w-full xl:max-w-md">
+                                        <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Cerca impostazione</label>
+                                        <div className="relative">
+                                            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                            <input
+                                                type="text"
+                                                value={settingsSearch}
+                                                onChange={(e) => setSettingsSearch(e.target.value)}
+                                                placeholder="Es. wifi, instagram, parcheggio, prezzo..."
+                                                className="apple-input pl-11 pr-12"
+                                            />
+                                            {settingsSearch ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSettingsSearch('')}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-bold text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                                                >
+                                                    Reset
+                                                </button>
+                                            ) : null}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-9">
+                            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 md:gap-6">
                                 {/* Section 1: Contatti */}
-                                <section className="apple-card p-6 space-y-4">
+                                {showContactSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-4">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="z-icon-chip"><Store className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Contatti & Info Base</h2>
                                     </div>
-                                    <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" />
-                                    <InputField label="Email" value={formData.mail} onChange={updateField('mail')} />
-                                    <InputField label="Indirizzo" value={formData.indirizzo} onChange={updateField('indirizzo')} />
-                                    <InputField label="Sito Web URL" value={formData.sito_web_url} onChange={updateField('sito_web_url')} />
-                                    <InputField label="Google Maps Link" value={formData.google_maps_link} onChange={updateField('google_maps_link')} />
+                                    {showSettingsField('Contatti & Info Base', 'Telefono', formData.telefono) ? <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Email', formData.mail) ? <InputField label="Email" value={formData.mail} onChange={updateField('mail')} /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Indirizzo', formData.indirizzo) ? <InputField label="Indirizzo" value={formData.indirizzo} onChange={updateField('indirizzo')} /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Sito Web URL', formData.sito_web_url) ? <InputField label="Sito Web URL" value={formData.sito_web_url} onChange={updateField('sito_web_url')} /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Google Maps Link', formData.google_maps_link) ? <InputField label="Google Maps Link" value={formData.google_maps_link} onChange={updateField('google_maps_link')} /> : null}
                                 </section>
+                                ) : null}
 
                                 {/* Section 2: Orari */}
-                                <section className="apple-card p-6 space-y-4">
+                                {showScheduleSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-4">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="z-icon-chip"><Clock className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Orari & Tempistiche</h2>
                                     </div>
-                                    <TextareaField label="Orari di Apertura" value={formData.orari_apertura} onChange={updateField('orari_apertura')} rows={2} />
-                                    <InputField label="Giorni di Chiusura" value={formData.giorni_chiusura} onChange={updateField('giorni_chiusura')} />
-                                    <InputField label="Orari Check-in / Check-out" value={formData.orari_checkin_checkout} onChange={updateField('orari_checkin_checkout')} />
-                                    <InputField label="Durata Media Appuntamento" value={formData.durata_media_appuntamento} onChange={updateField('durata_media_appuntamento')} />
+                                    {showSettingsField('Orari & Tempistiche', 'Orari di Apertura', formData.orari_apertura) ? <TextareaField label="Orari di Apertura" value={formData.orari_apertura} onChange={updateField('orari_apertura')} rows={2} /> : null}
+                                    {showSettingsField('Orari & Tempistiche', 'Giorni di Chiusura', formData.giorni_chiusura) ? <InputField label="Giorni di Chiusura" value={formData.giorni_chiusura} onChange={updateField('giorni_chiusura')} /> : null}
+                                    {showSettingsField('Orari & Tempistiche', 'Orari Check-in / Check-out', formData.orari_checkin_checkout) ? <InputField label="Orari Check-in / Check-out" value={formData.orari_checkin_checkout} onChange={updateField('orari_checkin_checkout')} /> : null}
+                                    {showSettingsField('Orari & Tempistiche', 'Durata Media Appuntamento', formData.durata_media_appuntamento) ? <InputField label="Durata Media Appuntamento" value={formData.durata_media_appuntamento} onChange={updateField('durata_media_appuntamento')} /> : null}
                                 </section>
+                                ) : null}
 
                                 {/* Section 3: Social */}
-                                <section className="apple-card p-6 space-y-4">
+                                {showSocialSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-4">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="z-icon-chip"><LinkIcon className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Social & Link</h2>
                                     </div>
-                                    <InputField label="Link Prenotazione Tavoli" value={formData.link_prenotazione_tavoli} onChange={updateField('link_prenotazione_tavoli')} />
-                                    <InputField label="Link Booking/Calendario" value={formData.link_booking_esterno} onChange={updateField('link_booking_esterno')} />
-                                    <InputField label="Instagram URL" value={formData.instagram_url} onChange={updateField('instagram_url')} />
-                                    <InputField label="Facebook URL" value={formData.facebook_url} onChange={updateField('facebook_url')} />
-                                    <InputField label="TripAdvisor URL" value={formData.tripadvisor_url} onChange={updateField('tripadvisor_url')} />
-                                    <InputField label="Link Recensioni (Google)" value={formData.recensioni_url} onChange={updateField('recensioni_url')} />
+                                    {showSettingsField('Social & Link', 'Link Prenotazione Tavoli', formData.link_prenotazione_tavoli) ? <InputField label="Link Prenotazione Tavoli" value={formData.link_prenotazione_tavoli} onChange={updateField('link_prenotazione_tavoli')} /> : null}
+                                    {showSettingsField('Social & Link', 'Link Booking/Calendario', formData.link_booking_esterno) ? <InputField label="Link Booking/Calendario" value={formData.link_booking_esterno} onChange={updateField('link_booking_esterno')} /> : null}
+                                    {showSettingsField('Social & Link', 'Instagram URL', formData.instagram_url) ? <InputField label="Instagram URL" value={formData.instagram_url} onChange={updateField('instagram_url')} /> : null}
+                                    {showSettingsField('Social & Link', 'Facebook URL', formData.facebook_url) ? <InputField label="Facebook URL" value={formData.facebook_url} onChange={updateField('facebook_url')} /> : null}
+                                    {showSettingsField('Social & Link', 'TripAdvisor URL', formData.tripadvisor_url) ? <InputField label="TripAdvisor URL" value={formData.tripadvisor_url} onChange={updateField('tripadvisor_url')} /> : null}
+                                    {showSettingsField('Social & Link', 'Link Recensioni (Google)', formData.recensioni_url) ? <InputField label="Link Recensioni (Google)" value={formData.recensioni_url} onChange={updateField('recensioni_url')} /> : null}
                                 </section>
+                                ) : null}
 
                                 {/* Section 4: Offerta */}
-                                <section className="apple-card p-6 space-y-4 lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                {showOfferSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                     <div className="col-span-1 md:col-span-2 flex items-center gap-3 mb-2">
                                         <div className="z-icon-chip"><Utensils className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Dettagli Offerta (Menu, Servizi, Costi)</h2>
                                     </div>
                                     <div className="space-y-4">
-                                        <InputField label="Tipo Cucina / Categoria" value={formData.tipo_cucina} onChange={updateField('tipo_cucina')} />
-                                        <TextareaField label="Specialità della Casa" value={formData.specialita_casa} onChange={updateField('specialita_casa')} rows={2} />
-                                        <InputField label="Prezzo Medio" value={formData.prezzo_medio} onChange={updateField('prezzo_medio')} />
-                                        <InputField label="Costo Prima Consulenza" value={formData.prima_consulenza_costo} onChange={updateField('prima_consulenza_costo')} />
-                                        <TextareaField label="Servizi Inclusi" value={formData.servizi_inclusi} onChange={updateField('servizi_inclusi')} rows={3} />
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Tipo Cucina / Categoria', formData.tipo_cucina) ? <InputField label="Tipo Cucina / Categoria" value={formData.tipo_cucina} onChange={updateField('tipo_cucina')} /> : null}
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Specialità della Casa', formData.specialita_casa) ? <TextareaField label="Specialità della Casa" value={formData.specialita_casa} onChange={updateField('specialita_casa')} rows={2} /> : null}
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Prezzo Medio', formData.prezzo_medio) ? <InputField label="Prezzo Medio" value={formData.prezzo_medio} onChange={updateField('prezzo_medio')} /> : null}
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Costo Prima Consulenza', formData.prima_consulenza_costo) ? <InputField label="Costo Prima Consulenza" value={formData.prima_consulenza_costo} onChange={updateField('prima_consulenza_costo')} /> : null}
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', 'Servizi Inclusi', formData.servizi_inclusi) ? <TextareaField label="Servizi Inclusi" value={formData.servizi_inclusi} onChange={updateField('servizi_inclusi')} rows={3} /> : null}
                                     </div>
                                     <div className="space-y-4">
-                                        <TextareaField label="Testo del Menu Ridotto o Tariffario (Extra info per l'AI)" value={formData.menu_testo} onChange={updateField('menu_testo')} rows={10} />
+                                        {showSettingsField('Dettagli Offerta (Menu, Servizi, Costi)', "Testo del Menu Ridotto o Tariffario (Extra info per l'assistente)", formData.menu_testo) ? <TextareaField label="Testo del Menu Ridotto o Tariffario (Extra info per l'assistente)" value={formData.menu_testo} onChange={updateField('menu_testo')} rows={10} /> : null}
                                     </div>
                                 </section>
+                                ) : null}
 
                                 {/* Section 5: Info Pratiche */}
-                                <section className="apple-card p-6 space-y-4 lg:col-span-2">
+                                {showPracticalSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-8">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="z-icon-chip"><Info className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Info Pratiche & Regole</h2>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <InputField label="WiFi Password" value={formData.wifi_password} onChange={updateField('wifi_password')} />
-                                        <TextareaField label="Info Parcheggio" value={formData.parcheggio_info} onChange={updateField('parcheggio_info')} rows={1} />
-                                        <InputField label="Animali Ammessi" value={formData.animali_ammessi} onChange={updateField('animali_ammessi')} />
-                                        <InputField label="Metodi di Pagamento" value={formData.metodi_pagamento} onChange={updateField('metodi_pagamento')} />
-                                        <InputField label="Tassa di Soggiorno" value={formData.tassa_soggiorno} onChange={updateField('tassa_soggiorno')} />
-                                        <TextareaField label="Policy Allergie" value={formData.allergie_policy} onChange={updateField('allergie_policy')} rows={2} />
+                                        {showSettingsField('Info Pratiche & Regole', 'WiFi Password', formData.wifi_password) ? <InputField label="WiFi Password" value={formData.wifi_password} onChange={updateField('wifi_password')} /> : null}
+                                        {showSettingsField('Info Pratiche & Regole', 'Info Parcheggio', formData.parcheggio_info) ? <TextareaField label="Info Parcheggio" value={formData.parcheggio_info} onChange={updateField('parcheggio_info')} rows={1} /> : null}
+                                        {showSettingsField('Info Pratiche & Regole', 'Animali Ammessi', formData.animali_ammessi) ? <InputField label="Animali Ammessi" value={formData.animali_ammessi} onChange={updateField('animali_ammessi')} /> : null}
+                                        {showSettingsField('Info Pratiche & Regole', 'Metodi di Pagamento', formData.metodi_pagamento) ? <InputField label="Metodi di Pagamento" value={formData.metodi_pagamento} onChange={updateField('metodi_pagamento')} /> : null}
+                                        {showSettingsField('Info Pratiche & Regole', 'Tassa di Soggiorno', formData.tassa_soggiorno) ? <InputField label="Tassa di Soggiorno" value={formData.tassa_soggiorno} onChange={updateField('tassa_soggiorno')} /> : null}
+                                        {showSettingsField('Info Pratiche & Regole', 'Policy Allergie', formData.allergie_policy) ? <TextareaField label="Policy Allergie" value={formData.allergie_policy} onChange={updateField('allergie_policy')} rows={2} /> : null}
                                     </div>
                                 </section>
+                                ) : null}
 
                                 {/* Section 6: Marketing */}
-                                <section className="apple-card p-6 space-y-4 xl:col-span-1">
+                                {showMarketingSection ? (
+                                <section className="apple-card p-5 space-y-4 xl:col-span-4">
                                     <div className="flex items-center gap-3 mb-4">
                                         <div className="z-icon-chip"><Megaphone className="w-5 h-5" /></div>
-                                        <h2 className="text-lg font-bold">Marketing & Custom AI</h2>
+                                        <h2 className="text-lg font-bold">Marketing & Messaggi</h2>
                                     </div>
-                                    <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} />
-                                    <TextareaField label="Informazioni Aggiuntive Rapide" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} />
+                                    {showSettingsField('Marketing & Messaggi', 'Promozione Attiva Oggi', formData.promozione_attiva) ? <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} /> : null}
+                                    {showSettingsField('Marketing & Messaggi', 'Informazioni Aggiuntive Rapide', formData.dati_testuali_brevi) ? <TextareaField label="Informazioni Aggiuntive Rapide" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} /> : null}
                                 </section>
+                                ) : null}
                             </div>
 
-                            {/* Floating Save Button */}
-                            <footer className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 animate-fade-in sm:px-6">
-                                <button
-                                    onClick={handleUpdate}
-                                    disabled={isUpdating}
-                                    className="apple-button h-16 md:h-18 px-8 md:px-12 bg-zirel-gradient flex items-center justify-center gap-4 shadow-2xl shadow-orange-500/30 w-full md:w-auto mx-auto border-none outline-none group"
-                                >
-                                    {isUpdating ? (
-                                        <Loader2 className="w-6 h-6 animate-spin" />
-                                    ) : (
-                                        <Save className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                                    )}
-                                    <span className="text-lg font-bold">Salva e Aggiorna AI</span>
-                                </button>
-                            </footer>
+                            {!hasVisibleSettingsResults ? (
+                                <div className="apple-card p-8 text-center">
+                                    <p className="text-lg font-bold text-gray-700">Nessuna impostazione trovata</p>
+                                    <p className="mt-2 text-sm text-gray-500">Prova con un termine diverso, ad esempio “wifi”, “instagram”, “prezzo” o “parcheggio”.</p>
                                 </div>
+                            ) : null}
+
+                        </div>
                             )}
                         </div>
                     </div>
                 </div>
-            </main>
+                    </main>
+                </div>
+            </div>
         </div>
     );
 };
