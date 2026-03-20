@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle2, Copy, Loader2, MessageSquare, RefreshCw, Smartphone, Sparkles, TriangleAlert, Unplug } from 'lucide-react';
+import { Activity, CheckCircle2, ChevronDown, ChevronUp, Copy, Loader2, MessageSquare, RefreshCw, ShieldCheck, Smartphone, Sparkles, TriangleAlert, Unplug, Webhook } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { completeWhatsAppEmbeddedSignup, getWhatsAppChannelSummary } from '../lib/supabase-helpers';
+import { completeWhatsAppEmbeddedSignup, disconnectWhatsAppChannel, getWhatsAppChannelOpsSummary, getWhatsAppChannelSummary } from '../lib/supabase-helpers';
 import {
     extractEmbeddedSignupIdentifiers,
     isEmbeddedSignupConfigured,
     launchEmbeddedSignup,
 } from '../lib/meta-embedded-signup';
-import type { CompleteWhatsAppEmbeddedSignupPayload, WhatsAppChannelSummary } from '../types';
+import type { CompleteWhatsAppEmbeddedSignupPayload, WhatsAppChannelOpsSummary, WhatsAppChannelSummary } from '../types';
 
 interface WhatsAppChannelCardProps {
     tenantId?: string;
@@ -24,6 +24,66 @@ const formatDateTime = (value?: string | null) => {
         hour: '2-digit',
         minute: '2-digit',
     });
+};
+
+const formatPhoneFallback = (value?: string | null) => {
+    const normalized = String(value || '').trim();
+    if (!normalized) return 'non disponibile';
+    if (normalized.startsWith('+')) return normalized;
+    return normalized;
+};
+
+const formatModeLabel = (value?: string | null) => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (!normalized) return 'n/d';
+    if (normalized === 'platform_managed') return 'Platform managed';
+    if (normalized === 'tenant_managed') return 'Tenant managed';
+    return normalized.replace(/_/g, ' ');
+};
+
+const getWebhookMeta = (summary: WhatsAppChannelSummary | null) => {
+    const verifiedAt = summary?.webhook_verified_at || null;
+    const lastWebhookAt = summary?.last_webhook_at || null;
+
+    if (!verifiedAt) {
+        return {
+            label: 'Webhook da verificare',
+            tone: 'bg-amber-50 text-amber-700 border-amber-100',
+            body: 'Il canale è collegato ma non abbiamo ancora una conferma di verifica webhook registrata.',
+        };
+    }
+
+    if (!lastWebhookAt) {
+        return {
+            label: 'Webhook verificato',
+            tone: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+            body: 'La verifica webhook è presente. Stiamo aspettando o non abbiamo ancora registrato eventi recenti.',
+        };
+    }
+
+    const lastEventDate = new Date(lastWebhookAt);
+    if (Number.isNaN(lastEventDate.getTime())) {
+        return {
+            label: 'Webhook verificato',
+            tone: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+            body: 'La verifica webhook è presente, ma la data dell’ultimo evento non è leggibile.',
+        };
+    }
+
+    const hoursFromLastEvent = Math.round((Date.now() - lastEventDate.getTime()) / (1000 * 60 * 60));
+    if (hoursFromLastEvent > 72) {
+        return {
+            label: 'Webhook inattivo',
+            tone: 'bg-orange-50 text-orange-700 border-orange-100',
+            body: 'Il webhook è verificato, ma non vediamo eventi recenti da oltre 72 ore.',
+        };
+    }
+
+    return {
+        label: 'Webhook attivo',
+        tone: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+        body: 'Il webhook è verificato e sta ricevendo eventi recenti.',
+    };
 };
 
 const statusMeta: Record<string, { label: string; tone: string; body: string }> = {
@@ -45,7 +105,7 @@ const statusMeta: Record<string, { label: string; tone: string; body: string }> 
     requires_attention: {
         label: 'Richiede attenzione',
         tone: 'bg-orange-50 text-orange-700 border-orange-100',
-        body: 'La connessione esiste, ma manca ancora qualcosa per considerarla completamente sana.',
+        body: 'La connessione esiste, ma mancano ancora alcuni dettagli canale da sincronizzare o verificare.',
     },
     error: {
         label: 'Errore',
@@ -60,6 +120,10 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLaunchingMeta, setIsLaunchingMeta] = useState(false);
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
+    const [isOpsLoading, setIsOpsLoading] = useState(false);
+    const [isOpsOpen, setIsOpsOpen] = useState(false);
+    const [opsSummary, setOpsSummary] = useState<WhatsAppChannelOpsSummary | null>(null);
     const [signupForm, setSignupForm] = useState<CompleteWhatsAppEmbeddedSignupPayload>({
         meta_phone_number_id: '',
         waba_id: '',
@@ -84,13 +148,29 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
         }
     };
 
+    const loadOpsSummary = async () => {
+        try {
+            setIsOpsLoading(true);
+            const nextSummary = await getWhatsAppChannelOpsSummary(tenantId);
+            setOpsSummary(nextSummary);
+        } catch (error) {
+            console.error('WhatsApp channel ops load error:', error);
+            toast.error('Non siamo riusciti a caricare gli ultimi errori del canale.');
+        } finally {
+            setIsOpsLoading(false);
+        }
+    };
+
     useEffect(() => {
         void loadSummary();
     }, [tenantId]);
 
     const meta = statusMeta[summary?.connection_status || 'not_connected'] || statusMeta.not_connected;
     const isConnected = summary?.connection_status === 'connected';
+    const needsAttention = summary?.connection_status === 'requires_attention';
     const embeddedSignupReady = isEmbeddedSignupConfigured();
+    const connectedNumber = summary?.display_phone_number || summary?.meta_phone_number_id || null;
+    const webhookMeta = getWebhookMeta(summary);
 
     const updateSignupField = <K extends keyof CompleteWhatsAppEmbeddedSignupPayload>(
         key: K,
@@ -184,17 +264,37 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
         }
     };
 
+    const handleDisconnect = async () => {
+        const confirmed = window.confirm(
+            'Vuoi davvero scollegare questo canale WhatsApp? Il tenant non riceverà più nuovi messaggi finché non lo ricolleghi.'
+        );
+
+        if (!confirmed) return;
+
+        try {
+            setIsDisconnecting(true);
+            await disconnectWhatsAppChannel();
+            toast.success('Canale WhatsApp scollegato.');
+            await loadSummary();
+        } catch (error) {
+            console.error('WhatsApp disconnect error:', error);
+            toast.error(error instanceof Error ? error.message : 'Non siamo riusciti a scollegare il canale WhatsApp.');
+        } finally {
+            setIsDisconnecting(false);
+        }
+    };
+
     return (
         <>
             <section className="apple-card p-6 md:p-8 space-y-6 border-t-4 border-emerald-500">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 md:gap-4">
                         <div className="z-icon-chip-lg shrink-0">
                             <MessageSquare className="w-6 h-6" />
                         </div>
                         <div>
                             <h3 className="text-xl md:text-2xl font-black text-gray-800">Canale WhatsApp</h3>
-                            <p className="text-gray-500">Stato del collegamento e prossimi passi del canale.</p>
+                            <p className="text-sm md:text-base text-gray-500">Stato del collegamento e prossimi passi del canale.</p>
                         </div>
                     </div>
                     <button
@@ -213,14 +313,30 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                         Caricamento stato canale WhatsApp...
                     </div>
                 ) : (
-                    <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-sm space-y-5">
+                    <div className="rounded-[1.75rem] border border-gray-100 bg-white p-5 md:p-6 shadow-sm space-y-5">
                         <div className="flex flex-wrap items-center gap-3">
                             <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] ${meta.tone}`}>
                                 {meta.label}
                             </span>
+                            {(isConnected || needsAttention) ? (
+                                <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${webhookMeta.tone}`}>
+                                    <Webhook className="h-3.5 w-3.5" />
+                                    {webhookMeta.label}
+                                </span>
+                            ) : null}
                             {summary?.credential_mode ? (
                                 <span className="text-xs font-bold uppercase tracking-[0.14em] text-gray-400">
-                                    Mode: {summary.credential_mode}
+                                    Mode: {formatModeLabel(summary.credential_mode)}
+                                </span>
+                            ) : null}
+                            {summary?.verified_name ? (
+                                <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                                    {summary.verified_name}
+                                </span>
+                            ) : null}
+                            {needsAttention ? (
+                                <span className="inline-flex items-center rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-bold text-orange-700">
+                                    Sync incompleto
                                 </span>
                             ) : null}
                         </div>
@@ -232,38 +348,172 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             ) : null}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
                                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Numero collegato</div>
                                 <div className="font-semibold text-gray-800 flex items-center gap-2">
                                     <Smartphone className="w-4 h-4 text-gray-400" />
-                                    <span>{summary?.display_phone_number || summary?.meta_phone_number_id || 'non disponibile'}</span>
+                                    <span className="break-all">{formatPhoneFallback(connectedNumber)}</span>
                                 </div>
                             </div>
-                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4">
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
                                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Ultimo aggiornamento</div>
                                 <div className="font-semibold text-gray-800">{formatDateTime(summary?.last_sync_at)}</div>
                             </div>
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Verified name</div>
+                                <div className="font-semibold text-gray-800 break-words">{summary?.verified_name || 'n/d'}</div>
+                            </div>
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">WABA ID</div>
+                                <div className="font-semibold text-gray-800 break-all">{summary?.waba_id || 'n/d'}</div>
+                            </div>
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Ultimo webhook</div>
+                                <div className="font-semibold text-gray-800">{formatDateTime(summary?.last_webhook_at)}</div>
+                            </div>
+                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 min-h-[108px]">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Webhook verificato</div>
+                                <div className="font-semibold text-gray-800">{formatDateTime(summary?.webhook_verified_at)}</div>
+                            </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-3">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                            <div className="rounded-2xl border border-dashed border-gray-200 bg-slate-50 px-4 py-4 space-y-2">
+                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                                    <Activity className="h-4 w-4" />
+                                    Stato operativo
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                    {isConnected
+                                        ? 'Il canale è pronto per onboarding, messaggi inbound/outbound e gestione conversazioni.'
+                                        : needsAttention
+                                            ? 'Il canale è collegato ma conviene rifinire il profilo Meta o rilanciare la sincronizzazione per avere tutti i dettagli completi.'
+                                            : 'Il canale non è ancora completamente operativo. Puoi completare o ripetere il collegamento.'}
+                                </p>
+                            </div>
+                            <div className="rounded-2xl border border-dashed border-gray-200 bg-slate-50 px-4 py-4 space-y-2">
+                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                                    <ShieldCheck className="h-4 w-4" />
+                                    Diagnostica canale
+                                </div>
+                                <p className="text-sm text-gray-600">{webhookMeta.body}</p>
+                                {summary?.onboarding_error ? (
+                                    <p className="text-xs font-semibold text-red-600 break-words">
+                                        Ultimo errore: {summary.onboarding_error}
+                                    </p>
+                                ) : null}
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-gray-100 bg-white">
+                            <button
+                                onClick={() => {
+                                    const next = !isOpsOpen;
+                                    setIsOpsOpen(next);
+                                    if (next && !opsSummary && !isOpsLoading) {
+                                        void loadOpsSummary();
+                                    }
+                                }}
+                                className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left"
+                            >
+                                <div>
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">Vista admin</div>
+                                    <p className="mt-1 text-sm text-gray-600">Ultimi errori outbound e ultimi eventi webhook del canale.</p>
+                                </div>
+                                <span className="inline-flex items-center gap-2 text-sm font-semibold text-zirel-blue">
+                                    {isOpsOpen ? 'Nascondi' : 'Mostra'}
+                                    {isOpsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                </span>
+                            </button>
+
+                            {isOpsOpen ? (
+                                <div className="border-t border-gray-100 px-4 py-4 space-y-4">
+                                    {isOpsLoading ? (
+                                        <div className="rounded-2xl bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+                                            <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin text-zirel-orange-dark" />
+                                            Caricamento diagnostica canale...
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4">
+                                                <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">Ultimi errori outbound</div>
+                                                {opsSummary?.failed_outbound?.length ? (
+                                                    <div className="space-y-3">
+                                                        {opsSummary.failed_outbound.map((item) => (
+                                                            <div key={item.id} className="rounded-2xl border border-red-100 bg-white px-3 py-3">
+                                                                <div className="flex items-center justify-between gap-3">
+                                                                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-red-600">
+                                                                        {item.delivery_status || item.processing_status || 'error'}
+                                                                    </span>
+                                                                    <span className="text-xs text-gray-400">{formatDateTime(item.failed_at || item.created_at)}</span>
+                                                                </div>
+                                                                <p className="mt-2 text-sm text-gray-700 break-words">{item.error_message || 'Errore non disponibile'}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-gray-500">Nessun errore outbound recente.</p>
+                                                )}
+                                            </div>
+
+                                            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4">
+                                                <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">Ultimi eventi webhook</div>
+                                                {opsSummary?.recent_webhook_events?.length ? (
+                                                    <div className="space-y-3">
+                                                        {opsSummary.recent_webhook_events.map((item) => (
+                                                            <div key={item.id} className="rounded-2xl border border-gray-100 bg-white px-3 py-3">
+                                                                <div className="flex items-center justify-between gap-3">
+                                                                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-gray-600">
+                                                                        {item.event_status || 'evento'}
+                                                                    </span>
+                                                                    <span className="text-xs text-gray-400">{formatDateTime(item.created_at)}</span>
+                                                                </div>
+                                                                <p className="mt-2 text-sm text-gray-700 break-words">
+                                                                    {item.event_type || 'Webhook event'}
+                                                                    {item.error_message ? ` · ${item.error_message}` : ''}
+                                                                </p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-gray-500">Nessun evento webhook recente.</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 onClick={() => {
                                     seedFromCurrentSummary();
                                     setIsModalOpen(true);
                                 }}
-                                className="apple-button flex items-center justify-center gap-2 text-white"
+                                className="apple-button flex items-center justify-center gap-2 text-white w-full sm:w-auto"
                             >
                                 {isConnected ? <Sparkles className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                                {isConnected ? 'Gestisci collegamento' : 'Collega WhatsApp'}
+                                {isConnected || needsAttention ? 'Ricollega' : 'Collega WhatsApp'}
                             </button>
                             {isConnected ? (
                                 <button
                                     onClick={onOpenConversations}
-                                    className="apple-button-secondary flex items-center justify-center gap-2"
+                                    className="apple-button-secondary flex items-center justify-center gap-2 w-full sm:w-auto"
                                 >
                                     <MessageSquare className="w-4 h-4" />
                                     Apri conversazioni
+                                </button>
+                            ) : null}
+                            {(isConnected || needsAttention) ? (
+                                <button
+                                    onClick={() => void handleDisconnect()}
+                                    disabled={isDisconnecting}
+                                    className="apple-button-secondary flex items-center justify-center gap-2 w-full sm:w-auto disabled:opacity-60"
+                                >
+                                    {isDisconnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Unplug className="w-4 h-4" />}
+                                    Scollega
                                 </button>
                             ) : null}
                         </div>
@@ -272,12 +522,12 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
             </section>
 
             {isModalOpen ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4">
-                    <div className="w-full max-w-2xl rounded-[2rem] bg-white shadow-2xl border border-gray-100 p-6 md:p-8 space-y-5">
+                <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-slate-950/45 px-3 py-4 md:px-4 overflow-y-auto">
+                    <div className="w-full max-w-2xl rounded-[2rem] bg-white shadow-2xl border border-gray-100 p-5 md:p-8 space-y-5 my-auto">
                         <div className="flex items-start justify-between gap-4">
                             <div>
-                                <h4 className="text-2xl font-black text-gray-900">Collega WhatsApp</h4>
-                                <p className="text-gray-500 mt-2">
+                                <h4 className="text-xl md:text-2xl font-black text-gray-900">Collega WhatsApp</h4>
+                                <p className="text-sm md:text-base text-gray-500 mt-2">
                                     Questa schermata e già il ponte operativo tra il completion payload di Meta e il backend Zirèl. Nel prossimo step qui agganceremo anche l'avvio diretto dell'SDK `Embedded Signup`.
                                 </p>
                             </div>
@@ -370,36 +620,36 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             </div>
                         </div>
 
-                        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3">
-                            <label className="inline-flex items-center gap-3 text-sm text-gray-600">
+                        <div className="flex flex-col gap-4">
+                            <label className="inline-flex items-start gap-3 text-sm text-gray-600">
                                 <input
                                     type="checkbox"
                                     checked={signupForm.replace_existing === true}
                                     onChange={(event) => updateSignupField('replace_existing', event.target.checked)}
-                                    className="rounded border-gray-300"
+                                    className="rounded border-gray-300 mt-1"
                                 />
                                 Sostituisci il numero esistente del tenant se già collegato
                             </label>
 
-                            <div className="flex gap-3">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                                 <button
                                     onClick={() => void handleLaunchMetaSignup()}
                                     disabled={isLaunchingMeta}
-                                    className="apple-button-secondary flex items-center justify-center gap-2 disabled:opacity-60"
+                                    className="apple-button-secondary flex items-center justify-center gap-2 disabled:opacity-60 w-full sm:w-auto"
                                 >
                                     {isLaunchingMeta ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                     Avvia Meta
                                 </button>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="apple-button-secondary"
+                                    className="apple-button-secondary w-full sm:w-auto"
                                 >
                                     Chiudi
                                 </button>
                                 <button
                                     onClick={() => void handleSubmitSignup()}
                                     disabled={isSubmitting}
-                                    className="apple-button flex items-center justify-center gap-2 text-white disabled:opacity-60"
+                                    className="apple-button flex items-center justify-center gap-2 text-white disabled:opacity-60 w-full sm:w-auto"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                                     Completa collegamento

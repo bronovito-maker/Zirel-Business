@@ -7,6 +7,8 @@ import type {
     AnalyticsTrendPoint,
     CompleteWhatsAppEmbeddedSignupPayload,
     CompleteWhatsAppEmbeddedSignupResult,
+    DisconnectWhatsAppChannelResult,
+    WhatsAppChannelOpsSummary,
     WhatsAppConversationSummary,
     WhatsAppConversationStatus,
     WhatsAppMessageSummary,
@@ -439,6 +441,78 @@ export const completeWhatsAppEmbeddedSignup = async (
     }
 
     return data;
+};
+
+export const disconnectWhatsAppChannel = async (): Promise<DisconnectWhatsAppChannelResult> => {
+    const authToken = getAuthToken();
+    const tenantId = getTenantId();
+    if (!authToken || !tenantId) throw new Error('NOT_AUTHENTICATED');
+
+    const response = await fetch('/api/whatsapp/disconnect', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tenantId,
+        },
+        body: JSON.stringify({
+            tenant_id: tenantId,
+            tenant_api_token: authToken,
+        }),
+    });
+
+    let data: DisconnectWhatsAppChannelResult | null = null;
+
+    try {
+        data = await response.json() as DisconnectWhatsAppChannelResult;
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok || !data?.ok) {
+        throw new Error(data?.error_message || data?.error_code || `WHATSAPP_DISCONNECT_HTTP_${response.status}`);
+    }
+
+    return data;
+};
+
+export const getWhatsAppChannelOpsSummary = async (tenantId?: string): Promise<WhatsAppChannelOpsSummary> => {
+    const tid = ensureTenantId(tenantId);
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+
+    const response = await fetch('/api/whatsapp/channel-ops', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tid,
+        },
+        body: JSON.stringify({
+            tenant_id: tid,
+            tenant_api_token: authToken,
+        }),
+    });
+
+    let body: { ok?: boolean; failed_outbound?: WhatsAppChannelOpsSummary['failed_outbound']; recent_webhook_events?: WhatsAppChannelOpsSummary['recent_webhook_events']; error_message?: string; error_code?: string } | null = null;
+
+    try {
+        body = await response.json() as { ok?: boolean; failed_outbound?: WhatsAppChannelOpsSummary['failed_outbound']; recent_webhook_events?: WhatsAppChannelOpsSummary['recent_webhook_events']; error_message?: string; error_code?: string };
+    } catch {
+        body = null;
+    }
+
+    if (!response.ok || !body?.ok) {
+        throw new Error(body?.error_message || body?.error_code || `WHATSAPP_OPS_HTTP_${response.status}`);
+    }
+
+    return {
+        tenant_id: tid,
+        failed_outbound: body.failed_outbound || [],
+        recent_webhook_events: body.recent_webhook_events || [],
+    };
 };
 
 export const regenerateTenantToken = async (tenantId?: string): Promise<string> => {

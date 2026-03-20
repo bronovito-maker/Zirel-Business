@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import PublicDataDeletionPage from './components/PublicDataDeletionPage';
 import { isAuthenticated, logout } from './lib/auth';
 
 function App() {
   const [isAuth, setIsAuth] = useState<boolean>(() => isAuthenticated());
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
 
   const handleLogin = () => {
     setIsAuth(true);
@@ -19,7 +21,9 @@ function App() {
   return (
     <div className="min-h-screen bg-[#FBFBFD]">
       <Toaster position="top-center" />
-      {!isAuth ? (
+      {pathname === '/meta/data-deletion' ? (
+        <PublicDataDeletionPage />
+      ) : !isAuth ? (
         <Login onLogin={handleLogin} />
       ) : (
         <Dashboard onLogout={handleLogout} />

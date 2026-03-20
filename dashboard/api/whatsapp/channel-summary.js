@@ -63,11 +63,24 @@ function normalizeSummary(row, tenantId) {
     }
 
     const connectionStatus = String(row.connection_status || '').trim().toLowerCase();
-    const derivedStatus = ['not_connected', 'connection_in_progress', 'connected', 'requires_attention', 'error'].includes(connectionStatus)
+    const hasPhoneId = Boolean(row.meta_phone_number_id);
+    const hasDisplayPhone = Boolean(row.display_phone_number);
+    const hasVerifiedName = Boolean(row.verified_name);
+    const hasBlockingError = Boolean(row.onboarding_error);
+
+    let derivedStatus = ['not_connected', 'connection_in_progress', 'connected', 'requires_attention', 'error'].includes(connectionStatus)
         ? connectionStatus
-        : row.meta_phone_number_id
+        : hasPhoneId
             ? 'connected'
             : 'not_connected';
+
+    if (derivedStatus === 'connected' && (!hasDisplayPhone || !hasVerifiedName)) {
+        derivedStatus = 'requires_attention';
+    }
+
+    if (hasBlockingError) {
+        derivedStatus = 'error';
+    }
 
     return {
         id: row.id,
@@ -81,6 +94,8 @@ function normalizeSummary(row, tenantId) {
         verified_name: row.verified_name || null,
         connection_status: derivedStatus,
         last_sync_at: row.last_sync_at || null,
+        last_webhook_at: row.last_webhook_at || null,
+        webhook_verified_at: row.webhook_verified_at || null,
         onboarding_error: row.onboarding_error || null,
     };
 }
@@ -115,7 +130,7 @@ export default async function handler(req, res) {
     try {
         const { data, error } = await supabase
             .from('tenant_whatsapp_accounts')
-            .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref, meta_business_account_id, meta_waba_id, waba_id, display_phone_number, verified_name, connection_status, last_sync_at, onboarding_error')
+            .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref, meta_business_account_id, meta_waba_id, waba_id, display_phone_number, verified_name, connection_status, last_sync_at, last_webhook_at, webhook_verified_at, onboarding_error')
             .eq('tenant_id', tenant.tenant_id)
             .order('updated_at', { ascending: false, nullsFirst: false })
             .limit(1)

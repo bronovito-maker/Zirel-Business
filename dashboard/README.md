@@ -49,6 +49,19 @@ Per il callback server-side servono inoltre:
 8. clicca `Completa collegamento`
 9. verifica che la card passi a `Connesso`
 
+## URL pubblici compliance Meta
+
+- Data deletion instructions URL:
+  - `https://dashboard.zirel.org/meta/data-deletion`
+- Revoke / deauthorize callback URL:
+  - `https://dashboard.zirel.org/api/meta/deauthorize`
+
+Env server consigliate per i callback Meta:
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL`
+- `META_APP_SECRET`
+
 Fallback:
 
 se Meta non popola automaticamente tutti i campi nel browser, puoi completare manualmente il form con:

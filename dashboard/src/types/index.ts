@@ -190,6 +190,8 @@ export interface WhatsAppChannelSummary {
     verified_name?: string | null;
     connection_status: WhatsAppConnectionStatus;
     last_sync_at?: string | null;
+    last_webhook_at?: string | null;
+    webhook_verified_at?: string | null;
     onboarding_error?: string | null;
 }
 
@@ -215,4 +217,37 @@ export interface CompleteWhatsAppEmbeddedSignupResult {
     next_step?: string;
     error_code?: string;
     error_message?: string;
+}
+
+export interface DisconnectWhatsAppChannelResult {
+    ok: boolean;
+    tenant_id?: string;
+    connection_status?: WhatsAppConnectionStatus | string;
+    next_step?: string;
+    error_code?: string;
+    error_message?: string;
+}
+
+export interface WhatsAppFailedOutboundItem {
+    id: string;
+    conversation_id?: string | null;
+    processing_status?: string | null;
+    delivery_status?: string | null;
+    error_message?: string | null;
+    created_at?: string | null;
+    failed_at?: string | null;
+}
+
+export interface WhatsAppWebhookEventItem {
+    id: string;
+    event_type?: string | null;
+    event_status?: string | null;
+    error_message?: string | null;
+    created_at?: string | null;
+}
+
+export interface WhatsAppChannelOpsSummary {
+    tenant_id?: string;
+    failed_outbound: WhatsAppFailedOutboundItem[];
+    recent_webhook_events: WhatsAppWebhookEventItem[];
 }
