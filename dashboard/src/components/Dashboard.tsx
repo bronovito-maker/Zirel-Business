@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare, House, Menu, X, Search } from 'lucide-react';
+import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare, Menu, X, Search, CircleHelp } from 'lucide-react';
 import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
 import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
 import { syncTenantFieldState } from '../lib/tenant-form';
@@ -620,13 +620,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         <div className="shrink-0 border-t border-gray-200/80 pt-4">
                             <div className="grid grid-cols-2 gap-3">
                             <a
-                                href="https://zirel.org"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="/help"
                                 className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white/90 px-4 py-3"
                             >
-                                <House className="h-4 w-4" />
-                                Home
+                                <CircleHelp className="h-4 w-4" />
+                                Aiuto
                             </a>
                             <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white/90 px-4 py-3 group">
                                 <LogOut className="h-4 w-4 text-gray-400 group-hover:text-red-500 transition-colors" />
@@ -769,13 +767,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                 <div className="mt-4 shrink-0 border-t border-gray-200/80 pt-4">
                                     <div className="grid grid-cols-2 gap-3">
                                         <a
-                                            href="https://zirel.org"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                            href="/help"
                                             className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-4 py-3"
                                         >
-                                            <House className="h-4 w-4" />
-                                            Home
+                                            <CircleHelp className="h-4 w-4" />
+                                            Aiuto
                                         </a>
                                         <button onClick={onLogout} className="apple-button-secondary flex w-full items-center justify-center gap-2 border-gray-200 bg-white px-4 py-3">
                                             <LogOut className="h-4 w-4 text-gray-400" />
