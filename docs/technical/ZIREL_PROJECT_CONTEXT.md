@@ -68,9 +68,14 @@ Regole attive:
 
 Valori correnti:
 
-- entry: `49 euro/mese + 349 euro` attivazione assistita
-- intermedio: `99 euro/mese + 599 euro` setup e configurazione iniziale
+- entry: `69 euro/mese + 399 euro` attivazione assistita
+- intermedio: `129 euro/mese + 699 euro` setup e configurazione iniziale
 - custom: su progetto
+
+Nota operativa:
+
+- risposte automatiche su WhatsApp incluse nei piani
+- costi di messaggistica Meta / WhatsApp eventualmente applicabili esclusi
 
 Naming piani per settore:
 

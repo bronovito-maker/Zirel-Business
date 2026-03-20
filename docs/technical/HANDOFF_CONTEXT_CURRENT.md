@@ -14,8 +14,8 @@ Data: 2026-03-04
 
 Fonte ufficiale: `docs/technical/PRICING_MODEL.md`
 
-- Entry: `€49/mese + €349` attivazione assistita
-- Intermedio: `€99/mese + €599` setup e configurazione iniziale
+- Entry: `€69/mese + €399` attivazione assistita
+- Intermedio: `€129/mese + €699` setup e configurazione iniziale
 - Custom: su progetto
 - Annuale: `-50%` sull'attivazione iniziale
 

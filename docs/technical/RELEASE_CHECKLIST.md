@@ -23,8 +23,8 @@ Data: 2026-03-04
 
 ## Pricing commerciale
 
-- Entry: `€49/mese + €349` attivazione assistita
-- Intermedio: `€99/mese + €599` setup e configurazione iniziale
+- Entry: `€69/mese + €399` attivazione assistita
+- Intermedio: `€129/mese + €699` setup e configurazione iniziale
 - Annuale: `-50%` attivazione iniziale
 - Policy testuale visibile:
   - canone sempre attivo

@@ -153,6 +153,10 @@ if (!secretKey) {
 }
 
 const params = new URLSearchParams();
+const rawTrialDays = Number(input.trial_days || $env.STRIPE_TRIAL_DAYS || 7);
+const trialDays = Number.isFinite(rawTrialDays) && rawTrialDays > 0
+  ? Math.max(1, Math.floor(rawTrialDays))
+  : 7;
 params.set('mode', 'subscription');
 params.set('success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?status=success'));
 params.set('cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?status=cancel'));
@@ -160,9 +164,11 @@ params.set('customer_email', input.billing_email || input.email);
 params.set('client_reference_id', input.tenant_id);
 params.set('line_items[0][price]', input.price_id);
 params.set('line_items[0][quantity]', '1');
+params.set('subscription_data[trial_period_days]', String(trialDays));
 params.set('metadata[tenant_id]', input.tenant_id);
 params.set('metadata[billing_email]', input.billing_email || input.email || '');
 params.set('metadata[business_name]', input.business_name || '');
+params.set('metadata[trial_days]', String(trialDays));
 
 const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
   method: 'POST',

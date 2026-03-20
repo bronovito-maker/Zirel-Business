@@ -7,13 +7,13 @@ Questa scheda raccoglie i contenuti pronti da copiare nel tenant `zirel_official
 ### `prezzo_medio`
 
 ```text
-Piani da EUR49/mese a EUR99/mese + attivazione iniziale. Soluzioni custom su richiesta. Con annuale: -50% sull'attivazione iniziale.
+Piani da EUR69/mese a EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Soluzioni custom su richiesta. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 ```
 
 ### `servizi_inclusi`
 
 ```text
-Widget chat personalizzato per sito web, risposte AI h24, base conoscenza aggiornata dal cliente, supporto multilingua, raccolta lead, gestione richieste commerciali e, nei piani avanzati, automazione prenotazioni con notifiche interne.
+Widget chat personalizzato per sito web, risposte automatiche h24 su sito e WhatsApp, base conoscenza aggiornata dal cliente, supporto multilingua, raccolta lead, gestione richieste commerciali e, nei piani avanzati, handoff umano e automazione prenotazioni con notifiche interne.
 ```
 
 ### `promozione_attiva`
@@ -87,21 +87,23 @@ La demo serve a mostrare come Zirèl si comporterebbe nel contesto reale del cli
 
 #### Piano Entry
 
-- EUR49/mese
-- EUR349 attivazione assistita una tantum
+- EUR69/mese
+- EUR399 attivazione assistita una tantum
 - Risposte AI h24
+- Risposte automatiche su WhatsApp
 - Informazioni operative e richieste frequenti
 - 1 lingua (Italiano)
 - Widget chat personalizzato
 
 #### Piano Intermedio
 
-- EUR99/mese
-- EUR599 setup e configurazione iniziale una tantum
+- EUR129/mese
+- EUR699 setup e configurazione iniziale una tantum
 - Tutto del piano Entry
 - 10 lingue incluse
 - Flussi operativi piu completi
 - Integrazione dashboard
+- Handoff umano e gestione conversazioni WhatsApp
 - Piano consigliato per la maggior parte delle attivita
 
 #### Gran Turismo

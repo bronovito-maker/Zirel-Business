@@ -110,13 +110,13 @@ https://zirel.org/restaurant
 #### `prezzo_medio`
 
 ```text
-Piani da EUR49/mese a EUR99/mese + attivazione iniziale. Soluzioni custom per locali con esigenze piu complesse. Con annuale: -50% sull'attivazione iniziale.
+Piani Servizio da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Maestro su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 ```
 
 #### `servizi_inclusi`
 
 ```text
-Widget chat personalizzato per il sito del ristorante, risposte AI h24, raccolta richieste tavolo, FAQ su orari e servizi, filtraggio richieste incomplete, supporto multilingua, passaggio a operatore umano per casi fuori flusso e configurazione coerente con il brand del locale.
+Widget chat personalizzato per il sito del ristorante, risposte automatiche su sito e WhatsApp, raccolta richieste tavolo, FAQ su orari e servizi, filtraggio richieste incomplete, supporto multilingua, passaggio a operatore umano per casi fuori flusso e configurazione coerente con il brand del locale.
 ```
 
 #### `promozione_attiva`
@@ -227,7 +227,7 @@ Questa e la lista dei campi chiave, gia adattata alla struttura attuale del vost
 - `sito_web_url`: `https://zirel.org/restaurant`
 - `durata_media_appuntamento`: `10-15 minuti per la demo commerciale.`
 - `servizi_inclusi`: `Widget chat personalizzato per il sito del ristorante, risposte AI h24, raccolta richieste tavolo, FAQ su orari e servizi, filtraggio richieste incomplete, supporto multilingua, passaggio a operatore umano per casi fuori flusso e configurazione coerente con il brand del locale.`
-- `prezzo_medio`: `Piani da EUR49/mese a EUR99/mese + attivazione iniziale. Soluzioni custom per locali con esigenze piu complesse. Con annuale: -50% sull'attivazione iniziale.`
+- `prezzo_medio`: `Piani Servizio da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Maestro su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.`
 - `promozione_attiva`: `Demo live gia pronta su un ristorante fittizio ma realistico, per vedere con mano come Zirèl lavorerebbe sul sito di un locale prima di decidere.`
 - `prompt_base`: `Sei l'assistente ufficiale di Zirèl Restaurant e lavori come consulente pre-sales per ristoratori. Stai parlando con titolari o gestori di locali che vogliono capire se Zirèl puo aiutare il loro ristorante a gestire meglio prenotazioni, domande frequenti e richieste fuori orario. Devi essere concreto, rapido, professionale e commerciale, senza risultare invadente. Non devi comportarti come il chatbot di un ristorante vero: non stai prendendo tavoli per il tuo locale, stai spiegando come Zirèl puo funzionare sul sito del cliente. Se l'utente vuole provare il prodotto, invitalo a testare la demo live del ristorante gia pronta oppure a prenotare una demo guidata. Non inventare mai funzioni, integrazioni, sconti o conferme non reali.`
 - `telefono`: `+39 343 68335677`
@@ -374,7 +374,7 @@ Configura o aggiorna il tenant `zirel_restaurant` con questi valori:
 - telefono: +39 343 68335677
 - mail: info@zirel.org
 - sito_web_url: https://zirel.org/restaurant
-- prezzo_medio: Piani da EUR49/mese a EUR99/mese + attivazione iniziale. Soluzioni custom per locali con esigenze piu complesse. Con annuale: -50% sull'attivazione iniziale.
+- prezzo_medio: Piani Servizio da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Maestro su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 - servizi_inclusi: Widget chat personalizzato per il sito del ristorante, risposte AI h24, raccolta richieste tavolo, FAQ su orari e servizi, filtraggio richieste incomplete, supporto multilingua, passaggio a operatore umano per casi fuori flusso e configurazione coerente con il brand del locale.
 - promozione_attiva: Demo live gia pronta su un ristorante fittizio ma realistico, per vedere con mano come Zirèl lavorerebbe sul sito di un locale prima di decidere.
 - dati_testuali_brevi: Zirèl Restaurant aiuta i ristoratori a non perdere richieste mentre il servizio e in corso. Risponde alle domande frequenti, raccoglie i dati utili per la prenotazione tavolo, fa un riepilogo ordinato e registra solo quando il flusso e davvero valido. Non sostituisce il locale: alleggerisce il team nei momenti di punta.

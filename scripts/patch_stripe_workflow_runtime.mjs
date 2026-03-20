@@ -143,6 +143,16 @@ if (!secretKey) {
 }
 
 const formBody = [
+  ...(() => {
+    const rawTrialDays = Number(input.trial_days || $env.STRIPE_TRIAL_DAYS || 7);
+    const trialDays = Number.isFinite(rawTrialDays) && rawTrialDays > 0
+      ? Math.max(1, Math.floor(rawTrialDays))
+      : 7;
+    return [
+      ['subscription_data[trial_period_days]', String(trialDays)],
+      ['metadata[trial_days]', String(trialDays)],
+    ];
+  })(),
   ['mode', 'subscription'],
   ['success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=success')],
   ['cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=cancel')],

@@ -18,6 +18,7 @@ interface BillingSectionProps {
 }
 
 type BillingUiStatus = 'trialing' | 'expired_trial' | 'active' | 'past_due' | 'canceled' | 'unpaid';
+type PricingSector = 'restaurant' | 'hotel' | 'professional';
 
 const BILLING_GRACE_DAYS = 7;
 
@@ -54,54 +55,116 @@ const statusAccessMeta: Record<BillingUiStatus, { label: string; tone: string; d
     },
 };
 
-const monthlyPlans = [
-    {
-        key: 'premium',
-        label: 'Zirel Core Premium',
-        price: 'EUR99',
-        cadence: '/ mese',
-        setup: 'Setup iniziale: € 599 (una tantum)',
-        annualSetup: 'Risparmi il 50% sul setup scegliendo l\'Annuale (€ 299,50)',
-        description: 'L\'esperienza di concierge AI più completa e personalizzata, multilingua e con suggerimenti proattivi.',
-        features: [
-            'Tutto del piano Base',
-            'Concierge multilingua',
-            'Ottimizzazione avanzata della conversione',
-            'Analisi richieste in tempo reale',
-            'Supporto prioritario',
-        ],
-        priceEnv: ['VITE_STRIPE_PRICE_PREMIUM_ID', 'VITE_STRIPE_PRICE_PREMIUM_MONTHLY_ID'],
-        priceYearlyEnv: ['VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID', 'VITE_STRIPE_PRICE_PREMIUM_ANNUAL_ID'],
-        setupEnv: ['VITE_STRIPE_SETUP_PREMIUM_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY'],
-        setupYearlyEnv: ['VITE_STRIPE_SETUP_PREMIUM_YEARLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_YEARLY', 'VITE_STRIPE_SETUP_PREMIUM_ANNUAL_ID'],
-        accent: 'text-zirel-orange-dark',
-        buttonClass: 'apple-button bg-zirel-gradient',
-        setupAccent: 'text-zirel-orange-dark',
-    },
-    {
-        key: 'base',
-        label: 'Zirèl Core Base',
-        price: '€ 49',
-        cadence: '/ mese',
-        setup: 'Setup iniziale: € 349 (una tantum)',
-        annualSetup: 'Risparmi il 50% sul setup scegliendo l\'Annuale (€ 174,50)',
-        description: 'Per attivazioni rapide e per automatizzare immediatamente la gestione operativa essenziale.',
-        features: [
-            'Assistente AI operativo 24/7',
-            'Gestione automatica richieste, orari e menu',
-            'Intercettazione prenotazioni dal sito',
+const sectorPlanNames: Record<PricingSector, { base: string; premium: string; custom: string }> = {
+    restaurant: { base: 'Servizio', premium: 'Azdora', custom: 'Maestro' },
+    hotel: { base: 'Direct', premium: 'Azdora', custom: 'Gran Turismo' },
+    professional: { base: 'Studio', premium: 'Equipe', custom: 'Partner' },
+};
+
+const getPricingSector = (formData: TenantData): PricingSector => {
+    if (formData.hotel_name && !formData.nome_ristorante) return 'hotel';
+    if (formData.nome_ristorante) return 'restaurant';
+    return 'professional';
+};
+
+const getMonthlyPlans = (sector: PricingSector) => {
+    const names = sectorPlanNames[sector];
+    const baseDescription = {
+        restaurant: 'Per locali che vogliono rispondere subito dal sito e su WhatsApp, gestendo richieste e domande frequenti senza perdere coperti.',
+        hotel: 'Per strutture che vogliono raccogliere richieste dirette dal sito e su WhatsApp, riducendo tempi morti e lead dispersi.',
+        professional: 'Per studi e attivita di servizio che vogliono automatizzare il primo contatto dal sito e su WhatsApp con una gestione essenziale ma solida.',
+    }[sector];
+    const premiumDescription = {
+        restaurant: 'Per ristoranti e locali che vogliono un concierge piu completo, multilingua e con gestione conversazioni WhatsApp piu evoluta.',
+        hotel: 'Per hotel e strutture ricettive che vogliono un concierge piu completo, multilingua e con gestione avanzata dei lead diretti e WhatsApp.',
+        professional: 'Per studi e attivita professionali che vogliono un concierge piu completo, multilingua e con gestione avanzata delle conversazioni WhatsApp.',
+    }[sector];
+
+    const baseFeatures = {
+        restaurant: [
+            'Risposte automatiche su sito e WhatsApp',
+            'Gestione automatica richieste, orari, menu e servizi',
+            'Raccolta richieste tavolo e contatti dal sito',
             'Una lingua inclusa',
             'Supporto via email',
         ],
-        priceEnv: ['VITE_STRIPE_PRICE_BASE_ID', 'VITE_STRIPE_PRICE_BASE_MONTHLY_ID'],
-        priceYearlyEnv: ['VITE_STRIPE_PRICE_BASE_YEARLY_ID', 'VITE_STRIPE_PRICE_BASE_ANNUAL_ID'],
-        setupEnv: ['VITE_STRIPE_SETUP_BASE_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY'],
-        setupYearlyEnv: ['VITE_STRIPE_SETUP_BASE_YEARLY_ID', 'VITE_STRIPE_SETUP_BASE_YEARLY', 'VITE_STRIPE_SETUP_BASE_ANNUAL_ID'],
-        accent: 'text-zirel-blue',
-        buttonClass: 'apple-button-secondary',
-        setupAccent: 'text-zirel-blue',
-    },
-];
+        hotel: [
+            'Risposte automatiche su sito e WhatsApp',
+            'Gestione automatica richieste, orari, servizi e FAQ struttura',
+            'Raccolta lead soggiorno e richieste dirette dal sito',
+            'Una lingua inclusa',
+            'Supporto via email',
+        ],
+        professional: [
+            'Risposte automatiche su sito e WhatsApp',
+            'Gestione automatica richieste, orari, servizi e informazioni pratiche',
+            'Raccolta lead e richieste commerciali dal sito',
+            'Una lingua inclusa',
+            'Supporto via email',
+        ],
+    }[sector];
+
+    const premiumFeatures = {
+        restaurant: [
+            `Tutto del piano ${names.base}`,
+            'Concierge multilingua',
+            'Handoff umano e gestione conversazioni WhatsApp avanzata',
+            'Ottimizzazione avanzata della conversione',
+            'Supporto prioritario',
+        ],
+        hotel: [
+            `Tutto del piano ${names.base}`,
+            'Concierge multilingua',
+            'Handoff umano e gestione conversazioni WhatsApp avanzata',
+            'Follow-up lead e gestione richieste piu strutturata',
+            'Supporto prioritario',
+        ],
+        professional: [
+            `Tutto del piano ${names.base}`,
+            'Concierge multilingua',
+            'Handoff umano e gestione conversazioni WhatsApp avanzata',
+            'Qualifica contatti e instradamento piu evoluto',
+            'Supporto prioritario',
+        ],
+    }[sector];
+
+    return [
+        {
+            key: 'premium',
+            label: names.premium,
+            price: '€ 129',
+            cadence: '/ mese',
+            setup: 'Setup iniziale: € 699 (una tantum)',
+            annualSetup: 'Con l’annuale: -50% sul setup (€ 349,50)',
+            description: premiumDescription,
+            features: premiumFeatures,
+            priceEnv: ['VITE_STRIPE_PRICE_PREMIUM_ID', 'VITE_STRIPE_PRICE_PREMIUM_MONTHLY_ID'],
+            priceYearlyEnv: ['VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID', 'VITE_STRIPE_PRICE_PREMIUM_ANNUAL_ID'],
+            setupEnv: ['VITE_STRIPE_SETUP_PREMIUM_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_MONTHLY'],
+            setupYearlyEnv: ['VITE_STRIPE_SETUP_PREMIUM_YEARLY_ID', 'VITE_STRIPE_SETUP_PREMIUM_YEARLY', 'VITE_STRIPE_SETUP_PREMIUM_ANNUAL_ID'],
+            accent: 'text-zirel-orange-dark',
+            buttonClass: 'apple-button bg-zirel-gradient',
+            setupAccent: 'text-zirel-orange-dark',
+        },
+        {
+            key: 'base',
+            label: names.base,
+            price: '€ 69',
+            cadence: '/ mese',
+            setup: 'Setup iniziale: € 399 (una tantum)',
+            annualSetup: 'Con l’annuale: -50% sul setup (€ 199,50)',
+            description: baseDescription,
+            features: baseFeatures,
+            priceEnv: ['VITE_STRIPE_PRICE_BASE_ID', 'VITE_STRIPE_PRICE_BASE_MONTHLY_ID'],
+            priceYearlyEnv: ['VITE_STRIPE_PRICE_BASE_YEARLY_ID', 'VITE_STRIPE_PRICE_BASE_ANNUAL_ID'],
+            setupEnv: ['VITE_STRIPE_SETUP_BASE_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY_ID', 'VITE_STRIPE_SETUP_BASE_MONTHLY'],
+            setupYearlyEnv: ['VITE_STRIPE_SETUP_BASE_YEARLY_ID', 'VITE_STRIPE_SETUP_BASE_YEARLY', 'VITE_STRIPE_SETUP_BASE_ANNUAL_ID'],
+            accent: 'text-zirel-blue',
+            buttonClass: 'apple-button-secondary',
+            setupAccent: 'text-zirel-blue',
+        },
+    ];
+};
 
 const statusMeta: Record<BillingUiStatus, { label: string; tone: string; title: string; description: string; cta: string }> = {
     trialing: {
@@ -173,6 +236,9 @@ const resolveEnv = (keys: string[]) => {
 };
 
 const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: BillingSectionProps) => {
+    const pricingSector = getPricingSector(formData);
+    const planNames = sectorPlanNames[pricingSector];
+    const monthlyPlans = getMonthlyPlans(pricingSector);
     const trialEndsAt = formData.trial_ends_at ? new Date(formData.trial_ends_at) : null;
     const currentPeriodEnd = formData.current_period_end ? new Date(formData.current_period_end) : null;
     const now = new Date();
@@ -201,14 +267,14 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
             formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_YEARLY_ID ||
             formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ANNUAL_ID
         )
-            ? 'Zirel Core Premium'
+            ? planNames.premium
             : (
                 formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_ID ||
                 formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_MONTHLY_ID ||
                 formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_YEARLY_ID ||
                 formData.stripe_price_id === import.meta.env.VITE_STRIPE_PRICE_BASE_ANNUAL_ID
             )
-                ? 'Zirel Core Base'
+                ? planNames.base
                 : currentStatus === 'expired_trial'
                     ? 'Nessun piano attivo'
                     : 'Periodo di prova';
@@ -406,6 +472,11 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                                 <span className="inline-block mt-2">La prima attivazione include il <strong className="text-gray-900">canone del piano scelto</strong> e un <strong className="text-gray-900">contributo di setup iniziale</strong> (una tantum). I rinnovi successivi includeranno esclusivamente il canone ricorrente. Scegliendo la frequenza annuale ottieni immediatamente uno <strong className="text-zirel-blue">sconto del 50% sulla quota di setup</strong> e garantisci l'operatività per 12 mesi in un’unica soluzione.</span>
                             </p>
                         </div>
+                        <div className="p-5 rounded-2xl bg-orange-50 border border-orange-100 max-w-4xl text-sm text-gray-700 leading-relaxed shadow-sm">
+                            <p>
+                                <strong className="text-gray-900">Nota WhatsApp:</strong> le funzionalita di risposta automatica e handoff umano su WhatsApp sono incluse nel piano. Eventuali costi di messaggistica Meta/WhatsApp restano esclusi e possono variare in base al volume o a campagne/template fuori fair use.
+                            </p>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -496,6 +567,23 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
                     </div>
                 </section>
             )}
+
+            <section className="apple-card p-6 md:p-7 border border-gray-100">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
+                    <div className="space-y-2 max-w-3xl">
+                        <p className="text-[11px] uppercase tracking-[0.22em] font-black text-gray-400">Piano su misura</p>
+                        <h3 className="text-2xl font-black text-gray-900">{planNames.custom}</h3>
+                        <p className="text-gray-600 leading-relaxed">
+                            Pensato per realta che vogliono un progetto piu ampio, piu canali, piu automazioni o una configurazione operativa costruita su processi interni specifici.
+                        </p>
+                    </div>
+                    <div className="rounded-[1.5rem] border border-orange-100 bg-orange-50 px-5 py-4 min-w-[220px]">
+                        <p className="text-[10px] uppercase tracking-[0.22em] font-bold text-orange-500">Prezzo</p>
+                        <p className="mt-2 text-2xl font-black text-gray-900">Su progetto</p>
+                        <p className="mt-2 text-sm text-gray-600">Analisi, configurazione e preventivo costruiti sul caso reale del cliente.</p>
+                    </div>
+                </div>
+            </section>
 
             <section className="rounded-[2rem] border border-gray-100 bg-gray-50 px-6 py-5 flex items-start gap-4">
                 <div className="p-2 bg-white text-gray-400 rounded-xl shrink-0 border border-gray-100">

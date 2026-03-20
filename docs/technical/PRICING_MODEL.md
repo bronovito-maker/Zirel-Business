@@ -1,6 +1,6 @@
 # Zirèl Pricing Model
 
-Data di riferimento: 2026-03-04
+Data di riferimento: 2026-03-20
 
 ## Regola generale
 
@@ -13,21 +13,22 @@ Data di riferimento: 2026-03-04
 
 ### Piano entry
 
-- Canone: `€49 / mese`
-- Attivazione assistita (mensile): `€349` una tantum
+- Canone: `€69 / mese`
+- Attivazione assistita (mensile): `€399` una tantum
 - Soluzione annuale: `attivazione assistita scontata del 50%`
 
 Note:
-- L'attivazione assistita include configurazione iniziale, caricamento contenuti chiave, settaggio widget e messa a punto del flusso base.
+- L'attivazione assistita include configurazione iniziale, caricamento contenuti chiave, settaggio widget, collegamento sito e messa a punto del flusso base.
+- Il piano include risposte automatiche su sito e WhatsApp.
 
 ### Piano intermedio
 
-- Canone: `€99 / mese`
-- Setup e configurazione iniziale (mensile): `€599` una tantum
+- Canone: `€129 / mese`
+- Setup e configurazione iniziale (mensile): `€699` una tantum
 - Soluzione annuale: `setup e configurazione iniziale scontati del 50%`
 
 Note:
-- Include tutto il piano entry piu' ottimizzazione iniziale del flusso conversazionale / di intake e setup piu' strutturato della dashboard.
+- Include tutto il piano entry piu' ottimizzazione iniziale del flusso conversazionale / di intake, gestione conversazioni WhatsApp piu' evoluta e setup piu' strutturato della dashboard.
 
 ### Piano custom
 
@@ -38,6 +39,8 @@ Note:
 
 - La soluzione annuale mantiene lo stesso canone mensile di listino.
 - Lo sconto si applica solo all'attivazione iniziale.
+- I costi di messaggistica Meta / WhatsApp eventualmente applicabili restano esclusi dal canone.
+- Oltre una soglia di utilizzo ragionevole, eventuali volumi extra possono essere gestiti a consumo.
 - Messaggio commerciale consigliato:
   - `Con abbonamento annuale: -50% sull'attivazione iniziale`
 
