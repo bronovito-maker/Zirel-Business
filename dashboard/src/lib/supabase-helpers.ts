@@ -406,7 +406,11 @@ export const completeWhatsAppEmbeddedSignup = async (
             'X-Zirel-Api-Token': authToken,
             ...(tenantId ? { 'X-Zirel-Tenant-Id': tenantId } : {}),
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+            ...payload,
+            tenant_api_token: authToken,
+            tenant_id: tenantId || undefined,
+        }),
     });
 
     let data: CompleteWhatsAppEmbeddedSignupResult | null = null;

@@ -26,11 +26,14 @@ function createSupabaseAdmin() {
 }
 
 async function resolveTenantId(supabase, req) {
+    const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
     const authHeader = req.headers.authorization;
     const apiToken =
+        extractBearerToken(requestBody.tenant_api_token) ||
         extractBearerToken(authHeader) ||
         extractBearerToken(req.headers['x-zirel-api-token']);
-    const expectedTenantId = String(req.headers['x-zirel-tenant-id'] || '').trim() || null;
+    const expectedTenantId =
+        String(requestBody.tenant_id || req.headers['x-zirel-tenant-id'] || '').trim() || null;
 
     if (!apiToken) {
         return { ok: false, status: 401, error_code: 'WHATSAPP_SIGNUP_UNAUTHORIZED', error_message: 'Missing tenant API token' };
