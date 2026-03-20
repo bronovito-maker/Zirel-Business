@@ -252,7 +252,7 @@
     },
     {
       "parameters": {
-        "modelName": "models/text-embedding-004",
+        "modelName": "models/gemini-embedding-001",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
@@ -298,7 +298,13 @@
             "appointment_calendar_provider": "={{ $('Get a row1').item.json.appointment_calendar_provider || $('Get a row1').item.json.calendar_provider || \"\" }}",
             "appointment_calendar_api_url": "={{ $('Get a row1').item.json.appointment_calendar_api_url || $('Get a row1').item.json.calendar_api_url || $('Get a row1').item.json.availability_api_url || \"\" }}",
             "availability_api_url": "={{ $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "adapter_test_mode": "={{ $('Get a row1').item.json.adapter_test_mode || \"false\" }}"
+            "adapter_test_mode": "={{ $('Get a row1').item.json.adapter_test_mode || \"false\" }}",
+            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+            "internal_notification_email": "={{ $('Get a row1').item.json.internal_notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || \"\" }}",
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+            "internal_telegram_chat_id": "={{ $('Get a row1').item.json.internal_telegram_chat_id || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -465,6 +471,66 @@
             {
               "id": "adapter_test_mode",
               "displayName": "adapter_test_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "notification_email",
+              "displayName": "notification_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "internal_notification_email",
+              "displayName": "internal_notification_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "internal_email",
+              "displayName": "internal_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "billing_email",
+              "displayName": "billing_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "internal_telegram_chat_id",
+              "displayName": "internal_telegram_chat_id",
               "required": false,
               "defaultMatch": false,
               "display": true,

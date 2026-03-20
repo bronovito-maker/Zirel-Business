@@ -99,7 +99,7 @@ https://zirel.org/hotel
 #### `prezzo_medio`
 
 ```text
-Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
+Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Direct parte dal sito; WhatsApp ufficiale e handoff umano entrano da Azdora in poi. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 ```
 
 #### `servizi_inclusi`
@@ -210,7 +210,7 @@ true
 - `sito_web_url`: `https://zirel.org/hotel`
 - `durata_media_appuntamento`: `10-15 minuti per la demo commerciale.`
 - `servizi_inclusi`: `Widget chat personalizzato per il sito della struttura, risposta automatica alle richieste frequenti, raccolta dati per richieste soggiorno, supporto multilingua, lead ordinati, follow-up brandizzati e passaggio al team per conferma finale.`
-- `prezzo_medio`: `Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.`
+- `prezzo_medio`: `Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Direct parte dal sito; WhatsApp ufficiale e handoff umano entrano da Azdora in poi. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.`
 - `promozione_attiva`: `Demo guidata disponibile per vedere come Zirèl puo accogliere richieste, raccogliere date e contatti, e trasformare una conversazione in un lead piu ordinato.`
 - `prompt_base`: `Sei l'assistente ufficiale di Zirèl Hotel e lavori come consulente pre-sales per hotelier e strutture ricettive. Stai parlando con proprietari, direttori o responsabili marketing che vogliono capire se Zirèl puo aiutare il loro hotel a gestire meglio richieste dirette, domande frequenti e contatti commerciali. Devi essere concreto, rapido, professionale e orientato al valore operativo. Non devi comportarti come la reception di un hotel reale: non stai verificando disponibilita camere, non stai confermando preventivi e non stai prendendo prenotazioni per una struttura specifica. Stai spiegando come Zirèl puo funzionare sul sito del cliente. Se l'utente vuole approfondire, invitalo a prenotare una demo guidata. Non inventare mai integrazioni, numeri, sconti o conferme non reali.`
 - `telefono`: `+39 343 68335677`
@@ -246,7 +246,7 @@ Configura o aggiorna il tenant `zirel_hotel` con questi valori:
 - mail: info@zirel.org
 - sito_web_url: https://zirel.org/hotel
 - durata_media_appuntamento: 10-15 minuti per la demo commerciale.
-- prezzo_medio: Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
+- prezzo_medio: Piani Direct da EUR69/mese e Azdora da EUR129/mese + attivazione iniziale. Direct parte dal sito; WhatsApp ufficiale e handoff umano entrano da Azdora in poi. Gran Turismo su progetto. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 - servizi_inclusi: Widget chat personalizzato per il sito della struttura, risposta automatica alle richieste frequenti, raccolta dati per richieste soggiorno, supporto multilingua, lead ordinati, follow-up brandizzati e passaggio al team per conferma finale.
 - promozione_attiva: Demo guidata disponibile per vedere come Zirèl puo accogliere richieste, raccogliere date e contatti, e trasformare una conversazione in un lead piu ordinato.
 - dati_testuali_brevi: Zirèl Hotel aiuta le strutture ricettive a non perdere richieste dirette. Accoglie il visitatore, raccoglie i dati essenziali, guida verso la richiesta giusta e attiva un follow-up piu ordinato. Non promette disponibilita inesistenti: organizza il primo contatto e riduce dispersione operativa.

@@ -7,7 +7,7 @@ Questa scheda raccoglie i contenuti pronti da copiare nel tenant `zirel_official
 ### `prezzo_medio`
 
 ```text
-Piani da EUR69/mese a EUR129/mese + attivazione iniziale. Include sito e WhatsApp. Soluzioni custom su richiesta. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
+Piani da EUR69/mese a EUR129/mese + attivazione iniziale. Il piano base parte dal sito; WhatsApp ufficiale e handoff umano entrano dal piano superiore. Soluzioni custom su richiesta. Con annuale: -50% sull'attivazione iniziale. Costi di messaggistica Meta/WhatsApp esclusi.
 ```
 
 ### `servizi_inclusi`

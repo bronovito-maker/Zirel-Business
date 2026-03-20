@@ -55,6 +55,24 @@
             },
             {
               "name": "adapter_test_mode"
+            },
+            {
+              "name": "notification_email"
+            },
+            {
+              "name": "internal_notification_email"
+            },
+            {
+              "name": "internal_email"
+            },
+            {
+              "name": "billing_email"
+            },
+            {
+              "name": "telegram_chat_id"
+            },
+            {
+              "name": "internal_telegram_chat_id"
             }
           ]
         }
@@ -78,7 +96,7 @@
         -3648,
         -1200
       ],
-      "id": "55b057cc-71e4-49fb-91dd-ee1d58823ad0",
+      "id": "1e210301-c046-4e58-9a1c-c9b7684bc9de",
       "name": "Normalize Appointment Request1"
     },
     {
@@ -92,7 +110,7 @@
           },
           "conditions": [
             {
-              "id": "fafb3231-05c1-42c8-a298-ddc2b9235f31",
+              "id": "09cdb778-b76f-4115-8d4f-80e67b53739e",
               "leftValue": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" }}",
               "rightValue": true,
               "operator": {
@@ -112,7 +130,7 @@
         -3376,
         -1344
       ],
-      "id": "76fd0d2d-ae1c-4fc4-8f96-ba1aa1ef2e34",
+      "id": "414ddb8b-d1d7-4682-bd39-350abe8d1fdc",
       "name": "Check Supported Sector1"
     },
     {
@@ -120,25 +138,25 @@
         "assignments": {
           "assignments": [
             {
-              "id": "9cb9f4f9-c5b5-4f8e-ac9e-00bc85d1cb97",
+              "id": "7239b284-b9d7-4219-a7a9-034b32880ac9",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "61b10517-d8b3-41f8-a248-f08029e8be0d",
+              "id": "e61ae616-b17e-4596-adc3-ce5ada4dc03d",
               "name": "code",
               "value": "UNSUPPORTED_SECTOR",
               "type": "string"
             },
             {
-              "id": "023ff387-7074-4a75-9dc6-40736eabacd1",
+              "id": "a6f47731-f105-495d-a6ad-6b2c8d233074",
               "name": "message",
               "value": "Questo workflow gestisce solo appuntamenti per settori supportati diversi da restaurant.",
               "type": "string"
             },
             {
-              "id": "ae650fca-1069-45b2-b322-4220dca03ef5",
+              "id": "34163446-0def-4e4c-8ce3-a15731d89dbf",
               "name": "final_reply",
               "value": "Posso raccogliere i dati, ma questa richiesta non può essere registrata da questo flusso.",
               "type": "string"
@@ -153,7 +171,7 @@
         -3104,
         -1424
       ],
-      "id": "aad4095c-86dd-4eb9-b9aa-d2e10068350b",
+      "id": "1387463e-7388-4a56-97f4-9d1ce9f23b48",
       "name": "Unsupported Sector Response1"
     },
     {
@@ -167,7 +185,7 @@
           },
           "conditions": [
             {
-              "id": "2700a558-be41-4d62-baa9-eda6ee7f16b1",
+              "id": "cb6e8f33-de22-4d44-806e-536424849a78",
               "leftValue": "={{ !!$json.validation_code }}",
               "rightValue": true,
               "operator": {
@@ -187,7 +205,7 @@
         -3376,
         -1120
       ],
-      "id": "bf22b7cf-278b-41b9-bc6c-17fb285110ed",
+      "id": "2b9a5c3c-c5d5-4ffb-b8ad-a317f159c36e",
       "name": "Check Required Fields1"
     },
     {
@@ -195,37 +213,37 @@
         "assignments": {
           "assignments": [
             {
-              "id": "80e63f9d-32d3-4e44-96d4-ca596580605d",
+              "id": "f21a671a-ea1a-4c48-82df-03699189d305",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "81db2f2c-9a1c-4b19-bddd-3ddffc357233",
+              "id": "8cd99600-1015-4b41-8356-c200e4a81378",
               "name": "code",
               "value": "={{ $json.validation_code }}",
               "type": "string"
             },
             {
-              "id": "cc4e7704-3152-49ba-b1b4-28ff3ef32194",
+              "id": "d64cba1f-ba87-46e0-a743-190d3e2f7775",
               "name": "message",
               "value": "={{ $json.validation_message }}",
               "type": "string"
             },
             {
-              "id": "938e014a-4526-48dc-9677-309558621acf",
+              "id": "2b0eee35-97d3-4a24-b936-3589595fe5cd",
               "name": "final_reply",
               "value": "={{ $json.validation_code === \"NEED_EXACT_SLOT\" ? \"Per registrare davvero l’appuntamento mi serve una data precisa e un orario preciso.\" : \"Per registrare l’appuntamento mi servono tutti i dati obbligatori, compreso il motivo della richiesta.\" }}",
               "type": "string"
             },
             {
-              "id": "17ab4ecc-2e4d-4756-a5a1-4aa6c78c9d09",
+              "id": "b69b513b-794f-46c7-b0fe-3e5123004568",
               "name": "tenant_id",
               "value": "={{ $json.tenant_id }}",
               "type": "string"
             },
             {
-              "id": "1efdb70e-199a-4ede-a20e-b6e36662958b",
+              "id": "096ddfff-143b-49e5-91d6-a17e0b9d5fea",
               "name": "trace_id",
               "value": "={{ $json.trace_id }}",
               "type": "string"
@@ -240,7 +258,7 @@
         -3104,
         -992
       ],
-      "id": "a9067f65-98e1-4fc3-8266-db80d334f473",
+      "id": "bae96ad4-1635-47b0-a8c8-997e3ba8478f",
       "name": "Validation Error Response1"
     },
     {
@@ -253,7 +271,7 @@
         -3104,
         -1200
       ],
-      "id": "f37df8dc-1c16-4f40-a391-fca78db696a4",
+      "id": "9948de03-60f8-403f-9a60-f301c892824f",
       "name": "Build Availability Payload1"
     },
     {
@@ -267,7 +285,7 @@
           },
           "conditions": [
             {
-              "id": "9d3be415-42b3-4e86-afcd-312f4db4de92",
+              "id": "f8b5907f-6518-4b04-baf8-1043b4368688",
               "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode }}",
               "rightValue": true,
               "operator": {
@@ -287,7 +305,7 @@
         -2832,
         -1200
       ],
-      "id": "fde3d381-2d8b-4df6-a18a-ce421e0a685d",
+      "id": "528df0cc-c92a-4b80-8b3b-d49b53cbe62b",
       "name": "Use Live Availability Adapter1"
     },
     {
@@ -324,7 +342,7 @@
         -2576,
         -1296
       ],
-      "id": "d2291e7c-777b-46de-ab97-58a367b2d6eb",
+      "id": "7ad958a4-3bb5-4601-a607-f7952b28d093",
       "name": "Availability Adapter1",
       "onError": "continueRegularOutput"
     },
@@ -338,7 +356,7 @@
         -2320,
         -1200
       ],
-      "id": "f3c5e881-8c2a-457a-ae2c-527226b80947",
+      "id": "6b671302-ef65-4019-8fed-998a58f921fb",
       "name": "Normalize Availability Response1"
     },
     {
@@ -418,7 +436,7 @@
         -1776,
         -1296
       ],
-      "id": "28e573d0-97ac-405b-bbf5-3830927a89f4",
+      "id": "a10dd99b-1201-484c-8fc4-ddd867949e15",
       "name": "Build Notification Outbox Rows1"
     },
     {
@@ -491,7 +509,7 @@
         -1504,
         -1296
       ],
-      "id": "44c30f03-54ce-4ee4-8de5-6c6b7190ae4c",
+      "id": "9aaa56a9-a679-40ac-b9bc-b41b6e301037",
       "name": "Insert Outbox Rows1",
       "credentials": {
         "supabaseApi": {
@@ -510,7 +528,7 @@
         -1776,
         -1072
       ],
-      "id": "b19aed18-37a5-404f-b4d4-91318747ba8d",
+      "id": "685bacbf-8861-4d2c-bccc-72a634368911",
       "name": "Build Final Response1"
     }
   ],
@@ -659,7 +677,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "acc3bb5b-2da8-4fe8-97f8-9d53436945bc",
+  "versionId": "6c6fdfb7-d2c2-42c5-9fd4-629156584d11",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

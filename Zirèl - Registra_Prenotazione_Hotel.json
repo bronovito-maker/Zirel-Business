@@ -109,7 +109,7 @@
           },
           "conditions": [
             {
-              "id": "18194833-0e65-485c-a586-794df8ac1818",
+              "id": "4cd81037-915d-401f-a29f-c6e115a50624",
               "leftValue": "={{ String($json.business_type || \"\").trim().toLowerCase() === \"hotel\" || !String($json.business_type || \"\").trim() }}",
               "rightValue": true,
               "operator": {
@@ -137,25 +137,25 @@
         "assignments": {
           "assignments": [
             {
-              "id": "463dfb85-6a5a-4164-8bd3-e8bff507876a",
+              "id": "7f5911ea-2873-451f-92bd-55d30e2fef7c",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "01c868df-7f08-485d-bac0-6116bc7ee904",
+              "id": "d915ed59-7165-41f5-afd2-12db6165ab5e",
               "name": "code",
               "value": "UNSUPPORTED_SECTOR",
               "type": "string"
             },
             {
-              "id": "4c32ffe5-35d2-4a8f-9400-0ffa3a9316bc",
+              "id": "d311c875-ee69-41d4-b939-d739a7f89531",
               "name": "message",
               "value": "Questo workflow gestisce solo richieste hotel.",
               "type": "string"
             },
             {
-              "id": "8721a942-9e23-41c3-a9f8-71b7eb1d73ee",
+              "id": "445bb334-0ce3-4304-9568-1e88ded98bd9",
               "name": "final_reply",
               "value": "Posso raccogliere i dati, ma questa richiesta non può essere registrata da questo flusso hotel.",
               "type": "string"
@@ -197,7 +197,7 @@
           },
           "conditions": [
             {
-              "id": "9968d2eb-21ef-4050-b1f7-1a625fe9599b",
+              "id": "d8985755-53f5-40da-b933-9ae921edb6b3",
               "leftValue": "={{ !!$json.validation_code }}",
               "rightValue": true,
               "operator": {
@@ -225,37 +225,37 @@
         "assignments": {
           "assignments": [
             {
-              "id": "e9eafdd7-1f34-4acd-832c-116add3cacdc",
+              "id": "9418ac32-066a-4b2c-95cf-3094d3462aea",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "31f5bee4-0804-46b0-8aab-1d3bf901339e",
+              "id": "afae4765-cd65-49f5-85e2-a98a6472cb1e",
               "name": "code",
               "value": "={{ $json.validation_code }}",
               "type": "string"
             },
             {
-              "id": "c5a44a91-be96-4435-92fa-dc31aca5a608",
+              "id": "0262cb50-477b-4c28-b251-9583f18817a7",
               "name": "message",
               "value": "={{ $json.validation_message }}",
               "type": "string"
             },
             {
-              "id": "8e6be7c3-5448-4b4a-9d2e-1abd624624c7",
+              "id": "1cbbc7b3-95d6-46eb-b08b-f3143d5c9c8e",
               "name": "final_reply",
               "value": "Per registrare davvero il soggiorno mi servono tutti i dati obbligatori, con date di check-in e check-out valide.",
               "type": "string"
             },
             {
-              "id": "d79fb5d7-c9f3-42a9-b94e-ca43764ca601",
+              "id": "7f8e9763-837f-4b73-b172-e31c9df799ff",
               "name": "tenant_id",
               "value": "={{ $json.tenant_id }}",
               "type": "string"
             },
             {
-              "id": "02583366-8320-4261-b5ba-a50e5483bf70",
+              "id": "e8dd00c5-4bad-4f1d-9137-9c713ef3d503",
               "name": "trace_id",
               "value": "={{ $json.trace_id }}",
               "type": "string"
@@ -297,7 +297,7 @@
           },
           "conditions": [
             {
-              "id": "43c92e1f-b6bf-414c-ab9c-c5e58bd0e6bb",
+              "id": "674e813f-7521-4ce9-8c11-d7ef0151c7a8",
               "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode }}",
               "rightValue": true,
               "operator": {
@@ -741,7 +741,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "0b9e63d5-6ee3-4c30-86c0-5a3dcccf6f18",
+  "versionId": "ffa58961-bbf9-4d41-9b33-bf3cac514357",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

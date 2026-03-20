@@ -75,7 +75,7 @@
         -3328,
         -896
       ],
-      "id": "91b219ce-51e0-4f01-a356-faed1b450df5",
+      "id": "addbe1af-d765-47b8-a0cc-dc2fafb02096",
       "name": "Normalize Reservation Request1"
     },
     {
@@ -89,7 +89,7 @@
           },
           "conditions": [
             {
-              "id": "c428fd70-b3cc-4259-82bd-8098b00d6d89",
+              "id": "bd6decc5-b6d7-4935-ba70-611a430ec94a",
               "leftValue": "={{ !!$json.validation_code && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
               "rightValue": true,
               "operator": {
@@ -109,7 +109,7 @@
         -3072,
         -1024
       ],
-      "id": "5848fa81-8c29-46f1-90aa-af4989288601",
+      "id": "49b702b4-e0a7-4739-b7fc-ed1bc308cb4e",
       "name": "Check Validation Error1"
     },
     {
@@ -117,37 +117,37 @@
         "assignments": {
           "assignments": [
             {
-              "id": "c22c3cb4-58b8-4ed0-aa55-652c299a5634",
+              "id": "18880940-f54c-4319-a1a8-cbde17cd2d6e",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "e2407940-677e-4f38-b957-d0bdf3c2dbac",
+              "id": "51e743ba-8673-402d-9362-6129191f62b0",
               "name": "code",
               "value": "={{ $json.validation_code }}",
               "type": "string"
             },
             {
-              "id": "f96b263a-2617-4d3f-ad93-ed08d685b099",
+              "id": "7129ecf7-e84d-408f-9721-5fe3416c745f",
               "name": "message",
               "value": "={{ $json.validation_message }}",
               "type": "string"
             },
             {
-              "id": "708fdde5-dc49-4436-a999-fac12f63eccf",
+              "id": "deb6e922-cb74-4334-b329-d0c023fcb7c7",
               "name": "final_reply",
               "value": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" ? \"Al momento la prenotazione automatica non è disponibile per questo tipo di attività.\" : \"Per registrare davvero la prenotazione mi servono tutti i dati obbligatori, con una data e un orario precisi.\" }}",
               "type": "string"
             },
             {
-              "id": "daf52074-1cb7-440a-a5d9-41e6831f9ec7",
+              "id": "bda6f2a7-70f6-4e31-87cd-a70cf8f24a64",
               "name": "tenant_id",
               "value": "={{ $json.tenant_id }}",
               "type": "string"
             },
             {
-              "id": "84079ee9-9ef3-4408-8fd9-cf7e0b62d369",
+              "id": "5e33bca7-e79d-4286-9e28-47e61a293ca4",
               "name": "trace_id",
               "value": "={{ $json.trace_id }}",
               "type": "string"
@@ -162,7 +162,7 @@
         -2816,
         -1040
       ],
-      "id": "2e991a6d-f96e-43ab-a3e3-312ae4e4db46",
+      "id": "065c5b36-9736-4cd9-881c-63c066806e89",
       "name": "Validation Error Response1"
     },
     {
@@ -175,7 +175,7 @@
         -2816,
         -896
       ],
-      "id": "cd64dc82-ad90-4e98-b378-5cf01701158a",
+      "id": "e0732b27-24b6-4284-9a74-8541677015d6",
       "name": "Build Availability Payload1"
     },
     {
@@ -189,7 +189,7 @@
           },
           "conditions": [
             {
-              "id": "b0beb7d1-ccf7-47a3-abbc-d8246fe5e65c",
+              "id": "0ba4ca52-2a59-465a-90ef-89e70e01f3eb",
               "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
               "rightValue": true,
               "operator": {
@@ -209,7 +209,7 @@
         -2560,
         -896
       ],
-      "id": "9c3756b3-0aa3-4955-ac40-412b6958806f",
+      "id": "9d6e98f3-f86b-43e7-b687-822f2ebfc30d",
       "name": "Use Live Availability Adapter1"
     },
     {
@@ -246,7 +246,7 @@
         -2304,
         -992
       ],
-      "id": "bca58294-ac97-4138-b1d5-6ae3843099f2",
+      "id": "e542a607-0e26-4625-a1fd-509e1c73e579",
       "name": "Availability Adapter1",
       "onError": "continueRegularOutput"
     },
@@ -260,7 +260,7 @@
         -2048,
         -896
       ],
-      "id": "24eefe7d-30d5-4890-9ef9-35c320d1e7fc",
+      "id": "02d87918-b466-4981-abc7-23f3fa42ed6a",
       "name": "Normalize Availability Response1"
     },
     {
@@ -328,7 +328,7 @@
         -1536,
         -992
       ],
-      "id": "284fc640-f858-4ca5-9696-b3b5719bc221",
+      "id": "8666038d-fc9f-4b6d-874d-0c38fe13cab9",
       "name": "Build Notification Outbox Rows1"
     },
     {
@@ -401,7 +401,7 @@
         -1280,
         -992
       ],
-      "id": "b2f9df55-d193-43c5-931a-885cc8ae1abb",
+      "id": "1ad2832e-9d92-4694-b51e-cdbb0824994d",
       "name": "Insert Outbox Rows1",
       "credentials": {
         "supabaseApi": {
@@ -420,7 +420,7 @@
         -1536,
         -768
       ],
-      "id": "6b856e43-6df0-4e80-92bd-5bf56fb29ef6",
+      "id": "1e8c8453-0721-41a7-94b9-0424bcaa9704",
       "name": "Build Final Response1"
     }
   ],
@@ -550,7 +550,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "8cfdc142-4111-4b96-b6a0-d4eb82a6b0b3",
+  "versionId": "e2522e89-cdf4-4834-8a9c-ba243288c859",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

@@ -1474,7 +1474,7 @@ const buildAppointmentWorkflow = () => {
   const nodes = [
     triggerNode(
       'When Executed by Another Workflow',
-      ['tenant_id', 'business_type', 'appointment_type', 'nome', 'telefono', 'email', 'data_input', 'orario', 'note', 'motivo', 'trace_id', 'session_id', 'source', 'appointment_calendar_provider', 'appointment_calendar_api_url', 'availability_api_url', 'adapter_test_mode'],
+      ['tenant_id', 'business_type', 'appointment_type', 'nome', 'telefono', 'email', 'data_input', 'orario', 'note', 'motivo', 'trace_id', 'session_id', 'source', 'appointment_calendar_provider', 'appointment_calendar_api_url', 'availability_api_url', 'adapter_test_mode', 'notification_email', 'internal_notification_email', 'internal_email', 'billing_email', 'telegram_chat_id', 'internal_telegram_chat_id'],
       [-3920, -1200],
       { id: current.nodes.find((node) => node.name === 'When Executed by Another Workflow')?.id }
     ),
@@ -2279,7 +2279,7 @@ const buildAICoreWorkflow = () => {
       1,
       [7952, -16],
       {
-        modelName: 'models/text-embedding-004',
+        modelName: 'models/gemini-embedding-001',
         options: {},
       },
       {
@@ -2314,10 +2314,16 @@ const buildAICoreWorkflow = () => {
             appointment_calendar_api_url: '={{ $(\'Get a row1\').item.json.appointment_calendar_api_url || $(\'Get a row1\').item.json.calendar_api_url || $(\'Get a row1\').item.json.availability_api_url || "" }}',
             availability_api_url: '={{ $(\'Get a row1\').item.json.availability_api_url || "" }}',
             adapter_test_mode: '={{ $(\'Get a row1\').item.json.adapter_test_mode || "false" }}',
+            notification_email: '={{ $(\'Get a row1\').item.json.notification_email || "" }}',
+            internal_notification_email: '={{ $(\'Get a row1\').item.json.internal_notification_email || "" }}',
+            internal_email: '={{ $(\'Get a row1\').item.json.internal_email || $(\'Get a row1\').item.json.mail || "" }}',
+            billing_email: '={{ $(\'Get a row1\').item.json.billing_email || "" }}',
+            telegram_chat_id: '={{ $(\'Get a row1\').item.json.telegram_chat_id || "" }}',
+            internal_telegram_chat_id: '={{ $(\'Get a row1\').item.json.internal_telegram_chat_id || "" }}',
           },
           matchingColumns: [],
           schema: [
-            'tenant_id', 'business_type', 'appointment_type', 'nome', 'telefono', 'email', 'data_input', 'orario', 'note', 'motivo', 'trace_id', 'session_id', 'source', 'appointment_calendar_provider', 'appointment_calendar_api_url', 'availability_api_url', 'adapter_test_mode',
+            'tenant_id', 'business_type', 'appointment_type', 'nome', 'telefono', 'email', 'data_input', 'orario', 'note', 'motivo', 'trace_id', 'session_id', 'source', 'appointment_calendar_provider', 'appointment_calendar_api_url', 'availability_api_url', 'adapter_test_mode', 'notification_email', 'internal_notification_email', 'internal_email', 'billing_email', 'telegram_chat_id', 'internal_telegram_chat_id',
           ].map((id) => ({ id, displayName: id, required: false, defaultMatch: false, display: true, canBeUsedToMatch: true, type: 'string', removed: false })),
           attemptToConvertTypes: false,
           convertFieldsToString: false,

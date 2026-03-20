@@ -19,7 +19,8 @@ Data di riferimento: 2026-03-20
 
 Note:
 - L'attivazione assistita include configurazione iniziale, caricamento contenuti chiave, settaggio widget, collegamento sito e messa a punto del flusso base.
-- Il piano include risposte automatiche su sito e WhatsApp.
+- Il piano include risposte automatiche sul sito.
+- WhatsApp ufficiale e handoff umano fanno parte del piano intermedio o superiore.
 
 ### Piano intermedio
 
@@ -28,7 +29,7 @@ Note:
 - Soluzione annuale: `setup e configurazione iniziale scontati del 50%`
 
 Note:
-- Include tutto il piano entry piu' ottimizzazione iniziale del flusso conversazionale / di intake, gestione conversazioni WhatsApp piu' evoluta e setup piu' strutturato della dashboard.
+- Include tutto il piano entry piu' canale WhatsApp ufficiale, handoff umano, ottimizzazione iniziale del flusso conversazionale / di intake, gestione conversazioni piu' evoluta e setup piu' strutturato della dashboard.
 
 ### Piano custom
 

@@ -120,7 +120,14 @@ const template = String($json.template_key || '').trim();
 const channel = String($json.channel || '').trim();
 const activity = payload.nome_struttura || payload.nome_attivita || 'Zirèl';
 const businessName = payload.business_name || payload.hotel_name || payload.nome_attivita || payload.nome_struttura || payload.nome_ristorante || payload.tenant_id || activity;
-const recipientEmail = String($json.recipient_email || payload.internal_email || payload.billing_email || payload.email || '').trim().toLowerCase();
+const recipientEmail = String(
+  $json.recipient_email ||
+  (channel === 'email_guest_appointment' || channel === 'email_guest_hotel' || channel === 'email_guest_restaurant' ? payload.email : '') ||
+  payload.internal_email ||
+  payload.billing_email ||
+  payload.email ||
+  ''
+).trim().toLowerCase();
 const statusLabel = ({
   confirmed: 'Confermata',
   manual_review: 'Verifica manuale',
@@ -441,10 +448,15 @@ if (template === 'hotel_internal_alert') {
 }
 
 const callbackData = relatedType && relatedId ? ['accept', relatedType, relatedId].join('|') : '';
+const escapedText = text.replace(/[&<>]/g, (char) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+}[char] || char));
 return [{
   json: {
     ...$json,
-    rendered_telegram_text: text,
+    rendered_telegram_text: escapedText,
     telegram_accept_callback_data: callbackData,
   },
 }];`;
@@ -613,7 +625,6 @@ return items.map((item, index) => {
         },
         additionalFields: {
           appendAttribution: false,
-          parseMode: 'HTML',
           disableWebPagePreview: true,
         },
       }, {
