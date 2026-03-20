@@ -86,12 +86,12 @@ function normalizeSummary(row, tenantId) {
 }
 
 export default async function handler(req, res) {
-    if (!['GET', 'POST'].includes(req.method || '')) {
-        res.setHeader('Allow', 'GET, POST');
+    if (!['POST'].includes(req.method || '')) {
+        res.setHeader('Allow', 'POST');
         return json(res, 405, {
             ok: false,
             error_code: 'METHOD_NOT_ALLOWED',
-            error_message: 'Use GET or POST for this endpoint',
+            error_message: 'Use POST for this endpoint',
         });
     }
 

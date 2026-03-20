@@ -370,14 +370,18 @@ export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<What
     const authToken = getAuthToken();
     if (!authToken) throw new Error('NOT_AUTHENTICATED');
 
-    const response = await fetch(`/api/whatsapp/channel-summary?tenant_id=${encodeURIComponent(tid)}`, {
-        method: 'GET',
+    const response = await fetch('/api/whatsapp/channel-summary', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${authToken}`,
             'X-Zirel-Api-Token': authToken,
             'X-Zirel-Tenant-Id': tid,
         },
+        body: JSON.stringify({
+            tenant_id: tid,
+            tenant_api_token: authToken,
+        }),
     });
 
     let body: { ok?: boolean; summary?: Partial<WhatsAppChannelSummary>; error_message?: string; error_code?: string } | null = null;
