@@ -670,6 +670,17 @@ const getConversation = async (conversationId) => {
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 };
 
+const getTenantAccount = async (tenantId) => {
+  if (!tenantId) return null;
+  const rows = await rest(
+    'GET',
+    'tenant_whatsapp_accounts?select=id,tenant_id,ai_enabled,human_handoff_enabled&tenant_id=eq.' +
+      encode(tenantId) +
+      '&order=updated_at.desc.nullslast&limit=1'
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
 const resolveRecipient = (conversation, message) => {
   const explicitRecipient = message?.provider_payload_json?.recipient_phone || message?.provider_payload_json?.to || null;
   return explicitRecipient || conversation?.customer_phone_normalized || conversation?.external_contact_id || null;
@@ -1121,6 +1132,19 @@ for (const row of claimedRows) {
       continue;
     }
 
+    const tenantAccount = await getTenantAccount(conversation.tenant_id);
+    if (tenantAccount && tenantAccount.ai_enabled === false) {
+      outcomes.push({
+        json: {
+          id: row.id,
+          processing_status: 'skipped_hho',
+          conversation_ai_processing_status: 'skipped',
+          error_message: 'SKIPPED:ai_disabled',
+        },
+      });
+      continue;
+    }
+
     if (conversation.status === 'human_handoff' || conversation.status === 'closed') {
       outcomes.push({
         json: {
@@ -1429,7 +1453,7 @@ const buildAiOrchestratorWorkflow = () => ({
     codeNode('Code: Claim + Orchestrate AI', [360, 200], aiOrchestratorCode, {
       id: 'wa-ai-code',
       notesInFlow: true,
-      notes: 'Legge inbound pending_ai, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender.',
+      notes: 'Legge inbound pending_ai, rispetta ai_enabled globale, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender.',
     }),
     supabaseNode('Supabase: Persist AI Outcome', [760, 200], {
       operation: 'update',

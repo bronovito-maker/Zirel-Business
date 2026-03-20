@@ -15,6 +15,8 @@ import type {
     WhatsAppMessageSummary,
     WhatsAppChannelSummary,
     WhatsAppConnectionStatus,
+    UpdateWhatsAppAutomationSettingsResult,
+    SendWhatsAppHumanMessageResult,
 } from '../types';
 import { getAuthToken, getTenantId } from './auth/storage';
 import { sanitizeFilename } from './validators';
@@ -354,6 +356,83 @@ export const getWhatsAppConversationMessages = async (
 
     if (error) throw error;
     return (data || []) as WhatsAppMessageSummary[];
+};
+
+export const updateWhatsAppAutomationSettings = async (
+    aiEnabled: boolean,
+    tenantId?: string
+): Promise<UpdateWhatsAppAutomationSettingsResult> => {
+    const tid = ensureTenantId(tenantId);
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+
+    const response = await fetch('/api/whatsapp/automation-settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tid,
+        },
+        body: JSON.stringify({
+            tenant_id: tid,
+            tenant_api_token: authToken,
+            ai_enabled: aiEnabled,
+        }),
+    });
+
+    let body: UpdateWhatsAppAutomationSettingsResult | null = null;
+    try {
+        body = await response.json() as UpdateWhatsAppAutomationSettingsResult;
+    } catch {
+        body = null;
+    }
+
+    if (!response.ok || !body?.ok) {
+        throw new Error(body?.error_message || body?.error_code || `WHATSAPP_AUTOMATION_HTTP_${response.status}`);
+    }
+
+    return body;
+};
+
+export const sendWhatsAppHumanMessage = async (
+    conversationId: string,
+    contentText: string,
+    tenantId?: string
+): Promise<SendWhatsAppHumanMessageResult> => {
+    const tid = ensureTenantId(tenantId);
+    const authToken = getAuthToken();
+    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    if (!conversationId || !contentText.trim()) throw new Error('INVALID_PARAMS');
+
+    const response = await fetch('/api/whatsapp/human-send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+            'X-Zirel-Api-Token': authToken,
+            'X-Zirel-Tenant-Id': tid,
+        },
+        body: JSON.stringify({
+            tenant_id: tid,
+            tenant_api_token: authToken,
+            conversation_id: conversationId,
+            content_text: contentText.trim(),
+        }),
+    });
+
+    let body: SendWhatsAppHumanMessageResult | null = null;
+    try {
+        body = await response.json() as SendWhatsAppHumanMessageResult;
+    } catch {
+        body = null;
+    }
+
+    if (!response.ok || !body?.ok) {
+        throw new Error(body?.error_message || body?.error_code || `WHATSAPP_HUMAN_SEND_HTTP_${response.status}`);
+    }
+
+    return body;
 };
 
 const normalizeWhatsAppConnectionStatus = (

@@ -189,6 +189,8 @@ export interface WhatsAppChannelSummary {
     display_phone_number?: string | null;
     verified_name?: string | null;
     connection_status: WhatsAppConnectionStatus;
+    ai_enabled?: boolean;
+    human_handoff_enabled?: boolean;
     last_sync_at?: string | null;
     last_webhook_at?: string | null;
     webhook_verified_at?: string | null;
@@ -233,6 +235,25 @@ export interface SyncWhatsAppChannelResult {
     synced?: boolean;
     reason?: string;
     account?: Partial<WhatsAppChannelSummary> | null;
+    error_code?: string;
+    error_message?: string;
+}
+
+export interface UpdateWhatsAppAutomationSettingsResult {
+    ok: boolean;
+    tenant_id?: string;
+    ai_enabled?: boolean;
+    human_handoff_enabled?: boolean;
+    error_code?: string;
+    error_message?: string;
+}
+
+export interface SendWhatsAppHumanMessageResult {
+    ok: boolean;
+    tenant_id?: string;
+    conversation_id?: string;
+    conversation_status?: WhatsAppConversationStatus | string;
+    message?: WhatsAppMessageSummary | null;
     error_code?: string;
     error_message?: string;
 }

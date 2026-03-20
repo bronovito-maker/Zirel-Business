@@ -26,7 +26,7 @@ class TokenAuthService {
      * Validates format, queries Supabase, and stores session data.
      */
     async authenticate(credentials: LoginCredentials): Promise<void> {
-        const { token } = credentials;
+        const { token, persistence } = credentials;
 
         if (!validateTokenFormat(token)) {
             throw new Error('INVALID_FORMAT');
@@ -46,7 +46,7 @@ class TokenAuthService {
             const authResult = data as AuthResult;
 
             // Store session data
-            this.storeSession(authResult);
+            this.storeSession(authResult, persistence || this.defaultPersistence);
         } catch (err: unknown) {
             if (err instanceof Error) {
                 if (err.message === 'INVALID_FORMAT' || err.message === 'AUTH_FAILED') {
@@ -111,9 +111,9 @@ class TokenAuthService {
     /**
      * Stores authentication session data.
      */
-    storeSession(authResult: AuthResult): void {
-        saveAuthToken(authResult.api_token, this.defaultPersistence);
-        saveTenantId(authResult.tenant_id, this.defaultPersistence);
+    storeSession(authResult: AuthResult, persistence: AuthPersistenceMode = this.defaultPersistence): void {
+        saveAuthToken(authResult.api_token, persistence);
+        saveTenantId(authResult.tenant_id, persistence);
     }
 
     /**

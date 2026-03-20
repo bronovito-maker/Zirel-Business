@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { login } from '../lib/auth';
+import { getCurrentTenantId } from '../lib/auth';
 import toast from 'react-hot-toast';
 
 interface LoginProps {
@@ -10,6 +11,10 @@ interface LoginProps {
 const Login = ({ onLogin }: LoginProps) => {
     const [token, setToken] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
+    const [isTokenVisible, setIsTokenVisible] = useState(false);
+    const formRef = useRef<HTMLFormElement | null>(null);
+    const credentialUsername = useMemo(() => `dashboard@${window.location.host}`, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,7 +23,32 @@ const Login = ({ onLogin }: LoginProps) => {
 
         setIsLoading(true);
         try {
-            await login({ token: trimmedToken });
+            await login({
+                token: trimmedToken,
+                persistence: rememberMe ? 'persistent' : 'session',
+            });
+
+            const currentTenantId = getCurrentTenantId();
+
+            if (typeof window !== 'undefined' && 'PasswordCredential' in window && navigator.credentials?.store) {
+                try {
+                    const PasswordCredentialCtor = (window as Window & {
+                        PasswordCredential?: new (data: { id: string; name?: string; password: string }) => Credential;
+                    }).PasswordCredential;
+
+                    if (PasswordCredentialCtor) {
+                        const credential = new PasswordCredentialCtor({
+                            id: currentTenantId || credentialUsername,
+                            name: currentTenantId || credentialUsername,
+                            password: trimmedToken,
+                        });
+                        void navigator.credentials.store(credential);
+                    }
+                } catch {
+                    // Ignore unsupported password manager APIs and rely on browser autocomplete metadata.
+                }
+            }
+
             onLogin();
             toast.success('Accesso eseguito!');
         } catch (err) {
@@ -43,7 +73,7 @@ const Login = ({ onLogin }: LoginProps) => {
             <div className="w-full max-w-xl relative z-10 animate-fade-in">
                 <div className="apple-card p-7 md:p-10 text-center shadow-2xl">
                     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zirel-blue/5 text-zirel-blue text-[11px] font-bold uppercase tracking-[0.15em] border border-zirel-blue/10">
-                        Dashboard Access
+                        Secure Access
                     </span>
 
                     <div className="mt-6 flex flex-col items-center gap-4">
@@ -54,25 +84,47 @@ const Login = ({ onLogin }: LoginProps) => {
                             <span className="text-zirel-orange">Zirèl</span>
                         </div>
                         <h2 className="text-2xl md:text-3xl font-black tracking-tight text-zirel-blue">
-                            Accedi al tuo Concierge
+                            Accedi al pannello protetto
                         </h2>
                         <p className="text-gray-500 text-sm md:text-base max-w-md">
-                            Inserisci il tuo API token per entrare nel pannello operativo.
+                            Usa il tuo token di accesso per entrare nel workspace operativo di Zirèl in modo rapido e sicuro.
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5 mt-8">
+                    <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 mt-8" autoComplete="on">
+                        <input type="text" name="username" autoComplete="username" value={credentialUsername} readOnly className="hidden" tabIndex={-1} />
                         <div className="relative">
                             <input
-                                type="text"
+                                type={isTokenVisible ? 'text' : 'password'}
+                                name="password"
                                 value={token}
                                 onChange={(e) => setToken(e.target.value)}
-                                placeholder="Inserisci il tuo API token"
-                                className="apple-input text-center md:text-lg h-14"
+                                placeholder="Inserisci il token di accesso"
+                                autoComplete="current-password"
+                                spellCheck={false}
+                                className="apple-input h-14 pr-14 text-center md:text-lg"
                                 required
                                 disabled={isLoading}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setIsTokenVisible((current) => !current)}
+                                className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                                aria-label={isTokenVisible ? 'Nascondi token' : 'Mostra token'}
+                            >
+                                {isTokenVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
                         </div>
+
+                        <label className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <input
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-zirel-orange-dark focus:ring-zirel-orange-dark"
+                            />
+                            Mantieni l’accesso su questo dispositivo
+                        </label>
 
                         <button
                             type="submit"
@@ -83,7 +135,7 @@ const Login = ({ onLogin }: LoginProps) => {
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    Accedi ora
+                                    Entra nel workspace
                                     <ArrowRight className="w-5 h-5" />
                                 </>
                             )}
@@ -91,6 +143,9 @@ const Login = ({ onLogin }: LoginProps) => {
                     </form>
 
                     <div className="mt-7">
+                        <p className="mb-3 text-xs text-gray-400">
+                            Il token può essere salvato dal browser o dal password manager per un accesso più rapido.
+                        </p>
                         <a href="https://zirel.org" className="text-zirel-blue hover:text-zirel-orange-dark underline text-sm font-medium transition-colors">
                             Torna a zirel.org
                         </a>

@@ -6,6 +6,7 @@ export type AuthPersistenceMode = 'session' | 'persistent';
 
 export interface LoginCredentials {
     token: string;
+    persistence?: AuthPersistenceMode;
 }
 
 export interface AuthSession {

@@ -107,8 +107,10 @@ const orchestratorNode = getNode(aiOrchestrator, 'Code: Claim + Orchestrate AI')
 assert.ok(orchestratorNode.parameters.jsCode.includes('ZIREL_AI_CORE_WEBHOOK_URL'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('AI_CORE_WEBHOOK_URL'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('pending_ai'));
+assert.ok(orchestratorNode.parameters.jsCode.includes('ai_enabled'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('human_handoff'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('closed'));
+assert.ok(orchestratorNode.parameters.jsCode.includes('SKIPPED:ai_disabled'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('callAiCore'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('insertOutboundMessage'));
 assert.ok(orchestratorNode.parameters.jsCode.includes('getExistingOutboundForInbound'));

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Bot, Loader2, MessageSquare, Phone, RefreshCw, UserRound, XCircle } from 'lucide-react';
+import { Bot, Loader2, MessageSquare, Phone, RefreshCw, Send, UserRound, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getWhatsAppConversations, getWhatsAppConversationMessages, updateWhatsAppConversationStatus } from '../lib/supabase-helpers';
+import { getWhatsAppConversations, getWhatsAppConversationMessages, sendWhatsAppHumanMessage, updateWhatsAppConversationStatus } from '../lib/supabase-helpers';
 import type { WhatsAppConversationSummary, WhatsAppMessageSummary } from '../types';
 
 interface WhatsAppHandoffPanelProps {
@@ -45,6 +45,8 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isMessagesLoading, setIsMessagesLoading] = useState(false);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [draftMessage, setDraftMessage] = useState('');
+    const [isSendingHuman, setIsSendingHuman] = useState(false);
 
     const loadConversations = async () => {
         try {
@@ -134,6 +136,50 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
             (typeof provider.output === 'string' && provider.output) ||
             (typeof provider.recipient_phone === 'string' ? null : null);
         return message.content_text || providerText || 'Messaggio senza testo';
+    };
+
+    const handleSendHumanMessage = async () => {
+        if (!selectedConversation?.id || !draftMessage.trim()) {
+            toast.error('Scrivi un messaggio prima di inviarlo.');
+            return;
+        }
+
+        try {
+            setIsSendingHuman(true);
+            const result = await sendWhatsAppHumanMessage(selectedConversation.id, draftMessage, tenantId);
+            const nextStatus = result.conversation_status || 'human_handoff';
+            const insertedMessage = result.message || null;
+
+            setConversations((current) =>
+                current.map((conversation) =>
+                    conversation.id === selectedConversation.id
+                        ? {
+                              ...conversation,
+                              status: nextStatus,
+                              ai_processing_status: conversation.ai_processing_status || 'done',
+                              updated_at: insertedMessage?.created_at || new Date().toISOString(),
+                              last_message_at: insertedMessage?.created_at || new Date().toISOString(),
+                              last_outbound_message_id: insertedMessage?.id || conversation.last_outbound_message_id,
+                          }
+                        : conversation
+                )
+            );
+
+            if (insertedMessage) {
+                setMessages((current) => [...current, insertedMessage]);
+            } else {
+                const rows = await getWhatsAppConversationMessages(selectedConversation.id, tenantId);
+                setMessages(rows);
+            }
+
+            setDraftMessage('');
+            toast.success('Messaggio inviato. La conversazione è ora in handoff umano.');
+        } catch (error) {
+            console.error('WhatsApp human message send error:', error);
+            toast.error(error instanceof Error ? error.message : 'Non siamo riusciti a inviare il messaggio umano.');
+        } finally {
+            setIsSendingHuman(false);
+        }
     };
 
     return (
@@ -340,6 +386,39 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
                                             })}
                                         </div>
                                     )}
+                                </div>
+                                <div className="border-t border-gray-100 bg-white px-4 py-4 md:px-6">
+                                    <div className="rounded-[1.5rem] border border-amber-100 bg-amber-50/70 px-4 py-3 text-sm text-amber-800">
+                                        Quando invii un messaggio manuale da Zirèl, l’AI viene sospesa automaticamente solo per questa conversazione.
+                                    </div>
+                                    <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-end">
+                                        <div className="flex-1 space-y-2">
+                                            <label className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                                                Risposta operatore
+                                            </label>
+                                            <textarea
+                                                value={draftMessage}
+                                                onChange={(event) => setDraftMessage(event.target.value)}
+                                                onKeyDown={(event) => {
+                                                    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                                                        event.preventDefault();
+                                                        void handleSendHumanMessage();
+                                                    }
+                                                }}
+                                                rows={4}
+                                                placeholder="Scrivi qui la risposta umana. Al primo invio, Zirèl mette la chat in handoff umano."
+                                                className="w-full rounded-[1.5rem] border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 shadow-inner focus:border-zirel-orange-dark focus:bg-white focus:outline-none"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => void handleSendHumanMessage()}
+                                            disabled={isSendingHuman || !draftMessage.trim()}
+                                            className="apple-button flex items-center justify-center gap-2 text-white w-full md:w-auto disabled:opacity-60"
+                                        >
+                                            {isSendingHuman ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                            Invia e passa a operatore
+                                        </button>
+                                    </div>
                                 </div>
                             </>
                         ) : (

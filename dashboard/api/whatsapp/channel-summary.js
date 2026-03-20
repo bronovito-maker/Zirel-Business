@@ -1,58 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-import { extractBearerToken } from '../_lib/whatsapp-embedded-signup.js';
-
-function json(res, status, body) {
-    res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.send(JSON.stringify(body));
-}
-
-function createSupabaseAdmin() {
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !serviceRoleKey) {
-        throw new Error('MISSING_SUPABASE_SERVER_ENV');
-    }
-
-    return createClient(supabaseUrl, serviceRoleKey, {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false,
-        },
-    });
-}
-
-async function resolveTenantId(supabase, req) {
-    const requestBody = req.body && typeof req.body === 'object' ? req.body : {};
-    const authHeader = req.headers.authorization;
-    const apiToken =
-        extractBearerToken(requestBody.tenant_api_token) ||
-        extractBearerToken(authHeader) ||
-        extractBearerToken(req.headers['x-zirel-api-token']);
-    const expectedTenantId =
-        String(requestBody.tenant_id || req.headers['x-zirel-tenant-id'] || req.query?.tenant_id || '').trim() || null;
-
-    if (!apiToken) {
-        return { ok: false, status: 401, error_code: 'WHATSAPP_SUMMARY_UNAUTHORIZED', error_message: 'Missing tenant API token' };
-    }
-
-    let query = supabase
-        .from('tenants')
-        .select('tenant_id')
-        .eq('api_token', apiToken);
-
-    if (expectedTenantId) {
-        query = query.eq('tenant_id', expectedTenantId);
-    }
-
-    const { data, error } = await query.single();
-
-    if (error || !data?.tenant_id) {
-        return { ok: false, status: 401, error_code: 'WHATSAPP_SUMMARY_UNAUTHORIZED', error_message: 'Invalid tenant API token' };
-    }
-
-    return { ok: true, tenant_id: String(data.tenant_id) };
-}
+import { createSupabaseAdmin, json, resolveTenantId } from '../_lib/whatsapp-server-auth.js';
 
 function normalizeSummary(row, tenantId) {
     if (!row) {
@@ -93,6 +39,8 @@ function normalizeSummary(row, tenantId) {
         display_phone_number: row.display_phone_number || null,
         verified_name: row.verified_name || null,
         connection_status: derivedStatus,
+        ai_enabled: row.ai_enabled !== false,
+        human_handoff_enabled: row.human_handoff_enabled !== false,
         last_sync_at: row.last_sync_at || null,
         last_webhook_at: row.last_webhook_at || null,
         webhook_verified_at: row.webhook_verified_at || null,
@@ -122,7 +70,7 @@ export default async function handler(req, res) {
         });
     }
 
-    const tenant = await resolveTenantId(supabase, req);
+    const tenant = await resolveTenantId(supabase, req, 'WHATSAPP_SUMMARY_UNAUTHORIZED');
     if (!tenant.ok) {
         return json(res, tenant.status, tenant);
     }
@@ -130,7 +78,7 @@ export default async function handler(req, res) {
     try {
         const { data, error } = await supabase
             .from('tenant_whatsapp_accounts')
-            .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref, meta_business_account_id, meta_waba_id, waba_id, display_phone_number, verified_name, connection_status, last_sync_at, last_webhook_at, webhook_verified_at, onboarding_error')
+            .select('id, tenant_id, meta_phone_number_id, credential_mode, credential_provider, access_token_ref, meta_business_account_id, meta_waba_id, waba_id, display_phone_number, verified_name, connection_status, ai_enabled, human_handoff_enabled, last_sync_at, last_webhook_at, webhook_verified_at, onboarding_error')
             .eq('tenant_id', tenant.tenant_id)
             .order('updated_at', { ascending: false, nullsFirst: false })
             .limit(1)

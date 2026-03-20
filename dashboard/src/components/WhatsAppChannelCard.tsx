@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Activity, CheckCircle2, ChevronDown, ChevronUp, Copy, Loader2, MessageSquare, RefreshCw, ShieldCheck, Smartphone, Sparkles, TriangleAlert, Unplug, Webhook } from 'lucide-react';
+import { Activity, CheckCircle2, ChevronDown, ChevronUp, Copy, Loader2, MessageSquare, RefreshCw, ShieldCheck, Smartphone, Sparkles, ToggleLeft, ToggleRight, TriangleAlert, Unplug, Webhook } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { completeWhatsAppEmbeddedSignup, disconnectWhatsAppChannel, getWhatsAppChannelOpsSummary, getWhatsAppChannelSummary, syncWhatsAppChannel } from '../lib/supabase-helpers';
+import { completeWhatsAppEmbeddedSignup, disconnectWhatsAppChannel, getWhatsAppChannelOpsSummary, getWhatsAppChannelSummary, syncWhatsAppChannel, updateWhatsAppAutomationSettings } from '../lib/supabase-helpers';
 import {
     extractEmbeddedSignupIdentifiers,
     isEmbeddedSignupConfigured,
@@ -123,6 +123,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const [isDisconnecting, setIsDisconnecting] = useState(false);
     const [isOpsLoading, setIsOpsLoading] = useState(false);
     const [isOpsOpen, setIsOpsOpen] = useState(false);
+    const [isAutomationSaving, setIsAutomationSaving] = useState(false);
     const [opsSummary, setOpsSummary] = useState<WhatsAppChannelOpsSummary | null>(null);
     const [signupForm, setSignupForm] = useState<CompleteWhatsAppEmbeddedSignupPayload>({
         meta_phone_number_id: '',
@@ -185,6 +186,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const embeddedSignupReady = isEmbeddedSignupConfigured();
     const connectedNumber = summary?.display_phone_number || summary?.meta_phone_number_id || null;
     const webhookMeta = getWebhookMeta(summary);
+    const automationEnabled = summary?.ai_enabled !== false;
 
     const updateSignupField = <K extends keyof CompleteWhatsAppEmbeddedSignupPayload>(
         key: K,
@@ -298,6 +300,36 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
         }
     };
 
+    const handleToggleAutomation = async () => {
+        if (!summary?.tenant_id) {
+            toast.error('Tenant WhatsApp non disponibile.');
+            return;
+        }
+
+        const nextValue = !automationEnabled;
+        const confirmationMessage = nextValue
+            ? 'Vuoi riattivare le risposte automatiche WhatsApp per tutto il tenant?'
+            : 'Vuoi sospendere le risposte automatiche WhatsApp per tutto il tenant? Le conversazioni resteranno visibili, ma Zirèl non risponderà automaticamente.';
+
+        if (!window.confirm(confirmationMessage)) return;
+
+        try {
+            setIsAutomationSaving(true);
+            const result = await updateWhatsAppAutomationSettings(nextValue, tenantId);
+            setSummary((current) => current ? {
+                ...current,
+                ai_enabled: result.ai_enabled !== false,
+                human_handoff_enabled: result.human_handoff_enabled !== false,
+            } : current);
+            toast.success(nextValue ? 'Automazione WhatsApp riattivata.' : 'Automazione WhatsApp sospesa.');
+        } catch (error) {
+            console.error('WhatsApp automation toggle error:', error);
+            toast.error(error instanceof Error ? error.message : 'Non siamo riusciti ad aggiornare l’automazione WhatsApp.');
+        } finally {
+            setIsAutomationSaving(false);
+        }
+    };
+
     return (
         <>
             <section className="apple-card p-6 md:p-8 space-y-6 border-t-4 border-emerald-500">
@@ -393,13 +425,50 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                            <div className="rounded-2xl border border-dashed border-gray-200 bg-slate-50 px-4 py-4 space-y-3">
+                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
+                                    <MessageSquare className="h-4 w-4" />
+                                    Automazione WhatsApp
+                                </div>
+                                <div className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white px-4 py-3">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {automationEnabled ? 'Risposte automatiche attive' : 'Risposte automatiche sospese'}
+                                        </p>
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            {automationEnabled
+                                                ? 'Zirèl può rispondere automaticamente alle nuove conversazioni, salvo handoff per singola chat.'
+                                                : 'L’AI è spenta globalmente: solo gli operatori umani possono intervenire.'}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => void handleToggleAutomation()}
+                                        disabled={isAutomationSaving}
+                                        className={`inline-flex items-center justify-center rounded-2xl border px-4 py-3 transition ${
+                                            automationEnabled
+                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                : 'border-slate-200 bg-slate-50 text-slate-600'
+                                        } disabled:opacity-60`}
+                                    >
+                                        {isAutomationSaving ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : automationEnabled ? (
+                                            <ToggleRight className="h-6 w-6" />
+                                        ) : (
+                                            <ToggleLeft className="h-6 w-6" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
                             <div className="rounded-2xl border border-dashed border-gray-200 bg-slate-50 px-4 py-4 space-y-2">
                                 <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
                                     <Activity className="h-4 w-4" />
                                     Stato operativo
                                 </div>
                                 <p className="text-sm text-gray-600">
-                                    {isConnected
+                                    {!automationEnabled
+                                        ? 'Il canale è collegato, ma le risposte automatiche sono sospese globalmente dal toggle operatore.'
+                                        : isConnected
                                         ? 'Il canale è pronto per onboarding, messaggi inbound/outbound e gestione conversazioni.'
                                         : needsAttention
                                             ? 'Il canale è collegato ma conviene rifinire il profilo Meta o rilanciare la sincronizzazione per avere tutti i dettagli completi.'
