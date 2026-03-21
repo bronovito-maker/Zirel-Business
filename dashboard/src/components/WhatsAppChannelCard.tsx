@@ -187,6 +187,11 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const connectedNumber = summary?.display_phone_number || summary?.meta_phone_number_id || null;
     const webhookMeta = getWebhookMeta(summary);
     const automationEnabled = summary?.ai_enabled !== false;
+    const hasMetaIdentifiers = Boolean(
+        signupForm.meta_phone_number_id.trim() &&
+        signupForm.waba_id.trim()
+    );
+    const hasSignupSession = Boolean(signupForm.signup_session_id?.trim());
 
     const updateSignupField = <K extends keyof CompleteWhatsAppEmbeddedSignupPayload>(
         key: K,
@@ -611,7 +616,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             <div>
                                 <h4 className="text-xl md:text-2xl font-black text-gray-900">Collega WhatsApp</h4>
                                 <p className="text-sm md:text-base text-gray-500 mt-2">
-                                    Questa schermata e già il ponte operativo tra il completion payload di Meta e il backend Zirèl. Nel prossimo step qui agganceremo anche l'avvio diretto dell'SDK `Embedded Signup`.
+                                    Segui questi passaggi guidati: avvia Meta, completa il collegamento e verifica che Zirèl abbia ricevuto automaticamente Number ID e WABA ID.
                                 </p>
                             </div>
                             <button
@@ -623,14 +628,32 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             </button>
                         </div>
 
-                        <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-5 py-5 space-y-3">
-                            <div className="text-sm font-bold text-gray-800">Cosa fa già questo flusso</div>
-                            <ul className="text-sm text-gray-600 space-y-2">
-                                <li>1. Riceve i dati finali del collegamento WhatsApp.</li>
-                                <li>2. Li invia al callback server-side protetto.</li>
-                                <li>3. Salva numero, WABA e stato connessione in Zirèl.</li>
-                                <li>4. Aggiorna subito la card del canale.</li>
-                            </ul>
+                        <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-5 py-5 space-y-4">
+                            <div className="text-sm font-bold text-gray-800">Installazione guidata</div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className={`rounded-2xl border px-4 py-4 ${hasSignupSession ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Step 1</div>
+                                    <p className="text-sm font-semibold text-gray-800">Avvia Meta</p>
+                                    <p className="mt-1 text-sm text-gray-600">Collega l’account WhatsApp Business e autorizza Zirèl.</p>
+                                    <p className={`mt-3 text-xs font-semibold ${hasSignupSession ? 'text-emerald-700' : 'text-gray-400'}`}>
+                                        {hasSignupSession ? 'Completato' : 'In attesa'}
+                                    </p>
+                                </div>
+                                <div className={`rounded-2xl border px-4 py-4 ${hasMetaIdentifiers ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Step 2</div>
+                                    <p className="text-sm font-semibold text-gray-800">Verifica dati tecnici</p>
+                                    <p className="mt-1 text-sm text-gray-600">Zirèl dovrebbe compilare da solo Number ID e WABA ID.</p>
+                                    <p className={`mt-3 text-xs font-semibold ${hasMetaIdentifiers ? 'text-emerald-700' : 'text-amber-700'}`}>
+                                        {hasMetaIdentifiers ? 'Ricevuti automaticamente' : 'Se restano vuoti, usa il fallback manuale'}
+                                    </p>
+                                </div>
+                                <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4">
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Step 3</div>
+                                    <p className="text-sm font-semibold text-gray-800">Completa collegamento</p>
+                                    <p className="mt-1 text-sm text-gray-600">Conferma i dati e salva il canale nel tenant.</p>
+                                    <p className="mt-3 text-xs font-semibold text-gray-400">Ultimo step</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -642,6 +665,9 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     placeholder="1023529240851906"
                                     className="apple-input"
                                 />
+                                <span className="mt-2 block text-xs text-gray-500">
+                                    Viene compilato automaticamente dopo il flusso Meta. Se resta vuoto, incollalo manualmente dal payload finale.
+                                </span>
                             </label>
                             <label className="block">
                                 <span className="block text-sm font-semibold text-gray-700 mb-2">WABA ID</span>
@@ -651,6 +677,9 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     placeholder="952596820596407"
                                     className="apple-input"
                                 />
+                                <span className="mt-2 block text-xs text-gray-500">
+                                    Anche questo campo dovrebbe arrivare da Meta in automatico insieme al Number ID.
+                                </span>
                             </label>
                             <label className="block">
                                 <span className="block text-sm font-semibold text-gray-700 mb-2">Display phone number</span>
@@ -687,6 +716,9 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     placeholder="trace o session id"
                                     className="apple-input"
                                 />
+                                <span className="mt-2 block text-xs text-gray-500">
+                                    Campo opzionale. Può essere utile per diagnosi o retry del collegamento, ma non basta da solo a completare il setup.
+                                </span>
                             </label>
                         </div>
 
@@ -694,7 +726,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             <TriangleAlert className="w-5 h-5 text-orange-600 mt-0.5 shrink-0" />
                             <div className="text-sm text-orange-800 space-y-2">
                                 <p>
-                                    Il launcher Meta è già collegato. Se Meta non restituisce subito tutti gli identificativi nel browser, puoi ancora completare il collegamento usando questo form come fallback sicuro.
+                                    Se Meta non restituisce subito tutti gli identificativi nel browser, puoi ancora completare il collegamento usando questo form come fallback sicuro.
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Copy className="w-4 h-4 shrink-0" />
@@ -731,7 +763,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                 </button>
                                 <button
                                     onClick={() => void handleSubmitSignup()}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !hasMetaIdentifiers}
                                     className="apple-button flex items-center justify-center gap-2 text-white disabled:opacity-60 w-full sm:w-auto"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
@@ -739,6 +771,12 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                 </button>
                             </div>
                         </div>
+
+                        {!hasMetaIdentifiers ? (
+                            <p className="text-xs text-gray-500">
+                                Il pulsante `Completa collegamento` si attiva quando Zirèl riceve o inserisci manualmente sia `Meta phone number ID` sia `WABA ID`.
+                            </p>
+                        ) : null}
 
                         {!embeddedSignupReady ? (
                             <p className="text-xs text-gray-400">

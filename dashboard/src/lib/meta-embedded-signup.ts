@@ -127,10 +127,30 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
     await loadFacebookSdk();
 
     return new Promise<EmbeddedSignupLaunchResult>((resolve, reject) => {
-        const timeout = window.setTimeout(() => {
+        let resolved = false;
+        let pendingCode: string | null = null;
+        let fallbackTimer: number | null = null;
+
+        const resolveOnce = (result: EmbeddedSignupLaunchResult) => {
+            if (resolved) return;
+            resolved = true;
             cleanup();
-            resolve({ code: null, event: null });
+            resolve(result);
+        };
+
+        const timeout = window.setTimeout(() => {
+            resolveOnce({ code: pendingCode, event: null });
         }, 120000);
+
+        const scheduleCodeFallback = () => {
+            if (!pendingCode || fallbackTimer !== null) return;
+            fallbackTimer = window.setTimeout(() => {
+                resolveOnce({
+                    code: pendingCode,
+                    event: null,
+                });
+            }, 8000);
+        };
 
         const onMessage = (event: MessageEvent) => {
             if (!event?.data) return;
@@ -149,15 +169,25 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
             const type = String((data as Record<string, unknown>).type || '').toLowerCase();
             if (!type.includes('whatsapp') && !type.includes('embedded')) return;
 
-            cleanup();
-            resolve({
-                code: null,
-                event: data as Record<string, unknown>,
-            });
+            const extracted = extractEmbeddedSignupIdentifiers(data);
+            if (extracted.meta_phone_number_id && extracted.waba_id) {
+                resolveOnce({
+                    code: pendingCode,
+                    event: data as Record<string, unknown>,
+                });
+                return;
+            }
+
+            if (pendingCode) {
+                scheduleCodeFallback();
+            }
         };
 
         const cleanup = () => {
             window.clearTimeout(timeout);
+            if (fallbackTimer !== null) {
+                window.clearTimeout(fallbackTimer);
+            }
             window.removeEventListener('message', onMessage);
         };
 
@@ -170,11 +200,8 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
                     const code = readString(authResponse?.code) || readString((response as Record<string, unknown>)?.code);
 
                     if (code) {
-                        cleanup();
-                        resolve({
-                            code,
-                            event: response,
-                        });
+                        pendingCode = code;
+                        scheduleCodeFallback();
                         return;
                     }
 

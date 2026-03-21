@@ -985,6 +985,17 @@ const claimRow = async (rowId) => {
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 };
 
+const getTenantAccount = async (tenantId) => {
+  if (!tenantId) return null;
+  const rows = await rest(
+    'GET',
+    'tenant_whatsapp_accounts?select=id,tenant_id,ai_enabled,human_handoff_enabled&tenant_id=eq.' +
+      encode(tenantId) +
+      '&order=updated_at.desc.nullslast&limit=1'
+  );
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+};
+
 const getConversation = async (conversationId) => {
   if (!conversationId) return null;
   const rows = await rest(
