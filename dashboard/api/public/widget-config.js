@@ -77,6 +77,29 @@ function normalizeQuickReplies(rawValue) {
     return [];
 }
 
+function normalizeTeaserMessages(rawValue) {
+    if (Array.isArray(rawValue)) {
+        return rawValue
+            .map((item) => normalizeString(typeof item === 'string' ? item : item?.message || item?.label))
+            .filter(Boolean)
+            .slice(0, 4);
+    }
+
+    if (typeof rawValue === 'string' && rawValue.trim()) {
+        try {
+            return normalizeTeaserMessages(JSON.parse(rawValue));
+        } catch {
+            return rawValue
+                .split('\n')
+                .map((line) => normalizeString(line))
+                .filter(Boolean)
+                .slice(0, 4);
+        }
+    }
+
+    return [];
+}
+
 function buildDefaultWelcomeMessage(row, title) {
     const businessType = normalizeString(row.business_type).toLowerCase();
 
@@ -117,6 +140,32 @@ function buildDefaultQuickReplies(row) {
     ];
 }
 
+function buildDefaultTeaserMessages(row) {
+    const businessType = normalizeString(row.business_type).toLowerCase();
+
+    if (businessType === 'restaurant') {
+        return [
+            'Hai fame? Ti aiuto subito con tavoli e orari. 🍽️',
+            'Prenotare un tavolo richiede un attimo. 💬',
+            'Se vuoi, ti mando subito orari e indicazioni. 📍',
+        ];
+    }
+
+    if (businessType === 'hotel') {
+        return [
+            'Cerchi una camera? Ti aiuto subito. 🛎️',
+            'Posso aiutarti con soggiorni, orari e informazioni. 💬',
+            'Vuoi inviare una richiesta soggiorno? Ci siamo. ✨',
+        ];
+    }
+
+    return [
+        'Hai una domanda? Ti aiuto subito. 💬',
+        'Posso raccogliere richieste e appuntamenti in un attimo. ✨',
+        'Scrivimi pure: ti rispondo subito. 🚀',
+    ];
+}
+
 function buildPublicWidgetConfig(row) {
     const businessName =
         normalizeString(row.widget_title) ||
@@ -129,6 +178,9 @@ function buildPublicWidgetConfig(row) {
     const quickReplies =
         normalizeQuickReplies(row.widget_quick_replies) ||
         normalizeQuickReplies(row.widget_quick_replies_json);
+    const teaserMessages =
+        normalizeTeaserMessages(row.widget_teaser_messages) ||
+        normalizeTeaserMessages(row.widget_teaser_messages_json);
 
     return {
         tenant_id: normalizeString(row.tenant_id),
@@ -140,6 +192,7 @@ function buildPublicWidgetConfig(row) {
             normalizeString(row.widget_welcome_message) ||
             buildDefaultWelcomeMessage(row, businessName),
         quick_replies: quickReplies.length ? quickReplies : buildDefaultQuickReplies(row),
+        teaser_messages: teaserMessages.length ? teaserMessages : buildDefaultTeaserMessages(row),
         links: {
             website: normalizeString(row.sito_web_url) || '',
             maps: normalizeString(row.google_maps_link) || '',

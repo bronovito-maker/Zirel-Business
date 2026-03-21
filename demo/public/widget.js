@@ -245,7 +245,7 @@
         const tooltip = document.createElement('div');
         tooltip.id = 'chat-tooltip';
         tooltip.className = 'chat-tooltip';
-        tooltip.textContent = 'Hai una domanda? Ti aiuto subito. 💬';
+        tooltip.textContent = (window.zirelTooltipMessages[0] || 'Hai una domanda? Ti aiuto subito. 💬');
         document.body.appendChild(tooltip);
 
         const widget = document.createElement('div');

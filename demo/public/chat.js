@@ -61,12 +61,15 @@
     const sessionId = runtimeSessions[tenantId];
 
     // Messaggi tooltip (sovrascrivibili dalla pagina ospite)
-    const tooltipMessages = window.zirelTooltipMessages || [
+    const defaultTooltipMessages = [
         'Serve aiuto? Ci pensa Zirèl! 💬',
         'Fissa una Demo Gratuita! 🚀',
         "Scopri come funziona l'AI 🤖",
         'Aumenta le tue prenotazioni! 📈',
     ];
+    if (!Array.isArray(window.zirelTooltipMessages) || !window.zirelTooltipMessages.length) {
+        window.zirelTooltipMessages = defaultTooltipMessages;
+    }
     let tooltipIndex = 0;
 
     // ─── Fetch Widget Configuration ───────────────────────────────────────────
@@ -139,6 +142,7 @@
                 widget_icon,
                 welcome_message,
                 quick_replies,
+                teaser_messages,
             } = config;
 
             if (widget_title) {
@@ -186,6 +190,12 @@
             if (quick_replies) {
                 renderQuickReplies(quick_replies);
             }
+            if (Array.isArray(teaser_messages) && teaser_messages.length) {
+                window.zirelTooltipMessages = teaser_messages
+                    .map((item) => String(item || '').trim())
+                    .filter(Boolean)
+                    .slice(0, 4);
+            }
         } catch (err) {
             console.warn('[Zirèl] Error applying dynamic customization, using defaults:', err);
             // Fallback to static window config if available
@@ -196,6 +206,7 @@
                 widget_icon,
                 welcome_message,
                 quick_replies,
+                teaser_messages,
             } = window.ZirelWidgetConfig || {};
             if (widget_title) {
                 const titleEl = document.getElementById('zirel-widget-title');
@@ -228,6 +239,12 @@
             }
             if (quick_replies) {
                 renderQuickReplies(quick_replies);
+            }
+            if (Array.isArray(teaser_messages) && teaser_messages.length) {
+                window.zirelTooltipMessages = teaser_messages
+                    .map((item) => String(item || '').trim())
+                    .filter(Boolean)
+                    .slice(0, 4);
             }
             // ... rest of logic if needed, but the catch already logs it.
         }
@@ -269,6 +286,9 @@
     function showAndCycleTooltip() {
         const tooltip = document.getElementById('chat-tooltip');
         const widget = document.getElementById('n8n-widget-mock');
+        const tooltipMessages = Array.isArray(window.zirelTooltipMessages) && window.zirelTooltipMessages.length
+            ? window.zirelTooltipMessages
+            : defaultTooltipMessages;
         if (widget && widget.classList.contains('scale-0') && tooltip) {
             tooltip.innerText = tooltipMessages[tooltipIndex];
             tooltip.classList.add('visible');

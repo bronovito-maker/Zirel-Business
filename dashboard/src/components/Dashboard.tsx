@@ -1067,6 +1067,16 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 placeholder={'Es. Ciao! Sono l’assistente di NikiTuttoFare.\nPosso aiutarti con richieste, informazioni e appuntamenti.'}
                                                 rows={4}
                                             />
+                                            <TextareaField
+                                                label="Messaggi Popup Widget Chiuso"
+                                                value={formData.widget_teaser_messages || ''}
+                                                onChange={updateField('widget_teaser_messages')}
+                                                placeholder={'Una frase per riga\nEs. Hai una domanda? Ti aiuto subito. 💬\nPosso aiutarti con richieste e appuntamenti. ✨\nScrivimi pure: ti rispondo subito. 🚀'}
+                                                rows={4}
+                                            />
+                                            <p className="text-xs text-gray-500 px-1 -mt-3">
+                                                Inserisci una frase per riga. Il widget chiuso mostrerà queste frasi a rotazione nel popup accanto al bottone.
+                                            </p>
                                         </div>
                                         <div className="space-y-6">
                                             <div>
@@ -1109,6 +1119,17 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     {/* Simple Preview */}
                                     <div className="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-6">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Anteprima Rapida</p>
+                                        <div className="max-w-sm mx-auto mb-4">
+                                            <div className="rounded-2xl bg-[#003049] px-4 py-3 text-sm font-semibold text-white shadow-sm">
+                                                {(
+                                                    String(formData.widget_teaser_messages || '')
+                                                        .split('\n')
+                                                        .map((line) => line.trim())
+                                                        .filter(Boolean)
+                                                        .slice(0, 1)[0]
+                                                ) || 'Hai una domanda? Ti aiuto subito. 💬'}
+                                            </div>
+                                        </div>
                                         <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 max-w-sm mx-auto overflow-hidden">
                                             <div
                                                 className="px-5 py-4 text-white flex items-center gap-3"
