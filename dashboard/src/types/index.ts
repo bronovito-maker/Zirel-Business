@@ -80,16 +80,51 @@ export interface TenantData {
     [key: string]: unknown; // Strict index signature
 }
 
-export interface Reservation {
-    id: number;
+export type OperationalRequestKind = 'restaurant' | 'appointment' | 'hotel';
+
+export interface OperationalRequest {
+    id: number | string;
     tenant_id: string;
-    nome_cliente: string;
-    telefono: string;
-    data_prenotazione: string;
-    ora: string;
-    persone: string;
-    stato: string;
+    kind: OperationalRequestKind;
+    title: string;
+    primary_contact?: string | null;
+    email?: string | null;
+    date_label: string;
+    time_label: string;
+    party_size_label?: string | null;
+    reason_label?: string | null;
+    status: string;
     created_at: string;
+}
+
+export interface RequestEvent {
+    id: string;
+    tenant_id: string;
+    request_type: string;
+    request_id: string;
+    event_type: string;
+    actor?: string | null;
+    payload?: Record<string, unknown> | null;
+    created_at: string;
+}
+
+export interface OperationalRequestDetail extends OperationalRequest {
+    requested_date?: string | null;
+    requested_time?: string | null;
+    note?: string | null;
+    party_size?: number | null;
+    confirmed_at?: string | null;
+    confirmed_by?: string | null;
+    rejected_at?: string | null;
+    rejected_by?: string | null;
+    rejection_reason?: string | null;
+    change_proposed_at?: string | null;
+    change_proposed_by?: string | null;
+    proposed_date?: string | null;
+    proposed_time?: string | null;
+    change_note?: string | null;
+    last_customer_email_sent_at?: string | null;
+    last_internal_update_sent_at?: string | null;
 }
 
 export interface DocumentFile {

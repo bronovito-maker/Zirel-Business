@@ -130,9 +130,13 @@ const recipientEmail = String(
 ).trim().toLowerCase();
 const statusLabel = ({
   confirmed: 'Confermata',
+  confermata: 'Confermata',
   manual_review: 'Verifica manuale',
   rejected: 'Non disponibile',
+  rifiutata: 'Non disponibile',
+  annullata: 'Non disponibile',
   pending: 'In lavorazione',
+  change_proposed: 'Proposta inviata',
 })[String(payload.booking_status || payload.status || payload.availability_status || '').trim()] || 'In lavorazione';
 const planCode = String(payload.billing_plan_code || '').trim().toLowerCase();
 const cycleCode = String(payload.billing_cycle || '').trim().toLowerCase();
@@ -217,6 +221,122 @@ if (template === 'hotel_guest_confirmation' || channel === 'email_guest_hotel') 
       { label: 'Stato richiesta', value: statusLabel },
     ],
     'Il team verificherà la disponibilità e ti ricontatterà con il prossimo aggiornamento.'
+  );
+} else if (template === 'appointment_confirmed') {
+  subject = \`Appuntamento confermato • \${activity}\`;
+  text = \`Ciao \${payload.nome || 'Cliente'},\\n\\nla tua richiesta è stata confermata.\\n\\nData: \${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra: \${payload.orario || 'N/D'}\\nMotivo: \${payload.motivo || 'N/D'}\\n\\nTi aspettiamo.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Appuntamento confermato',
+    \`Ciao <strong>\${payload.nome || 'Cliente'}</strong>, il tuo appuntamento con <strong>\${activity}</strong> è stato confermato.\`,
+    [
+      { label: 'Data', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },
+      { label: 'Ora', value: payload.orario || 'N/D' },
+      { label: 'Motivo', value: payload.motivo || 'N/D' },
+    ],
+    'Ti aspettiamo nello slot confermato. Se hai bisogno di aggiornamenti, rispondi a questa email.'
+  );
+} else if (template === 'appointment_rejected') {
+  subject = \`Aggiornamento richiesta • \${activity}\`;
+  text = \`Ciao \${payload.nome || 'Cliente'},\\n\\nnon siamo riusciti a confermare la tua richiesta per lo slot indicato.\\n\\nData richiesta: \${payload.data_appuntamento_label || payload.data_appuntamento || 'N/D'}\\nOra richiesta: \${payload.orario || 'N/D'}\\nMotivo: \${payload.motivo || 'N/D'}\\nMotivo del rifiuto: \${payload.rejection_reason || 'Non disponibile'}\\n\\nSe vuoi, puoi rispondere a questa email per concordare un nuovo orario.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Richiesta non confermata',
+    \`Ciao <strong>\${payload.nome || 'Cliente'}</strong>, al momento non siamo riusciti a confermare il tuo slot richiesto con <strong>\${activity}</strong>.\`,
+    [
+      { label: 'Data richiesta', value: payload.data_appuntamento_label || payload.data_appuntamento || 'N/D' },
+      { label: 'Ora richiesta', value: payload.orario || 'N/D' },
+      { label: 'Motivo', value: payload.motivo || 'N/D' },
+      { label: 'Dettaglio', value: payload.rejection_reason || 'Non disponibile' },
+    ],
+    'Se vuoi una nuova disponibilità, rispondi pure a questa email e ti aiuteremo a trovare un altro slot.'
+  );
+} else if (template === 'appointment_change_proposed') {
+  subject = \`Nuova proposta di orario • \${activity}\`;
+  text = \`Ciao \${payload.nome || 'Cliente'},\\n\\nlo slot richiesto non è disponibile. Ti proponiamo questo nuovo appuntamento:\\n\\nNuova data: \${payload.proposed_date || 'N/D'}\\nNuovo orario: \${payload.proposed_time || 'N/D'}\\nNota: \${payload.change_note || 'Nessuna'}\\n\\nSe per te va bene, rispondi a questa email e confermeremo la modifica.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Ti proponiamo un nuovo slot',
+    \`Ciao <strong>\${payload.nome || 'Cliente'}</strong>, lo slot richiesto inizialmente non è disponibile. Ti proponiamo una nuova disponibilità con <strong>\${activity}</strong>.\`,
+    [
+      { label: 'Richiesta iniziale', value: (payload.original_date || payload.data_appuntamento || 'N/D') + ' alle ' + (payload.original_time || payload.orario || 'N/D') },
+      { label: 'Nuova data', value: payload.proposed_date || 'N/D' },
+      { label: 'Nuovo orario', value: payload.proposed_time || 'N/D' },
+      { label: 'Nota', value: payload.change_note || 'Nessuna' },
+    ],
+    'Se la nuova proposta ti va bene, rispondi pure a questa email e confermeremo il nuovo appuntamento.'
+  );
+} else if (template === 'restaurant_confirmed') {
+  subject = \`Prenotazione confermata • \${activity}\`;
+  text = \`Ciao \${payload.nome_cliente || 'Cliente'},\\n\\nla tua prenotazione è confermata.\\n\\nData: \${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra: \${payload.ora || 'N/D'}\\nPersone: \${payload.persone || 'N/D'}\\n\\nTi aspettiamo.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Prenotazione confermata',
+    \`Ciao <strong>\${payload.nome_cliente || 'Cliente'}</strong>, la tua prenotazione presso <strong>\${activity}</strong> è confermata.\`,
+    [
+      { label: 'Data', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },
+      { label: 'Ora', value: payload.ora || 'N/D' },
+      { label: 'Persone', value: String(payload.persone || 'N/D') },
+      { label: 'Note', value: payload.note_prenotazione || 'Nessuna' },
+    ],
+    'Ti aspettiamo nel giorno e nell’orario confermati.'
+  );
+} else if (template === 'restaurant_rejected') {
+  subject = \`Aggiornamento prenotazione • \${activity}\`;
+  text = \`Ciao \${payload.nome_cliente || 'Cliente'},\\n\\nnon siamo riusciti a confermare la tua richiesta di tavolo.\\n\\nData richiesta: \${payload.data_prenotazione_label || payload.data_prenotazione || 'N/D'}\\nOra richiesta: \${payload.ora || 'N/D'}\\nPersone: \${payload.persone || 'N/D'}\\nMotivo: \${payload.rejection_reason || 'Non disponibile'}\\n\\nSe vuoi, rispondi a questa email e proveremo a trovare una soluzione alternativa.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Prenotazione non confermata',
+    \`Ciao <strong>\${payload.nome_cliente || 'Cliente'}</strong>, al momento non siamo riusciti a confermare il tavolo richiesto presso <strong>\${activity}</strong>.\`,
+    [
+      { label: 'Data richiesta', value: payload.data_prenotazione_label || payload.data_prenotazione || 'N/D' },
+      { label: 'Ora richiesta', value: payload.ora || 'N/D' },
+      { label: 'Persone', value: String(payload.persone || 'N/D') },
+      { label: 'Dettaglio', value: payload.rejection_reason || 'Non disponibile' },
+    ],
+    'Se vuoi valutare un’alternativa, rispondi pure a questa email.'
+  );
+} else if (template === 'restaurant_change_proposed') {
+  subject = \`Nuova proposta per la tua prenotazione • \${activity}\`;
+  text = \`Ciao \${payload.nome_cliente || 'Cliente'},\\n\\nlo slot richiesto non è disponibile. Ti proponiamo:\\n\\nNuova data: \${payload.proposed_date || 'N/D'}\\nNuovo orario: \${payload.proposed_time || 'N/D'}\\nPersone: \${payload.persone || 'N/D'}\\nNota: \${payload.change_note || 'Nessuna'}\\n\\nSe ti va bene, rispondi a questa email e confermeremo il tavolo.\\n\\nA presto,\\n\${activity}\`;
+  html = renderShell(
+    'Ti proponiamo un nuovo tavolo',
+    \`Ciao <strong>\${payload.nome_cliente || 'Cliente'}</strong>, lo slot richiesto non è disponibile. Ti proponiamo una nuova disponibilità presso <strong>\${activity}</strong>.\`,
+    [
+      { label: 'Richiesta iniziale', value: (payload.original_date || payload.data_prenotazione || 'N/D') + ' alle ' + (payload.original_time || payload.ora || 'N/D') },
+      { label: 'Nuova data', value: payload.proposed_date || 'N/D' },
+      { label: 'Nuovo orario', value: payload.proposed_time || 'N/D' },
+      { label: 'Persone', value: String(payload.persone || 'N/D') },
+      { label: 'Nota', value: payload.change_note || 'Nessuna' },
+    ],
+    'Se la proposta ti va bene, rispondi pure a questa email e confermeremo la prenotazione.'
+  );
+} else if (template === 'appointment_internal_status_update' || template === 'restaurant_internal_status_update') {
+  const isAppointment = template === 'appointment_internal_status_update';
+  subject = \`Aggiornamento richiesta interna • \${activity}\`;
+  text = isAppointment
+    ? \`Aggiornamento richiesta appuntamento\\n\\nCliente: \${payload.nome || 'N/D'}\\nTelefono: \${payload.telefono || 'N/D'}\\nEmail: \${payload.email || 'N/D'}\\nStato: \${statusLabel}\\nMotivo rifiuto: \${payload.rejection_reason || 'Nessuno'}\\nNuova proposta: \${payload.proposed_date || 'N/D'} \${payload.proposed_time ? 'alle ' + payload.proposed_time : ''}\\nNota operativa: \${payload.change_note || 'Nessuna'}\\nOperatore: \${payload.actor || 'dashboard'}\`
+    : \`Aggiornamento richiesta tavolo\\n\\nCliente: \${payload.nome_cliente || 'N/D'}\\nTelefono: \${payload.telefono || 'N/D'}\\nEmail: \${payload.email || 'N/D'}\\nStato: \${statusLabel}\\nMotivo rifiuto: \${payload.rejection_reason || 'Nessuno'}\\nNuova proposta: \${payload.proposed_date || 'N/D'} \${payload.proposed_time ? 'alle ' + payload.proposed_time : ''}\\nNota operativa: \${payload.change_note || 'Nessuna'}\\nOperatore: \${payload.actor || 'dashboard'}\`;
+  html = renderShell(
+    'Aggiornamento richiesta interna',
+    \`La richiesta per <strong>\${activity}</strong> è stata aggiornata dalla dashboard.\`,
+    isAppointment
+      ? [
+          { label: 'Cliente', value: payload.nome || 'N/D' },
+          { label: 'Telefono', value: payload.telefono || 'N/D' },
+          { label: 'Email', value: payload.email || 'N/D' },
+          { label: 'Stato', value: statusLabel },
+          { label: 'Motivo rifiuto', value: payload.rejection_reason || 'Nessuno' },
+          { label: 'Nuova proposta', value: (payload.proposed_date || 'N/D') + (payload.proposed_time ? ' alle ' + payload.proposed_time : '') },
+          { label: 'Nota operativa', value: payload.change_note || 'Nessuna' },
+          { label: 'Operatore', value: payload.actor || 'dashboard' },
+        ]
+      : [
+          { label: 'Cliente', value: payload.nome_cliente || 'N/D' },
+          { label: 'Telefono', value: payload.telefono || 'N/D' },
+          { label: 'Email', value: payload.email || 'N/D' },
+          { label: 'Stato', value: statusLabel },
+          { label: 'Motivo rifiuto', value: payload.rejection_reason || 'Nessuno' },
+          { label: 'Nuova proposta', value: (payload.proposed_date || 'N/D') + (payload.proposed_time ? ' alle ' + payload.proposed_time : '') },
+          { label: 'Nota operativa', value: payload.change_note || 'Nessuna' },
+          { label: 'Operatore', value: payload.actor || 'dashboard' },
+        ],
+    'Puoi aprire la dashboard richieste per vedere il dettaglio completo e la timeline aggiornata.'
   );
 } else if (template === 'billing_trial_ending') {
   subject = \`Il periodo di prova di \${businessName} termina tra 3 giorni\`;

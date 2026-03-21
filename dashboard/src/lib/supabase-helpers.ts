@@ -1,7 +1,9 @@
 import { supabase } from './supabaseClient';
 import type {
     TenantData,
-    Reservation,
+    OperationalRequest,
+    OperationalRequestDetail,
+    RequestEvent,
     DocumentFile,
     AnalyticsSummary,
     AnalyticsTrendPoint,
@@ -54,7 +56,7 @@ const normalizeOperationalStatus = (value?: string | null) => {
 
     if (['confirmed', 'confermata'].includes(normalized)) return 'confirmed';
     if (['rejected', 'rifiutata', 'annullata', 'unavailable', 'canceled', 'cancelled'].includes(normalized)) return 'rejected';
-    if (['manual_review', 'pending', 'new', 'in_review'].includes(normalized)) return 'pending';
+    if (['manual_review', 'pending', 'new', 'in_review', 'change_proposed'].includes(normalized)) return 'pending';
 
     return 'unknown';
 };
@@ -159,25 +161,85 @@ export const updateTenantData = async (updateData: Partial<TenantData>) => {
     if (error) throw error;
 };
 
-// --- Reservation Operations ---
+// --- Operational Requests ---
 
-export const getReservations = async (tenantId?: string): Promise<Reservation[]> => {
+export const getOperationalRequests = async (tenantId?: string): Promise<OperationalRequest[]> => {
     const tid = ensureTenantId(tenantId);
 
-    const { data, error } = await supabase
-        .from('prenotazioni')
-        .select('*')
-        .eq('tenant_id', tid)
-        .order('created_at', { ascending: false });
+    const [{ data: reservationData, error: reservationError }, { data: appointmentData, error: appointmentError }] = await Promise.all([
+        supabase
+            .from('prenotazioni')
+            .select('id, tenant_id, nome_cliente, telefono, data_prenotazione, ora, persone, note_prenotazione, stato, created_at')
+            .eq('tenant_id', tid)
+            .order('created_at', { ascending: false }),
+        supabase
+            .from('appointments')
+            .select('id, tenant_id, nome, telefono, email, data_appuntamento, orario, note, stato, created_at')
+            .eq('tenant_id', tid)
+            .order('created_at', { ascending: false }),
+    ]);
 
-    if (error) throw error;
-    return (data || []) as Reservation[];
+    if (reservationError) throw reservationError;
+    if (appointmentError) throw appointmentError;
+
+    const requests: OperationalRequest[] = [
+        ...((reservationData || []).map((row) => ({
+            id: row.id,
+            tenant_id: row.tenant_id,
+            kind: 'restaurant' as const,
+            title: row.nome_cliente || 'Cliente Sconosciuto',
+            primary_contact: row.telefono || null,
+            date_label: row.data_prenotazione || 'N/D',
+            time_label: row.ora || 'N/D',
+            party_size_label: row.persone ? `${row.persone} persone` : 'N/D',
+            reason_label: row.note_prenotazione || null,
+            status: row.stato || 'PENDING',
+            created_at: row.created_at || new Date().toISOString(),
+        })) || []),
+        ...((appointmentData || []).map((row) => ({
+            id: row.id,
+            tenant_id: row.tenant_id,
+            kind: 'appointment' as const,
+            title: row.nome || 'Richiesta appuntamento',
+            primary_contact: row.telefono || null,
+            email: row.email || null,
+            date_label: row.data_appuntamento || 'N/D',
+            time_label: row.orario || 'N/D',
+            reason_label: row.note || null,
+            status: row.stato || 'manual_review',
+            created_at: row.created_at || new Date().toISOString(),
+        })) || []),
+    ];
+
+    return requests.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 };
 
-export const updateReservationStatus = async (id: number, newStatus: string, tenantId?: string) => {
+export const updateOperationalRequestStatus = async (
+    id: number | string,
+    kind: OperationalRequest['kind'],
+    newStatus: string,
+    tenantId?: string
+) => {
     const tid = ensureTenantId(tenantId);
     if (!id || !ALLOWED_RESERVATION_STATUSES.includes(newStatus as (typeof ALLOWED_RESERVATION_STATUSES)[number])) {
         throw new Error('INVALID_PARAMS');
+    }
+
+    if (kind === 'appointment') {
+        const mappedStatus = newStatus === 'CONFERMATA'
+            ? 'confirmed'
+            : newStatus === 'RIFIUTATA' || newStatus === 'ANNULLATA'
+                ? 'rejected'
+                : 'manual_review';
+
+        const { error } = await supabase
+            .from('appointments')
+            .update({ stato: mappedStatus })
+            .eq('id', id)
+            .eq('tenant_id', tid);
+
+        if (error) throw error;
+        return;
     }
 
     const { error } = await supabase
@@ -188,6 +250,407 @@ export const updateReservationStatus = async (id: number, newStatus: string, ten
 
     if (error) throw error;
 };
+
+const normalizeDetail = (kind: OperationalRequest['kind'], row: Record<string, unknown>): OperationalRequestDetail => {
+    if (kind === 'appointment') {
+        return {
+            id: row.id as number | string,
+            tenant_id: String(row.tenant_id || ''),
+            kind,
+            title: String(row.nome || 'Richiesta appuntamento'),
+            primary_contact: (row.telefono as string | null) || null,
+            email: (row.email as string | null) || null,
+            date_label: String(row.data_appuntamento || 'N/D'),
+            time_label: String(row.orario || 'N/D'),
+            reason_label: (row.note as string | null) || null,
+            status: String(row.stato || 'manual_review'),
+            created_at: String(row.created_at || new Date().toISOString()),
+            requested_date: (row.data_appuntamento as string | null) || null,
+            requested_time: (row.orario as string | null) || null,
+            note: (row.note as string | null) || null,
+            confirmed_at: (row.confirmed_at as string | null) || null,
+            confirmed_by: (row.confirmed_by as string | null) || null,
+            rejected_at: (row.rejected_at as string | null) || null,
+            rejected_by: (row.rejected_by as string | null) || null,
+            rejection_reason: (row.rejection_reason as string | null) || null,
+            change_proposed_at: (row.change_proposed_at as string | null) || null,
+            change_proposed_by: (row.change_proposed_by as string | null) || null,
+            proposed_date: (row.proposed_date as string | null) || null,
+            proposed_time: (row.proposed_time as string | null) || null,
+            change_note: (row.change_note as string | null) || null,
+            last_customer_email_sent_at: (row.last_customer_email_sent_at as string | null) || null,
+            last_internal_update_sent_at: (row.last_internal_update_sent_at as string | null) || null,
+        };
+    }
+
+    return {
+        id: row.id as number | string,
+        tenant_id: String(row.tenant_id || ''),
+        kind,
+        title: String(row.nome_cliente || 'Cliente Sconosciuto'),
+        primary_contact: (row.telefono as string | null) || null,
+        email: (row.email as string | null) || null,
+        date_label: String(row.data_prenotazione || 'N/D'),
+        time_label: String(row.ora || 'N/D'),
+        party_size_label: row.persone ? `${row.persone} persone` : 'N/D',
+        reason_label: (row.note_prenotazione as string | null) || null,
+        status: String(row.stato || 'PENDING'),
+        created_at: String(row.created_at || new Date().toISOString()),
+        requested_date: (row.data_prenotazione as string | null) || null,
+        requested_time: (row.ora as string | null) || null,
+        note: (row.note_prenotazione as string | null) || null,
+        party_size: row.persone ? Number(row.persone) : null,
+        confirmed_at: (row.confirmed_at as string | null) || null,
+        confirmed_by: (row.confirmed_by as string | null) || null,
+        rejected_at: (row.rejected_at as string | null) || null,
+        rejected_by: (row.rejected_by as string | null) || null,
+        rejection_reason: (row.rejection_reason as string | null) || null,
+        change_proposed_at: (row.change_proposed_at as string | null) || null,
+        change_proposed_by: (row.change_proposed_by as string | null) || null,
+        proposed_date: (row.proposed_date as string | null) || null,
+        proposed_time: (row.proposed_time as string | null) || null,
+        change_note: (row.change_note as string | null) || null,
+        last_customer_email_sent_at: (row.last_customer_email_sent_at as string | null) || null,
+        last_internal_update_sent_at: (row.last_internal_update_sent_at as string | null) || null,
+    };
+};
+
+export const getOperationalRequestDetail = async (
+    id: number | string,
+    kind: OperationalRequest['kind'],
+    tenantId?: string
+): Promise<OperationalRequestDetail> => {
+    const tid = ensureTenantId(tenantId);
+
+    if (kind === 'appointment') {
+        const { data, error } = await supabase
+            .from('appointments')
+            .select('id, tenant_id, nome, telefono, email, data_appuntamento, orario, note, stato, created_at, confirmed_at, confirmed_by, rejected_at, rejected_by, rejection_reason, change_proposed_at, change_proposed_by, proposed_date, proposed_time, change_note, last_customer_email_sent_at, last_internal_update_sent_at')
+            .eq('id', id)
+            .eq('tenant_id', tid)
+            .single();
+
+        if (error || !data) throw error || new Error('REQUEST_NOT_FOUND');
+        return normalizeDetail(kind, data as Record<string, unknown>);
+    }
+
+    const { data, error } = await supabase
+        .from('prenotazioni')
+        .select('id, tenant_id, nome_cliente, telefono, email, data_prenotazione, ora, persone, note_prenotazione, stato, created_at, confirmed_at, confirmed_by, rejected_at, rejected_by, rejection_reason, change_proposed_at, change_proposed_by, proposed_date, proposed_time, change_note, last_customer_email_sent_at, last_internal_update_sent_at')
+        .eq('id', id)
+        .eq('tenant_id', tid)
+        .single();
+
+    if (error || !data) throw error || new Error('REQUEST_NOT_FOUND');
+    return normalizeDetail(kind, data as Record<string, unknown>);
+};
+
+export const getOperationalRequestEvents = async (
+    id: number | string,
+    kind: OperationalRequest['kind'],
+    tenantId?: string
+): Promise<RequestEvent[]> => {
+    const tid = ensureTenantId(tenantId);
+
+    const { data, error } = await supabase
+        .from('request_events')
+        .select('id, tenant_id, request_type, request_id, event_type, actor, payload, created_at')
+        .eq('tenant_id', tid)
+        .eq('request_type', kind)
+        .eq('request_id', String(id))
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as RequestEvent[];
+};
+
+type OperationalRequestAction = 'confirm' | 'reject' | 'propose_change' | 'confirm_change';
+
+interface OperationalRequestActionInput {
+    action: OperationalRequestAction;
+    reason?: string;
+    proposedDate?: string;
+    proposedTime?: string;
+    note?: string;
+    actor?: string;
+}
+
+const normalizeEmail = (value?: string | null) => String(value || '').trim().toLowerCase();
+
+const resolveInternalRecipient = (tenantRow: Record<string, unknown>) =>
+    normalizeEmail(
+        (tenantRow.notification_email as string | null) ||
+        (tenantRow.billing_email as string | null) ||
+        (tenantRow.mail as string | null) ||
+        ''
+    ) || null;
+
+const buildActivityLabel = (tenantRow: Record<string, unknown>) =>
+    String(
+        tenantRow.nome_attivita ||
+        tenantRow.nome_ristorante ||
+        tenantRow.hotel_name ||
+        tenantRow.tenant_id ||
+        'Zirèl'
+    );
+
+const mapActionToStatusValue = (kind: OperationalRequest['kind'], action: OperationalRequestAction) => {
+    if (action === 'confirm' || action === 'confirm_change') {
+        return kind === 'appointment' ? 'confirmed' : 'CONFERMATA';
+    }
+
+    if (action === 'reject') {
+        return kind === 'appointment' ? 'rejected' : 'RIFIUTATA';
+    }
+
+    return 'change_proposed';
+};
+
+const mapActionToCustomerTemplate = (kind: OperationalRequest['kind'], action: OperationalRequestAction) => {
+    if (kind === 'appointment') {
+        if (action === 'reject') return 'appointment_rejected';
+        if (action === 'propose_change') return 'appointment_change_proposed';
+        return 'appointment_confirmed';
+    }
+
+    if (action === 'reject') return 'restaurant_rejected';
+    if (action === 'propose_change') return 'restaurant_change_proposed';
+    return 'restaurant_confirmed';
+};
+
+const mapActionToInternalTemplate = (kind: OperationalRequest['kind']) =>
+    kind === 'appointment' ? 'appointment_internal_status_update' : 'restaurant_internal_status_update';
+
+const mapKindToOutbox = (kind: OperationalRequest['kind']) => ({
+    relatedEntityType: kind === 'appointment' ? 'appointment' : 'restaurant_booking',
+    guestChannel: kind === 'appointment' ? 'email_guest_appointment' : 'email_guest_restaurant',
+    internalChannel: kind === 'appointment' ? 'email_internal_appointment' : 'email_internal_restaurant',
+});
+
+export const applyOperationalRequestAction = async (
+    id: number | string,
+    kind: OperationalRequest['kind'],
+    input: OperationalRequestActionInput,
+    tenantId?: string
+): Promise<void> => {
+    const tid = ensureTenantId(tenantId);
+    const actor = String(input.actor || 'dashboard').trim();
+    const now = new Date().toISOString();
+    const currentDetail = await getOperationalRequestDetail(id, kind, tid);
+    const { data: tenantData, error: tenantError } = await supabase
+        .from('tenants')
+        .select('tenant_id, nome_attivita, nome_ristorante, hotel_name, notification_email, billing_email, mail')
+        .eq('tenant_id', tid)
+        .single();
+
+    if (tenantError || !tenantData) throw tenantError || new Error('TENANT_NOT_FOUND');
+
+    const tenantRow = tenantData as unknown as Record<string, unknown>;
+    const internalRecipient = resolveInternalRecipient(tenantRow);
+    const customerRecipient = normalizeEmail(currentDetail.email || '');
+    const dashboardUrl = 'https://dashboard.zirel.org?tab=prenotazioni';
+    const nextStatus = mapActionToStatusValue(kind, input.action);
+    const activity = buildActivityLabel(tenantRow);
+    const requestContext =
+        kind === 'appointment'
+            ? {
+                date: currentDetail.requested_date || currentDetail.date_label,
+                time: currentDetail.requested_time || currentDetail.time_label,
+            }
+            : {
+                date: currentDetail.requested_date || currentDetail.date_label,
+                time: currentDetail.requested_time || currentDetail.time_label,
+            };
+
+    let updatePayload: Record<string, unknown> = {};
+    let eventType = '';
+
+    if (input.action === 'confirm') {
+        updatePayload = {
+            stato: nextStatus,
+            confirmed_at: now,
+            confirmed_by: actor,
+            ...(customerRecipient ? { last_customer_email_sent_at: now } : {}),
+            ...(internalRecipient ? { last_internal_update_sent_at: now } : {}),
+        };
+        eventType = 'confirmed';
+    } else if (input.action === 'reject') {
+        updatePayload = {
+            stato: nextStatus,
+            rejected_at: now,
+            rejected_by: actor,
+            rejection_reason: input.reason || null,
+            ...(customerRecipient ? { last_customer_email_sent_at: now } : {}),
+            ...(internalRecipient ? { last_internal_update_sent_at: now } : {}),
+        };
+        eventType = 'rejected';
+    } else if (input.action === 'propose_change') {
+        updatePayload = {
+            stato: nextStatus,
+            change_proposed_at: now,
+            change_proposed_by: actor,
+            proposed_date: input.proposedDate || null,
+            proposed_time: input.proposedTime || null,
+            change_note: input.note || null,
+            ...(customerRecipient ? { last_customer_email_sent_at: now } : {}),
+            ...(internalRecipient ? { last_internal_update_sent_at: now } : {}),
+        };
+        eventType = 'change_proposed';
+    } else if (input.action === 'confirm_change') {
+        updatePayload = {
+            stato: nextStatus,
+            confirmed_at: now,
+            confirmed_by: actor,
+            ...(kind === 'appointment'
+                ? {
+                    data_appuntamento: currentDetail.proposed_date || currentDetail.requested_date || null,
+                    orario: currentDetail.proposed_time || currentDetail.requested_time || null,
+                }
+                : {
+                    data_prenotazione: currentDetail.proposed_date || currentDetail.requested_date || null,
+                    ora: currentDetail.proposed_time || currentDetail.requested_time || null,
+                }),
+            ...(customerRecipient ? { last_customer_email_sent_at: now } : {}),
+            ...(internalRecipient ? { last_internal_update_sent_at: now } : {}),
+        };
+        eventType = 'change_confirmed';
+    } else {
+        throw new Error('INVALID_PARAMS');
+    }
+
+    const updateQuery = kind === 'appointment'
+        ? supabase.from('appointments').update(updatePayload).eq('id', id).eq('tenant_id', tid)
+        : supabase.from('prenotazioni').update(updatePayload).eq('id', id).eq('tenant_id', tid);
+
+    const { error: updateError } = await updateQuery;
+
+    if (updateError) throw updateError;
+
+    const { error: eventError } = await supabase
+        .from('request_events')
+        .insert({
+            tenant_id: tid,
+            request_type: kind,
+            request_id: String(id),
+            event_type: eventType,
+            actor,
+            payload: {
+                reason: input.reason || null,
+                proposed_date: input.proposedDate || null,
+                proposed_time: input.proposedTime || null,
+                note: input.note || null,
+            },
+        });
+
+    if (eventError) throw eventError;
+
+    const effectiveDate = input.action === 'confirm_change'
+        ? (currentDetail.proposed_date || currentDetail.requested_date || requestContext.date)
+        : requestContext.date;
+    const effectiveTime = input.action === 'confirm_change'
+        ? (currentDetail.proposed_time || currentDetail.requested_time || requestContext.time)
+        : requestContext.time;
+
+    const payload = kind === 'appointment'
+        ? {
+            tenant_id: tid,
+            nome_attivita: activity,
+            dashboard_url: dashboardUrl,
+            appointment_id: currentDetail.id,
+            nome: currentDetail.title,
+            telefono: currentDetail.primary_contact || null,
+            email: currentDetail.email || null,
+            motivo: currentDetail.reason_label || currentDetail.note || 'N/D',
+            note: currentDetail.note || '',
+            data_appuntamento: effectiveDate || null,
+            data_appuntamento_label: effectiveDate || null,
+            orario: effectiveTime || null,
+            original_date: currentDetail.requested_date || null,
+            original_time: currentDetail.requested_time || null,
+            proposed_date: input.proposedDate || currentDetail.proposed_date || null,
+            proposed_time: input.proposedTime || currentDetail.proposed_time || null,
+            rejection_reason: input.reason || currentDetail.rejection_reason || null,
+            change_note: input.note || currentDetail.change_note || null,
+            status: nextStatus,
+            actor,
+        }
+        : {
+            tenant_id: tid,
+            nome_attivita: activity,
+            dashboard_url: dashboardUrl,
+            reservation_id: currentDetail.id,
+            nome_cliente: currentDetail.title,
+            telefono: currentDetail.primary_contact || null,
+            email: currentDetail.email || null,
+            data_prenotazione: effectiveDate || null,
+            data_prenotazione_label: effectiveDate || null,
+            ora: effectiveTime || null,
+            persone: currentDetail.party_size || null,
+            note_prenotazione: currentDetail.note || '',
+            original_date: currentDetail.requested_date || null,
+            original_time: currentDetail.requested_time || null,
+            proposed_date: input.proposedDate || currentDetail.proposed_date || null,
+            proposed_time: input.proposedTime || currentDetail.proposed_time || null,
+            rejection_reason: input.reason || currentDetail.rejection_reason || null,
+            change_note: input.note || currentDetail.change_note || null,
+            status: nextStatus,
+            actor,
+        };
+
+    const { relatedEntityType, guestChannel, internalChannel } = mapKindToOutbox(kind);
+    const outboxRows: Array<Record<string, unknown>> = [];
+    const dedupeBase = `${tid}:${id}:${eventType}:${now}`;
+
+    if (customerRecipient) {
+        outboxRows.push({
+            tenant_id: tid,
+            channel: guestChannel,
+            template_key: mapActionToCustomerTemplate(kind, input.action),
+            related_entity_type: relatedEntityType,
+            related_entity_id: id,
+            status: 'pending',
+            retry_count: 0,
+            max_retries: 5,
+            next_retry_at: now,
+            trace_id: `dashboard:${dedupeBase}`,
+            dedupe_key: `${guestChannel}:${dedupeBase}`,
+            recipient_email: customerRecipient,
+            payload,
+        });
+    }
+
+    if (internalRecipient) {
+        outboxRows.push({
+            tenant_id: tid,
+            channel: internalChannel,
+            template_key: mapActionToInternalTemplate(kind),
+            related_entity_type: relatedEntityType,
+            related_entity_id: id,
+            status: 'pending',
+            retry_count: 0,
+            max_retries: 5,
+            next_retry_at: now,
+            trace_id: `dashboard:${dedupeBase}:internal`,
+            dedupe_key: `${internalChannel}:${dedupeBase}`,
+            recipient_email: internalRecipient,
+            payload,
+        });
+    }
+
+    if (outboxRows.length > 0) {
+        const { error: outboxError } = await supabase
+            .from('notification_outbox')
+            .insert(outboxRows);
+
+        if (outboxError) throw outboxError;
+    }
+};
+
+export const getReservations = async (tenantId?: string) =>
+    getOperationalRequests(tenantId).then((rows) => rows.filter((row) => row.kind === 'restaurant'));
+
+export const updateReservationStatus = async (id: number | string, newStatus: string, tenantId?: string) =>
+    updateOperationalRequestStatus(id, 'restaurant', newStatus, tenantId);
 
 // --- Storage & Vector Operations ---
 

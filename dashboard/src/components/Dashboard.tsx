@@ -84,7 +84,7 @@ const BILLING_GRACE_DAYS = 7;
 
 const DASHBOARD_TABS: Array<{ id: DashboardTab; label: string; shortLabel: string; icon: typeof BarChart3; description: string }> = [
     { id: 'analytics', label: 'Analytics', shortLabel: 'Analytics', icon: BarChart3, description: 'Metriche, trend e stato operativo del concierge.' },
-    { id: 'prenotazioni', label: 'Prenotazioni', shortLabel: 'Prenotazioni', icon: CalendarDays, description: 'Richieste ricevute, conferme e operatività quotidiana.' },
+    { id: 'prenotazioni', label: 'Richieste', shortLabel: 'Richieste', icon: CalendarDays, description: 'Appuntamenti, tavoli e richieste operative in un’unica vista.' },
     { id: 'conversazioni', label: 'Conversazioni', shortLabel: 'Conversazioni', icon: MessageSquare, description: 'Thread WhatsApp, handoff umano e controlli live.' },
     { id: 'documenti', label: 'Documenti', shortLabel: 'Documenti', icon: FileText, description: 'Knowledge base, materiali e ingestione documentale.' },
     { id: 'abbonamento', label: 'Abbonamento', shortLabel: 'Abbonamento', icon: CreditCard, description: 'Billing, prova, rinnovi e stato del servizio.' },
@@ -215,7 +215,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         {
             id: 'settings-social',
             title: 'Social e link',
-            subtitle: 'Instagram, Facebook, prenotazioni e recensioni',
+            subtitle: 'Instagram, Facebook, richieste e recensioni',
             tab: 'impostazioni',
             settingsQuery: 'instagram',
             keywords: ['social', 'instagram', 'facebook', 'tripadvisor', 'recensioni', 'booking', 'prenotazione'],
@@ -700,7 +700,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 </div>
                                             ) : (
                                                 <div className="px-3 py-4 text-sm text-gray-500">
-                                                    Nessun risultato. Prova con “whatsapp”, “stripe”, “wifi” o “prenotazioni”.
+                                                    Nessun risultato. Prova con “whatsapp”, “stripe”, “wifi” o “richieste”.
                                                 </div>
                                             )}
                                         </div>
@@ -848,8 +848,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <p className="text-gray-600 leading-relaxed">
                                             {productAccessState === 'suspended'
                                                 ? normalizedSubscriptionStatus === 'past_due'
-                                                    ? 'Prenotazioni, documenti e impostazioni restano consultabili, ma il concierge e le azioni operative riprenderanno solo dopo l’aggiornamento del metodo di pagamento dal portale Stripe.'
-                                                    : 'Prenotazioni, documenti e impostazioni restano consultabili, ma le modifiche e le azioni operative vanno riattivate dal tab Abbonamento.'
+                                                    ? 'Richieste, documenti e impostazioni restano consultabili, ma il concierge e le azioni operative riprenderanno solo dopo l’aggiornamento del metodo di pagamento dal portale Stripe.'
+                                                    : 'Richieste, documenti e impostazioni restano consultabili, ma le modifiche e le azioni operative vanno riattivate dal tab Abbonamento.'
                                                 : 'Il periodo di prova e terminato. Manteniamo visibili le informazioni principali, ma blocchiamo l’operativita finche non viene attivato un piano.'}
                                         </p>
                                     </div>
