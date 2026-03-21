@@ -124,6 +124,8 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const [isOpsLoading, setIsOpsLoading] = useState(false);
     const [isOpsOpen, setIsOpsOpen] = useState(false);
     const [isAutomationSaving, setIsAutomationSaving] = useState(false);
+    const [isAdvancedSignupOpen, setIsAdvancedSignupOpen] = useState(false);
+    const [showMetaProgressOverlay, setShowMetaProgressOverlay] = useState(false);
     const [opsSummary, setOpsSummary] = useState<WhatsAppChannelOpsSummary | null>(null);
     const [signupForm, setSignupForm] = useState<CompleteWhatsAppEmbeddedSignupPayload>({
         meta_phone_number_id: '',
@@ -194,6 +196,11 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     );
     const hasSignupCode = Boolean(signupForm.signup_code?.trim());
     const hasSignupSession = Boolean(signupForm.signup_session_id?.trim() || signupForm.signup_code?.trim());
+    const primarySignupCtaLabel = hasMetaIdentifiers
+        ? 'Completa collegamento'
+        : hasSignupCode
+            ? 'Completa collegamento automatico'
+            : 'Completa collegamento';
 
     const updateSignupField = <K extends keyof CompleteWhatsAppEmbeddedSignupPayload>(
         key: K,
@@ -216,6 +223,20 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
         }));
     };
 
+    useEffect(() => {
+        if (hasMetaIdentifiers) {
+            setShowMetaProgressOverlay(false);
+        }
+    }, [hasMetaIdentifiers]);
+
+    useEffect(() => {
+        if (!showMetaProgressOverlay) return undefined;
+        const timeout = window.setTimeout(() => {
+            setShowMetaProgressOverlay(false);
+        }, 6500);
+        return () => window.clearTimeout(timeout);
+    }, [showMetaProgressOverlay]);
+
     const handleSubmitSignup = async () => {
         if (!hasMetaIdentifiers && !hasSignupCode) {
             toast.error('Completa Meta oppure inserisci almeno phone number ID e WABA ID.');
@@ -224,6 +245,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
 
         try {
             setIsSubmitting(true);
+            setShowMetaProgressOverlay(false);
             const result = await completeWhatsAppEmbeddedSignup({
                 meta_phone_number_id: (signupForm.meta_phone_number_id || '').trim() || undefined,
                 waba_id: (signupForm.waba_id || '').trim() || undefined,
@@ -239,6 +261,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
             toast.success(result.display_phone_number
                 ? `WhatsApp collegato: ${result.display_phone_number}`
                 : 'WhatsApp collegato correttamente.');
+            console.info('[Zirel WhatsApp Embedded Signup] callback response', result);
             setIsModalOpen(false);
             await loadSummary();
         } catch (error) {
@@ -257,6 +280,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
 
         try {
             setIsLaunchingMeta(true);
+            setShowMetaProgressOverlay(false);
             const result = await launchEmbeddedSignup();
             const extracted = extractEmbeddedSignupIdentifiers(result.event);
 
@@ -273,6 +297,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
             if (extracted.meta_phone_number_id && extracted.waba_id) {
                 toast.success('Dati Meta ricevuti. Ora puoi completare il collegamento.');
             } else if (result.code) {
+                setShowMetaProgressOverlay(true);
                 toast.success('Flusso Meta completato. Zirèl proverà a recuperare automaticamente gli identificativi lato server.');
             } else {
                 toast('Meta ha chiuso il flusso, ma non abbiamo ancora letto tutti gli identificativi nel browser.', {
@@ -581,6 +606,8 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             <button
                                 onClick={() => {
                                     seedFromCurrentSummary();
+                                    setIsAdvancedSignupOpen(false);
+                                    setShowMetaProgressOverlay(false);
                                     setIsModalOpen(true);
                                 }}
                                 className="apple-button flex items-center justify-center gap-2 text-white w-full sm:w-auto"
@@ -614,16 +641,43 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
 
             {isModalOpen ? (
                 <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-slate-950/45 px-3 py-4 md:px-4 overflow-y-auto">
-                    <div className="w-full max-w-2xl rounded-[2rem] bg-white shadow-2xl border border-gray-100 p-5 md:p-8 space-y-5 my-auto">
+                    <div className="relative w-full max-w-4xl rounded-[2rem] bg-white shadow-2xl border border-gray-100 p-5 md:p-8 space-y-6 my-auto overflow-hidden">
+                        {(isLaunchingMeta || isSubmitting || showMetaProgressOverlay) ? (
+                            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/92 backdrop-blur-sm px-6">
+                                <div className="max-w-lg text-center space-y-4">
+                                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-orange-50 text-zirel-orange-dark shadow-sm">
+                                        <Loader2 className="h-10 w-10 animate-spin" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h5 className="text-2xl font-black text-gray-900">
+                                            {isSubmitting ? 'Stiamo completando il collegamento' : 'Stiamo recuperando i dati del tuo numero'}
+                                        </h5>
+                                        <p className="text-base leading-relaxed text-gray-600">
+                                            {isSubmitting
+                                                ? 'Un attimo ancora: stiamo salvando il canale e verificando i dati ricevuti da Meta.'
+                                                : 'Hai autorizzato Meta correttamente. Ora Zirèl prova a trovare in automatico numero WhatsApp e account Business, così non devi incollare nulla a mano.'}
+                                        </p>
+                                    </div>
+                                    {!isSubmitting ? (
+                                        <p className="text-sm font-medium text-gray-500">
+                                            Se non vedi subito i dati nella schermata successiva, puoi comunque cliccare “Completa collegamento automatico”: il recupero server-side parte lo stesso.
+                                        </p>
+                                    ) : null}
+                                </div>
+                            </div>
+                        ) : null}
                         <div className="flex items-start justify-between gap-4">
                             <div>
                                 <h4 className="text-xl md:text-2xl font-black text-gray-900">Collega WhatsApp</h4>
                                 <p className="text-sm md:text-base text-gray-500 mt-2">
-                                    Segui questi passaggi guidati: avvia Meta, completa il collegamento e verifica che Zirèl abbia ricevuto automaticamente Number ID e WABA ID.
+                                    Basti due passaggi: avvia Meta e poi lascia che Zirèl completi il collegamento. I dati tecnici compaiono da soli quando possibile.
                                 </p>
                             </div>
                             <button
-                                onClick={() => setIsModalOpen(false)}
+                                onClick={() => {
+                                    setShowMetaProgressOverlay(false);
+                                    setIsModalOpen(false);
+                                }}
                                 className="rounded-full border border-gray-200 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50"
                                 aria-label="Chiudi"
                             >
@@ -644,10 +698,10 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                 </div>
                                 <div className={`rounded-2xl border px-4 py-4 ${hasMetaIdentifiers ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
                                     <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Step 2</div>
-                                    <p className="text-sm font-semibold text-gray-800">Verifica dati tecnici</p>
-                                    <p className="mt-1 text-sm text-gray-600">Zirèl dovrebbe compilare da solo Number ID e WABA ID.</p>
+                                    <p className="text-sm font-semibold text-gray-800">Recupero automatico</p>
+                                    <p className="mt-1 text-sm text-gray-600">Zirèl prova a trovare da solo il tuo numero e l’account WhatsApp Business.</p>
                                     <p className={`mt-3 text-xs font-semibold ${hasMetaIdentifiers ? 'text-emerald-700' : 'text-amber-700'}`}>
-                                        {hasMetaIdentifiers ? 'Ricevuti automaticamente' : 'Se restano vuoti, usa il fallback manuale'}
+                                        {hasMetaIdentifiers ? 'Dati ricevuti automaticamente' : hasSignupCode ? 'Puoi continuare anche se qui vedi ancora vuoto' : 'Ti mostriamo qui i dati appena arrivano'}
                                     </p>
                                 </div>
                                 <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4">
@@ -659,86 +713,141 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">Meta phone number ID</span>
-                                <input
-                                    value={signupForm.meta_phone_number_id}
-                                    onChange={(event) => updateSignupField('meta_phone_number_id', event.target.value)}
-                                    placeholder="1023529240851906"
-                                    className="apple-input"
-                                />
-                                <span className="mt-2 block text-xs text-gray-500">
-                                    Viene compilato automaticamente dopo il flusso Meta. Se resta vuoto, incollalo manualmente dal payload finale.
-                                </span>
-                            </label>
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">WABA ID</span>
-                                <input
-                                    value={signupForm.waba_id}
-                                    onChange={(event) => updateSignupField('waba_id', event.target.value)}
-                                    placeholder="952596820596407"
-                                    className="apple-input"
-                                />
-                                <span className="mt-2 block text-xs text-gray-500">
-                                    Anche questo campo dovrebbe arrivare da Meta in automatico insieme al Number ID.
-                                </span>
-                            </label>
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">Display phone number</span>
-                                <input
-                                    value={signupForm.display_phone_number || ''}
-                                    onChange={(event) => updateSignupField('display_phone_number', event.target.value)}
-                                    placeholder="+1 555-159-8512"
-                                    className="apple-input"
-                                />
-                            </label>
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">Verified name</span>
-                                <input
-                                    value={signupForm.verified_name || ''}
-                                    onChange={(event) => updateSignupField('verified_name', event.target.value)}
-                                    placeholder="Test Number"
-                                    className="apple-input"
-                                />
-                            </label>
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">Business ID (opzionale)</span>
-                                <input
-                                    value={signupForm.business_id || ''}
-                                    onChange={(event) => updateSignupField('business_id', event.target.value)}
-                                    placeholder="Business asset id"
-                                    className="apple-input"
-                                />
-                            </label>
-                            <label className="block">
-                                <span className="block text-sm font-semibold text-gray-700 mb-2">Signup session ID (opzionale)</span>
-                                <input
-                                    value={signupForm.signup_session_id || ''}
-                                    onChange={(event) => updateSignupField('signup_session_id', event.target.value)}
-                                    placeholder="trace o session id"
-                                    className="apple-input"
-                                />
-                                <span className="mt-2 block text-xs text-gray-500">
-                                    Campo opzionale. Può essere utile per diagnosi o retry del collegamento, ma non basta da solo a completare il setup.
-                                </span>
-                            </label>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div className="rounded-3xl border border-gray-100 bg-white px-5 py-5">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Numero WhatsApp</div>
+                                <div className="text-lg font-semibold text-gray-900 break-words">
+                                    {signupForm.display_phone_number?.trim() || 'In attesa di recupero automatico'}
+                                </div>
+                                <p className="mt-2 text-sm text-gray-500">
+                                    È il numero che verrà collegato a Zirèl per ricevere e inviare messaggi.
+                                </p>
+                            </div>
+                            <div className="rounded-3xl border border-gray-100 bg-white px-5 py-5">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Nome profilo</div>
+                                <div className="text-lg font-semibold text-gray-900 break-words">
+                                    {signupForm.verified_name?.trim() || 'Arriva automaticamente da Meta'}
+                                </div>
+                                <p className="mt-2 text-sm text-gray-500">
+                                    Ti aiuta a riconoscere subito il profilo WhatsApp corretto.
+                                </p>
+                            </div>
+                            <div className={`rounded-3xl border px-5 py-5 ${hasMetaIdentifiers ? 'border-emerald-200 bg-emerald-50' : hasSignupCode ? 'border-orange-200 bg-orange-50' : 'border-gray-100 bg-white'}`}>
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 mb-2">Stato recupero dati</div>
+                                <div className={`text-lg font-semibold ${hasMetaIdentifiers ? 'text-emerald-800' : hasSignupCode ? 'text-orange-800' : 'text-gray-900'}`}>
+                                    {hasMetaIdentifiers ? 'Pronto al salvataggio' : hasSignupCode ? 'Meta autorizzato, recupero in corso' : 'Avvia Meta per iniziare'}
+                                </div>
+                                <p className="mt-2 text-sm text-gray-600">
+                                    {hasMetaIdentifiers
+                                        ? 'Abbiamo già tutto quello che serve. Puoi completare il collegamento.'
+                                        : hasSignupCode
+                                            ? 'Anche se i campi avanzati sono ancora vuoti, Zirèl può completare il collegamento usando il codice ricevuto da Meta.'
+                                            : 'Ti guidiamo noi: prima autorizza Meta, poi completi il collegamento.'}
+                                </p>
+                            </div>
                         </div>
 
                         <div className="rounded-3xl border border-orange-100 bg-orange-50 px-5 py-4 flex items-start gap-3">
                             <TriangleAlert className="w-5 h-5 text-orange-600 mt-0.5 shrink-0" />
                             <div className="text-sm text-orange-800 space-y-2">
                                 <p>
-                                    Se Meta non restituisce subito tutti gli identificativi nel browser, Zirèl prova prima a recuperarli lato server usando il code del flow Meta. In alternativa puoi sempre usare il fallback manuale.
+                                    Se Meta non mostra subito tutti i dati sullo schermo, non significa che il collegamento sia fallito. Zirèl può recuperarli lato server dal codice del flusso Meta quando premi il pulsante finale.
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Copy className="w-4 h-4 shrink-0" />
-                                    Dati minimi richiesti: `meta_phone_number_id` e `waba_id`, oppure un `signup code` valido già ricevuto dal launcher Meta.
+                                    Il fallback manuale resta disponibile solo se vuoi incollare a mano gli ID avanzati.
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-4">
+                            <div className="rounded-3xl border border-gray-100 bg-slate-50 px-4 py-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAdvancedSignupOpen((current) => !current)}
+                                    className="flex w-full items-center justify-between gap-4 text-left"
+                                >
+                                    <div>
+                                        <div className="text-sm font-semibold text-gray-900">Opzioni avanzate e fallback manuale</div>
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            Apri questa sezione solo se vuoi inserire manualmente gli identificativi tecnici o fare diagnosi.
+                                        </p>
+                                    </div>
+                                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-zirel-blue">
+                                        {isAdvancedSignupOpen ? 'Nascondi' : 'Mostra'}
+                                        {isAdvancedSignupOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                    </span>
+                                </button>
+
+                                {isAdvancedSignupOpen ? (
+                                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-200 pt-4">
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">ID numero WhatsApp</span>
+                                            <input
+                                                value={signupForm.meta_phone_number_id}
+                                                onChange={(event) => updateSignupField('meta_phone_number_id', event.target.value)}
+                                                placeholder="1023529240851906"
+                                                className="apple-input"
+                                            />
+                                            <span className="mt-2 block text-xs text-gray-500">
+                                                Campo avanzato. Di solito arriva da solo. Inseriscilo a mano solo se il supporto te lo chiede.
+                                            </span>
+                                        </label>
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">ID account WhatsApp Business</span>
+                                            <input
+                                                value={signupForm.waba_id}
+                                                onChange={(event) => updateSignupField('waba_id', event.target.value)}
+                                                placeholder="952596820596407"
+                                                className="apple-input"
+                                            />
+                                            <span className="mt-2 block text-xs text-gray-500">
+                                                Anche questo è un campo avanzato. Se manca, Zirèl prova a recuperarlo automaticamente.
+                                            </span>
+                                        </label>
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">Numero visualizzato</span>
+                                            <input
+                                                value={signupForm.display_phone_number || ''}
+                                                onChange={(event) => updateSignupField('display_phone_number', event.target.value)}
+                                                placeholder="+1 555-159-8512"
+                                                className="apple-input"
+                                            />
+                                        </label>
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">Nome verificato</span>
+                                            <input
+                                                value={signupForm.verified_name || ''}
+                                                onChange={(event) => updateSignupField('verified_name', event.target.value)}
+                                                placeholder="Test Number"
+                                                className="apple-input"
+                                            />
+                                        </label>
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">Business ID (opzionale)</span>
+                                            <input
+                                                value={signupForm.business_id || ''}
+                                                onChange={(event) => updateSignupField('business_id', event.target.value)}
+                                                placeholder="Business asset id"
+                                                className="apple-input"
+                                            />
+                                        </label>
+                                        <label className="block">
+                                            <span className="block text-sm font-semibold text-gray-700 mb-2">Codice sessione Meta (diagnostica)</span>
+                                            <input
+                                                value={signupForm.signup_session_id || ''}
+                                                onChange={(event) => updateSignupField('signup_session_id', event.target.value)}
+                                                placeholder="trace o session id"
+                                                className="apple-input"
+                                            />
+                                            <span className="mt-2 block text-xs text-gray-500">
+                                                Utile solo per diagnosi o retry. Da solo non basta a completare il setup.
+                                            </span>
+                                        </label>
+                                    </div>
+                                ) : null}
+                            </div>
+
                             <label className="inline-flex items-start gap-3 text-sm text-gray-600">
                                 <input
                                     type="checkbox"
@@ -759,7 +868,10 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     Avvia Meta
                                 </button>
                                 <button
-                                    onClick={() => setIsModalOpen(false)}
+                                    onClick={() => {
+                                        setShowMetaProgressOverlay(false);
+                                        setIsModalOpen(false);
+                                    }}
                                     className="apple-button-secondary w-full sm:w-auto"
                                 >
                                     Chiudi
@@ -770,14 +882,14 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                     className="apple-button flex items-center justify-center gap-2 text-white disabled:opacity-60 w-full sm:w-auto"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                                    Completa collegamento
+                                    {primarySignupCtaLabel}
                                 </button>
                             </div>
                         </div>
 
                         {!hasMetaIdentifiers && !hasSignupCode ? (
                             <p className="text-xs text-gray-500">
-                                Il pulsante `Completa collegamento` si attiva quando Zirèl riceve il `signup code` dal launcher Meta oppure quando inserisci manualmente sia `Meta phone number ID` sia `WABA ID`.
+                                Il pulsante finale si attiva quando Zirèl riceve il `signup code` dal launcher Meta oppure quando inserisci manualmente gli ID avanzati.
                             </p>
                         ) : null}
 
