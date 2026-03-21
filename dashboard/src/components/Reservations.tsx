@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { OperationalRequest, OperationalRequestDetail, RequestEvent } from '../types';
+import type { OperationalRequest, OperationalRequestDetail } from '../types';
 import {
     applyOperationalRequestAction,
     getOperationalRequestDetail,
-    getOperationalRequestEvents,
     getOperationalRequests,
 } from '../lib/supabase-helpers';
 import toast from 'react-hot-toast';
@@ -13,14 +12,13 @@ import {
     Users,
     Phone,
     Loader2,
-    X,
     RefreshCw,
     BriefcaseBusiness,
     Mail,
     Search,
     ChevronRight,
-    PanelRightOpen,
-    History,
+    ChevronDown,
+    ChevronUp,
     MessageSquareQuote,
 } from 'lucide-react';
 
@@ -49,8 +47,7 @@ const Reservations = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRequest, setSelectedRequest] = useState<OperationalRequest | null>(null);
     const [detail, setDetail] = useState<OperationalRequestDetail | null>(null);
-    const [events, setEvents] = useState<RequestEvent[]>([]);
-    const [isDrawerLoading, setIsDrawerLoading] = useState(false);
+    const [isDetailLoading, setIsDetailLoading] = useState(false);
     const [actionMode, setActionMode] = useState<ActionMode>(null);
     const [actionReason, setActionReason] = useState('');
     const [proposedDate, setProposedDate] = useState('');
@@ -110,22 +107,18 @@ const Reservations = () => {
         }
     }, []);
 
-    const loadDrawerData = useCallback(async (request: OperationalRequest) => {
-        setIsDrawerLoading(true);
+    const loadRequestDetail = useCallback(async (request: OperationalRequest) => {
+        setIsDetailLoading(true);
         try {
-            const [detailData, eventData] = await Promise.all([
-                getOperationalRequestDetail(request.id, request.kind),
-                getOperationalRequestEvents(request.id, request.kind),
-            ]);
+            const detailData = await getOperationalRequestDetail(request.id, request.kind);
             setDetail(detailData);
-            setEvents(eventData);
             setProposedDate(detailData.proposed_date || detailData.requested_date || '');
             setProposedTime(detailData.proposed_time || detailData.requested_time || '');
         } catch (error) {
             console.error('Error loading request detail:', error);
             toast.error('Non siamo riusciti a caricare il dettaglio della richiesta.');
         } finally {
-            setIsDrawerLoading(false);
+            setIsDetailLoading(false);
         }
     }, []);
 
@@ -136,7 +129,6 @@ const Reservations = () => {
     useEffect(() => {
         if (!selectedRequest) {
             setDetail(null);
-            setEvents([]);
             setActionMode(null);
             setActionReason('');
             setActionNote('');
@@ -145,8 +137,8 @@ const Reservations = () => {
             return;
         }
 
-        void loadDrawerData(selectedRequest);
-    }, [selectedRequest, loadDrawerData]);
+        void loadRequestDetail(selectedRequest);
+    }, [selectedRequest, loadRequestDetail]);
 
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
@@ -187,11 +179,11 @@ const Reservations = () => {
     ];
 
     const handleCardOpen = (request: OperationalRequest) => {
+        if (selectedRequest?.id === request.id && selectedRequest.kind === request.kind) {
+            setSelectedRequest(null);
+            return;
+        }
         setSelectedRequest(request);
-    };
-
-    const closeDrawer = () => {
-        setSelectedRequest(null);
     };
 
     const resetActionForm = () => {
@@ -237,7 +229,7 @@ const Reservations = () => {
             });
 
             await fetchRequests(true);
-            await loadDrawerData(selectedRequest);
+            await loadRequestDetail(selectedRequest);
             resetActionForm();
             toast.success('Richiesta aggiornata correttamente.', { id: loadingToast });
         } catch (error) {
@@ -321,26 +313,30 @@ const Reservations = () => {
                         const normalizedStatus = normalizeFilterStatus(request.status);
                         const isPending = normalizedStatus === 'pending';
                         const isNew = Date.now() - new Date(request.created_at).getTime() <= 1000 * 60 * 60 * 24;
+                        const isExpanded = selectedRequest?.id === request.id && selectedRequest.kind === request.kind;
+                        const activeDetail = isExpanded ? detail : null;
 
                         return (
                             <div
                                 key={`${request.kind}-${request.id}`}
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => handleCardOpen(request)}
-                                onKeyDown={(event) => {
-                                    if (event.key === 'Enter' || event.key === ' ') {
-                                        event.preventDefault();
-                                        handleCardOpen(request);
-                                    }
-                                }}
                                 className={`apple-card bg-white p-5 md:p-6 border shadow-sm hover:shadow-md transition-all group cursor-pointer ${
                                     isPending
                                         ? 'border-amber-200 ring-1 ring-amber-100'
                                         : 'border-gray-100'
                                 }`}
                             >
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => handleCardOpen(request)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            handleCardOpen(request);
+                                        }
+                                    }}
+                                    className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+                                >
                                     <div className="flex-1 space-y-4">
                                         <div className="flex items-center justify-between md:justify-start gap-4">
                                             <h3 className="text-xl font-bold text-gray-900 group-hover:text-zirel-orange-dark transition-colors">
@@ -396,226 +392,156 @@ const Reservations = () => {
                                     </div>
 
                                     <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
-                                        <PanelRightOpen className="w-4 h-4" />
-                                        <span>Apri dettaglio</span>
-                                        <ChevronRight className="w-4 h-4" />
+                                        <span>{isExpanded ? 'Chiudi' : 'Dettaglio'}</span>
+                                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                     </div>
                                 </div>
+
+                                {isExpanded ? (
+                                    <div className="mt-5 border-t border-gray-100 pt-5">
+                                        {isDetailLoading || !activeDetail ? (
+                                            <div className="flex items-center gap-3 py-4 text-sm text-gray-500">
+                                                <Loader2 className="h-4 w-4 animate-spin text-zirel-orange-dark" />
+                                                <span>Caricamento dettaglio...</span>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-5">
+                                                <div className="grid gap-3 md:grid-cols-2 text-sm text-gray-700">
+                                                    {activeDetail.party_size ? (
+                                                        <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+                                                            <span className="font-semibold text-gray-900">Persone:</span> {activeDetail.party_size}
+                                                        </div>
+                                                    ) : null}
+                                                    {activeDetail.proposed_date || activeDetail.proposed_time ? (
+                                                        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 px-4 py-3 md:col-span-2">
+                                                            <span className="font-semibold text-gray-900">Proposta attuale:</span> {activeDetail.proposed_date || 'N/D'} {activeDetail.proposed_time ? `alle ${activeDetail.proposed_time}` : ''}
+                                                        </div>
+                                                    ) : null}
+                                                    {activeDetail.rejection_reason ? (
+                                                        <div className="rounded-2xl border border-red-100 bg-red-50/60 px-4 py-3 md:col-span-2">
+                                                            <span className="font-semibold text-gray-900">Motivo rifiuto:</span> {activeDetail.rejection_reason}
+                                                        </div>
+                                                    ) : null}
+                                                    {activeDetail.note && activeDetail.note !== activeDetail.reason_label ? (
+                                                        <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3 md:col-span-2">
+                                                            <span className="font-semibold text-gray-900">Note complete:</span> {activeDetail.note}
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+
+                                                <div className="rounded-3xl border border-gray-200 bg-gray-50/60 p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <MessageSquareQuote className="h-4 w-4 text-zirel-orange-dark" />
+                                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Azioni</p>
+                                                    </div>
+
+                                                    <div className="mt-4 flex flex-wrap gap-3">
+                                                        <button
+                                                            onClick={() => void handleImmediateAction('confirm')}
+                                                            disabled={isSubmittingAction}
+                                                            className="rounded-2xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:opacity-60"
+                                                        >
+                                                            Conferma
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setActionMode('reject')}
+                                                            className="rounded-2xl border border-red-100 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                                                        >
+                                                            Rifiuta
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setActionMode('propose_change')}
+                                                            className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
+                                                        >
+                                                            Proponi modifica
+                                                        </button>
+                                                        {String(activeDetail.status || '').trim().toLowerCase() === 'change_proposed' ? (
+                                                            <button
+                                                                onClick={() => void handleImmediateAction('confirm_change')}
+                                                                disabled={isSubmittingAction}
+                                                                className="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
+                                                            >
+                                                                Conferma modifica
+                                                            </button>
+                                                        ) : null}
+                                                    </div>
+
+                                                    {actionMode === 'reject' || actionMode === 'propose_change' ? (
+                                                        <div className="mt-4 space-y-4 rounded-2xl border border-gray-200 bg-white p-4">
+                                                            {actionMode === 'reject' ? (
+                                                                <div>
+                                                                    <label className="mb-2 block text-sm font-medium text-gray-500">Motivo rifiuto</label>
+                                                                    <textarea
+                                                                        value={actionReason}
+                                                                        onChange={(event) => setActionReason(event.target.value)}
+                                                                        rows={3}
+                                                                        className="apple-input resize-none"
+                                                                        placeholder="Spiega perché la richiesta non può essere confermata"
+                                                                    />
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <div className="grid gap-4 md:grid-cols-2">
+                                                                        <div>
+                                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuova data</label>
+                                                                            <input
+                                                                                type="date"
+                                                                                value={proposedDate}
+                                                                                onChange={(event) => setProposedDate(event.target.value)}
+                                                                                className="apple-input"
+                                                                            />
+                                                                        </div>
+                                                                        <div>
+                                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuovo orario</label>
+                                                                            <input
+                                                                                type="time"
+                                                                                value={proposedTime}
+                                                                                onChange={(event) => setProposedTime(event.target.value)}
+                                                                                className="apple-input"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="mb-2 block text-sm font-medium text-gray-500">Messaggio per il cliente</label>
+                                                                        <textarea
+                                                                            value={actionNote}
+                                                                            onChange={(event) => setActionNote(event.target.value)}
+                                                                            rows={3}
+                                                                            className="apple-input resize-none"
+                                                                            placeholder="Spiega la proposta alternativa in modo chiaro"
+                                                                        />
+                                                                    </div>
+                                                                </>
+                                                            )}
+
+                                                            <div className="flex flex-wrap gap-3">
+                                                                <button
+                                                                    onClick={() => void submitAction(actionMode)}
+                                                                    disabled={isSubmittingAction}
+                                                                    className="rounded-2xl bg-zirel-orange-dark px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-500 disabled:opacity-60"
+                                                                >
+                                                                    {isSubmittingAction ? 'Salvataggio...' : actionMode === 'reject' ? 'Invia rifiuto' : 'Invia proposta'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={resetActionForm}
+                                                                    disabled={isSubmittingAction}
+                                                                    className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
+                                                                >
+                                                                    Annulla
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : null}
                             </div>
                         );
                     })}
                 </div>
             )}
-
-            {selectedRequest ? (
-                <div className="fixed inset-0 z-40 flex justify-end bg-slate-950/50 backdrop-blur-sm">
-                    <button className="absolute inset-0 cursor-default" onClick={closeDrawer} aria-label="Chiudi dettaglio richiesta" />
-                    <aside className="relative z-50 h-full w-full max-w-[720px] overflow-y-auto border-l border-gray-200 bg-[#fcfbf8] p-6 shadow-2xl">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <p className="text-xs font-black uppercase tracking-[0.22em] text-zirel-orange-dark">Richiesta operativa</p>
-                                <h3 className="mt-2 text-2xl font-black text-gray-900">{detail?.title || selectedRequest.title}</h3>
-                                <div className="mt-3 flex flex-wrap items-center gap-2">
-                                    <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${getStatusStyle(detail?.status || selectedRequest.status)}`}>
-                                        {getStatusLabel(detail?.status || selectedRequest.status)}
-                                    </span>
-                                    <span className="rounded-full bg-gray-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                        {selectedRequest.kind === 'appointment' ? 'Appuntamento' : 'Ristorante'}
-                                    </span>
-                                </div>
-                            </div>
-                            <button onClick={closeDrawer} className="rounded-2xl border border-gray-200 bg-white p-3 text-gray-400 transition hover:bg-gray-50 hover:text-gray-700">
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-
-                        {isDrawerLoading || !detail ? (
-                            <div className="flex flex-col items-center justify-center py-20">
-                                <Loader2 className="mb-4 h-8 w-8 animate-spin text-zirel-orange-dark" />
-                                <p className="text-gray-500">Caricamento dettaglio richiesta...</p>
-                            </div>
-                        ) : (
-                            <div className="mt-8 space-y-6">
-                                <section className="grid gap-4 md:grid-cols-2">
-                                    <div className="rounded-3xl border border-gray-200 bg-white p-5">
-                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Cliente</p>
-                                        <div className="mt-4 space-y-3 text-sm text-gray-700">
-                                            <div><span className="font-semibold text-gray-900">Nome:</span> {detail.title}</div>
-                                            <div><span className="font-semibold text-gray-900">Telefono:</span> {detail.primary_contact || 'N/D'}</div>
-                                            <div><span className="font-semibold text-gray-900">Email:</span> {detail.email || 'N/D'}</div>
-                                        </div>
-                                    </div>
-                                    <div className="rounded-3xl border border-gray-200 bg-white p-5">
-                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Richiesta</p>
-                                        <div className="mt-4 space-y-3 text-sm text-gray-700">
-                                            <div><span className="font-semibold text-gray-900">Data:</span> {detail.requested_date || detail.date_label}</div>
-                                            <div><span className="font-semibold text-gray-900">Ora:</span> {detail.requested_time || detail.time_label}</div>
-                                            {detail.party_size ? <div><span className="font-semibold text-gray-900">Persone:</span> {detail.party_size}</div> : null}
-                                            {detail.reason_label ? <div><span className="font-semibold text-gray-900">Dettaglio:</span> {detail.reason_label}</div> : null}
-                                            {detail.note ? <div><span className="font-semibold text-gray-900">Note:</span> {detail.note}</div> : null}
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
-                                    <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Stato operativo</p>
-                                    <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm text-gray-700">
-                                        <div><span className="font-semibold text-gray-900">Ricevuta il:</span> {formatDateTime(detail.created_at)}</div>
-                                        <div><span className="font-semibold text-gray-900">Confermata il:</span> {formatDateTime(detail.confirmed_at)}</div>
-                                        <div><span className="font-semibold text-gray-900">Rifiutata il:</span> {formatDateTime(detail.rejected_at)}</div>
-                                        <div><span className="font-semibold text-gray-900">Proposta inviata il:</span> {formatDateTime(detail.change_proposed_at)}</div>
-                                        <div><span className="font-semibold text-gray-900">Confermata da:</span> {detail.confirmed_by || 'N/D'}</div>
-                                        <div><span className="font-semibold text-gray-900">Rifiutata da:</span> {detail.rejected_by || 'N/D'}</div>
-                                        {detail.rejection_reason ? <div className="md:col-span-2"><span className="font-semibold text-gray-900">Motivo rifiuto:</span> {detail.rejection_reason}</div> : null}
-                                        {detail.proposed_date || detail.proposed_time ? (
-                                            <div className="md:col-span-2">
-                                                <span className="font-semibold text-gray-900">Proposta attuale:</span> {detail.proposed_date || 'N/D'} alle {detail.proposed_time || 'N/D'}
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                </section>
-
-                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
-                                    <div className="flex items-center gap-2">
-                                        <History className="h-4 w-4 text-zirel-orange-dark" />
-                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Timeline</p>
-                                    </div>
-                                    <div className="mt-4 space-y-3">
-                                        {events.length === 0 ? (
-                                            <p className="text-sm text-gray-500">Nessun evento operativo ancora registrato per questa richiesta.</p>
-                                        ) : (
-                                            events.map((eventItem) => (
-                                                <div key={eventItem.id} className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 text-sm text-gray-700">
-                                                    <div className="flex items-center justify-between gap-3">
-                                                        <p className="font-bold text-gray-900">{eventItem.event_type}</p>
-                                                        <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">{formatDateTime(eventItem.created_at)}</span>
-                                                    </div>
-                                                    <p className="mt-2 text-xs uppercase tracking-widest text-gray-400">Attore: {eventItem.actor || 'dashboard'}</p>
-                                                    {eventItem.payload && Object.keys(eventItem.payload).length > 0 ? (
-                                                        <pre className="mt-3 overflow-x-auto rounded-2xl bg-white p-3 text-xs text-gray-600">{JSON.stringify(eventItem.payload, null, 2)}</pre>
-                                                    ) : null}
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </section>
-
-                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
-                                    <div className="flex items-center gap-2">
-                                        <MessageSquareQuote className="h-4 w-4 text-zirel-orange-dark" />
-                                        <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Azioni</p>
-                                    </div>
-
-                                    <div className="mt-4 flex flex-wrap gap-3">
-                                        <button
-                                            onClick={() => void handleImmediateAction('confirm')}
-                                            disabled={isSubmittingAction}
-                                            className="rounded-2xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"
-                                        >
-                                            Conferma
-                                        </button>
-                                        <button
-                                            onClick={() => setActionMode('reject')}
-                                            className="rounded-2xl border border-red-100 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
-                                        >
-                                            Rifiuta
-                                        </button>
-                                        <button
-                                            onClick={() => setActionMode('propose_change')}
-                                            className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
-                                        >
-                                            Proponi modifica
-                                        </button>
-                                        {String(detail.status || '').trim().toLowerCase() === 'change_proposed' ? (
-                                            <button
-                                                onClick={() => void handleImmediateAction('confirm_change')}
-                                                disabled={isSubmittingAction}
-                                                className="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
-                                            >
-                                                Conferma modifica
-                                            </button>
-                                        ) : null}
-                                    </div>
-
-                                    {actionMode === 'reject' || actionMode === 'propose_change' ? (
-                                        <div className="mt-5 space-y-4 rounded-3xl border border-gray-200 bg-gray-50/70 p-5">
-                                            <p className="text-sm font-black text-gray-900">
-                                                {actionMode === 'reject' && 'Rifiuta richiesta'}
-                                                {actionMode === 'propose_change' && 'Proponi nuovo slot'}
-                                            </p>
-
-                                            {actionMode === 'reject' ? (
-                                                <div>
-                                                    <label className="mb-2 block text-sm font-medium text-gray-500">Motivo rifiuto</label>
-                                                    <textarea
-                                                        value={actionReason}
-                                                        onChange={(event) => setActionReason(event.target.value)}
-                                                        rows={3}
-                                                        className="apple-input resize-none"
-                                                        placeholder="Spiega perché la richiesta non può essere confermata"
-                                                    />
-                                                </div>
-                                            ) : null}
-
-                                            {actionMode === 'propose_change' ? (
-                                                <>
-                                                    <div className="grid gap-4 md:grid-cols-2">
-                                                        <div>
-                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuova data</label>
-                                                            <input
-                                                                type="date"
-                                                                value={proposedDate}
-                                                                onChange={(event) => setProposedDate(event.target.value)}
-                                                                className="apple-input"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuovo orario</label>
-                                                            <input
-                                                                type="time"
-                                                                value={proposedTime}
-                                                                onChange={(event) => setProposedTime(event.target.value)}
-                                                                className="apple-input"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className="mb-2 block text-sm font-medium text-gray-500">Nota per il cliente</label>
-                                                        <textarea
-                                                            value={actionNote}
-                                                            onChange={(event) => setActionNote(event.target.value)}
-                                                            rows={3}
-                                                            className="apple-input resize-none"
-                                                            placeholder="Spiega la proposta alternativa in modo chiaro"
-                                                        />
-                                                    </div>
-                                                </>
-                                            ) : null}
-
-                                            <div className="flex flex-wrap gap-3 pt-1">
-                                                <button
-                                                    onClick={() => void submitAction(actionMode)}
-                                                    disabled={isSubmittingAction}
-                                                    className="rounded-2xl bg-zirel-orange-dark px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-500 disabled:opacity-60"
-                                                >
-                                                    {isSubmittingAction ? 'Salvataggio...' : actionMode === 'reject' ? 'Invia rifiuto' : 'Invia proposta'}
-                                                </button>
-                                                <button
-                                                    onClick={resetActionForm}
-                                                    disabled={isSubmittingAction}
-                                                    className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
-                                                >
-                                                    Annulla
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : null}
-                                </section>
-                            </div>
-                        )}
-                    </aside>
-                </div>
-            ) : null}
         </div>
     );
 };
