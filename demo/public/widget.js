@@ -144,38 +144,36 @@
                 margin-bottom: 0;
             }
             #quick-replies-container {
-                display: flex;
-                flex-wrap: nowrap;
-                gap: 10px;
-                margin-top: 4px;
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding-bottom: 4px;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-            }
-            #quick-replies-container::-webkit-scrollbar {
-                display: none;
+                display: grid;
+                gap: 12px;
+                margin-top: 6px;
             }
             .quick-reply-btn {
-                min-height: 44px;
+                width: 100%;
+                min-height: 52px;
                 border: 1px solid #BDE6FF;
                 border-radius: 9999px;
                 background: #fff;
                 color: #003049;
-                font: 600 14px/1.2 Outfit, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+                font: 600 15px/1.25 Outfit, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
                 text-align: left;
-                padding: 10px 14px;
+                padding: 12px 18px;
                 cursor: pointer;
-                display: inline-flex;
+                display: flex;
                 align-items: center;
-                justify-content: center;
-                flex: 0 0 auto;
-                white-space: nowrap;
-                width: auto;
-                min-width: max-content;
+                box-shadow: 0 2px 6px rgba(0, 48, 73, 0.04);
+                transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease, background .2s ease;
             }
-            .quick-reply-btn:hover { border-color: #8DD4FF; }
+            .quick-reply-btn:hover {
+                border-color: #8DD4FF;
+                background: #F8FDFF;
+                box-shadow: 0 6px 14px rgba(0, 48, 73, 0.08);
+                transform: translateY(-1px);
+            }
+            .quick-reply-btn:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 6px rgba(0, 48, 73, 0.05);
+            }
             #zirel-chat-input-wrap {
                 height: 64px;
                 border-top: 1px solid #F2E5C8;

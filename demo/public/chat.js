@@ -103,19 +103,19 @@
             : [];
 
         quickReplies.innerHTML = '';
-        quickReplies.style.display = normalized.length ? 'flex' : 'none';
-        quickReplies.style.flexWrap = 'nowrap';
-        quickReplies.style.overflowX = 'auto';
-        quickReplies.style.overflowY = 'hidden';
+        quickReplies.style.display = normalized.length ? 'grid' : 'none';
+        quickReplies.style.flexWrap = '';
+        quickReplies.style.overflowX = '';
+        quickReplies.style.overflowY = '';
 
         normalized.forEach((item) => {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'quick-reply-btn';
             button.textContent = item.label;
-            button.style.whiteSpace = 'nowrap';
-            button.style.flex = '0 0 auto';
-            button.style.minWidth = 'max-content';
+            button.style.whiteSpace = '';
+            button.style.flex = '';
+            button.style.minWidth = '';
             button.addEventListener('click', () => window.sendChatMessage(item.prompt));
             quickReplies.appendChild(button);
         });
