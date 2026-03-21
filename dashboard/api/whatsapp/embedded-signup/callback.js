@@ -448,6 +448,7 @@ export default async function handler(req, res) {
 
     let normalized = normalizeEmbeddedSignupPayload(req.body);
     let exchangedAccessToken = null;
+    let codeExchangeFailure = null;
     if (!normalized.ok) {
         try {
             const resolved = await resolveEmbeddedSignupFromCode(req.body);
@@ -456,14 +457,22 @@ export default async function handler(req, res) {
                 exchangedAccessToken = resolved.access_token || null;
             }
         } catch (exchangeError) {
+            codeExchangeFailure = exchangeError instanceof Error ? exchangeError.message : String(exchangeError);
             console.warn('[whatsapp-embedded-signup] code exchange failed', {
                 tenant_id: tenant.tenant_id,
-                error: exchangeError instanceof Error ? exchangeError.message : String(exchangeError),
+                error: codeExchangeFailure,
             });
         }
     }
 
     if (!normalized.ok) {
+        if (codeExchangeFailure) {
+            return json(res, 400, {
+                ok: false,
+                error_code: 'WHATSAPP_SIGNUP_CODE_EXCHANGE_FAILED',
+                error_message: codeExchangeFailure,
+            });
+        }
         console.warn('[whatsapp-embedded-signup] invalid payload', {
             tenant_id: tenant.tenant_id,
             error_code: normalized.error_code,
