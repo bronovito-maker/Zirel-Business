@@ -62,6 +62,9 @@ const sectorPlanNames: Record<PricingSector, { base: string; premium: string; cu
 };
 
 const getPricingSector = (formData: TenantData): PricingSector => {
+    const rawBusinessType = String(formData.business_type || '').trim().toLowerCase();
+    if (rawBusinessType === 'hotel') return 'hotel';
+    if (rawBusinessType === 'restaurant') return 'restaurant';
     if (formData.hotel_name && !formData.nome_ristorante) return 'hotel';
     if (formData.nome_ristorante) return 'restaurant';
     return 'professional';
@@ -295,7 +298,7 @@ const BillingSection = ({ formData, isBillingLoading, onCheckout, onPortal }: Bi
         }
         : statusAccessMeta[currentStatus];
     const billingEmail = formData.billing_email || formData.mail || 'Non impostata';
-    const businessName = formData.hotel_name || formData.nome_ristorante || formData.tenant_id || 'Zirel';
+    const businessName = formData.hotel_name || formData.nome_ristorante || formData.nome_attivita || formData.tenant_id || 'Zirel';
     const billingCycleLabel = formatCycle(formData.billing_cycle);
     const renewalLabel = currentStatus === 'trialing' || currentStatus === 'expired_trial'
         ? formatDate(formData.trial_ends_at)

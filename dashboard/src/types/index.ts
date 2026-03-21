@@ -8,6 +8,8 @@ export interface TenantData {
     api_token_revealed?: boolean;
     api_token_generated_at?: string;
     hotel_name?: string;
+    nome_attivita?: string;
+    business_type?: string;
     booking_url?: string;
     ai_instructions?: string;
     created_at?: string;
@@ -28,6 +30,8 @@ export interface TenantData {
     billing_cycle?: string;
     current_period_end?: string;
     setup_fee_paid?: boolean;
+    notification_email?: string;
+    internal_email?: string;
 
     // Business Info
     nome_ristorante?: string;

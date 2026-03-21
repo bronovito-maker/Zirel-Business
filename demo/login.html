@@ -92,6 +92,11 @@
                 <p class="text-lg md:text-xl text-brand-blue/70 max-w-3xl mx-auto leading-relaxed">
                     Hai già un account? Entra in dashboard. Devi iniziare? Crea il tuo account in pochi minuti.
                 </p>
+                <div id="signup-feedback"
+                    class="hidden mt-6 mx-auto max-w-2xl rounded-3xl border border-brand-orange/20 bg-brand-orange/5 px-5 py-4 text-left text-sm text-brand-blue/75">
+                    <p class="font-bold text-brand-blue">Registrazione inviata</p>
+                    <p class="mt-1">Nel flusso live riceverai il token completo via email e potrai accedere subito alla dashboard per lo Step 2.</p>
+                </div>
             </div>
 
             <div class="grid md:grid-cols-2 gap-8 items-stretch">
@@ -179,6 +184,14 @@
     </footer>
 
     <script type="module" src="/ui-helpers.js"></script>
+    <script>
+        const signupFeedback = document.getElementById('signup-feedback');
+        const params = new URLSearchParams(window.location.search);
+
+        if (signupFeedback && params.get('signup') === 'ok') {
+            signupFeedback.classList.remove('hidden');
+        }
+    </script>
 </body>
 
 </html>

@@ -15,6 +15,14 @@ const Login = ({ onLogin }: LoginProps) => {
     const [isTokenVisible, setIsTokenVisible] = useState(false);
     const formRef = useRef<HTMLFormElement | null>(null);
     const credentialUsername = useMemo(() => `dashboard@${window.location.host}`, []);
+    const signupContext = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('signup') !== 'ok') return null;
+
+        return {
+            email: String(params.get('email') || '').trim().toLowerCase(),
+        };
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -90,6 +98,16 @@ const Login = ({ onLogin }: LoginProps) => {
                             Usa il tuo token di accesso per entrare nel workspace operativo di Zirèl in modo rapido e sicuro.
                         </p>
                     </div>
+
+                    {signupContext ? (
+                        <div className="mt-6 rounded-[1.6rem] border border-orange-200 bg-orange-50 px-5 py-4 text-left">
+                            <p className="text-sm font-black uppercase tracking-[0.15em] text-zirel-orange-dark">Registrazione inviata</p>
+                            <p className="mt-2 text-sm leading-6 text-zirel-blue">
+                                Il tenant è stato creato correttamente.
+                                {signupContext.email ? ` Il token completo viene inviato a ${signupContext.email}.` : ' Il token completo viene inviato via email.'}
+                            </p>
+                        </div>
+                    ) : null}
 
                     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 mt-8" autoComplete="on">
                         <input type="text" name="username" autoComplete="username" value={credentialUsername} readOnly className="hidden" tabIndex={-1} />

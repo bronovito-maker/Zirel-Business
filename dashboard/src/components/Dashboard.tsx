@@ -109,6 +109,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const [isWorkspaceSearchFocused, setIsWorkspaceSearchFocused] = useState(false);
 
     const tenantId = formData?.tenant_id || getCurrentTenantId();
+    const workspaceName = formData?.nome_ristorante || formData?.hotel_name || formData?.nome_attivita || tenantId;
     const trialEndsAt = formData?.trial_ends_at ? new Date(formData.trial_ends_at) : null;
     const currentPeriodEnd = formData?.current_period_end ? new Date(formData.current_period_end) : null;
     const trialDaysRemaining = trialEndsAt ? Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
@@ -591,7 +592,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             </div>
                             <div className="rounded-[1.6rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-3.5 shadow-sm">
                                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Tenant attivo</p>
-                                <p className="mt-1.5 text-lg font-black tracking-tight text-zirel-blue">{formData.nome_ristorante || tenantId}</p>
+                                <p className="mt-1.5 text-lg font-black tracking-tight text-zirel-blue">{workspaceName}</p>
                                 <p className="mt-0.5 text-sm text-gray-500">Pannello di controllo Zirèl</p>
                             </div>
                         </div>
@@ -651,7 +652,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     <div className="flex items-center gap-2">
                                         <h1 className="truncate text-xl font-black tracking-tight text-zirel-blue">{activeTabMeta.label}</h1>
                                         <span className="hidden rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-xs font-bold text-zirel-orange-dark sm:inline-flex">
-                                            {formData.nome_ristorante || tenantId}
+                                            {workspaceName}
                                         </span>
                                     </div>
                                     <p className="hidden text-sm text-gray-500 md:block">{activeTabMeta.description}</p>
@@ -739,7 +740,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
                                 <div className="mb-4 shrink-0 rounded-[1.5rem] border border-gray-200/80 bg-gradient-to-br from-white to-orange-50/30 px-4 py-4 shadow-sm">
                                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-gray-400">Tenant attivo</p>
-                                    <p className="mt-2 text-lg font-black tracking-tight text-zirel-blue">{formData.nome_ristorante || tenantId}</p>
+                                    <p className="mt-2 text-lg font-black tracking-tight text-zirel-blue">{workspaceName}</p>
                                     <p className="mt-1 text-sm text-gray-500">Pannello di controllo</p>
                                 </div>
 

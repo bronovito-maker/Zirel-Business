@@ -107,7 +107,7 @@
                             1</div>
                         <div>
                             <h3 class="text-xl font-bold mb-1">Crea l'account</h3>
-                            <p class="text-brand-blue/60 text-sm">Inserisci i dati base e accedi subito alla tua area.</p>
+                            <p class="text-brand-blue/60 text-sm">Inserisci i dati base. Il token di accesso ti arriva via email.</p>
                         </div>
                     </div>
                     <div class="flex gap-6 items-start">
@@ -152,7 +152,7 @@
                 <div class="absolute top-0 right-0 w-32 h-32 bg-brand-orange/10 rounded-full -mr-16 -mt-16 blur-2xl">
                 </div>
 
-                <h2 class="text-2xl font-bold mb-8">Attiva Prova Gratuita</h2>
+                <h2 class="text-2xl font-bold mb-8">Attiva 7 giorni di prova</h2>
 
                 <form class="space-y-6" id="registration-form">
                     <div class="grid grid-cols-2 gap-4">
@@ -160,13 +160,13 @@
                             <label
                                 class="block text-xs font-bold uppercase tracking-widest text-brand-blue/50 mb-2 ml-1">Nome
                                 attività</label>
-                            <input type="text" placeholder="es. Hotel Bellavista"
+                            <input type="text" name="business_name" placeholder="es. Hotel Bellavista" required
                                 class="w-full bg-white border border-brand-blue/10 px-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition-all placeholder:text-brand-blue/20">
                         </div>
                         <div class="col-span-2 sm:col-span-1">
                             <label
                                 class="block text-xs font-bold uppercase tracking-widest text-brand-blue/50 mb-2 ml-1">Settore</label>
-                            <select
+                            <select name="business_type" required
                                 class="w-full bg-white border border-brand-blue/10 px-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition-all appearance-none cursor-pointer">
                                 <option>Albergo / Hotel</option>
                                 <option>Ristorante / Bar</option>
@@ -181,30 +181,34 @@
                         <label
                             class="block text-xs font-bold uppercase tracking-widest text-brand-blue/50 mb-2 ml-1">Email
                             aziendale</label>
-                        <input type="email" placeholder="nome@azienda.it"
+                        <input type="email" name="email" placeholder="nome@azienda.it" required
                             class="w-full bg-white border border-brand-blue/10 px-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition-all placeholder:text-brand-blue/20">
                     </div>
 
                     <div>
                         <label
-                            class="block text-xs font-bold uppercase tracking-widest text-brand-blue/50 mb-2 ml-1">Password</label>
-                        <input type="password" placeholder="Minimo 8 caratteri"
+                            class="block text-xs font-bold uppercase tracking-widest text-brand-blue/50 mb-2 ml-1">Sito web</label>
+                        <input type="url" name="website" placeholder="https://www.tuosito.it"
                             class="w-full bg-white border border-brand-blue/10 px-4 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition-all placeholder:text-brand-blue/20">
                     </div>
 
                     <div class="flex items-center gap-3 py-2">
-                        <input type="checkbox" id="privacy" class="w-5 h-5 accent-brand-orange rounded-lg">
+                        <input type="checkbox" id="privacy" name="privacy" required class="w-5 h-5 accent-brand-orange rounded-lg">
                         <label for="privacy" class="text-xs text-brand-blue/60">
                             Accetto la <a href="privacy.html" class="underline hover:text-brand-orange">Privacy
                                 Policy</a> e i termini di servizio.
                         </label>
                     </div>
 
-                    <button type="button"
-                        onclick="alert('In un sistema reale qui verrebbe creato il tenant e verresti reindirizzato alla Dashboard per lo Step 2!')"
+                    <button type="submit" id="registration-submit"
                         class="w-full bg-zirel-gradient text-white py-5 rounded-full font-black text-lg shadow-xl shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95">
                         Attiva 7 Giorni Gratis
                     </button>
+
+                    <div id="registration-feedback" class="hidden rounded-3xl border border-brand-orange/20 bg-brand-orange/5 px-5 py-4 text-sm text-brand-blue/75">
+                        <p class="font-bold text-brand-blue">Workspace in preparazione</p>
+                        <p class="mt-1">Nel flusso live qui verranno creati tenant e token e verrai accompagnato al passo successivo della dashboard.</p>
+                    </div>
 
                     <p class="text-center text-xs text-brand-blue/40 pt-4">
                         Hai gia un account? <a href="login.html"
@@ -290,6 +294,78 @@
     </footer>
 
     <script type="module" src="/ui-helpers.js"></script>
+    <script>
+        const registrationForm = document.getElementById('registration-form');
+        const registrationSubmit = document.getElementById('registration-submit');
+        const registrationFeedback = document.getElementById('registration-feedback');
+        const registrationEndpoint = 'https://dashboard.zirel.org/api/public/register';
+
+        if (registrationForm && registrationSubmit && registrationFeedback) {
+            registrationForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                if (!registrationForm.reportValidity()) {
+                    return;
+                }
+
+                registrationSubmit.disabled = true;
+                registrationSubmit.textContent = 'Preparazione workspace...';
+                registrationSubmit.classList.add('opacity-70', 'cursor-not-allowed');
+                registrationFeedback.classList.remove('hidden');
+                registrationFeedback.className = 'rounded-3xl border border-brand-orange/20 bg-brand-orange/5 px-5 py-4 text-sm text-brand-blue/75';
+                registrationFeedback.innerHTML = `
+                    <p class="font-bold text-brand-blue">Workspace in preparazione</p>
+                    <p class="mt-1">Stiamo creando il tenant e preparando il token di accesso.</p>
+                `;
+
+                const formData = new FormData(registrationForm);
+                const payload = {
+                    business_name: String(formData.get('business_name') || '').trim(),
+                    business_type: String(formData.get('business_type') || '').trim(),
+                    email: String(formData.get('email') || '').trim(),
+                    website: String(formData.get('website') || '').trim(),
+                };
+
+                try {
+                    const response = await fetch(registrationEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    });
+
+                    const result = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !result?.ok) {
+                        throw new Error(result?.error_message || 'Registrazione non riuscita.');
+                    }
+
+                    registrationFeedback.className = 'rounded-3xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800';
+                    registrationFeedback.innerHTML = `
+                        <p class="font-bold text-green-900">Workspace creato</p>
+                        <p class="mt-1">${result.email_queued === false
+                            ? 'Il tenant è stato creato, ma l’email automatica del token non è ancora partita. Ti portiamo comunque alla dashboard.'
+                            : 'Ti stiamo portando alla dashboard. Il token completo ti arriverà via email tra pochi istanti.'
+                        }</p>
+                    `;
+
+                    window.setTimeout(() => {
+                        window.location.href = result.login_url || 'https://dashboard.zirel.org?signup=ok';
+                    }, 1200);
+                } catch (error) {
+                    registrationSubmit.disabled = false;
+                    registrationSubmit.textContent = 'Attiva 7 Giorni Gratis';
+                    registrationSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
+                    registrationFeedback.className = 'rounded-3xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800';
+                    registrationFeedback.innerHTML = `
+                        <p class="font-bold text-red-900">Registrazione non completata</p>
+                        <p class="mt-1">${error instanceof Error ? error.message : 'Si è verificato un errore inatteso. Riprova tra poco.'}</p>
+                    `;
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
