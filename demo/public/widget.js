@@ -240,15 +240,15 @@
         widget.className = 'scale-0';
         widget.innerHTML = `
             <div class="brand-gradient">
-                <div class="chat-icon flex-shrink-0 text-2xl bg-white/20 rounded-full">💬</div>
+                <div id="zirel-widget-icon" class="chat-icon flex-shrink-0 text-2xl bg-white/20 rounded-full">💬</div>
                 <div class="chat-header-main">
-                    <h6>Zirèl Assistant</h6>
-                    <p>Concierge AI h24</p>
+                    <h6 id="zirel-widget-title">Zirèl Assistant</h6>
+                    <p id="zirel-widget-subtitle">Concierge AI h24</p>
                 </div>
                 <button class="chat-close" onclick="toggleDemo()">Chiudi</button>
             </div>
             <div id="chat-messages">
-                <div>
+                <div id="zirel-welcome-message">
                     <p><strong style="color:#FF8C42">Ciao!</strong> Sono Zirèl.</p>
                     <p>Ti aiuto a rispondere subito ai tuoi clienti.</p>
                 </div>

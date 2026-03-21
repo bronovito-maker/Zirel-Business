@@ -1060,6 +1060,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 onChange={updateField('widget_subtitle')}
                                                 placeholder="es. Concierge h24"
                                             />
+                                            <TextareaField
+                                                label="Messaggio di Benvenuto"
+                                                value={formData.widget_welcome_message || ''}
+                                                onChange={updateField('widget_welcome_message')}
+                                                placeholder={'Es. Ciao! Sono l’assistente di NikiTuttoFare.\nPosso aiutarti con richieste, informazioni e appuntamenti.'}
+                                                rows={4}
+                                            />
                                         </div>
                                         <div className="space-y-6">
                                             <div>
@@ -1086,22 +1093,57 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                                 onChange={updateField('widget_icon')}
                                                 placeholder="es. 💬 o 🤖"
                                             />
+                                            <TextareaField
+                                                label="Quick Replies Iniziali"
+                                                value={formData.widget_quick_replies || ''}
+                                                onChange={updateField('widget_quick_replies')}
+                                                placeholder={'Una quick reply per riga\nEs. 📞 Contatto rapido\n🛠️ Richiedi un intervento\n📅 Fissa un appuntamento'}
+                                                rows={5}
+                                            />
+                                            <p className="text-xs text-gray-500 px-1 -mt-3">
+                                                Inserisci una quick reply per riga. Il widget userà ogni riga come bottone iniziale cliccabile.
+                                            </p>
                                         </div>
                                     </div>
 
                                     {/* Simple Preview */}
                                     <div className="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-6">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Anteprima Rapida</p>
-                                        <div className="flex flex-col gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 max-w-sm mx-auto text-center xs:flex-row xs:items-center xs:text-left">
+                                        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 max-w-sm mx-auto overflow-hidden">
                                             <div
-                                                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl text-white shadow-lg mx-auto shrink-0 xs:mx-0"
-                                                style={{ backgroundColor: formData.widget_color || '#FF8C42' }}
+                                                className="px-5 py-4 text-white flex items-center gap-3"
+                                                style={{ background: `linear-gradient(135deg, ${formData.widget_color || '#FF8C42'} 0%, ${formData.widget_color || '#FF8C42'}CC 100%)` }}
                                             >
-                                                {formData.widget_icon || '💬'}
+                                                <div className="w-11 h-11 rounded-full flex items-center justify-center text-2xl bg-white/20 shrink-0">
+                                                    {formData.widget_icon || '💬'}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="font-bold break-words">{formData.widget_title || 'Zirèl Assistant'}</h4>
+                                                    <p className="text-sm text-white/85 break-words">{formData.widget_subtitle || 'Concierge h24'}</p>
+                                                </div>
                                             </div>
-                                            <div className="min-w-0">
-                                                <h4 className="font-bold text-gray-800 break-words">{formData.widget_title || 'Zirèl Assistant'}</h4>
-                                                <p className="text-xs text-gray-500 break-words">{formData.widget_subtitle || 'Concierge h24'}</p>
+                                            <div className="p-4 space-y-4">
+                                                <div className="rounded-2xl border border-orange-100 bg-orange-50/40 px-4 py-3 text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                                                    {formData.widget_welcome_message || 'Ciao! Sono l’assistente della tua attività.\nPosso aiutarti con informazioni, richieste e appuntamenti.'}
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {(String(formData.widget_quick_replies || '')
+                                                        .split('\n')
+                                                        .map((line) => line.trim())
+                                                        .filter(Boolean)
+                                                        .slice(0, 4).length
+                                                        ? String(formData.widget_quick_replies || '')
+                                                            .split('\n')
+                                                            .map((line) => line.trim())
+                                                            .filter(Boolean)
+                                                            .slice(0, 4)
+                                                        : ['📞 Contatto rapido', '🛠️ Richiedi un intervento', '📅 Fissa un appuntamento']
+                                                    ).map((item) => (
+                                                        <div key={item} className="rounded-full border border-sky-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+                                                            {item}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1162,6 +1204,24 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                             <p className="text-sm text-gray-600 leading-relaxed italic">
                                                 <strong>Istruzioni:</strong> Inserisci questo codice subito prima del tag <code className="bg-white border border-gray-200 px-1.5 py-0.5 rounded text-xs font-mono">&lt;/body&gt;</code>.
                                             </p>
+                                        </div>
+
+                                        <div className="p-6 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-4">
+                                            <div className="p-2 bg-white text-amber-600 rounded-lg shrink-0 border border-amber-200"><Info size={16} /></div>
+                                            <div className="space-y-2 text-sm text-amber-900 leading-relaxed">
+                                                <p>
+                                                    <strong>Se il widget non compare:</strong> molto spesso viene bloccato dalle policy di sicurezza del sito, non dallo snippet.
+                                                </p>
+                                                <p>
+                                                    Verifica di consentire <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">cdn.zirel.org</code> e gli endpoint <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">*.zirel.org</code> nelle direttive <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">script-src</code>, <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">connect-src</code>, <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">img-src</code> e <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">frame-src</code>.
+                                                </p>
+                                                <p>
+                                                    Se il widget si apre ma la chat viene bloccata quando invia i messaggi, controlla <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">connect-src</code>: nei casi come Railway devi consentire anche <code className="bg-white border border-amber-200 px-1.5 py-0.5 rounded text-xs font-mono">https://*.up.railway.app</code>.
+                                                </p>
+                                                <p>
+                                                    Se usi CSP o header server-side, dopo la modifica serve un nuovo deploy. Se dopo il deploy resta un errore, il passo successivo è distinguere tra blocco CSP lato sito e blocco CORS lato webhook.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

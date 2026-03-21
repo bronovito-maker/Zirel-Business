@@ -215,7 +215,7 @@ const session_id = normalizeSpaces(input.session_id || input.conversation_id) ||
 const source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';
 
 const normalizedBusinessType = normalizeSpaces(input.business_type).toLowerCase();
-const normalizedAppointmentType = normalizeSpaces(input.appointment_type || 'demo_request').toLowerCase();
+const normalizedAppointmentType = normalizeSpaces(input.appointment_type || 'standard_appointment').toLowerCase();
 const nome = normalizeSpaces(input.nome)
   .split(' ')
   .filter(Boolean)
@@ -228,7 +228,7 @@ const note = normalizeSpaces(input.note);
 const tenant_id = normalizeSpaces(input.tenant_id);
 
 const SUPPORTED_SECTORS = ['professional', 'medical', 'legal', 'hotel'];
-const SUPPORTED_TYPES = ['demo_request', 'intro_call', 'first_consultation', 'callback_request'];
+const SUPPORTED_TYPES = ['standard_appointment', 'demo_request', 'intro_call', 'first_consultation', 'callback_request'];
 
 function getRomeDay(offsetDays = 0) {
   const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -1379,6 +1379,8 @@ const final_system_prompt = [
   businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',
   businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',
   ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',
+  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',
+  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',
   ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',
   '',
   '[CONTESTO ATTIVITÀ]',
@@ -1394,7 +1396,9 @@ const final_system_prompt = [
   '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',
   '- Registra_Appuntamento:',
   '  - Solo per settori supportati diversi da restaurant.',
+  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',
   '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',
+  '  - Per standard_appointment email non è obbligatoria.',
   '  - Per demo_request email è obbligatoria.',
   '  - Prima del tool: riepilogo + conferma esplicita.',
   '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',
@@ -2299,7 +2303,7 @@ const buildAICoreWorkflow = () => {
           value: {
             tenant_id: '={{ $(\'Crystalize Context1\').item.json.tenant_id }}',
             business_type: '={{ $(\'Build Prompt1\').item.json.normalized_business_type }}',
-            appointment_type: '={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\'appointment_type\', `demo_request`, \'string\') }}',
+            appointment_type: '={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\'appointment_type\', `standard_appointment`, \'string\') }}',
             note: '={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\'note\', ``, \'string\') }}',
             orario: '={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\'orario\', ``, \'string\') }}',
             data_input: '={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\'data_input\', ``, \'string\') }}',

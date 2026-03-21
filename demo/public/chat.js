@@ -70,40 +70,83 @@
     let tooltipIndex = 0;
 
     // ─── Fetch Widget Configuration ───────────────────────────────────────────
+    const widgetConfigUrl = `${'https://dashboard.zirel.org'}/api/public/widget-config`;
+
+    function renderWelcomeMessage(message) {
+        const safeText = escapeHTML(String(message || '').trim() || 'Ciao! Sono Zirèl.\nTi aiuto a rispondere subito ai tuoi clienti.');
+        return safeText
+            .split(/\n{2,}/)
+            .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+            .join('');
+    }
+
+    function renderQuickReplies(items) {
+        const quickReplies = document.getElementById('quick-replies-container');
+        if (!quickReplies) return;
+
+        const normalized = Array.isArray(items)
+            ? items
+                .map((item) => {
+                    if (typeof item === 'string') {
+                        const value = String(item || '').trim();
+                        return value ? { label: value, prompt: value } : null;
+                    }
+
+                    if (!item || typeof item !== 'object') return null;
+
+                    const label = String(item.label || '').trim();
+                    const prompt = String(item.prompt || item.message || label).trim();
+                    return label && prompt ? { label, prompt } : null;
+                })
+                .filter(Boolean)
+                .slice(0, 4)
+            : [];
+
+        quickReplies.innerHTML = '';
+
+        normalized.forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'quick-reply-btn';
+            button.textContent = item.label;
+            button.addEventListener('click', () => window.sendChatMessage(item.prompt));
+            quickReplies.appendChild(button);
+        });
+
+        quickReplies.style.display = normalized.length ? 'flex' : 'none';
+    }
+
     async function applyWidgetCustomization() {
         if (!tenantId) return;
 
         try {
-            // Fetch configuration from Supabase at runtime for real-time sync
-            const supabaseUrl = 'https://ighmsttwjfoywhklgluf.supabase.co';
-            const anonKey = 'sb_publishable_757hQTSKPmrOs9iVEGRb4A_21Ccx-AT';
-
-            const response = await fetch(`${supabaseUrl}/rest/v1/tenants?tenant_id=eq.${tenantId}&select=widget_title,widget_subtitle,widget_color,widget_icon`, {
-                headers: {
-                    'apikey': anonKey,
-                    'Authorization': `Bearer ${anonKey}`
-                }
-            });
+            const response = await fetch(`${widgetConfigUrl}?tenant_id=${encodeURIComponent(tenantId)}`);
 
             if (!response.ok) throw new Error('Supabase fetch failed');
 
             const data = await response.json();
-            const config = data?.[0] || window.ZirelWidgetConfig || {};
+            const config = data?.config || window.ZirelWidgetConfig || {};
 
-            const { widget_title, widget_subtitle, widget_color, widget_icon } = config;
+            const {
+                widget_title,
+                widget_subtitle,
+                widget_color,
+                widget_icon,
+                welcome_message,
+                quick_replies,
+            } = config;
 
             if (widget_title) {
-                const titleEl = document.querySelector('#n8n-widget-mock h6');
+                const titleEl = document.getElementById('zirel-widget-title');
                 if (titleEl) titleEl.innerText = widget_title;
             }
             if (widget_subtitle) {
-                const subtitleEl = document.querySelector('#n8n-widget-mock p');
+                const subtitleEl = document.getElementById('zirel-widget-subtitle');
                 if (subtitleEl) subtitleEl.innerText = widget_subtitle;
             }
             if (widget_icon) {
                 const safeIcon = sanitizeWidgetIcon(widget_icon);
-                const iconContainer = document.querySelector('#n8n-widget-mock .flex-shrink-0.text-2xl') ||
-                    document.querySelector('#n8n-widget-mock .bg-white\\/20.rounded-full.text-2xl');
+                const iconContainer = document.getElementById('zirel-widget-icon');
                 if (iconContainer) iconContainer.innerText = safeIcon;
                 const toggleIcon = document.getElementById('toggle-icon-open');
                 const widget = document.getElementById('n8n-widget-mock');
@@ -131,10 +174,56 @@
                 // Apply theme color to user messages (optional enhancement)
                 // We'll skip for now to maintain consistency with the CSS variables approach if possible
             }
+            if (welcome_message) {
+                const welcomeEl = document.getElementById('zirel-welcome-message');
+                if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(welcome_message);
+            }
+            if (quick_replies) {
+                renderQuickReplies(quick_replies);
+            }
         } catch (err) {
             console.warn('[Zirèl] Error applying dynamic customization, using defaults:', err);
             // Fallback to static window config if available
-            const { widget_title, widget_subtitle, widget_color, widget_icon } = window.ZirelWidgetConfig || {};
+            const {
+                widget_title,
+                widget_subtitle,
+                widget_color,
+                widget_icon,
+                welcome_message,
+                quick_replies,
+            } = window.ZirelWidgetConfig || {};
+            if (widget_title) {
+                const titleEl = document.getElementById('zirel-widget-title');
+                if (titleEl) titleEl.innerText = widget_title;
+            }
+            if (widget_subtitle) {
+                const subtitleEl = document.getElementById('zirel-widget-subtitle');
+                if (subtitleEl) subtitleEl.innerText = widget_subtitle;
+            }
+            if (widget_icon) {
+                const iconEl = document.getElementById('zirel-widget-icon');
+                if (iconEl) iconEl.innerText = sanitizeWidgetIcon(widget_icon);
+            }
+            if (widget_color) {
+                const safeColor = sanitizeHexColor(widget_color);
+                const header = document.querySelector('#n8n-widget-mock .brand-gradient') ||
+                    document.querySelector('#n8n-widget-mock .demo-gradient');
+                if (header) {
+                    header.style.background = `linear-gradient(135deg, ${safeColor} 0%, ${safeColor}CC 100%)`;
+                }
+                const toggleBtn = document.getElementById('chat-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.style.background = safeColor;
+                    toggleBtn.style.boxShadow = `0 10px 25px -5px ${safeColor}66`;
+                }
+            }
+            if (welcome_message) {
+                const welcomeEl = document.getElementById('zirel-welcome-message');
+                if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(welcome_message);
+            }
+            if (quick_replies) {
+                renderQuickReplies(quick_replies);
+            }
             // ... rest of logic if needed, but the catch already logs it.
         }
     }
@@ -151,6 +240,18 @@
         const s = String(str == null ? '' : str);
         const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
         return s.replace(/[&<>'"]/g, tag => map[tag] || tag);
+    }
+
+    function renderRichBotText(text) {
+        const safeText = escapeHTML(String(text == null ? '' : text));
+        const withLinks = safeText.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, (match) => {
+            const href = match.startsWith('www.') ? `https://${match}` : match;
+            return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-brand-orange underline break-all">${match}</a>`;
+        });
+
+        return withLinks
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>')
+            .replace(/\n/g, '<br>');
     }
 
     // ─── Tooltip ──────────────────────────────────────────────────────────────
@@ -373,9 +474,7 @@
 
             const botMsg = document.createElement('div');
             botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4 whitespace-pre-line';
-            // Escape XSS prima di applicare il parser Markdown
-            const safeText = escapeHTML(botText);
-            botMsg.innerHTML = safeText.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>');
+            botMsg.innerHTML = renderRichBotText(botText);
             container.appendChild(botMsg);
             container.scrollTop = container.scrollHeight;
 

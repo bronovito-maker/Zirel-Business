@@ -81,6 +81,8 @@ export interface TenantData {
     widget_subtitle?: string;
     widget_color?: string;
     widget_icon?: string;
+    widget_welcome_message?: string;
+    widget_quick_replies?: string;
 
     [key: string]: unknown; // Strict index signature
 }

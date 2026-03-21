@@ -56,6 +56,9 @@ const helpSections = [
             'Vai in Impostazioni e cerca i campi del widget, come titolo, sottotitolo, colore e icona.',
             'Puoi cambiare il colore per adattarlo al tuo brand e aggiornare i testi che il visitatore vede sul sito.',
             'Se hai dubbi sull’installazione o sul codice da inserire nel sito, trovi il supporto anche nella sezione Integrazione.',
+            'Se il widget non compare, il problema spesso non è nello snippet ma nelle policy di sicurezza del sito: controlla CSP e header server, autorizzando almeno cdn.zirel.org e gli endpoint *.zirel.org nelle direttive script-src, connect-src, img-src e frame-src.',
+            'Se il widget si apre ma i messaggi non partono, controlla la console browser: spesso manca il dominio del webhook chat in connect-src. Nei casi come Railway va consentito anche https://*.up.railway.app.',
+            'Dopo aver aggiornato CSP o header di sicurezza devi fare un nuovo deploy del sito: il widget non ricompare finché non vengono pubblicate anche le nuove config server.',
         ],
     },
     {
