@@ -103,17 +103,22 @@
             : [];
 
         quickReplies.innerHTML = '';
+        quickReplies.style.display = normalized.length ? 'flex' : 'none';
+        quickReplies.style.flexWrap = 'nowrap';
+        quickReplies.style.overflowX = 'auto';
+        quickReplies.style.overflowY = 'hidden';
 
         normalized.forEach((item) => {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'quick-reply-btn';
             button.textContent = item.label;
+            button.style.whiteSpace = 'nowrap';
+            button.style.flex = '0 0 auto';
+            button.style.minWidth = 'max-content';
             button.addEventListener('click', () => window.sendChatMessage(item.prompt));
             quickReplies.appendChild(button);
         });
-
-        quickReplies.style.display = normalized.length ? 'flex' : 'none';
     }
 
     async function applyWidgetCustomization() {

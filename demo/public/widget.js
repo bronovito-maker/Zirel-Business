@@ -144,12 +144,20 @@
                 margin-bottom: 0;
             }
             #quick-replies-container {
-                display: grid;
+                display: flex;
+                flex-wrap: nowrap;
                 gap: 10px;
                 margin-top: 4px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            #quick-replies-container::-webkit-scrollbar {
+                display: none;
             }
             .quick-reply-btn {
-                width: 100%;
                 min-height: 44px;
                 border: 1px solid #BDE6FF;
                 border-radius: 9999px;
@@ -159,6 +167,13 @@
                 text-align: left;
                 padding: 10px 14px;
                 cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 auto;
+                white-space: nowrap;
+                width: auto;
+                min-width: max-content;
             }
             .quick-reply-btn:hover { border-color: #8DD4FF; }
             #zirel-chat-input-wrap {
