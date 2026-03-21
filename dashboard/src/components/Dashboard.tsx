@@ -141,8 +141,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     const showSettingsField = (sectionTitle: string, label: string, value?: string | null) =>
         matchesSettingsSearch(sectionTitle, label, value);
     const showContactSection = [
+        showSettingsField('Contatti & Info Base', 'Nome Attività', formData?.nome_attivita),
+        showSettingsField('Contatti & Info Base', 'Settore', formData?.business_type),
         showSettingsField('Contatti & Info Base', 'Telefono', formData?.telefono),
-        showSettingsField('Contatti & Info Base', 'Email', formData?.mail),
+        showSettingsField('Contatti & Info Base', 'Email Aziendale', formData?.mail),
         showSettingsField('Contatti & Info Base', 'Indirizzo', formData?.indirizzo),
         showSettingsField('Contatti & Info Base', 'Sito Web URL', formData?.sito_web_url),
         showSettingsField('Contatti & Info Base', 'Google Maps Link', formData?.google_maps_link),
@@ -178,8 +180,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         showSettingsField('Info Pratiche & Regole', 'Policy Allergie', formData?.allergie_policy),
     ].some(Boolean);
     const showMarketingSection = [
+        showSettingsField('Marketing & Messaggi', 'Target Clientela', formData?.target_clientela),
         showSettingsField('Marketing & Messaggi', 'Promozione Attiva Oggi', formData?.promozione_attiva),
-        showSettingsField('Marketing & Messaggi', 'Informazioni Aggiuntive Rapide', formData?.dati_testuali_brevi),
+        showSettingsField('Marketing & Messaggi', 'Informazioni rapide per l’assistente', formData?.dati_testuali_brevi),
     ].some(Boolean);
     const hasVisibleSettingsResults = [
         showContactSection,
@@ -200,10 +203,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         {
             id: 'settings-contacts',
             title: 'Contatti e info base',
-            subtitle: 'Telefono, email, indirizzo e sito',
+            subtitle: 'Nome attività, settore, email, indirizzo e sito',
             tab: 'impostazioni',
             settingsQuery: 'contatti',
-            keywords: ['contatti', 'telefono', 'email', 'indirizzo', 'sito', 'google maps'],
+            keywords: ['contatti', 'nome attività', 'settore', 'telefono', 'email', 'indirizzo', 'sito', 'google maps'],
         },
         {
             id: 'settings-hours',
@@ -236,6 +239,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             tab: 'impostazioni',
             settingsQuery: 'wifi',
             keywords: ['wifi', 'parcheggio', 'animali', 'pagamento', 'allergie', 'tassa soggiorno'],
+        },
+        {
+            id: 'settings-marketing',
+            title: 'Marketing e messaggi',
+            subtitle: 'Target clientela e informazioni rapide per l’assistente',
+            tab: 'impostazioni',
+            settingsQuery: 'target',
+            keywords: ['target', 'clientela', 'messaggi', 'assistente', 'informazioni rapide', 'marketing'],
         },
         {
             id: 'settings-marketing',
@@ -1202,8 +1213,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <div className="z-icon-chip"><Store className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Contatti & Info Base</h2>
                                     </div>
+                                    {showSettingsField('Contatti & Info Base', 'Nome Attività', formData.nome_attivita) ? <InputField label="Nome Attività" value={formData.nome_attivita} onChange={updateField('nome_attivita')} placeholder="Es. Niki Tuttofare" /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Settore', formData.business_type) ? <InputField label="Settore" value={formData.business_type} onChange={updateField('business_type')} placeholder="Es. professional, restaurant, hotel" /> : null}
                                     {showSettingsField('Contatti & Info Base', 'Telefono', formData.telefono) ? <InputField label="Telefono" value={formData.telefono} onChange={updateField('telefono')} placeholder="+39 333 1234567" /> : null}
-                                    {showSettingsField('Contatti & Info Base', 'Email', formData.mail) ? <InputField label="Email" value={formData.mail} onChange={updateField('mail')} /> : null}
+                                    {showSettingsField('Contatti & Info Base', 'Email Aziendale', formData.mail) ? <InputField label="Email Aziendale" value={formData.mail} onChange={updateField('mail')} /> : null}
                                     {showSettingsField('Contatti & Info Base', 'Indirizzo', formData.indirizzo) ? <InputField label="Indirizzo" value={formData.indirizzo} onChange={updateField('indirizzo')} /> : null}
                                     {showSettingsField('Contatti & Info Base', 'Sito Web URL', formData.sito_web_url) ? <InputField label="Sito Web URL" value={formData.sito_web_url} onChange={updateField('sito_web_url')} /> : null}
                                     {showSettingsField('Contatti & Info Base', 'Google Maps Link', formData.google_maps_link) ? <InputField label="Google Maps Link" value={formData.google_maps_link} onChange={updateField('google_maps_link')} /> : null}
@@ -1285,8 +1298,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <div className="z-icon-chip"><Megaphone className="w-5 h-5" /></div>
                                         <h2 className="text-lg font-bold">Marketing & Messaggi</h2>
                                     </div>
+                                    {showSettingsField('Marketing & Messaggi', 'Target Clientela', formData.target_clientela) ? <TextareaField label="Target Clientela" value={formData.target_clientela} onChange={updateField('target_clientela')} rows={3} placeholder="Descrivi il tipo di clienti ideali che vuoi intercettare." /> : null}
                                     {showSettingsField('Marketing & Messaggi', 'Promozione Attiva Oggi', formData.promozione_attiva) ? <TextareaField label="Promozione Attiva Oggi" value={formData.promozione_attiva} onChange={updateField('promozione_attiva')} rows={3} /> : null}
-                                    {showSettingsField('Marketing & Messaggi', 'Informazioni Aggiuntive Rapide', formData.dati_testuali_brevi) ? <TextareaField label="Informazioni Aggiuntive Rapide" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} /> : null}
+                                    {showSettingsField('Marketing & Messaggi', 'Informazioni rapide per l’assistente', formData.dati_testuali_brevi) ? <TextareaField label="Informazioni rapide per l’assistente" value={formData.dati_testuali_brevi} onChange={updateField('dati_testuali_brevi')} rows={4} placeholder="Inserisci dettagli brevi, utili e operativi che l’assistente deve usare spesso." /> : null}
                                 </section>
                                 ) : null}
                             </div>

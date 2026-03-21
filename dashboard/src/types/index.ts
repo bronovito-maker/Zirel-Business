@@ -40,6 +40,7 @@ export interface TenantData {
     indirizzo?: string;
     sito_web_url?: string;
     google_maps_link?: string;
+    target_clientela?: string;
 
     // Operations
     orari_apertura?: string;
