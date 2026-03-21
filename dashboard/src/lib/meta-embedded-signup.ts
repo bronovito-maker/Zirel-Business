@@ -111,8 +111,19 @@ const searchValue = (source: unknown, keys: string[]): string | null => {
 };
 
 export const extractEmbeddedSignupIdentifiers = (payload: unknown): EmbeddedSignupIdentifiers => ({
-    meta_phone_number_id: searchValue(payload, ['phone_number_id', 'meta_phone_number_id', 'phoneNumberId']),
-    waba_id: searchValue(payload, ['waba_id', 'whatsapp_business_account_id', 'whatsappBusinessAccountId']),
+    meta_phone_number_id: searchValue(payload, [
+        'phone_number_id',
+        'meta_phone_number_id',
+        'phoneNumberId',
+        'phoneNumberID',
+    ]),
+    waba_id: searchValue(payload, [
+        'waba_id',
+        'wabaId',
+        'whatsapp_business_account_id',
+        'whatsappBusinessAccountId',
+        'business_account_id',
+    ]),
     business_id: searchValue(payload, ['business_id', 'businessId']),
     display_phone_number: searchValue(payload, ['display_phone_number', 'displayPhoneNumber']),
     verified_name: searchValue(payload, ['verified_name', 'verifiedName']),
@@ -166,9 +177,6 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
                 : event.data;
 
             if (!data || typeof data !== 'object') return;
-            const type = String((data as Record<string, unknown>).type || '').toLowerCase();
-            if (!type.includes('whatsapp') && !type.includes('embedded')) return;
-
             const extracted = extractEmbeddedSignupIdentifiers(data);
             if (extracted.meta_phone_number_id && extracted.waba_id) {
                 resolveOnce({
@@ -177,6 +185,18 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
                 });
                 return;
             }
+
+            const type = String((data as Record<string, unknown>).type || '').toLowerCase();
+            const eventName = String((data as Record<string, unknown>).event || '').toLowerCase();
+            const isMetaSignupEvent =
+                type.includes('whatsapp') ||
+                type.includes('embedded') ||
+                eventName.includes('whatsapp') ||
+                eventName.includes('embedded') ||
+                String(event.origin || '').includes('facebook.com') ||
+                String(event.origin || '').includes('meta.com');
+
+            if (!isMetaSignupEvent) return;
 
             if (pendingCode) {
                 scheduleCodeFallback();

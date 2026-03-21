@@ -290,7 +290,7 @@ const getExistingConversation = async (tenantId, externalContactId, normalizedPh
   if (!orConditions.length) return null;
 
   const query = [
-    'tenant_conversations?select=id,last_inbound_message_id,last_outbound_message_id,last_message_at,ai_processing_status',
+    'tenant_conversations?select=id,status,last_inbound_message_id,last_outbound_message_id,last_message_at,ai_processing_status',
     'tenant_id=eq.' + encode(tenantId),
     'channel=eq.whatsapp',
     'or=' + encode('(' + orConditions.join(',') + ')'),
@@ -359,7 +359,7 @@ const patchConversation = async (conversationId, body) => {
     'PATCH',
     'tenant_conversations?id=eq.' +
       encode(conversationId) +
-      '&select=id,last_inbound_message_id,last_message_at,last_inbound_at',
+      '&select=id,status,last_inbound_message_id,last_message_at,last_inbound_at,ai_processing_status',
     body
   );
 };
@@ -475,6 +475,16 @@ for (const row of claimedRows) {
         if (!conversation?.id) {
           retryReason = 'conversation_create_failed';
           break;
+        }
+
+        if (conversation.status === 'closed') {
+          const reopenedRows = await patchConversation(conversation.id, {
+            status: 'ai_active',
+            ai_processing_status: 'idle',
+          });
+          conversation = Array.isArray(reopenedRows) && reopenedRows.length > 0
+            ? { ...conversation, ...reopenedRows[0] }
+            : { ...conversation, status: 'ai_active', ai_processing_status: 'idle' };
         }
 
         let message = await getExistingMessage(tenantAccount.tenant_id, event.wamid);
