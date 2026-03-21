@@ -96,7 +96,6 @@ function buildTenantDefaults({ businessName, businessType, email, website, tenan
         mail: email,
         billing_email: email,
         notification_email: email,
-        internal_email: email,
         sito_web_url: website || null,
         widget_title: businessName,
         widget_color: '#FF8C42',
