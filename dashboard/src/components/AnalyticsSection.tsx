@@ -148,42 +148,6 @@ const AnalyticsSection = () => {
                 </section>
 
                 <div className="space-y-6">
-                    <section className="apple-card p-6 md:p-8 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-3 mb-5">
-                            <div className="z-icon-chip">
-                                <BarChart3 className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black text-gray-900">Mix richieste</h3>
-                                <p className="text-sm text-gray-500">Fotografia rapida dei flussi già registrati.</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {[
-                                { label: 'Prenotazioni ristorante', value: summary.restaurant_requests },
-                                { label: 'Prenotazioni hotel', value: summary.hotel_requests },
-                                { label: 'Appuntamenti / demo', value: summary.appointment_requests },
-                            ].map((item) => {
-                                const share = summary.total_requests > 0 ? Math.round((item.value / summary.total_requests) * 100) : 0;
-                                return (
-                                    <div key={item.label} className="space-y-2">
-                                        <div className="flex items-center justify-between gap-4">
-                                            <p className="text-sm font-semibold text-gray-700">{item.label}</p>
-                                            <p className="text-sm font-black text-gray-900">{formatNumber(item.value)}</p>
-                                        </div>
-                                        <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
-                                            <div
-                                                className="h-full rounded-full bg-gradient-to-r from-zirel-orange-dark to-[#ff9b52]"
-                                                style={{ width: `${share}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </section>
-
                     <section className="apple-card p-6 md:p-8 border border-dashed border-orange-200 bg-orange-50/60 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="z-icon-chip bg-white border border-orange-100">
