@@ -178,54 +178,71 @@ async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId })
         businessIds.add(preferredBusinessId);
     }
 
-    const mePayload = await metaGraphRequest({
-        path: 'me',
-        accessToken,
-        apiVersion,
-        searchParams: {
-            fields: [
-                'id',
-                'name',
-                'businesses{id,name}',
-                'owned_whatsapp_business_accounts{id,name}',
-                'client_whatsapp_business_accounts{id,name}',
-                'whatsapp_business_accounts{id,name}',
-            ].join(','),
-        },
-    });
+    const meFieldCandidates = [
+        'id,name,businesses{id,name},whatsapp_business_accounts{id,name}',
+        'id,name,businesses{id,name}',
+        'id,name',
+    ];
 
-    collectNestedIds(
-        mePayload,
-        (key) => key.includes('whatsapp_business_account'),
-        wabaIds
-    );
-    collectNestedIds(
-        mePayload,
-        (key) => key === 'businesses',
-        businessIds
-    );
-
-    for (const businessId of businessIds) {
+    for (const fields of meFieldCandidates) {
         try {
-            const businessPayload = await metaGraphRequest({
-                path: String(businessId),
+            const mePayload = await metaGraphRequest({
+                path: 'me',
                 accessToken,
                 apiVersion,
-                searchParams: {
-                    fields: 'owned_whatsapp_business_accounts{id,name},client_whatsapp_business_accounts{id,name},whatsapp_business_accounts{id,name}',
-                },
+                searchParams: { fields },
             });
 
             collectNestedIds(
-                businessPayload,
+                mePayload,
                 (key) => key.includes('whatsapp_business_account'),
                 wabaIds
             );
+            collectNestedIds(
+                mePayload,
+                (key) => key === 'businesses',
+                businessIds
+            );
+            break;
         } catch (error) {
-            console.warn('[whatsapp-embedded-signup] business lookup skipped', {
-                business_id: businessId,
+            console.warn('[whatsapp-embedded-signup] me lookup skipped', {
+                fields,
                 error: error instanceof Error ? error.message : String(error),
             });
+        }
+    }
+
+    for (const businessId of businessIds) {
+        const businessFieldCandidates = [
+            'owned_whatsapp_business_accounts{id,name},client_whatsapp_business_accounts{id,name},whatsapp_business_accounts{id,name}',
+            'whatsapp_business_accounts{id,name}',
+            'owned_whatsapp_business_accounts{id,name}',
+            'client_whatsapp_business_accounts{id,name}',
+        ];
+
+        for (const fields of businessFieldCandidates) {
+            try {
+                const businessPayload = await metaGraphRequest({
+                    path: String(businessId),
+                    accessToken,
+                    apiVersion,
+                    searchParams: { fields },
+                });
+
+                collectNestedIds(
+                    businessPayload,
+                    (key) => key.includes('whatsapp_business_account'),
+                    wabaIds
+                );
+
+                if (wabaIds.size) break;
+            } catch (error) {
+                console.warn('[whatsapp-embedded-signup] business lookup skipped', {
+                    business_id: businessId,
+                    fields,
+                    error: error instanceof Error ? error.message : String(error),
+                });
+            }
         }
     }
 
