@@ -202,15 +202,23 @@ const Reservations = () => {
         setProposedTime(detail?.proposed_time || detail?.requested_time || '');
     };
 
-    const runAction = async () => {
-        if (!detail || !selectedRequest || !actionMode) return;
+    const submitAction = async (
+        mode: Exclude<ActionMode, null>,
+        options?: { reason?: string; proposedDate?: string; proposedTime?: string; note?: string }
+    ) => {
+        if (!detail || !selectedRequest) return;
 
-        if (actionMode === 'reject' && !actionReason.trim()) {
+        const reason = options?.reason ?? actionReason;
+        const nextDate = options?.proposedDate ?? proposedDate;
+        const nextTime = options?.proposedTime ?? proposedTime;
+        const note = options?.note ?? actionNote;
+
+        if (mode === 'reject' && !reason.trim()) {
             toast.error('Per rifiutare la richiesta serve un motivo.');
             return;
         }
 
-        if (actionMode === 'propose_change' && (!proposedDate.trim() || !proposedTime.trim())) {
+        if (mode === 'propose_change' && (!nextDate.trim() || !nextTime.trim())) {
             toast.error('Per proporre una modifica servono nuova data e nuovo orario.');
             return;
         }
@@ -220,11 +228,11 @@ const Reservations = () => {
 
         try {
             await applyOperationalRequestAction(detail.id, detail.kind, {
-                action: actionMode,
-                reason: actionReason.trim() || undefined,
-                proposedDate: proposedDate.trim() || undefined,
-                proposedTime: proposedTime.trim() || undefined,
-                note: actionNote.trim() || undefined,
+                action: mode,
+                reason: reason.trim() || undefined,
+                proposedDate: nextDate.trim() || undefined,
+                proposedTime: nextTime.trim() || undefined,
+                note: note.trim() || undefined,
                 actor: 'dashboard',
             });
 
@@ -238,6 +246,12 @@ const Reservations = () => {
         } finally {
             setIsSubmittingAction(false);
         }
+    };
+
+    const handleImmediateAction = async (mode: 'confirm' | 'confirm_change') => {
+        const label = mode === 'confirm' ? 'confermare' : 'confermare la modifica';
+        if (!window.confirm(`Vuoi ${label} questa richiesta?`)) return;
+        await submitAction(mode, { note: '' });
     };
 
     if (isLoading) {
@@ -394,9 +408,9 @@ const Reservations = () => {
             )}
 
             {selectedRequest ? (
-                <div className="fixed inset-0 z-40 flex justify-end bg-slate-900/30 backdrop-blur-[1px]">
+                <div className="fixed inset-0 z-40 flex justify-end bg-slate-950/50 backdrop-blur-sm">
                     <button className="absolute inset-0 cursor-default" onClick={closeDrawer} aria-label="Chiudi dettaglio richiesta" />
-                    <aside className="relative z-50 h-full w-full max-w-2xl overflow-y-auto border-l border-gray-100 bg-white p-6 shadow-2xl">
+                    <aside className="relative z-50 h-full w-full max-w-[720px] overflow-y-auto border-l border-gray-200 bg-[#fcfbf8] p-6 shadow-2xl">
                         <div className="flex items-start justify-between gap-4">
                             <div>
                                 <p className="text-xs font-black uppercase tracking-[0.22em] text-zirel-orange-dark">Richiesta operativa</p>
@@ -410,10 +424,7 @@ const Reservations = () => {
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                onClick={closeDrawer}
-                                className="rounded-2xl border border-gray-100 bg-white p-3 text-gray-400 transition hover:bg-gray-50 hover:text-gray-700"
-                            >
+                            <button onClick={closeDrawer} className="rounded-2xl border border-gray-200 bg-white p-3 text-gray-400 transition hover:bg-gray-50 hover:text-gray-700">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
@@ -424,9 +435,9 @@ const Reservations = () => {
                                 <p className="text-gray-500">Caricamento dettaglio richiesta...</p>
                             </div>
                         ) : (
-                            <div className="mt-8 space-y-8">
+                            <div className="mt-8 space-y-6">
                                 <section className="grid gap-4 md:grid-cols-2">
-                                    <div className="rounded-3xl border border-gray-100 bg-gray-50/70 p-5">
+                                    <div className="rounded-3xl border border-gray-200 bg-white p-5">
                                         <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Cliente</p>
                                         <div className="mt-4 space-y-3 text-sm text-gray-700">
                                             <div><span className="font-semibold text-gray-900">Nome:</span> {detail.title}</div>
@@ -434,7 +445,7 @@ const Reservations = () => {
                                             <div><span className="font-semibold text-gray-900">Email:</span> {detail.email || 'N/D'}</div>
                                         </div>
                                     </div>
-                                    <div className="rounded-3xl border border-gray-100 bg-gray-50/70 p-5">
+                                    <div className="rounded-3xl border border-gray-200 bg-white p-5">
                                         <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Richiesta</p>
                                         <div className="mt-4 space-y-3 text-sm text-gray-700">
                                             <div><span className="font-semibold text-gray-900">Data:</span> {detail.requested_date || detail.date_label}</div>
@@ -446,7 +457,7 @@ const Reservations = () => {
                                     </div>
                                 </section>
 
-                                <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
                                     <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Stato operativo</p>
                                     <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm text-gray-700">
                                         <div><span className="font-semibold text-gray-900">Ricevuta il:</span> {formatDateTime(detail.created_at)}</div>
@@ -464,7 +475,7 @@ const Reservations = () => {
                                     </div>
                                 </section>
 
-                                <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
                                     <div className="flex items-center gap-2">
                                         <History className="h-4 w-4 text-zirel-orange-dark" />
                                         <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Timeline</p>
@@ -474,7 +485,7 @@ const Reservations = () => {
                                             <p className="text-sm text-gray-500">Nessun evento operativo ancora registrato per questa richiesta.</p>
                                         ) : (
                                             events.map((eventItem) => (
-                                                <div key={eventItem.id} className="rounded-2xl border border-gray-100 bg-gray-50/70 p-4 text-sm text-gray-700">
+                                                <div key={eventItem.id} className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 text-sm text-gray-700">
                                                     <div className="flex items-center justify-between gap-3">
                                                         <p className="font-bold text-gray-900">{eventItem.event_type}</p>
                                                         <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">{formatDateTime(eventItem.created_at)}</span>
@@ -489,7 +500,7 @@ const Reservations = () => {
                                     </div>
                                 </section>
 
-                                <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+                                <section className="rounded-3xl border border-gray-200 bg-white p-5">
                                     <div className="flex items-center gap-2">
                                         <MessageSquareQuote className="h-4 w-4 text-zirel-orange-dark" />
                                         <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Azioni</p>
@@ -497,7 +508,8 @@ const Reservations = () => {
 
                                     <div className="mt-4 flex flex-wrap gap-3">
                                         <button
-                                            onClick={() => setActionMode('confirm')}
+                                            onClick={() => void handleImmediateAction('confirm')}
+                                            disabled={isSubmittingAction}
                                             className="rounded-2xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700"
                                         >
                                             Conferma
@@ -516,7 +528,8 @@ const Reservations = () => {
                                         </button>
                                         {String(detail.status || '').trim().toLowerCase() === 'change_proposed' ? (
                                             <button
-                                                onClick={() => setActionMode('confirm_change')}
+                                                onClick={() => void handleImmediateAction('confirm_change')}
+                                                disabled={isSubmittingAction}
                                                 className="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
                                             >
                                                 Conferma modifica
@@ -524,13 +537,11 @@ const Reservations = () => {
                                         ) : null}
                                     </div>
 
-                                    {actionMode ? (
-                                        <div className="mt-5 space-y-4 rounded-3xl border border-gray-100 bg-gray-50/70 p-5">
+                                    {actionMode === 'reject' || actionMode === 'propose_change' ? (
+                                        <div className="mt-5 space-y-4 rounded-3xl border border-gray-200 bg-gray-50/70 p-5">
                                             <p className="text-sm font-black text-gray-900">
-                                                {actionMode === 'confirm' && 'Conferma richiesta'}
                                                 {actionMode === 'reject' && 'Rifiuta richiesta'}
                                                 {actionMode === 'propose_change' && 'Proponi nuovo slot'}
-                                                {actionMode === 'confirm_change' && 'Conferma modifica già proposta'}
                                             </p>
 
                                             {actionMode === 'reject' ? (
@@ -547,46 +558,47 @@ const Reservations = () => {
                                             ) : null}
 
                                             {actionMode === 'propose_change' ? (
-                                                <div className="grid gap-4 md:grid-cols-2">
-                                                    <div>
-                                                        <label className="mb-2 block text-sm font-medium text-gray-500">Nuova data</label>
-                                                        <input
-                                                            type="date"
-                                                            value={proposedDate}
-                                                            onChange={(event) => setProposedDate(event.target.value)}
-                                                            className="apple-input"
-                                                        />
+                                                <>
+                                                    <div className="grid gap-4 md:grid-cols-2">
+                                                        <div>
+                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuova data</label>
+                                                            <input
+                                                                type="date"
+                                                                value={proposedDate}
+                                                                onChange={(event) => setProposedDate(event.target.value)}
+                                                                className="apple-input"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="mb-2 block text-sm font-medium text-gray-500">Nuovo orario</label>
+                                                            <input
+                                                                type="time"
+                                                                value={proposedTime}
+                                                                onChange={(event) => setProposedTime(event.target.value)}
+                                                                className="apple-input"
+                                                            />
+                                                        </div>
                                                     </div>
                                                     <div>
-                                                        <label className="mb-2 block text-sm font-medium text-gray-500">Nuovo orario</label>
-                                                        <input
-                                                            type="time"
-                                                            value={proposedTime}
-                                                            onChange={(event) => setProposedTime(event.target.value)}
-                                                            className="apple-input"
+                                                        <label className="mb-2 block text-sm font-medium text-gray-500">Nota per il cliente</label>
+                                                        <textarea
+                                                            value={actionNote}
+                                                            onChange={(event) => setActionNote(event.target.value)}
+                                                            rows={3}
+                                                            className="apple-input resize-none"
+                                                            placeholder="Spiega la proposta alternativa in modo chiaro"
                                                         />
                                                     </div>
-                                                </div>
+                                                </>
                                             ) : null}
 
-                                            <div>
-                                                <label className="mb-2 block text-sm font-medium text-gray-500">Nota operativa</label>
-                                                <textarea
-                                                    value={actionNote}
-                                                    onChange={(event) => setActionNote(event.target.value)}
-                                                    rows={3}
-                                                    className="apple-input resize-none"
-                                                    placeholder="Nota interna, utile per timeline o lavorazione"
-                                                />
-                                            </div>
-
-                                            <div className="flex flex-wrap gap-3">
+                                            <div className="flex flex-wrap gap-3 pt-1">
                                                 <button
-                                                    onClick={() => void runAction()}
+                                                    onClick={() => void submitAction(actionMode)}
                                                     disabled={isSubmittingAction}
                                                     className="rounded-2xl bg-zirel-orange-dark px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-500 disabled:opacity-60"
                                                 >
-                                                    {isSubmittingAction ? 'Salvataggio...' : 'Salva azione'}
+                                                    {isSubmittingAction ? 'Salvataggio...' : actionMode === 'reject' ? 'Invia rifiuto' : 'Invia proposta'}
                                                 </button>
                                                 <button
                                                     onClick={resetActionForm}

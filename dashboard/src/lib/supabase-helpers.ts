@@ -385,12 +385,14 @@ const resolveInternalRecipient = (tenantRow: Record<string, unknown>) =>
         ''
     ) || null;
 
-const buildActivityLabel = (tenantRow: Record<string, unknown>) =>
+const buildActivityLabel = (tenantRow: Record<string, unknown>, detail: OperationalRequestDetail, tenantId: string) =>
     String(
         tenantRow.nome_attivita ||
         tenantRow.nome_ristorante ||
         tenantRow.hotel_name ||
+        detail.title ||
         tenantRow.tenant_id ||
+        tenantId ||
         'Zirèl'
     );
 
@@ -439,7 +441,7 @@ export const applyOperationalRequestAction = async (
     const currentDetail = await getOperationalRequestDetail(id, kind, tid);
     const { data: tenantData, error: tenantError } = await supabase
         .from('tenants')
-        .select('tenant_id, nome_attivita, nome_ristorante, hotel_name, notification_email, billing_email, mail')
+        .select('tenant_id, notification_email, billing_email, mail')
         .eq('tenant_id', tid)
         .single();
 
@@ -450,7 +452,7 @@ export const applyOperationalRequestAction = async (
     const customerRecipient = normalizeEmail(currentDetail.email || '');
     const dashboardUrl = 'https://dashboard.zirel.org?tab=prenotazioni';
     const nextStatus = mapActionToStatusValue(kind, input.action);
-    const activity = buildActivityLabel(tenantRow);
+    const activity = buildActivityLabel(tenantRow, currentDetail, tid);
     const requestContext =
         kind === 'appointment'
             ? {
