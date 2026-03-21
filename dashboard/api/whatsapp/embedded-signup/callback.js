@@ -5,6 +5,40 @@ import {
 } from '../../_lib/whatsapp-embedded-signup.js';
 import { syncTenantWhatsAppAccount } from '../../_lib/whatsapp-channel-sync.js';
 
+function cleanString(value) {
+    const normalized = String(value ?? '').trim();
+    return normalized || null;
+}
+
+function collectNestedIds(source, matcher, results = new Set()) {
+    if (!source || typeof source !== 'object') return results;
+    const record = source;
+
+    for (const [key, value] of Object.entries(record)) {
+        const lowerKey = String(key).toLowerCase();
+        if (matcher(lowerKey, value)) {
+            if (Array.isArray(value)) {
+                value.forEach((item) => {
+                    const id = cleanString(item?.id);
+                    if (id) results.add(id);
+                });
+            } else if (value && typeof value === 'object') {
+                const id = cleanString(value.id);
+                if (id) results.add(id);
+            } else {
+                const id = cleanString(value);
+                if (id) results.add(id);
+            }
+        }
+
+        if (value && typeof value === 'object') {
+            collectNestedIds(value, matcher, results);
+        }
+    }
+
+    return results;
+}
+
 function json(res, status, body) {
     res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
     res.send(JSON.stringify(body));
@@ -24,6 +58,258 @@ function createSupabaseAdmin() {
             persistSession: false,
         },
     });
+}
+
+function getMetaConfig() {
+    return {
+        appId: cleanString(process.env.META_APP_ID) || cleanString(process.env.VITE_META_APP_ID),
+        appSecret:
+            cleanString(process.env.META_APP_SECRET) ||
+            cleanString(process.env.FACEBOOK_APP_SECRET) ||
+            cleanString(process.env.APP_SECRET),
+        apiVersion:
+            cleanString(process.env.META_API_VERSION) ||
+            cleanString(process.env.VITE_META_API_VERSION) ||
+            'v25.0',
+        redirectUri:
+            cleanString(process.env.META_EMBEDDED_SIGNUP_REDIRECT_URI) ||
+            cleanString(process.env.WHATSAPP_EMBEDDED_SIGNUP_REDIRECT_URI),
+    };
+}
+
+async function metaGraphRequest({ path, accessToken, apiVersion, method = 'GET', body, searchParams }) {
+    const version = cleanString(apiVersion) || 'v25.0';
+    const url = new URL(`https://graph.facebook.com/${version}/${String(path || '').replace(/^\/+/, '')}`);
+
+    if (searchParams && typeof searchParams === 'object') {
+        Object.entries(searchParams).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+                url.searchParams.set(key, String(value));
+            }
+        });
+    }
+
+    const response = await fetch(url.toString(), {
+        method,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+    });
+
+    let payload = null;
+    try {
+        payload = await response.json();
+    } catch {
+        payload = null;
+    }
+
+    if (!response.ok) {
+        const details =
+            payload?.error?.message ||
+            payload?.message ||
+            `META_GRAPH_HTTP_${response.status}`;
+        throw new Error(`META_GRAPH_REQUEST_FAILED:${details}`);
+    }
+
+    return payload;
+}
+
+async function exchangeSignupCodeForAccessToken(signupCode) {
+    const code = cleanString(signupCode);
+    const config = getMetaConfig();
+
+    if (!code) {
+        throw new Error('MISSING_SIGNUP_CODE');
+    }
+
+    if (!config.appId || !config.appSecret) {
+        throw new Error('MISSING_META_APP_CONFIG');
+    }
+
+    const url = new URL(`https://graph.facebook.com/${config.apiVersion}/oauth/access_token`);
+    url.searchParams.set('client_id', config.appId);
+    url.searchParams.set('client_secret', config.appSecret);
+    url.searchParams.set('code', code);
+    if (config.redirectUri) {
+        url.searchParams.set('redirect_uri', config.redirectUri);
+    }
+
+    const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    let payload = null;
+    try {
+        payload = await response.json();
+    } catch {
+        payload = null;
+    }
+
+    if (!response.ok) {
+        const details =
+            payload?.error?.message ||
+            payload?.message ||
+            `META_OAUTH_HTTP_${response.status}`;
+        throw new Error(`META_CODE_EXCHANGE_FAILED:${details}`);
+    }
+
+    const accessToken = cleanString(payload?.access_token);
+    if (!accessToken) {
+        throw new Error('META_CODE_EXCHANGE_MISSING_ACCESS_TOKEN');
+    }
+
+    return {
+        accessToken,
+        tokenType: cleanString(payload?.token_type),
+        expiresIn: payload?.expires_in ?? null,
+    };
+}
+
+async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId }) {
+    const wabaIds = new Set();
+    const businessIds = new Set();
+
+    if (preferredBusinessId) {
+        businessIds.add(preferredBusinessId);
+    }
+
+    const mePayload = await metaGraphRequest({
+        path: 'me',
+        accessToken,
+        apiVersion,
+        searchParams: {
+            fields: [
+                'id',
+                'name',
+                'businesses{id,name}',
+                'owned_whatsapp_business_accounts{id,name}',
+                'client_whatsapp_business_accounts{id,name}',
+                'whatsapp_business_accounts{id,name}',
+            ].join(','),
+        },
+    });
+
+    collectNestedIds(
+        mePayload,
+        (key) => key.includes('whatsapp_business_account'),
+        wabaIds
+    );
+    collectNestedIds(
+        mePayload,
+        (key) => key === 'businesses',
+        businessIds
+    );
+
+    for (const businessId of businessIds) {
+        try {
+            const businessPayload = await metaGraphRequest({
+                path: String(businessId),
+                accessToken,
+                apiVersion,
+                searchParams: {
+                    fields: 'owned_whatsapp_business_accounts{id,name},client_whatsapp_business_accounts{id,name},whatsapp_business_accounts{id,name}',
+                },
+            });
+
+            collectNestedIds(
+                businessPayload,
+                (key) => key.includes('whatsapp_business_account'),
+                wabaIds
+            );
+        } catch (error) {
+            console.warn('[whatsapp-embedded-signup] business lookup skipped', {
+                business_id: businessId,
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
+
+    return Array.from(wabaIds);
+}
+
+async function fetchPhoneNumbersForWaba({ accessToken, apiVersion, wabaId }) {
+    const payload = await metaGraphRequest({
+        path: `${wabaId}/phone_numbers`,
+        accessToken,
+        apiVersion,
+        searchParams: {
+            fields: 'id,display_phone_number,verified_name,quality_rating',
+        },
+    });
+
+    return Array.isArray(payload?.data) ? payload.data : [];
+}
+
+async function resolveEmbeddedSignupFromCode(rawPayload) {
+    const signupCode =
+        cleanString(rawPayload?.signup_code) ||
+        cleanString(rawPayload?.code) ||
+        cleanString(rawPayload?.signup_session_id);
+
+    if (!signupCode) {
+        return null;
+    }
+
+    const metaConfig = getMetaConfig();
+    const exchange = await exchangeSignupCodeForAccessToken(signupCode);
+    const preferredBusinessId =
+        cleanString(rawPayload?.business_id) ||
+        cleanString(rawPayload?.businessId);
+    const wabaIds = await discoverWabaIds({
+        accessToken: exchange.accessToken,
+        apiVersion: metaConfig.apiVersion,
+        preferredBusinessId,
+    });
+
+    if (!wabaIds.length) {
+        throw new Error('META_SIGNUP_DISCOVERY_FAILED:missing_waba_id');
+    }
+
+    for (const wabaId of wabaIds) {
+        try {
+            const phoneNumbers = await fetchPhoneNumbersForWaba({
+                accessToken: exchange.accessToken,
+                apiVersion: metaConfig.apiVersion,
+                wabaId,
+            });
+
+            const firstPhone = Array.isArray(phoneNumbers) ? phoneNumbers[0] : null;
+            const metaPhoneNumberId = cleanString(firstPhone?.id);
+            if (!metaPhoneNumberId) continue;
+
+            return {
+                ok: true,
+                data: {
+                    signup_session_id:
+                        cleanString(rawPayload?.signup_session_id) ||
+                        cleanString(rawPayload?.session_id) ||
+                        cleanString(rawPayload?.signupSessionId),
+                    business_id: preferredBusinessId,
+                    meta_phone_number_id: metaPhoneNumberId,
+                    waba_id: wabaId,
+                    display_phone_number: cleanString(firstPhone?.display_phone_number),
+                    verified_name: cleanString(firstPhone?.verified_name),
+                    connection_status: 'connected',
+                    credential_mode: 'platform_managed',
+                    credential_provider: 'n8n_credentials',
+                    replace_existing: rawPayload?.replace_existing === true || rawPayload?.replaceExisting === true,
+                },
+                access_token: exchange.accessToken,
+            };
+        } catch (error) {
+            console.warn('[whatsapp-embedded-signup] phone discovery skipped', {
+                waba_id: wabaId,
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
+
+    throw new Error('META_SIGNUP_DISCOVERY_FAILED:missing_phone_number_id');
 }
 
 async function resolveTenantId(supabase, req) {
@@ -160,7 +446,23 @@ export default async function handler(req, res) {
         return json(res, tenant.status, tenant);
     }
 
-    const normalized = normalizeEmbeddedSignupPayload(req.body);
+    let normalized = normalizeEmbeddedSignupPayload(req.body);
+    let exchangedAccessToken = null;
+    if (!normalized.ok) {
+        try {
+            const resolved = await resolveEmbeddedSignupFromCode(req.body);
+            if (resolved?.ok) {
+                normalized = resolved;
+                exchangedAccessToken = resolved.access_token || null;
+            }
+        } catch (exchangeError) {
+            console.warn('[whatsapp-embedded-signup] code exchange failed', {
+                tenant_id: tenant.tenant_id,
+                error: exchangeError instanceof Error ? exchangeError.message : String(exchangeError),
+            });
+        }
+    }
+
     if (!normalized.ok) {
         console.warn('[whatsapp-embedded-signup] invalid payload', {
             tenant_id: tenant.tenant_id,
@@ -212,6 +514,7 @@ export default async function handler(req, res) {
             meta_phone_number_id: normalized.data.meta_phone_number_id,
             waba_id: normalized.data.waba_id,
             signup_session_id: normalized.data.signup_session_id,
+            resolved_via_code_exchange: Boolean(exchangedAccessToken),
         });
 
         return json(res, 200, {

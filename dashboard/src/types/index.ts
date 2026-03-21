@@ -240,13 +240,14 @@ export interface WhatsAppChannelSummary {
 }
 
 export interface CompleteWhatsAppEmbeddedSignupPayload {
-    meta_phone_number_id: string;
-    waba_id: string;
+    meta_phone_number_id?: string;
+    waba_id?: string;
     display_phone_number?: string | null;
     verified_name?: string | null;
     connection_status?: WhatsAppConnectionStatus | string;
     business_id?: string | null;
     signup_session_id?: string | null;
+    signup_code?: string | null;
     replace_existing?: boolean;
 }
 

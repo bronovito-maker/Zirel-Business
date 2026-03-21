@@ -133,6 +133,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
         connection_status: 'connected',
         business_id: '',
         signup_session_id: '',
+        signup_code: '',
         replace_existing: false,
     });
 
@@ -188,10 +189,11 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     const webhookMeta = getWebhookMeta(summary);
     const automationEnabled = summary?.ai_enabled !== false;
     const hasMetaIdentifiers = Boolean(
-        signupForm.meta_phone_number_id.trim() &&
-        signupForm.waba_id.trim()
+        (signupForm.meta_phone_number_id || '').trim() &&
+        (signupForm.waba_id || '').trim()
     );
-    const hasSignupSession = Boolean(signupForm.signup_session_id?.trim());
+    const hasSignupCode = Boolean(signupForm.signup_code?.trim());
+    const hasSignupSession = Boolean(signupForm.signup_session_id?.trim() || signupForm.signup_code?.trim());
 
     const updateSignupField = <K extends keyof CompleteWhatsAppEmbeddedSignupPayload>(
         key: K,
@@ -215,21 +217,22 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
     };
 
     const handleSubmitSignup = async () => {
-        if (!signupForm.meta_phone_number_id.trim() || !signupForm.waba_id.trim()) {
-            toast.error('Inserisci almeno phone number ID e WABA ID.');
+        if (!hasMetaIdentifiers && !hasSignupCode) {
+            toast.error('Completa Meta oppure inserisci almeno phone number ID e WABA ID.');
             return;
         }
 
         try {
             setIsSubmitting(true);
             const result = await completeWhatsAppEmbeddedSignup({
-                meta_phone_number_id: signupForm.meta_phone_number_id.trim(),
-                waba_id: signupForm.waba_id.trim(),
+                meta_phone_number_id: (signupForm.meta_phone_number_id || '').trim() || undefined,
+                waba_id: (signupForm.waba_id || '').trim() || undefined,
                 display_phone_number: signupForm.display_phone_number?.trim() || null,
                 verified_name: signupForm.verified_name?.trim() || null,
                 connection_status: signupForm.connection_status || 'connected',
                 business_id: signupForm.business_id?.trim() || null,
                 signup_session_id: signupForm.signup_session_id?.trim() || null,
+                signup_code: signupForm.signup_code?.trim() || null,
                 replace_existing: signupForm.replace_existing === true,
             });
 
@@ -264,13 +267,13 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                 business_id: extracted.business_id || current.business_id || '',
                 display_phone_number: extracted.display_phone_number || current.display_phone_number || '',
                 verified_name: extracted.verified_name || current.verified_name || '',
-                signup_session_id: result.code || current.signup_session_id || '',
+                signup_code: result.code || current.signup_code || '',
             }));
 
             if (extracted.meta_phone_number_id && extracted.waba_id) {
                 toast.success('Dati Meta ricevuti. Ora puoi completare il collegamento.');
             } else if (result.code) {
-                toast.success('Flusso Meta completato. Se alcuni campi non si sono popolati, incolla il payload finale e completa il collegamento.');
+                toast.success('Flusso Meta completato. Zirèl proverà a recuperare automaticamente gli identificativi lato server.');
             } else {
                 toast('Meta ha chiuso il flusso, ma non abbiamo ancora letto tutti gli identificativi nel browser.', {
                     icon: <TriangleAlert className="w-4 h-4 text-orange-600" />,
@@ -726,11 +729,11 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             <TriangleAlert className="w-5 h-5 text-orange-600 mt-0.5 shrink-0" />
                             <div className="text-sm text-orange-800 space-y-2">
                                 <p>
-                                    Se Meta non restituisce subito tutti gli identificativi nel browser, puoi ancora completare il collegamento usando questo form come fallback sicuro.
+                                    Se Meta non restituisce subito tutti gli identificativi nel browser, Zirèl prova prima a recuperarli lato server usando il code del flow Meta. In alternativa puoi sempre usare il fallback manuale.
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Copy className="w-4 h-4 shrink-0" />
-                                    Dati minimi richiesti: `meta_phone_number_id` e `waba_id`.
+                                    Dati minimi richiesti: `meta_phone_number_id` e `waba_id`, oppure un `signup code` valido già ricevuto dal launcher Meta.
                                 </p>
                             </div>
                         </div>
@@ -763,7 +766,7 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                                 </button>
                                 <button
                                     onClick={() => void handleSubmitSignup()}
-                                    disabled={isSubmitting || !hasMetaIdentifiers}
+                                    disabled={isSubmitting || (!hasMetaIdentifiers && !hasSignupCode)}
                                     className="apple-button flex items-center justify-center gap-2 text-white disabled:opacity-60 w-full sm:w-auto"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
@@ -772,9 +775,9 @@ const WhatsAppChannelCard = ({ tenantId, onOpenConversations }: WhatsAppChannelC
                             </div>
                         </div>
 
-                        {!hasMetaIdentifiers ? (
+                        {!hasMetaIdentifiers && !hasSignupCode ? (
                             <p className="text-xs text-gray-500">
-                                Il pulsante `Completa collegamento` si attiva quando Zirèl riceve o inserisci manualmente sia `Meta phone number ID` sia `WABA ID`.
+                                Il pulsante `Completa collegamento` si attiva quando Zirèl riceve il `signup code` dal launcher Meta oppure quando inserisci manualmente sia `Meta phone number ID` sia `WABA ID`.
                             </p>
                         ) : null}
 
