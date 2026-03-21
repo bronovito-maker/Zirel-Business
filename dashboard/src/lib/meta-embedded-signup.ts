@@ -27,6 +27,7 @@ export interface EmbeddedSignupIdentifiers {
 }
 
 const META_SDK_URL = 'https://connect.facebook.net/en_US/sdk.js';
+const DEBUG_PREFIX = '[Zirel WhatsApp Embedded Signup]';
 
 const getRequiredEnv = (key: string) => String(import.meta.env[key] || '').trim();
 
@@ -177,7 +178,12 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
                 : event.data;
 
             if (!data || typeof data !== 'object') return;
+            console.info(`${DEBUG_PREFIX} postMessage received`, {
+                origin: event.origin || null,
+                data,
+            });
             const extracted = extractEmbeddedSignupIdentifiers(data);
+            console.info(`${DEBUG_PREFIX} extracted identifiers from postMessage`, extracted);
             if (extracted.meta_phone_number_id && extracted.waba_id) {
                 resolveOnce({
                     code: pendingCode,
@@ -216,6 +222,7 @@ export const launchEmbeddedSignup = async (): Promise<EmbeddedSignupLaunchResult
         try {
             window.FB?.login(
                 (response) => {
+                    console.info(`${DEBUG_PREFIX} FB.login callback`, response);
                     const authResponse = response?.authResponse as Record<string, unknown> | undefined;
                     const code = readString(authResponse?.code) || readString((response as Record<string, unknown>)?.code);
 
