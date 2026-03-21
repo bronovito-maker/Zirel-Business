@@ -16,10 +16,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -2736,
-        -176
+        -144,
+        -32
       ],
-      "id": "cd15c669-ff7c-4ddb-bf4a-6867d4d934e1"
+      "id": "9944ce88-82a2-4d2a-a3fc-633fa03b232e"
     },
     {
       "parameters": {
@@ -30,10 +30,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -2480,
-        -176
+        112,
+        -32
       ],
-      "id": "1469be43-4935-408f-954c-0c2d4f03737d",
+      "id": "c7ef8966-0627-4f96-bf0d-07c55586d027",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -49,10 +49,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2192,
-        -176
+        400,
+        -32
       ],
-      "id": "47f9c547-42c5-4266-b126-e1a3bff27273"
+      "id": "6ee409a3-9c95-499e-82da-07715463340a"
     },
     {
       "parameters": {
@@ -101,10 +101,10 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -2736,
-        256
+        -144,
+        400
       ],
-      "id": "64904117-74f5-4827-8ec1-e7a25d2309b7"
+      "id": "87f0268c-6c87-4fb2-a07d-ea3bef757298"
     },
     {
       "parameters": {
@@ -114,10 +114,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2480,
-        256
+        112,
+        400
       ],
-      "id": "48fa71c0-498f-4eec-9a16-ad74c0099c2b"
+      "id": "3c07d961-9168-414b-ab84-b102ea046c91"
     },
     {
       "parameters": {
@@ -183,10 +183,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -1888,
-        32
+        704,
+        176
       ],
-      "id": "97059691-2a63-47b9-be6d-00b6e0563e48",
+      "id": "01de817f-5c4b-4a84-8078-ec8de9ff0b4a",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -195,6 +195,7 @@
       }
     }
   ],
+  "pinData": {},
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -252,18 +253,15 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "a37f791f-d4fd-499c-939d-573b4530fa12",
+  "versionId": "7eb8a104-7a34-4811-ae84-89138a86950e",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
   },
-  "id": "ZirelBillingReminderEngine",
-  "tags": [],
-  "pinData": {}
+  "id": "byffaAWcHnknefuq",
+  "tags": []
 }

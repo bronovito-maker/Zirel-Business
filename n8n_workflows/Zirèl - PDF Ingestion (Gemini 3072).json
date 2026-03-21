@@ -1,0 +1,213 @@
+{
+  "name": "Zirèl - PDF Ingestion (Gemini 3072)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ingest-zirel-doc-http",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        7040,
+        816
+      ],
+      "id": "af690cda-1a41-427d-9ffa-b716dbe9caff",
+      "name": "Webhook",
+      "webhookId": "ingest-zirel-doc-http"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.file_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        7264,
+        816
+      ],
+      "id": "867ddb01-5e4c-4a9c-bf60-c0a0a33889dd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "zirel_vectors",
+          "mode": "list",
+          "cachedResultName": "zirel_vectors"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        7712,
+        816
+      ],
+      "id": "e650eb7e-5b01-4089-a614-34ce837311c7",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        7728,
+        1040
+      ],
+      "id": "50ed695a-e177-4ea0-8ade-6a02bbd0cf28",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "pdfLoader",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "tenant_id",
+                "value": "={{ $('Webhook').item.json.body.tenant_id }}"
+              },
+              {
+                "name": "filename",
+                "value": "={{ $('Webhook').item.json.body.filename }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        7856,
+        1040
+      ],
+      "id": "17e30709-e8a2-4930-bb80-ca520b9f21b7",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "995c23d4-4dd6-4bfe-8544-94e486ab032b",
+              "name": "tenant_id",
+              "value": "={{ $('Webhook').item.json.body.tenant_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7488,
+        816
+      ],
+      "id": "cc01e16c-ee5e-4338-8f09-a5dea878427f",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "d491101b-6157-4e0e-8055-ecbb35c39b3b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "cNrtzetWsJwWr5JQ",
+  "tags": []
+}

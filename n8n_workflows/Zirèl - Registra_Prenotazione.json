@@ -30,238 +30,28 @@
               "name": "business_type"
             },
             {
-              "name": "trace_id"
+              "name": "notification_email"
             },
             {
-              "name": "session_id"
+              "name": "billing_email"
             },
             {
-              "name": "source"
+              "name": "telegram_chat_id"
             },
             {
-              "name": "restaurant_booking_provider"
-            },
-            {
-              "name": "restaurant_booking_api_url"
-            },
-            {
-              "name": "restaurant_calendar_api_url"
-            },
-            {
-              "name": "availability_api_url"
-            },
-            {
-              "name": "adapter_test_mode"
+              "name": "internal_email"
             }
           ]
         }
       },
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -3584,
-        -896
-      ],
       "id": "c055762a-8fe7-4141-a639-df2372f30060",
-      "name": "When Executed by Another Workflow"
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst tenant_id = normalizeSpaces(input.tenant_id);\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\nconst business_type = normalizeSpaces(input.business_type).toLowerCase();\nconst nome_cliente = normalizeSpaces(input.nome_cliente)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst note_prenotazione = normalizeSpaces(input.note_prenotazione);\n\nfunction todayRome() {\n  const now = new Date();\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  return new Date(Date.UTC(\n    Number(parts.find((part) => part.type === 'year')?.value),\n    Number(parts.find((part) => part.type === 'month')?.value) - 1,\n    Number(parts.find((part) => part.type === 'day')?.value)\n  ));\n}\n\nfunction toIso(date) {\n  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;\n}\n\nfunction nextWeekday(index) {\n  const base = todayRome();\n  let diff = index - base.getUTCDay();\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeDate(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data prenotazione mancante.' };\n  if (raw === 'oggi') return { iso: toIso(todayRome()) };\n  if (raw === 'domani') {\n    const date = todayRome();\n    date.setUTCDate(date.getUTCDate() + 1);\n    return { iso: toIso(date) };\n  }\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n  if (weekdayMap[raw] !== undefined) return { iso: nextWeekday(weekdayMap[raw]) };\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n  return { iso: null, code: 'NEED_EXACT_SLOT', message: 'Data prenotazione non abbastanza precisa.' };\n}\n\nfunction normalizeTime(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction formatLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst ora = normalizeTime(input.ora);\nconst persone = Number(String(input.persone || '').trim());\n\nlet validation_code = '';\nlet validation_message = '';\nif (business_type !== 'restaurant') {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow funziona solo per tenant restaurant.';\n} else if (!tenant_id || !nome_cliente || !telefono || !parsedDate.iso || !ora || Number.isNaN(persone) || persone <= 0) {\n  validation_code = parsedDate.code || (!ora ? 'NEED_EXACT_SLOT' : 'MISSING_REQUIRED_FIELDS');\n  validation_message = parsedDate.message || (!ora ? 'Per registrare la prenotazione serve un orario preciso.' : 'Mancano uno o più campi obbligatori.');\n} else if (persone >= 10) {\n  validation_code = 'GROUP_REQUIRES_MANUAL_HANDLING';\n  validation_message = 'Gruppo numeroso da gestire manualmente.';\n}\n\nconst data_prenotazione = parsedDate.iso;\nconst data_prenotazione_label = formatLabel(data_prenotazione);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    source,\n    business_type,\n    nome_cliente,\n    telefono,\n    note_prenotazione,\n    data_prenotazione,\n    data_prenotazione_label,\n    ora,\n    persone: Number.isNaN(persone) ? null : persone,\n    requested_slot_iso: data_prenotazione && ora ? `${data_prenotazione}T${ora}:00+01:00` : null,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : (validation_code ? 'rejected' : 'pending_check'),\n    retryable: false,\n  },\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
       "position": [
-        -3328,
-        -896
-      ],
-      "id": "addbe1af-d765-47b8-a0cc-dc2fafb02096",
-      "name": "Normalize Reservation Request1"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "bd6decc5-b6d7-4935-ba70-611a430ec94a",
-              "leftValue": "={{ !!$json.validation_code && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        -3072,
-        -1024
-      ],
-      "id": "49b702b4-e0a7-4739-b7fc-ed1bc308cb4e",
-      "name": "Check Validation Error1"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "18880940-f54c-4319-a1a8-cbde17cd2d6e",
-              "name": "success",
-              "value": false,
-              "type": "boolean"
-            },
-            {
-              "id": "51e743ba-8673-402d-9362-6129191f62b0",
-              "name": "code",
-              "value": "={{ $json.validation_code }}",
-              "type": "string"
-            },
-            {
-              "id": "7129ecf7-e84d-408f-9721-5fe3416c745f",
-              "name": "message",
-              "value": "={{ $json.validation_message }}",
-              "type": "string"
-            },
-            {
-              "id": "deb6e922-cb74-4334-b329-d0c023fcb7c7",
-              "name": "final_reply",
-              "value": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" ? \"Al momento la prenotazione automatica non è disponibile per questo tipo di attività.\" : \"Per registrare davvero la prenotazione mi servono tutti i dati obbligatori, con una data e un orario precisi.\" }}",
-              "type": "string"
-            },
-            {
-              "id": "bda6f2a7-70f6-4e31-87cd-a70cf8f24a64",
-              "name": "tenant_id",
-              "value": "={{ $json.tenant_id }}",
-              "type": "string"
-            },
-            {
-              "id": "5e33bca7-e79d-4286-9e28-47e61a293ca4",
-              "name": "trace_id",
-              "value": "={{ $json.trace_id }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -2816,
-        -1040
-      ],
-      "id": "065c5b36-9736-4cd9-881c-63c066806e89",
-      "name": "Validation Error Response1"
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $json;\nconst provider = String(\n  input.restaurant_booking_provider ||\n  input.booking_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.restaurant_booking_api_url ||\n  input.restaurant_calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome_cliente: input.nome_cliente,\n        telefono: input.telefono,\n      },\n      reservation: {\n        date: input.data_prenotazione,\n        time: input.ora,\n        iso: input.requested_slot_iso,\n        persone: input.persone,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -2816,
-        -896
-      ],
-      "id": "e0732b27-24b6-4284-9a74-8541677015d6",
-      "name": "Build Availability Payload1"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "0ba4ca52-2a59-465a-90ef-89e70e01f3eb",
-              "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        -2560,
-        -896
-      ],
-      "id": "9d6e98f3-f86b-43e7-b687-822f2ebfc30d",
-      "name": "Use Live Availability Adapter1"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $json.provider_api_url }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "X-TENANT-ID",
-              "value": "={{ $json.tenant_id }}"
-            },
-            {
-              "name": "X-TRACE-ID",
-              "value": "={{ $json.trace_id }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.availability_payload }}",
-        "options": {
-          "timeout": 15000
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -2304,
-        -992
-      ],
-      "id": "e542a607-0e26-4625-a1fd-509e1c73e579",
-      "name": "Availability Adapter1",
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $json;\nconst fromHttp = input.body || input.data || null;\nconst adapter = input.adapter_test_mode\n  ? {\n      success: false,\n      code: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'GROUP_REQUIRES_MANUAL_HANDLING' : 'AVAILABILITY_ADAPTER_NOT_CONFIGURED',\n      availability_status: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review',\n      reference: null,\n      retryable: true,\n    }\n  : (fromHttp || input);\n\nlet availability_status = String(adapter.availability_status || '').toLowerCase();\nif (!availability_status) {\n  availability_status = adapter.success ? 'confirmed' : (input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review');\n}\n\nconst business_status = availability_status === 'confirmed'\n  ? 'confirmed'\n  : availability_status === 'unavailable'\n    ? 'rejected'\n    : 'manual_review';\n\nlet code = String(adapter.code || '');\nif (!code) {\n  code = business_status === 'confirmed'\n    ? 'RESTAURANT_BOOKING_CONFIRMED'\n    : business_status === 'rejected'\n      ? 'RESTAURANT_SLOT_UNAVAILABLE'\n      : 'RESTAURANT_BOOKING_MANUAL_REVIEW';\n}\n\nlet message = '';\nlet final_reply = '';\nif (business_status === 'confirmed') {\n  message = 'Prenotazione registrata correttamente.';\n  final_reply = `Perfetto, ho registrato la prenotazione per ${input.nome_cliente} il ${input.data_prenotazione_label} alle ${input.ora} per ${input.persone} persone.`;\n} else if (business_status === 'rejected') {\n  message = 'Slot non disponibile.';\n  final_reply = `Ho raccolto la richiesta, ma ${input.data_prenotazione_label} alle ${input.ora} non risulta disponibile. Possiamo cercare un altro orario.`;\n} else {\n  message = 'Richiesta salvata per verifica manuale.';\n  final_reply = input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING'\n    ? 'Ho raccolto la richiesta per il gruppo numeroso, ma serve una gestione manuale del locale. Ti ricontatteranno al più presto.'\n    : `Ho raccolto la richiesta, ma non posso confermare subito il tavolo per ${input.data_prenotazione_label} alle ${input.ora}. Il locale verificherà e ti ricontatterà a breve.`;\n}\n\nreturn [{\n  json: {\n    ...input,\n    success: business_status === 'confirmed',\n    code,\n    message,\n    final_reply,\n    reference: adapter.reference || adapter.booking_reference || null,\n    availability_status,\n    business_status,\n    retryable: Boolean(adapter.retryable ?? business_status !== 'confirmed'),\n    raw_provider_response: adapter,\n  },\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -2048,
-        -896
-      ],
-      "id": "02d87918-b466-4981-abc7-23f3fa42ed6a",
-      "name": "Normalize Availability Response1"
+        272,
+        928
+      ]
     },
     {
       "parameters": {
@@ -306,10 +96,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -1792,
-        -896
+        1840,
+        1024
       ],
-      "id": "82717e0f-fc50-4a15-8604-7278345fe794",
+      "id": "33b7eb0e-efc0-4ebe-b727-733be12a00d8",
       "name": "Create a row",
       "credentials": {
         "supabaseApi": {
@@ -320,16 +110,214 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $('Normalize Availability Response1').item.json;\nconst record = $('Create a row').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  business_type: input.business_type,\n  reservation_id: record.id || null,\n  nome_cliente: input.nome_cliente,\n  telefono: input.telefono,\n  data_prenotazione: input.data_prenotazione,\n  data_prenotazione_label: input.data_prenotazione_label,\n  ora: input.ora,\n  persone: input.persone,\n  note_prenotazione: input.note_prenotazione || '',\n  status: input.business_status,\n  reference: input.reference || null,\n  nome_attivita: input.nome_attivita || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst rows = [\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: 'restaurant_guest_confirmation',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n];\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_restaurant:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
+        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst tenant_id = normalizeSpaces(input.tenant_id);\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\nconst business_type = normalizeSpaces(input.business_type).toLowerCase();\nconst nome_cliente = normalizeSpaces(input.nome_cliente)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst note_prenotazione = normalizeSpaces(input.note_prenotazione);\n\nfunction todayRome() {\n  const now = new Date();\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  return new Date(Date.UTC(\n    Number(parts.find((part) => part.type === 'year')?.value),\n    Number(parts.find((part) => part.type === 'month')?.value) - 1,\n    Number(parts.find((part) => part.type === 'day')?.value)\n  ));\n}\n\nfunction toIso(date) {\n  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;\n}\n\nfunction nextWeekday(index) {\n  const base = todayRome();\n  let diff = index - base.getUTCDay();\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeDate(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data prenotazione mancante.' };\n  if (raw === 'oggi') return { iso: toIso(todayRome()) };\n  if (raw === 'domani') {\n    const date = todayRome();\n    date.setUTCDate(date.getUTCDate() + 1);\n    return { iso: toIso(date) };\n  }\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n  if (weekdayMap[raw] !== undefined) return { iso: nextWeekday(weekdayMap[raw]) };\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n  return { iso: null, code: 'NEED_EXACT_SLOT', message: 'Data prenotazione non abbastanza precisa.' };\n}\n\nfunction normalizeTime(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction formatLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst ora = normalizeTime(input.ora);\nconst persone = Number(String(input.persone || '').trim());\n\nlet validation_code = '';\nlet validation_message = '';\nif (business_type !== 'restaurant') {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow funziona solo per tenant restaurant.';\n} else if (!tenant_id || !nome_cliente || !telefono || !parsedDate.iso || !ora || Number.isNaN(persone) || persone <= 0) {\n  validation_code = parsedDate.code || (!ora ? 'NEED_EXACT_SLOT' : 'MISSING_REQUIRED_FIELDS');\n  validation_message = parsedDate.message || (!ora ? 'Per registrare la prenotazione serve un orario preciso.' : 'Mancano uno o più campi obbligatori.');\n} else if (persone >= 10) {\n  validation_code = 'GROUP_REQUIRES_MANUAL_HANDLING';\n  validation_message = 'Gruppo numeroso da gestire manualmente.';\n}\n\nconst data_prenotazione = parsedDate.iso;\nconst data_prenotazione_label = formatLabel(data_prenotazione);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    source,\n    business_type,\n    nome_cliente,\n    telefono,\n    note_prenotazione,\n    data_prenotazione,\n    data_prenotazione_label,\n    ora,\n    persone: Number.isNaN(persone) ? null : persone,\n    requested_slot_iso: data_prenotazione && ora ? `${data_prenotazione}T${ora}:00+01:00` : null,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : (validation_code ? 'rejected' : 'pending_check'),\n    retryable: false,\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1536,
-        -992
+        496,
+        928
       ],
-      "id": "8666038d-fc9f-4b6d-874d-0c38fe13cab9",
-      "name": "Build Notification Outbox Rows1"
+      "id": "74364433-bbf6-41f2-b0d1-56a398e0488d",
+      "name": "Normalize Reservation Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c428fd70-b3cc-4259-82bd-8098b00d6d89",
+              "leftValue": "={{ !!$json.validation_code && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        928
+      ],
+      "id": "c6bc6219-f774-4792-8d39-145e405627b6",
+      "name": "Check Validation Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c22c3cb4-58b8-4ed0-aa55-652c299a5634",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "e2407940-677e-4f38-b957-d0bdf3c2dbac",
+              "name": "code",
+              "value": "={{ $json.validation_code }}",
+              "type": "string"
+            },
+            {
+              "id": "f96b263a-2617-4d3f-ad93-ed08d685b099",
+              "name": "message",
+              "value": "={{ $json.validation_message }}",
+              "type": "string"
+            },
+            {
+              "id": "708fdde5-dc49-4436-a999-fac12f63eccf",
+              "name": "final_reply",
+              "value": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" ? \"Al momento la prenotazione automatica non è disponibile per questo tipo di attività.\" : \"Per registrare davvero la prenotazione mi servono tutti i dati obbligatori, con una data e un orario precisi.\" }}",
+              "type": "string"
+            },
+            {
+              "id": "daf52074-1cb7-440a-a5d9-41e6831f9ec7",
+              "name": "tenant_id",
+              "value": "={{ $json.tenant_id }}",
+              "type": "string"
+            },
+            {
+              "id": "84079ee9-9ef3-4408-8fd9-cf7e0b62d369",
+              "name": "trace_id",
+              "value": "={{ $json.trace_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        832
+      ],
+      "id": "6de23ba0-d3c6-46ed-a4fc-8185859f0c74",
+      "name": "Validation Error Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst provider = String(\n  input.restaurant_booking_provider ||\n  input.booking_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.restaurant_booking_api_url ||\n  input.restaurant_calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome_cliente: input.nome_cliente,\n        telefono: input.telefono,\n      },\n      reservation: {\n        date: input.data_prenotazione,\n        time: input.ora,\n        iso: input.requested_slot_iso,\n        persone: input.persone,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        1024
+      ],
+      "id": "85cf61a0-b964-4575-845d-b8203de8ae2d",
+      "name": "Build Availability Payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b0beb7d1-ccf7-47a3-abbc-d8246fe5e65c",
+              "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        1024
+      ],
+      "id": "372fe6a4-68a6-41ac-98f1-f39e63ad3633",
+      "name": "Use Live Availability Adapter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.provider_api_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-TENANT-ID",
+              "value": "={{ $json.tenant_id }}"
+            },
+            {
+              "name": "X-TRACE-ID",
+              "value": "={{ $json.trace_id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.availability_payload }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1392,
+        960
+      ],
+      "id": "90a34a03-89cf-4bbd-8a3a-a4e79bd58db0",
+      "name": "Availability Adapter",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst fromHttp = input.body || input.data || null;\nconst adapter = input.adapter_test_mode\n  ? {\n      success: false,\n      code: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'GROUP_REQUIRES_MANUAL_HANDLING' : 'AVAILABILITY_ADAPTER_NOT_CONFIGURED',\n      availability_status: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review',\n      reference: null,\n      retryable: true,\n    }\n  : (fromHttp || input);\n\nlet availability_status = String(adapter.availability_status || '').toLowerCase();\nif (!availability_status) {\n  availability_status = adapter.success ? 'confirmed' : (input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review');\n}\n\nconst business_status = availability_status === 'confirmed'\n  ? 'confirmed'\n  : availability_status === 'unavailable'\n    ? 'rejected'\n    : 'manual_review';\n\nlet code = String(adapter.code || '');\nif (!code) {\n  code = business_status === 'confirmed'\n    ? 'RESTAURANT_BOOKING_CONFIRMED'\n    : business_status === 'rejected'\n      ? 'RESTAURANT_SLOT_UNAVAILABLE'\n      : 'RESTAURANT_BOOKING_MANUAL_REVIEW';\n}\n\nlet message = '';\nlet final_reply = '';\nif (business_status === 'confirmed') {\n  message = 'Prenotazione registrata correttamente.';\n  final_reply = `Perfetto, ho registrato la prenotazione per ${input.nome_cliente} il ${input.data_prenotazione_label} alle ${input.ora} per ${input.persone} persone.`;\n} else if (business_status === 'rejected') {\n  message = 'Slot non disponibile.';\n  final_reply = `Ho raccolto la richiesta, ma ${input.data_prenotazione_label} alle ${input.ora} non risulta disponibile. Possiamo cercare un altro orario.`;\n} else {\n  message = 'Richiesta salvata per verifica manuale.';\n  final_reply = input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING'\n    ? 'Ho raccolto la richiesta per il gruppo numeroso, ma serve una gestione manuale del locale. Ti ricontatteranno al più presto.'\n    : `Ho raccolto la richiesta, ma non posso confermare subito il tavolo per ${input.data_prenotazione_label} alle ${input.ora}. Il locale verificherà e ti ricontatterà a breve.`;\n}\n\nreturn [{\n  json: {\n    ...input,\n    success: business_status === 'confirmed',\n    code,\n    message,\n    final_reply,\n    reference: adapter.reference || adapter.booking_reference || null,\n    availability_status,\n    business_status,\n    retryable: Boolean(adapter.retryable ?? business_status !== 'confirmed'),\n    raw_provider_response: adapter,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        1024
+      ],
+      "id": "256793ca-289c-4c03-893b-9430c05f3b92",
+      "name": "Normalize Availability Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  business_type: input.business_type,\n  reservation_id: record.id || null,\n  nome_cliente: input.nome_cliente,\n  telefono: input.telefono,\n  data_prenotazione: input.data_prenotazione,\n  data_prenotazione_label: input.data_prenotazione_label,\n  ora: input.ora,\n  persone: input.persone,\n  note_prenotazione: input.note_prenotazione || '',\n  status: input.business_status,\n  reference: input.reference || null,\n  nome_attivita: input.nome_attivita || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst rows = [\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: 'restaurant_guest_confirmation',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n];\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_restaurant:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        928
+      ],
+      "id": "a290f406-0cc4-4450-b270-5d95cb40aa16",
+      "name": "Build Notification Outbox Rows"
     },
     {
       "parameters": {
@@ -398,11 +386,11 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -1280,
-        -992
+        2288,
+        928
       ],
-      "id": "1ad2832e-9d92-4694-b51e-cdbb0824994d",
-      "name": "Insert Outbox Rows1",
+      "id": "2b2ed186-3b44-415c-94c5-6b27e5a953f6",
+      "name": "Insert Outbox Rows",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -412,16 +400,16 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $('Normalize Availability Response1').item.json;\nconst record = $('Create a row').item.json;\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    code: input.code || 'RESTAURANT_BOOKING_RESULT_UNKNOWN',\n    message: input.message || 'Richiesta prenotazione processata.',\n    final_reply: input.final_reply || 'Ho raccolto la richiesta di prenotazione.',\n    tenant_id: input.tenant_id,\n    trace_id: input.trace_id,\n    session_id: input.session_id,\n    reservation_id: record.id || null,\n    nome_cliente: input.nome_cliente,\n    telefono: input.telefono,\n    data_prenotazione: input.data_prenotazione,\n    data_prenotazione_label: input.data_prenotazione_label,\n    ora: input.ora,\n    persone: input.persone,\n    note_prenotazione: input.note_prenotazione || '',\n    booking_summary: `Tavolo per ${input.persone} persone il ${input.data_prenotazione_label} alle ${input.ora} a nome ${input.nome_cliente}.`,\n    availability_status: input.availability_status,\n    business_status: input.business_status,\n    reference: input.reference || null,\n    retryable: Boolean(input.retryable),\n  },\n}];"
+        "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    code: input.code || 'RESTAURANT_BOOKING_RESULT_UNKNOWN',\n    message: input.message || 'Richiesta prenotazione processata.',\n    final_reply: input.final_reply || 'Ho raccolto la richiesta di prenotazione.',\n    tenant_id: input.tenant_id,\n    trace_id: input.trace_id,\n    session_id: input.session_id,\n    reservation_id: record.id || null,\n    nome_cliente: input.nome_cliente,\n    telefono: input.telefono,\n    data_prenotazione: input.data_prenotazione,\n    data_prenotazione_label: input.data_prenotazione_label,\n    ora: input.ora,\n    persone: input.persone,\n    note_prenotazione: input.note_prenotazione || '',\n    booking_summary: `Tavolo per ${input.persone} persone il ${input.data_prenotazione_label} alle ${input.ora} a nome ${input.nome_cliente}.`,\n    availability_status: input.availability_status,\n    business_status: input.business_status,\n    reference: input.reference || null,\n    retryable: Boolean(input.retryable),\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1536,
-        -768
+        2064,
+        1120
       ],
-      "id": "1e8c8453-0721-41a7-94b9-0424bcaa9704",
-      "name": "Build Final Response1"
+      "id": "62a8f67e-2e77-46c9-84e2-93f0fc5fe93f",
+      "name": "Build Final Response"
     }
   ],
   "pinData": {},
@@ -430,87 +418,7 @@
       "main": [
         [
           {
-            "node": "Normalize Reservation Request1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Normalize Reservation Request1": {
-      "main": [
-        [
-          {
-            "node": "Check Validation Error1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check Validation Error1": {
-      "main": [
-        [
-          {
-            "node": "Validation Error Response1",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Build Availability Payload1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Availability Payload1": {
-      "main": [
-        [
-          {
-            "node": "Use Live Availability Adapter1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Use Live Availability Adapter1": {
-      "main": [
-        [
-          {
-            "node": "Availability Adapter1",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Normalize Availability Response1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Availability Adapter1": {
-      "main": [
-        [
-          {
-            "node": "Normalize Availability Response1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Normalize Availability Response1": {
-      "main": [
-        [
-          {
-            "node": "Create a row",
+            "node": "Normalize Reservation Request",
             "type": "main",
             "index": 0
           }
@@ -521,23 +429,103 @@
       "main": [
         [
           {
-            "node": "Build Notification Outbox Rows1",
+            "node": "Build Notification Outbox Rows",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Build Final Response1",
+            "node": "Build Final Response",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Build Notification Outbox Rows1": {
+    "Normalize Reservation Request": {
       "main": [
         [
           {
-            "node": "Insert Outbox Rows1",
+            "node": "Check Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Validation Error": {
+      "main": [
+        [
+          {
+            "node": "Validation Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Availability Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Availability Payload": {
+      "main": [
+        [
+          {
+            "node": "Use Live Availability Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use Live Availability Adapter": {
+      "main": [
+        [
+          {
+            "node": "Availability Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normalize Availability Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availability Adapter": {
+      "main": [
+        [
+          {
+            "node": "Normalize Availability Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Availability Response": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Notification Outbox Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Outbox Rows",
             "type": "main",
             "index": 0
           }
@@ -548,9 +536,10 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
+    "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "e2522e89-cdf4-4834-8a9c-ba243288c859",
+  "versionId": "d9c97a9a-0aec-4245-9b3d-125a82b3b231",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

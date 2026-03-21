@@ -1,0 +1,300 @@
+{
+  "name": "Zirèl - Calendar ICS",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "zirel-calendar-ics",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        272
+      ],
+      "id": "aeff94f0-ad63-4f43-b5fa-3b1d87a8ae44",
+      "name": "Webhook",
+      "webhookId": "d03e22ba-f1c8-4696-b7e0-e0f32b97692e"
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = $json.query || {};\nreturn [{\n  json: {\n    type: String(q.type || '').trim(),\n    id: String(q.id || '').trim(),\n    tenant_id: String(q.tenant_id || '').trim(),\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        272
+      ],
+      "id": "5e784089-ba59-44d9-8298-b0e03f426d8b",
+      "name": "Parse Query"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "valid-type",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "appointment",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        272
+      ],
+      "id": "35e261f8-04eb-42d3-bc86-fb0e14b3e089",
+      "name": "If Appointment?"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.id }}"
+            },
+            {
+              "keyName": "tenant_id",
+              "keyValue": "={{ $json.tenant_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        784,
+        160
+      ],
+      "id": "ae9b4f5a-7f80-4690-919d-0789a8d0de41",
+      "name": "Get Appointment Row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "prenotazioni",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.id }}"
+            },
+            {
+              "keyName": "tenant_id",
+              "keyValue": "={{ $json.tenant_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        784,
+        368
+      ],
+      "id": "e6474cdf-3d7f-4cb3-b73a-1c7ef8b11e62",
+      "name": "Get Restaurant Row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant_id",
+              "keyValue": "={{ $('Parse Query').item.json.tenant_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        272
+      ],
+      "id": "4cdde622-1cd7-4404-9891-33d499b2539e",
+      "name": "Get Tenant Row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $('Parse Query').item.json;\nconst tenant = $('Get Tenant Row').item.json || {};\nconst type = query.type;\n\nconst row = type === 'appointment'\n  ? ($('Get Appointment Row').item.json || {})\n  : ($('Get Restaurant Row').item.json || {});\n\nconst activity = tenant.nome_attivita || query.tenant_id || 'Zirèl';\n\nconst pad = (v) => String(v).padStart(2, '0');\n\nconst parseDateTimeParts = (dateValue, timeValue) => {\n  const dateRaw = String(dateValue || '').trim();\n  const timeRaw = String(timeValue || '').trim();\n  if (!dateRaw || !timeRaw) return null;\n\n  const [year, month, day] = dateRaw.split('-').map(Number);\n  const [hour, minute] = timeRaw.split(':').map(Number);\n\n  if (!year || !month || !day || Number.isNaN(hour) || Number.isNaN(minute)) return null;\n\n  return { year, month, day, hour, minute };\n};\n\nconst toLocalStamp = (parts) => {\n  if (!parts) return '';\n  return `${parts.year}${pad(parts.month)}${pad(parts.day)}T${pad(parts.hour)}${pad(parts.minute)}00`;\n};\n\nconst toUtcStamp = (dateObj) => {\n  if (!dateObj) return '';\n  return `${dateObj.getUTCFullYear()}${pad(dateObj.getUTCMonth() + 1)}${pad(dateObj.getUTCDate())}T${pad(dateObj.getUTCHours())}${pad(dateObj.getUTCMinutes())}${pad(dateObj.getUTCSeconds())}Z`;\n};\n\nconst addMinutes = (parts, minutesToAdd) => {\n  if (!parts) return null;\n  const d = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute + minutesToAdd, 0));\n  return {\n    year: d.getUTCFullYear(),\n    month: d.getUTCMonth() + 1,\n    day: d.getUTCDate(),\n    hour: d.getUTCHours(),\n    minute: d.getUTCMinutes(),\n  };\n};\n\nconst escapeIcs = (value) =>\n  String(value || '')\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\\n/g, '\\\\n')\n    .replace(/,/g, '\\\\,')\n    .replace(/;/g, '\\\\;');\n\nlet title = '';\nlet description = '';\nlet startParts = null;\nlet endParts = null;\n\nconst uid = `${query.type}-${query.id}@zirel.org`;\n\nif (type === 'appointment') {\n  title = `Appuntamento - ${row.nome || 'Cliente'}`;\n  description = [\n    `Attività: ${activity}`,\n    `Cliente: ${row.nome || 'N/D'}`,\n    `Telefono: ${row.telefono || 'N/D'}`,\n    `Email: ${row.email || 'N/D'}`,\n    `Motivo: ${row.motivo || row.note || 'N/D'}`\n  ].join('\\n');\n\n  startParts = parseDateTimeParts(row.data_appuntamento, row.orario || '10:00');\n  endParts = addMinutes(startParts, 30);\n} else {\n  title = `Prenotazione tavolo - ${row.nome_cliente || 'Cliente'}`;\n  description = [\n    `Attività: ${activity}`,\n    `Cliente: ${row.nome_cliente || 'N/D'}`,\n    `Telefono: ${row.telefono || 'N/D'}`,\n    `Persone: ${row.persone || 'N/D'}`,\n    `Note: ${row.note_prenotazione || 'Nessuna'}`\n  ].join('\\n');\n\n  startParts = parseDateTimeParts(row.data_prenotazione, row.ora || '20:00');\n  endParts = addMinutes(startParts, 120);\n}\n\nif (!startParts || !endParts) {\n  throw new Error(`Impossibile generare ICS: data/ora mancanti o non valide per type=${type}, id=${query.id}`);\n}\n\nconst nowUtc = new Date();\n\nconst ics = [\n  'BEGIN:VCALENDAR',\n  'VERSION:2.0',\n  'PRODID:-//Zirel//Calendar Export//IT',\n  'CALSCALE:GREGORIAN',\n  'METHOD:PUBLISH',\n  'X-WR-TIMEZONE:Europe/Rome',\n  'BEGIN:VEVENT',\n  `UID:${uid}`,\n  `DTSTAMP:${toUtcStamp(nowUtc)}`,\n  `DTSTART;TZID=Europe/Rome:${toLocalStamp(startParts)}`,\n  `DTEND;TZID=Europe/Rome:${toLocalStamp(endParts)}`,\n  `SUMMARY:${escapeIcs(title)}`,\n  `DESCRIPTION:${escapeIcs(description)}`,\n  `LOCATION:${escapeIcs(activity)}`,\n  'STATUS:CONFIRMED',\n  'END:VEVENT',\n  'END:VCALENDAR'\n].join('\\r\\n');\n\nreturn [{\n  json: {\n    ics,\n    filename: `${type}-${query.id}.ics`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        272
+      ],
+      "id": "aa5eb80e-c1d3-4ca3-b19a-f68b5492de58",
+      "name": "Build ICS"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.ics }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/calendar; charset=utf-8"
+              },
+              {
+                "name": "Content-Disposition",
+                "value": "=attachment; filename=\"{{ $json.filename }}\""
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1488,
+        272
+      ],
+      "id": "8d809194-2bb8-41e6-8f85-4fdf1bca0868",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Query": {
+      "main": [
+        [
+          {
+            "node": "If Appointment?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Appointment?": {
+      "main": [
+        [
+          {
+            "node": "Get Appointment Row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Restaurant Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Appointment Row": {
+      "main": [
+        [
+          {
+            "node": "Get Tenant Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Restaurant Row": {
+      "main": [
+        [
+          {
+            "node": "Get Tenant Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Tenant Row": {
+      "main": [
+        [
+          {
+            "node": "Build ICS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build ICS": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "de85546f-597a-4ad1-a509-a14d1396e76d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "ZXCO0RuanQdIU3BX",
+  "tags": []
+}

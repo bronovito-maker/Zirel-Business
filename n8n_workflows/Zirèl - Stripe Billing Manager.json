@@ -1,0 +1,581 @@
+{
+  "name": "Zirèl - Stripe Billing Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-billing/create-checkout",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook: Create Checkout",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        5904,
+        6240
+      ],
+      "id": "98b839dd-d8e9-475f-8a43-936164566a08",
+      "webhookId": "36e16a8a-6867-4b3d-abed-9a8278beb63d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\n\nif (!secretKey) {\n  return [{\n    json: {\n      ...input,\n      http_status: 500,\n      error: 'Missing STRIPE_SECRET_KEY'\n    }\n  }];\n}\n\nconst formBody = [\n  ...(() => {\n    const rawTrialDays = Number(input.trial_days || $env.STRIPE_TRIAL_DAYS || 7);\n    const trialDays = Number.isFinite(rawTrialDays) && rawTrialDays > 0\n      ? Math.max(1, Math.floor(rawTrialDays))\n      : 7;\n    return [\n      ['subscription_data[trial_period_days]', String(trialDays)],\n      ['metadata[trial_days]', String(trialDays)],\n    ];\n  })(),\n  ['mode', 'subscription'],\n  ['success_url', String($env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=success')],\n  ['cancel_url', String($env.STRIPE_CANCEL_URL || 'https://dashboard.zirel.org?tab=abbonamento&status=cancel')],\n  ['customer_email', input.billing_email || input.email || ''],\n  ['client_reference_id', input.tenant_id || ''],\n  ['line_items[0][price]', input.price_id || ''],\n  ['line_items[0][quantity]', '1'],\n  ['metadata[tenant_id]', input.tenant_id || ''],\n  ['metadata[billing_email]', input.billing_email || input.email || ''],\n  ['metadata[business_name]', input.business_name || ''],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))\n  .join('&');\n\nlet data;\ntry {\n  data = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.stripe.com/v1/checkout/sessions',\n    headers: {\n      Authorization: 'Bearer ' + secretKey,\n      'Content-Type': 'application/x-www-form-urlencoded',\n    },\n    body: formBody,\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      http_status: 502,\n      error: 'Stripe checkout creation failed',\n      stripe_error: String(error?.message || error).slice(0, 1000),\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    url: data.url,\n    stripe_checkout_session_id: data.id,\n    stripe_raw: data,\n    http_status: 200,\n  }\n}];"
+      },
+      "name": "Stripe: Create Checkout",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6800,
+        6144
+      ],
+      "id": "1b043f02-0a81-498b-9870-20c4e919aa27"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": "200"
+        }
+      },
+      "name": "Response: Checkout URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        7024,
+        6144
+      ],
+      "id": "d00040f4-044e-4f0a-8dda-fcc5f261372e"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-billing/create-portal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook: Create Portal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        5904,
+        6656
+      ],
+      "id": "77cc2837-41e3-4514-9d0b-528615504ef8",
+      "webhookId": "178c366a-4934-4588-bb10-32bbed16313c"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\nconst secretKey = String($env.STRIPE_SECRET_KEY || '').trim();\n\nif (!secretKey) {\n  return [{\n    json: {\n      ...input,\n      http_status: 500,\n      error: 'Missing STRIPE_SECRET_KEY'\n    }\n  }];\n}\n\nif (!input.stripe_customer_id) {\n  return [{\n    json: {\n      ...input,\n      http_status: 400,\n      error: 'Missing stripe_customer_id for portal session'\n    }\n  }];\n}\n\nconst formBody = [\n  ['customer', input.stripe_customer_id],\n  ['return_url', String($env.STRIPE_PORTAL_RETURN_URL || $env.STRIPE_SUCCESS_URL || 'https://dashboard.zirel.org?tab=abbonamento')],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))\n  .join('&');\n\nlet data;\ntry {\n  data = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.stripe.com/v1/billing_portal/sessions',\n    headers: {\n      Authorization: 'Bearer ' + secretKey,\n      'Content-Type': 'application/x-www-form-urlencoded',\n    },\n    body: formBody,\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      http_status: 502,\n      error: 'Stripe portal creation failed',\n      stripe_error: String(error?.message || error).slice(0, 1000),\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    url: data.url,\n    stripe_portal_session_id: data.id,\n    stripe_raw: data,\n    http_status: 200,\n  }\n}];"
+      },
+      "name": "Stripe: Create Portal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6800,
+        6560
+      ],
+      "id": "15bb2aa2-8ad7-4ce3-8e97-b71a9a3adeff"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": "200"
+        }
+      },
+      "name": "Response: Portal URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        7024,
+        6560
+      ],
+      "id": "eedc1c0c-7fb7-4af5-b1ac-7488c8ede36c"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-webhook",
+        "options": {}
+      },
+      "name": "Webhook: Stripe Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        5904,
+        7072
+      ],
+      "id": "b8b4431f-8d6a-4a8b-8103-e111c61af930",
+      "webhookId": "cb5e8e82-dba6-4e25-a6ad-ac822853f7f6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $json.body || $json || {};\nconst normalize = (v) => String(v || '').trim();\n\nconst tenant_id = normalize(source.tenant_id || source.tenantId);\nconst api_token = normalize(source.api_token || source.apiToken);\nconst price_id = normalize(source.price_id || source.priceId);\nconst email = normalize(source.email).toLowerCase();\nconst business_name = normalize(source.hotel_name || source.business_name || source.nome_attivita);\n\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\nif (!price_id) missing.push('price_id');\nif (!email) missing.push('email');\n\nreturn [{\n  json: {\n    tenant_id,\n    api_token,\n    price_id,\n    email,\n    business_name,\n    is_valid_request: missing.length === 0,\n    missing_fields: missing,\n    http_status: missing.length ? 400 : 200,\n  }\n}];"
+      },
+      "name": "Normalize Checkout Request1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6128,
+        6240
+      ],
+      "id": "8acc4262-91bf-4387-9688-a4b8f06173e7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nif (!input.is_valid_request) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 400,\n      error: 'Missing required fields',\n      details: input.missing_fields,\n    }\n  }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 500,\n      error: 'Missing Supabase env for billing auth',\n    }\n  }];\n}\n\nconst qs = [\n  ['select', 'tenant_id,api_token,mail,billing_email,stripe_customer_id'],\n  ['tenant_id', 'eq.' + input.tenant_id],\n  ['api_token', 'eq.' + input.api_token],\n  ['limit', '1'],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))\n  .join('&');\n\nlet rows;\ntry {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: supabaseUrl + '/rest/v1/tenants?' + qs,\n    headers: {\n      apikey: serviceKey,\n      Authorization: 'Bearer ' + serviceKey,\n    },\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 502,\n      error: 'Tenant auth lookup failed',\n      provider_error: String(error?.message || error).slice(0, 500),\n    }\n  }];\n}\n\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 401,\n      error: 'Unauthorized tenant or api_token',\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  }\n}];"
+      },
+      "name": "Verify Checkout Tenant1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6352,
+        6240
+      ],
+      "id": "51b63369-20f5-4974-a2f9-289f666e92ac"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.authorized) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "If Checkout Authorized1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        6576,
+        6240
+      ],
+      "id": "5a7c805e-d158-4336-a049-309a4b8c7e7c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.http_status || 200 }}"
+        }
+      },
+      "name": "Response: Checkout Error1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        6800,
+        6336
+      ],
+      "id": "bded6ee1-0490-4677-9ad6-4c707faf2601"
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $json.body || $json || {};\nconst normalize = (v) => String(v || '').trim();\n\nconst tenant_id = normalize(source.tenant_id || source.tenantId);\nconst api_token = normalize(source.api_token || source.apiToken);\n\nconst missing = [];\nif (!tenant_id) missing.push('tenant_id');\nif (!api_token) missing.push('api_token');\n\nreturn [{\n  json: {\n    tenant_id,\n    api_token,\n    is_valid_request: missing.length === 0,\n    missing_fields: missing,\n    http_status: missing.length ? 400 : 200,\n  }\n}];"
+      },
+      "name": "Normalize Portal Request1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6128,
+        6656
+      ],
+      "id": "3a0c4061-f73b-4805-a5ba-3cbe1443c5f2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nif (!input.is_valid_request) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 400,\n      error: 'Missing required fields',\n      details: input.missing_fields,\n    }\n  }];\n}\n\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 500,\n      error: 'Missing Supabase env for billing auth',\n    }\n  }];\n}\n\nconst qs = [\n  ['select', 'tenant_id,api_token,mail,billing_email,stripe_customer_id'],\n  ['tenant_id', 'eq.' + input.tenant_id],\n  ['api_token', 'eq.' + input.api_token],\n  ['limit', '1'],\n]\n  .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(value))\n  .join('&');\n\nlet rows;\ntry {\n  rows = await this.helpers.httpRequest({\n    method: 'GET',\n    url: supabaseUrl + '/rest/v1/tenants?' + qs,\n    headers: {\n      apikey: serviceKey,\n      Authorization: 'Bearer ' + serviceKey,\n    },\n    json: true,\n  });\n} catch (error) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 502,\n      error: 'Tenant auth lookup failed',\n      provider_error: String(error?.message || error).slice(0, 500),\n    }\n  }];\n}\n\nconst tenant = Array.isArray(rows) ? rows[0] : null;\n\nif (!tenant?.tenant_id) {\n  return [{\n    json: {\n      ...input,\n      authorized: false,\n      http_status: 401,\n      error: 'Unauthorized tenant or api_token',\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...input,\n    authorized: true,\n    tenant_record: tenant,\n    tenant_id: tenant.tenant_id,\n    billing_email: tenant.billing_email || tenant.mail || input.email || '',\n    stripe_customer_id: tenant.stripe_customer_id || '',\n    http_status: 200,\n  }\n}];"
+      },
+      "name": "Verify Portal Tenant1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6352,
+        6656
+      ],
+      "id": "af2b1ac5-58fe-45fe-989b-1354788f6dd9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ Boolean($json.authorized && $json.stripe_customer_id) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "If Portal Authorized1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        6576,
+        6656
+      ],
+      "id": "71796686-9c0b-40f4-9292-389bbe0b0aec"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.http_status || 200 }}"
+        }
+      },
+      "name": "Response: Portal Error1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        6800,
+        6752
+      ],
+      "id": "9ee3c2ca-bb40-46fe-bc76-3376eed3f70d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $json.body || {};\nconst object = event.data?.object || {};\nconst priceId = object.items?.data?.[0]?.price?.id || object.plan?.id || '';\nconst productId = object.items?.data?.[0]?.price?.product || object.plan?.product || '';\nconst tenantId = object.client_reference_id || object.metadata?.tenant_id || '';\nconst billingEmail = object.customer_details?.email || object.customer_email || object.receipt_email || '';\nconst planCode = priceId && priceId === String($env.STRIPE_PRICE_PREMIUM_ID || '') ? 'premium'\n  : priceId && priceId === String($env.STRIPE_PRICE_BASE_ID || '') ? 'base'\n  : '';\n\nreturn [{\n  json: {\n    raw_event: event,\n    event_type: String(event.type || ''),\n    event_id: String(event.id || ''),\n    tenant_id: tenantId,\n    customer_id: String(object.customer || ''),\n    subscription_id: String(object.subscription || object.id || ''),\n    billing_email: billingEmail,\n    stripe_price_id: priceId,\n    stripe_product_id: productId,\n    billing_plan_code: planCode,\n    subscription_status: event.type === 'customer.subscription.deleted'\n      ? 'canceled'\n      : event.type === 'invoice.payment_failed'\n        ? 'past_due'\n        : String(object.status || 'active'),\n  },\n}];"
+      },
+      "name": "Normalize Stripe Event1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6128,
+        7072
+      ],
+      "id": "f2fcd192-e006-4818-9374-d439d4f33a84"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.event_type }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "checkout.session.completed"
+            },
+            {
+              "value2": "customer.subscription.created",
+              "output": 1
+            },
+            {
+              "value2": "customer.subscription.updated",
+              "output": 1
+            },
+            {
+              "value2": "customer.subscription.deleted",
+              "output": 1
+            },
+            {
+              "value2": "invoice.paid",
+              "output": 1
+            },
+            {
+              "value2": "invoice.payment_failed",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "name": "Switch: Event Type1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        6352,
+        7040
+      ],
+      "id": "225f769f-cf5d-41a3-b078-bb2fcce3fdf6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tenant_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.tenant_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "stripe_customer_id",
+              "fieldValue": "={{ $json.customer_id }}"
+            },
+            {
+              "fieldId": "stripe_subscription_id",
+              "fieldValue": "={{ $json.subscription_id }}"
+            },
+            {
+              "fieldId": "subscription_status",
+              "fieldValue": "active"
+            },
+            {
+              "fieldId": "billing_email",
+              "fieldValue": "={{ $json.billing_email || null }}"
+            },
+            {
+              "fieldId": "billing_last_event_id",
+              "fieldValue": "={{ $json.event_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase: Sync Checkout1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        6576,
+        6976
+      ],
+      "id": "2b2fb1d9-c06a-45fe-aaff-2d606687d3f9",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "tenants",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "stripe_customer_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.customer_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "subscription_status",
+              "fieldValue": "={{ $json.subscription_status }}"
+            },
+            {
+              "fieldId": "stripe_subscription_id",
+              "fieldValue": "={{ $json.subscription_id || null }}"
+            },
+            {
+              "fieldId": "stripe_price_id",
+              "fieldValue": "={{ $json.stripe_price_id || null }}"
+            },
+            {
+              "fieldId": "stripe_product_id",
+              "fieldValue": "={{ $json.stripe_product_id || null }}"
+            },
+            {
+              "fieldId": "billing_plan_code",
+              "fieldValue": "={{ $json.billing_plan_code || null }}"
+            },
+            {
+              "fieldId": "billing_email",
+              "fieldValue": "={{ $json.billing_email || null }}"
+            },
+            {
+              "fieldId": "billing_last_event_id",
+              "fieldValue": "={{ $json.event_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Supabase: Sync Sub/Invoice1",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        6576,
+        7168
+      ],
+      "id": "26b987ec-739f-4dac-bd99-e0164a249249",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Create Checkout": {
+      "main": [
+        [
+          {
+            "node": "Normalize Checkout Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe: Create Checkout": {
+      "main": [
+        [
+          {
+            "node": "Response: Checkout URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Create Portal": {
+      "main": [
+        [
+          {
+            "node": "Normalize Portal Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe: Create Portal": {
+      "main": [
+        [
+          {
+            "node": "Response: Portal URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Stripe Events": {
+      "main": [
+        [
+          {
+            "node": "Normalize Stripe Event1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Checkout Request1": {
+      "main": [
+        [
+          {
+            "node": "Verify Checkout Tenant1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Checkout Tenant1": {
+      "main": [
+        [
+          {
+            "node": "If Checkout Authorized1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Checkout Authorized1": {
+      "main": [
+        [
+          {
+            "node": "Stripe: Create Checkout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response: Checkout Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Portal Request1": {
+      "main": [
+        [
+          {
+            "node": "Verify Portal Tenant1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Portal Tenant1": {
+      "main": [
+        [
+          {
+            "node": "If Portal Authorized1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Portal Authorized1": {
+      "main": [
+        [
+          {
+            "node": "Stripe: Create Portal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response: Portal Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Stripe Event1": {
+      "main": [
+        [
+          {
+            "node": "Switch: Event Type1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch: Event Type1": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Sync Checkout1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase: Sync Sub/Invoice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1351b5f3-620f-45f6-bc89-2db09242374d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "XrxiWzfRzsOwhITQ",
+  "tags": []
+}

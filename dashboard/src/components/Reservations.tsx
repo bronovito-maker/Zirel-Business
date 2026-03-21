@@ -16,7 +16,6 @@ import {
     BriefcaseBusiness,
     Mail,
     Search,
-    ChevronRight,
     ChevronDown,
     ChevronUp,
     MessageSquareQuote,
@@ -199,6 +198,11 @@ const Reservations = () => {
         options?: { reason?: string; proposedDate?: string; proposedTime?: string; note?: string }
     ) => {
         if (!detail || !selectedRequest) return;
+        if (['confirmed', 'rejected'].includes(normalizeFilterStatus(detail.status))) {
+            toast.error('Questa richiesta e chiusa e non puo piu essere modificata.');
+            resetActionForm();
+            return;
+        }
 
         const reason = options?.reason ?? actionReason;
         const nextDate = options?.proposedDate ?? proposedDate;
@@ -241,6 +245,11 @@ const Reservations = () => {
     };
 
     const handleImmediateAction = async (mode: 'confirm' | 'confirm_change') => {
+        if (detail && ['confirmed', 'rejected'].includes(normalizeFilterStatus(detail.status))) {
+            toast.error('Questa richiesta e chiusa e non puo piu essere modificata.');
+            resetActionForm();
+            return;
+        }
         const label = mode === 'confirm' ? 'confermare' : 'confermare la modifica';
         if (!window.confirm(`Vuoi ${label} questa richiesta?`)) return;
         await submitAction(mode, { note: '' });
@@ -315,6 +324,7 @@ const Reservations = () => {
                         const isNew = Date.now() - new Date(request.created_at).getTime() <= 1000 * 60 * 60 * 24;
                         const isExpanded = selectedRequest?.id === request.id && selectedRequest.kind === request.kind;
                         const activeDetail = isExpanded ? detail : null;
+                        const isTerminal = activeDetail ? ['confirmed', 'rejected'].includes(normalizeFilterStatus(activeDetail.status)) : false;
 
                         return (
                             <div
@@ -435,38 +445,44 @@ const Reservations = () => {
                                                         <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Azioni</p>
                                                     </div>
 
-                                                    <div className="mt-4 flex flex-wrap gap-3">
-                                                        <button
-                                                            onClick={() => void handleImmediateAction('confirm')}
-                                                            disabled={isSubmittingAction}
-                                                            className="rounded-2xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:opacity-60"
-                                                        >
-                                                            Conferma
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setActionMode('reject')}
-                                                            className="rounded-2xl border border-red-100 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
-                                                        >
-                                                            Rifiuta
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setActionMode('propose_change')}
-                                                            className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
-                                                        >
-                                                            Proponi modifica
-                                                        </button>
-                                                        {String(activeDetail.status || '').trim().toLowerCase() === 'change_proposed' ? (
+                                                    {isTerminal ? (
+                                                        <div className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
+                                                            Richiesta chiusa. Lo stato e stato gia definito e non sono disponibili ulteriori azioni.
+                                                        </div>
+                                                    ) : (
+                                                        <div className="mt-4 flex flex-wrap gap-3">
                                                             <button
-                                                                onClick={() => void handleImmediateAction('confirm_change')}
+                                                                onClick={() => void handleImmediateAction('confirm')}
                                                                 disabled={isSubmittingAction}
-                                                                className="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
+                                                                className="rounded-2xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:opacity-60"
                                                             >
-                                                                Conferma modifica
+                                                                Conferma
                                                             </button>
-                                                        ) : null}
-                                                    </div>
+                                                            <button
+                                                                onClick={() => setActionMode('reject')}
+                                                                className="rounded-2xl border border-red-100 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                                                            >
+                                                                Rifiuta
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setActionMode('propose_change')}
+                                                                className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
+                                                            >
+                                                                Proponi modifica
+                                                            </button>
+                                                            {String(activeDetail.status || '').trim().toLowerCase() === 'change_proposed' ? (
+                                                                <button
+                                                                    onClick={() => void handleImmediateAction('confirm_change')}
+                                                                    disabled={isSubmittingAction}
+                                                                    className="rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
+                                                                >
+                                                                    Conferma modifica
+                                                                </button>
+                                                            ) : null}
+                                                        </div>
+                                                    )}
 
-                                                    {actionMode === 'reject' || actionMode === 'propose_change' ? (
+                                                    {!isTerminal && (actionMode === 'reject' || actionMode === 'propose_change') ? (
                                                         <div className="mt-4 space-y-4 rounded-2xl border border-gray-200 bg-white p-4">
                                                             {actionMode === 'reject' ? (
                                                                 <div>

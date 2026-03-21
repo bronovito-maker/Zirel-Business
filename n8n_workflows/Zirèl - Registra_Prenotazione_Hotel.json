@@ -51,52 +51,28 @@
               "name": "nome_attivita"
             },
             {
-              "name": "trace_id"
+              "name": "notification_email"
             },
             {
-              "name": "session_id"
+              "name": "billing_email"
             },
             {
-              "name": "source"
+              "name": "telegram_chat_id"
             },
             {
-              "name": "booking_manager_provider"
-            },
-            {
-              "name": "link_booking_esterno"
-            },
-            {
-              "name": "hotel_middleware_mews_url"
-            },
-            {
-              "name": "hotel_middleware_cloudbeds_url"
-            },
-            {
-              "name": "hotel_middleware_siteminder_url"
-            },
-            {
-              "name": "hotel_middleware_5stelle_url"
-            },
-            {
-              "name": "hotel_middleware_fallback_url"
-            },
-            {
-              "name": "availability_api_url"
-            },
-            {
-              "name": "adapter_test_mode"
+              "name": "internal_email"
             }
           ]
         }
       },
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -5568,
-        -592
-      ],
       "id": "39d9baeb-b7f4-40e4-a1af-c24968b18ca6",
-      "name": "When Executed by Another Workflow"
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -6816,
+        -464
+      ]
     },
     {
       "parameters": {
@@ -109,7 +85,7 @@
           },
           "conditions": [
             {
-              "id": "4cd81037-915d-401f-a29f-c6e115a50624",
+              "id": "18194833-0e65-485c-a586-794df8ac1818",
               "leftValue": "={{ String($json.business_type || \"\").trim().toLowerCase() === \"hotel\" || !String($json.business_type || \"\").trim() }}",
               "rightValue": true,
               "operator": {
@@ -126,10 +102,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -5312,
-        -592
+        -6592,
+        -464
       ],
-      "id": "056caf18-0caf-4431-987b-d07471c1ffcc",
+      "id": "eea1e750-a61b-4ba5-9358-49627395adbb",
       "name": "Check Hotel Sector"
     },
     {
@@ -137,25 +113,25 @@
         "assignments": {
           "assignments": [
             {
-              "id": "7f5911ea-2873-451f-92bd-55d30e2fef7c",
+              "id": "463dfb85-6a5a-4164-8bd3-e8bff507876a",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "d915ed59-7165-41f5-afd2-12db6165ab5e",
+              "id": "01c868df-7f08-485d-bac0-6116bc7ee904",
               "name": "code",
               "value": "UNSUPPORTED_SECTOR",
               "type": "string"
             },
             {
-              "id": "d311c875-ee69-41d4-b939-d739a7f89531",
+              "id": "4c32ffe5-35d2-4a8f-9400-0ffa3a9316bc",
               "name": "message",
               "value": "Questo workflow gestisce solo richieste hotel.",
               "type": "string"
             },
             {
-              "id": "445bb334-0ce3-4304-9568-1e88ded98bd9",
+              "id": "8721a942-9e23-41c3-a9f8-71b7eb1d73ee",
               "name": "final_reply",
               "value": "Posso raccogliere i dati, ma questa richiesta non può essere registrata da questo flusso hotel.",
               "type": "string"
@@ -167,10 +143,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -5056,
-        -384
+        -6368,
+        -368
       ],
-      "id": "939ced25-e8ce-46d5-84c8-c06951200400",
+      "id": "3ac11efa-7f09-4bb5-887a-e327dde2217b",
       "name": "Unsupported Sector Response"
     },
     {
@@ -180,10 +156,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -5056,
-        -592
+        -6368,
+        -560
       ],
-      "id": "c5c9b803-f83c-4d28-86b5-c4eddb1dbeb4",
+      "id": "e798ae72-b566-497e-bf87-dba975010c69",
       "name": "Normalize & Validate Booking Data"
     },
     {
@@ -197,7 +173,7 @@
           },
           "conditions": [
             {
-              "id": "d8985755-53f5-40da-b933-9ae921edb6b3",
+              "id": "9968d2eb-21ef-4050-b1f7-1a625fe9599b",
               "leftValue": "={{ !!$json.validation_code }}",
               "rightValue": true,
               "operator": {
@@ -214,10 +190,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4800,
-        -592
+        -6144,
+        -560
       ],
-      "id": "159b7e3c-c819-4cf1-a761-355b41a35ff7",
+      "id": "561ed550-2d54-4dd0-bbc6-e2db985113fc",
       "name": "Check Valid Payload"
     },
     {
@@ -225,37 +201,37 @@
         "assignments": {
           "assignments": [
             {
-              "id": "9418ac32-066a-4b2c-95cf-3094d3462aea",
+              "id": "e9eafdd7-1f34-4acd-832c-116add3cacdc",
               "name": "success",
               "value": false,
               "type": "boolean"
             },
             {
-              "id": "afae4765-cd65-49f5-85e2-a98a6472cb1e",
+              "id": "31f5bee4-0804-46b0-8aab-1d3bf901339e",
               "name": "code",
               "value": "={{ $json.validation_code }}",
               "type": "string"
             },
             {
-              "id": "0262cb50-477b-4c28-b251-9583f18817a7",
+              "id": "c5a44a91-be96-4435-92fa-dc31aca5a608",
               "name": "message",
               "value": "={{ $json.validation_message }}",
               "type": "string"
             },
             {
-              "id": "1cbbc7b3-95d6-46eb-b08b-f3143d5c9c8e",
+              "id": "8e6be7c3-5448-4b4a-9d2e-1abd624624c7",
               "name": "final_reply",
               "value": "Per registrare davvero il soggiorno mi servono tutti i dati obbligatori, con date di check-in e check-out valide.",
               "type": "string"
             },
             {
-              "id": "7f8e9763-837f-4b73-b172-e31c9df799ff",
+              "id": "d79fb5d7-c9f3-42a9-b94e-ca43764ca601",
               "name": "tenant_id",
               "value": "={{ $json.tenant_id }}",
               "type": "string"
             },
             {
-              "id": "e8dd00c5-4bad-4f1d-9137-9c713ef3d503",
+              "id": "02583366-8320-4261-b5ba-a50e5483bf70",
               "name": "trace_id",
               "value": "={{ $json.trace_id }}",
               "type": "string"
@@ -267,10 +243,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4544,
-        -384
+        -5920,
+        -464
       ],
-      "id": "698a01d9-9bf5-48be-b118-010700804088",
+      "id": "5719e048-5635-4b14-b55d-d1537b2c6df6",
       "name": "Invalid Payload Response"
     },
     {
@@ -280,10 +256,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4544,
-        -592
+        -5920,
+        -656
       ],
-      "id": "1e33cc9b-8dc1-484d-b37b-3894c540031c",
+      "id": "0e95059d-83c8-449e-8093-f0098d590050",
       "name": "Build Booking Manager Payload"
     },
     {
@@ -297,7 +273,7 @@
           },
           "conditions": [
             {
-              "id": "674e813f-7521-4ce9-8c11-d7ef0151c7a8",
+              "id": "43c92e1f-b6bf-414c-ab9c-c5e58bd0e6bb",
               "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode }}",
               "rightValue": true,
               "operator": {
@@ -314,10 +290,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4288,
-        -592
+        -5696,
+        -656
       ],
-      "id": "fcd13fe7-70f2-45b2-8d02-cac3199643e2",
+      "id": "26b6d604-6dc0-47ba-8a8f-2a4b167fda8d",
       "name": "Use Live Booking Adapter?"
     },
     {
@@ -351,10 +327,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -4032,
-        -688
+        -5472,
+        -736
       ],
-      "id": "c04ec656-c288-4cba-a913-091b522f893d",
+      "id": "296b74ca-d874-47c4-a0b7-f4bd543de0e6",
       "name": "Booking Manager Adapter",
       "onError": "continueRegularOutput"
     },
@@ -365,10 +341,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3776,
-        -592
+        -5248,
+        -656
       ],
-      "id": "34f46a76-855f-41f9-8140-89396c130f21",
+      "id": "474da32c-28cd-43ad-9eed-80f5f1295536",
       "name": "Normalize Adapter Response"
     },
     {
@@ -478,10 +454,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -3520,
-        -592
+        -5024,
+        -656
       ],
-      "id": "5c27f590-9ae8-45d6-aed7-1f699e07c120",
+      "id": "4a1f9f5f-65d0-432e-9626-c7b9519b17b4",
       "name": "Create Hotel Booking Row",
       "credentials": {
         "supabaseApi": {
@@ -497,10 +473,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3264,
-        -688
+        -4800,
+        -752
       ],
-      "id": "7b823943-44b7-445c-9c1c-d3e6c2aa0501",
+      "id": "2aed6e2f-308d-40e4-9c36-07c147bb974f",
       "name": "Build Notification Outbox Rows"
     },
     {
@@ -570,10 +546,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -3008,
-        -688
+        -4576,
+        -752
       ],
-      "id": "215c83a5-2ade-42c4-b9d6-a33684388684",
+      "id": "1bb87517-9f33-4841-b3fe-a96719fd634d",
       "name": "Insert Outbox Rows",
       "credentials": {
         "supabaseApi": {
@@ -589,10 +565,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3264,
-        -464
+        -4800,
+        -560
       ],
-      "id": "1a009d09-d618-47d9-bedb-8a9a9afb6b62",
+      "id": "ff722ddf-786c-47af-bcd4-6a603ad6fdfa",
       "name": "Build Final Response"
     }
   ],
@@ -741,7 +717,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "ffa58961-bbf9-4d41-9b33-bf3cac514357",
+  "versionId": "4a4930b2-d0bb-4cd2-838a-56d0fb5fd935",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

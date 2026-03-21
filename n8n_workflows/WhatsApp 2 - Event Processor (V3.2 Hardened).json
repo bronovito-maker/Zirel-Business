@@ -16,10 +16,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [
-        0,
-        200
+        2112,
+        1152
       ],
-      "id": "435fac29-f879-42ed-8459-42abeea01435"
+      "id": "7ced19a4-0b83-44f7-b24f-db61fe16ade8"
     },
     {
       "parameters": {
@@ -29,10 +29,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        360,
-        200
+        2336,
+        1152
       ],
-      "id": "wa-processor-code",
+      "id": "13b2a3d9-bd43-4f1b-bb6a-9ca40f1ccdaf",
       "notesInFlow": true,
       "notes": "Claima la coda via Supabase REST usando event_status, poi esegue parsing Meta, tenant resolution, conversation match/create, inbound insert idempotente e status update."
     },
@@ -70,20 +70,21 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        720,
-        200
+        2560,
+        1152
       ],
-      "id": "wa-processor-update",
+      "id": "1e4487e0-5a9c-49d0-a06c-0f05619d0d45",
+      "notesInFlow": true,
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
           "name": "Supabase account - Zirèl"
         }
       },
-      "notesInFlow": true,
       "notes": "processed=true solo a fine lavorazione della singola webhook row. RETRY:* resta claimabile al giro successivo."
     }
   ],
+  "pinData": {},
   "connections": {
     "Cron (1 min)": {
       "main": [
@@ -107,5 +108,16 @@
         ]
       ]
     }
-  }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8c4888eb-bd47-419f-9f61-139250bd8541",
+  "meta": {
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "P8HSbeDOIg52DrPO",
+  "tags": []
 }

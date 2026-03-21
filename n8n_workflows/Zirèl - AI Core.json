@@ -12,10 +12,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        6288,
-        -240
+        6864,
+        -1424
       ],
-      "id": "eba411f4-808b-48fa-9be6-9ca2a2c110c6",
+      "id": "aa143c78-62e1-4f4a-bc63-61857780cdd1",
       "name": "When chat message received",
       "webhookId": "d9e10e54-2d61-4643-98ed-7bbe6221699e",
       "onError": "continueRegularOutput"
@@ -62,10 +62,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        6512,
-        -240
+        7088,
+        -1424
       ],
-      "id": "91c33c2d-da2d-4f8d-8f44-b0a088ac4c62",
+      "id": "e6ddf818-0079-479c-96bf-548b72f89ec7",
       "name": "Crystalize Context1"
     },
     {
@@ -106,10 +106,10 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        6736,
-        -240
+        7312,
+        -1424
       ],
-      "id": "8076d0f4-9b35-4291-a652-619aa39623e9",
+      "id": "39122497-6439-4b48-a5bd-268078b525c1",
       "name": "Security: Tenant Check1"
     },
     {
@@ -128,10 +128,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        6960,
-        -240
+        7536,
+        -1424
       ],
-      "id": "eeccb55a-1052-4499-afc1-5feba110596f",
+      "id": "11816f70-10e1-4db6-b5e0-d3be6ced6e21",
       "name": "Get a row1",
       "credentials": {
         "supabaseApi": {
@@ -147,10 +147,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7184,
-        -240
+        7760,
+        -1424
       ],
-      "id": "d7ad2ee0-2a86-4ae1-94de-15cc3872f841",
+      "id": "3b27addc-2983-46b0-b521-d93c1516393b",
       "name": "Build Prompt1"
     },
     {
@@ -164,10 +164,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        7696,
-        -240
+        8352,
+        -1424
       ],
-      "id": "86749553-1963-4567-930a-e2ac9cd1b626",
+      "id": "b23db228-e747-470c-9461-ae92990ddb93",
       "name": "AI Agent1",
       "onError": "continueRegularOutput"
     },
@@ -180,10 +180,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        7536,
-        -16
+        8112,
+        -1200
       ],
-      "id": "5644cec9-5f6b-48cc-83b8-a443288d7803",
+      "id": "7676784c-4c8e-47f1-88c4-1d5eb638a611",
       "name": "Postgres Chat Memory1",
       "credentials": {
         "postgres": {
@@ -218,10 +218,10 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
       "typeVersion": 1,
       "position": [
-        7792,
-        -16
+        8240,
+        -1200
       ],
-      "id": "8b78ff49-4572-4c43-ab84-fec37ee99777",
+      "id": "7d63138e-d6da-46ee-acc5-a3e51a60f48d",
       "name": "Supabase Vector Store1",
       "credentials": {
         "supabaseApi": {
@@ -232,16 +232,18 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-2.0-flash",
-        "options": {}
+        "modelName": "models/gemini-flash-latest",
+        "options": {
+          "temperature": 0.4
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        7408,
-        -16
+        7984,
+        -1200
       ],
-      "id": "ef5555e4-56f3-4a0b-977d-0a867afd9407",
+      "id": "763713da-bfd7-4c3b-9716-e4b9dc73a6ce",
       "name": "Google Gemini Chat Model1",
       "credentials": {
         "googlePalmApi": {
@@ -252,16 +254,15 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-embedding-001",
-        "options": {}
+        "modelName": "models/gemini-embedding-001"
       },
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "typeVersion": 1,
       "position": [
-        7952,
-        -16
+        8320,
+        -992
       ],
-      "id": "9b24c8ca-27a1-4884-a4a7-611e5cb60955",
+      "id": "2198ee46-b773-4df9-98b7-d1defc1a5323",
       "name": "Embeddings Google Gemini1",
       "credentials": {
         "googlePalmApi": {
@@ -284,7 +285,7 @@
           "value": {
             "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
             "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-            "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', `demo_request`, 'string') }}",
+            "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', ``, 'string') }}",
             "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
             "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
             "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
@@ -292,55 +293,16 @@
             "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
             "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
             "motivo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('motivo', ``, 'string') }}",
-            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id }}",
-            "session_id": "={{ $('Crystalize Context1').item.json.sessionId }}",
-            "source": "={{ $('Crystalize Context1').item.json.source }}",
-            "appointment_calendar_provider": "={{ $('Get a row1').item.json.appointment_calendar_provider || $('Get a row1').item.json.calendar_provider || \"\" }}",
-            "appointment_calendar_api_url": "={{ $('Get a row1').item.json.appointment_calendar_api_url || $('Get a row1').item.json.calendar_api_url || $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "availability_api_url": "={{ $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "adapter_test_mode": "={{ $('Get a row1').item.json.adapter_test_mode || \"false\" }}",
             "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-            "internal_notification_email": "={{ $('Get a row1').item.json.internal_notification_email || \"\" }}",
             "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || \"\" }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
             "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-            "internal_telegram_chat_id": "={{ $('Get a row1').item.json.internal_telegram_chat_id || \"\" }}"
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
             {
               "id": "tenant_id",
               "displayName": "tenant_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "business_type",
-              "displayName": "business_type",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "appointment_type",
-              "displayName": "appointment_type",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "nome",
-              "displayName": "nome",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -409,8 +371,8 @@
               "removed": false
             },
             {
-              "id": "trace_id",
-              "displayName": "trace_id",
+              "id": "nome",
+              "displayName": "nome",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -419,8 +381,8 @@
               "removed": false
             },
             {
-              "id": "session_id",
-              "displayName": "session_id",
+              "id": "business_type",
+              "displayName": "business_type",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -429,48 +391,8 @@
               "removed": false
             },
             {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "appointment_calendar_provider",
-              "displayName": "appointment_calendar_provider",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "appointment_calendar_api_url",
-              "displayName": "appointment_calendar_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "availability_api_url",
-              "displayName": "availability_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "adapter_test_mode",
-              "displayName": "adapter_test_mode",
+              "id": "appointment_type",
+              "displayName": "appointment_type",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -481,16 +403,6 @@
             {
               "id": "notification_email",
               "displayName": "notification_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "internal_notification_email",
-              "displayName": "internal_notification_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -527,16 +439,6 @@
               "canBeUsedToMatch": true,
               "type": "string",
               "removed": false
-            },
-            {
-              "id": "internal_telegram_chat_id",
-              "displayName": "internal_telegram_chat_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -546,10 +448,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8080,
-        -16
+        8528,
+        -1200
       ],
-      "id": "0f078308-6ca9-42c6-8d60-1431d886c8aa",
+      "id": "a1c7c1cb-da46-4369-9564-f3ed6c660d56",
       "name": "Registra_Appuntamento"
     },
     {
@@ -573,14 +475,10 @@
             "persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('persone', ``, 'string') }}",
             "ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ora', ``, 'string') }}",
             "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id }}",
-            "session_id": "={{ $('Crystalize Context1').item.json.sessionId }}",
-            "source": "={{ $('Crystalize Context1').item.json.source }}",
-            "restaurant_booking_provider": "={{ $('Get a row1').item.json.restaurant_booking_provider || $('Get a row1').item.json.booking_provider || \"\" }}",
-            "restaurant_booking_api_url": "={{ $('Get a row1').item.json.restaurant_booking_api_url || $('Get a row1').item.json.restaurant_calendar_api_url || $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "restaurant_calendar_api_url": "={{ $('Get a row1').item.json.restaurant_calendar_api_url || \"\" }}",
-            "availability_api_url": "={{ $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "adapter_test_mode": "={{ $('Get a row1').item.json.adapter_test_mode || \"false\" }}"
+            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -665,8 +563,8 @@
               "removed": false
             },
             {
-              "id": "trace_id",
-              "displayName": "trace_id",
+              "id": "notification_email",
+              "displayName": "notification_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -675,8 +573,8 @@
               "removed": false
             },
             {
-              "id": "session_id",
-              "displayName": "session_id",
+              "id": "billing_email",
+              "displayName": "billing_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -685,8 +583,8 @@
               "removed": false
             },
             {
-              "id": "source",
-              "displayName": "source",
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -695,48 +593,8 @@
               "removed": false
             },
             {
-              "id": "restaurant_booking_provider",
-              "displayName": "restaurant_booking_provider",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "restaurant_booking_api_url",
-              "displayName": "restaurant_booking_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "restaurant_calendar_api_url",
-              "displayName": "restaurant_calendar_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "availability_api_url",
-              "displayName": "availability_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "adapter_test_mode",
-              "displayName": "adapter_test_mode",
+              "id": "internal_email",
+              "displayName": "internal_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -752,10 +610,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8208,
-        -16
+        8656,
+        -1200
       ],
-      "id": "8d604784-6971-44d3-a3a4-97b053031ef9",
+      "id": "7094ec98-2b97-4af5-b4d4-b1c1a824dd17",
       "name": "Registra_Prenotazione"
     },
     {
@@ -786,18 +644,10 @@
             "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
             "lingua_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('lingua_cliente', `it`, 'string') }}",
             "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita }}",
-            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id }}",
-            "session_id": "={{ $('Crystalize Context1').item.json.sessionId }}",
-            "source": "={{ $('Crystalize Context1').item.json.source }}",
-            "booking_manager_provider": "={{ $('Get a row1').item.json.booking_manager_provider || \"\" }}",
-            "link_booking_esterno": "={{ $('Get a row1').item.json.link_booking_esterno || \"\" }}",
-            "hotel_middleware_mews_url": "={{ $('Get a row1').item.json.hotel_middleware_mews_url || \"\" }}",
-            "hotel_middleware_cloudbeds_url": "={{ $('Get a row1').item.json.hotel_middleware_cloudbeds_url || \"\" }}",
-            "hotel_middleware_siteminder_url": "={{ $('Get a row1').item.json.hotel_middleware_siteminder_url || \"\" }}",
-            "hotel_middleware_5stelle_url": "={{ $('Get a row1').item.json.hotel_middleware_5stelle_url || \"\" }}",
-            "hotel_middleware_fallback_url": "={{ $('Get a row1').item.json.hotel_middleware_fallback_url || $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "availability_api_url": "={{ $('Get a row1').item.json.availability_api_url || \"\" }}",
-            "adapter_test_mode": "={{ $('Get a row1').item.json.adapter_test_mode || \"false\" }}"
+            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -952,8 +802,8 @@
               "removed": false
             },
             {
-              "id": "trace_id",
-              "displayName": "trace_id",
+              "id": "notification_email",
+              "displayName": "notification_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -962,8 +812,8 @@
               "removed": false
             },
             {
-              "id": "session_id",
-              "displayName": "session_id",
+              "id": "billing_email",
+              "displayName": "billing_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -972,8 +822,8 @@
               "removed": false
             },
             {
-              "id": "source",
-              "displayName": "source",
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -982,88 +832,8 @@
               "removed": false
             },
             {
-              "id": "booking_manager_provider",
-              "displayName": "booking_manager_provider",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "link_booking_esterno",
-              "displayName": "link_booking_esterno",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "hotel_middleware_mews_url",
-              "displayName": "hotel_middleware_mews_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "hotel_middleware_cloudbeds_url",
-              "displayName": "hotel_middleware_cloudbeds_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "hotel_middleware_siteminder_url",
-              "displayName": "hotel_middleware_siteminder_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "hotel_middleware_5stelle_url",
-              "displayName": "hotel_middleware_5stelle_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "hotel_middleware_fallback_url",
-              "displayName": "hotel_middleware_fallback_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "availability_api_url",
-              "displayName": "availability_api_url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "adapter_test_mode",
-              "displayName": "adapter_test_mode",
+              "id": "internal_email",
+              "displayName": "internal_email",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -1079,10 +849,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8336,
-        -16
+        8784,
+        -1200
       ],
-      "id": "f7a16afd-0d68-4e6a-acbd-8ad4745f8a05",
+      "id": "a30a24b7-7871-4aa5-aad8-5b0f6218bd47",
       "name": "Registra_Prenotazione_Hotel"
     }
   ],
@@ -1229,7 +999,7 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "14d51d4c-a2a8-47a0-b55f-c43c8b83a390",
+  "versionId": "c1bcc4ed-9e27-46ca-8b03-f4a68e9d49e3",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"

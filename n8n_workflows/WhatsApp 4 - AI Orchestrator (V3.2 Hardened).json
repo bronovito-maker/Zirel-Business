@@ -16,10 +16,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [
-        0,
-        200
+        3536,
+        1072
       ],
-      "id": "0a9b22f3-89df-4dbe-8c51-887e713b8ca7"
+      "id": "a79435b0-5c1e-4184-9e98-a40956d1fd67"
     },
     {
       "parameters": {
@@ -29,10 +29,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        360,
-        200
+        3760,
+        1072
       ],
-      "id": "wa-ai-code",
+      "id": "addc3fd7-da10-43f9-9277-39149ae80125",
       "notesInFlow": true,
       "notes": "Legge inbound pending_ai, rispetta ai_enabled globale, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender."
     },
@@ -66,17 +66,17 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        760,
-        200
+        3984,
+        1072
       ],
-      "id": "wa-ai-update-message",
+      "id": "2fb80f28-97c7-47b8-a214-ea703be0ce81",
+      "notesInFlow": true,
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
           "name": "Supabase account - Zirèl"
         }
       },
-      "notesInFlow": true,
       "notes": "Aggiorna lo stato del messaggio inbound processato dall’orchestrator."
     },
     {
@@ -105,20 +105,21 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1120,
-        200
+        4208,
+        1072
       ],
-      "id": "wa-ai-update-conversation",
+      "id": "95889ee1-e500-4527-a601-a76fd1026e8f",
+      "notesInFlow": true,
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
           "name": "Supabase account - Zirèl"
         }
       },
-      "notesInFlow": true,
       "notes": "Persistenza finale sullo stato AI della conversation."
     }
   ],
+  "pinData": {},
   "connections": {
     "Cron (1 min)": {
       "main": [
@@ -153,5 +154,16 @@
         ]
       ]
     }
-  }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0b365480-48d7-4c9a-99de-4f03f606b6f0",
+  "meta": {
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "W5wfUfAnRipqfQ6r",
+  "tags": []
 }
