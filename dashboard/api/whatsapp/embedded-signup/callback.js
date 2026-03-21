@@ -173,6 +173,7 @@ async function exchangeSignupCodeForAccessToken(signupCode) {
 async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId }) {
     const wabaIds = new Set();
     const businessIds = new Set();
+    const diagnostics = [];
 
     if (preferredBusinessId) {
         businessIds.add(preferredBusinessId);
@@ -205,6 +206,11 @@ async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId })
             );
             break;
         } catch (error) {
+            diagnostics.push({
+                scope: 'me',
+                fields,
+                error: error instanceof Error ? error.message : String(error),
+            });
             console.warn('[whatsapp-embedded-signup] me lookup skipped', {
                 fields,
                 error: error instanceof Error ? error.message : String(error),
@@ -237,6 +243,12 @@ async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId })
 
                 if (wabaIds.size) break;
             } catch (error) {
+                diagnostics.push({
+                    scope: 'business',
+                    business_id: businessId,
+                    fields,
+                    error: error instanceof Error ? error.message : String(error),
+                });
                 console.warn('[whatsapp-embedded-signup] business lookup skipped', {
                     business_id: businessId,
                     fields,
@@ -246,7 +258,11 @@ async function discoverWabaIds({ accessToken, apiVersion, preferredBusinessId })
         }
     }
 
-    return Array.from(wabaIds);
+    return {
+        wabaIds: Array.from(wabaIds),
+        businessIds: Array.from(businessIds),
+        diagnostics,
+    };
 }
 
 async function fetchPhoneNumbersForWaba({ accessToken, apiVersion, wabaId }) {
@@ -277,14 +293,15 @@ async function resolveEmbeddedSignupFromCode(rawPayload) {
     const preferredBusinessId =
         cleanString(rawPayload?.business_id) ||
         cleanString(rawPayload?.businessId);
-    const wabaIds = await discoverWabaIds({
+    const discovery = await discoverWabaIds({
         accessToken: exchange.accessToken,
         apiVersion: metaConfig.apiVersion,
         preferredBusinessId,
     });
+    const wabaIds = discovery.wabaIds;
 
     if (!wabaIds.length) {
-        throw new Error('META_SIGNUP_DISCOVERY_FAILED:missing_waba_id');
+        throw new Error(`META_SIGNUP_DISCOVERY_FAILED:missing_waba_id:businesses=${discovery.businessIds.join(',') || 'none'};diagnostics=${encodeURIComponent(JSON.stringify(discovery.diagnostics.slice(0, 4)))}`);
     }
 
     for (const wabaId of wabaIds) {
