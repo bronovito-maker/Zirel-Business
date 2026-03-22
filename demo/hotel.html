@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zirèl Hotel | Il receptionist automatico per il tuo hotel</title>
+    <title>Zirèl Hotel | Richieste dirette e follow-up per il tuo hotel</title>
     <meta name="description"
-        content="Zirèl Hotel risponde alle richieste dal sito 24/7, raccoglie contatti e aiuta la tua struttura a non perdere prenotazioni quando la reception è occupata o chiusa.">
+        content="Zirèl Hotel aiuta la tua struttura a rispondere alle richieste dal sito, raccogliere contatti utili e proteggere meglio le prenotazioni dirette.">
 
     <link rel="canonical" href="https://zirel.org/hotel" />
     <meta property="og:title"
-        content="Zirèl Hotel | Il receptionist automatico per il sito del tuo hotel." />
+        content="Zirèl Hotel | Richieste dirette e follow-up per il tuo hotel." />
     <meta property="og:description"
         content="Zirèl Hotel risponde ai clienti, raccoglie richieste e alleggerisce reception e follow-up con un flusso ordinato." />
     <meta property="og:url" content="https://zirel.org/hotel" />
@@ -21,7 +21,7 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title"
-        content="Zirèl Hotel | Il receptionist automatico per il sito del tuo hotel." />
+        content="Zirèl Hotel | Richieste dirette e follow-up per il tuo hotel." />
     <meta name="twitter:description"
         content="Scopri come Zirèl Hotel aiuta la tua struttura a raccogliere richieste, non perdere contatti e migliorare il follow-up." />
     <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
@@ -111,18 +111,17 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body class="page-hotel font-sans text-brand-blue bg-white overflow-x-hidden">
+<body class="page-hotel font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="hotel">
 
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Hotel</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html" class="nav-link">HOME</a></li>
             <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
             <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
             <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
             <li><a href="pricing-hotel.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li><a href="faq.html" class="nav-link">FAQ</a></li>
             <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
         <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
@@ -141,23 +140,43 @@
                     Ogni richiesta diretta conta.
                 </span>
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
-                    Il receptionist automatico<br />
-                    <span class="text-brand-orange italic">per il sito del tuo hotel.</span>
+                    Non lasciare richieste dirette<br />
+                    <span class="text-brand-orange italic">senza risposta.</span>
                 </h1>
                 <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
-                    Risponde ai clienti 24/7, raccoglie richieste soggiorno e salva contatti utili anche quando la reception è occupata o chiusa.<br /><br />
-                    Meno richieste perse. Più follow-up utile.
+                    Zirèl risponde dal sito della struttura, raccoglie richieste soggiorno e prepara lead più chiari anche quando la reception è occupata o fuori orario.<br /><br />
+                    Più richieste salvate. Più follow-up che vale davvero la pena fare.
                 </p>
+                <div class="grid sm:grid-cols-3 gap-3 max-w-2xl mb-8 text-left">
+                    <div class="bg-white/90 border border-sky-100 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Fuori orario</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">La richiesta non resta sospesa fino al mattino</p>
+                    </div>
+                    <div class="bg-white/90 border border-sky-100 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Reception</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">Il team riceve contatti più puliti da lavorare</p>
+                    </div>
+                    <div class="bg-white/90 border border-sky-100 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Dirette</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">Protegge richieste che oggi rischiano di perdersi</p>
+                    </div>
+                </div>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <a href="hotel-demo.html"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
-                        Prova la demo hotel
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20"
+                        data-track="cta" data-track-location="hotel_hero" data-track-label="hotel hero demo">
+                        Richiedi una demo per la struttura
                     </a>
-                    <a href="#demo-guidata"
-                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
-                        Vedi come funziona
+                    <a href="hotel-demo.html"
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm"
+                        data-track="cta" data-track-location="hotel_hero" data-track-label="hotel hero live demo">
+                        Guarda la demo live
                     </a>
                 </div>
+                <p class="text-sm md:text-base text-brand-blue/60 mt-6 max-w-2xl">
+                    Se vuoi approfondire prima i problemi piu frequenti del settore, trovi anche le
+                    <a href="guide/index.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">guide dedicate al cluster hotel</a>.
+                </p>
             </div>
 
             <div class="md:w-2/5 flex justify-center items-center relative">
@@ -211,7 +230,8 @@
                         <div class="flex items-center justify-between gap-3">
                             <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand-orange">Sito demo live</span>
                             <a href="hotel-demo.html"
-                                class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg">Apri il sito demo</a>
+                                class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg"
+                                data-track="cta" data-track-location="hotel_mockup" data-track-label="hotel mockup demo">Apri il sito demo</a>
                         </div>
                     </div>
                 </div>
@@ -253,6 +273,23 @@
                     <p class="text-brand-blue/70 leading-relaxed">Ogni domanda ripetitiva sottrae attenzione alle attività a maggior valore: risposte lente, più attrito, meno continuità commerciale.</p>
                 </div>
             </div>
+            <div class="mt-12 grid md:grid-cols-3 gap-6">
+                <div class="rounded-3xl bg-white border border-sky-100 p-6 shadow-sm">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini caso</p>
+                    <p class="font-bold text-brand-blue mb-2">Richiesta serale</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">L'ospite scrive quando la reception è chiusa: Zirèl raccoglie date e contatto, così il team riparte già da una richiesta lavorabile.</p>
+                </div>
+                <div class="rounded-3xl bg-white border border-sky-100 p-6 shadow-sm">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini caso</p>
+                    <p class="font-bold text-brand-blue mb-2">Richiesta incompleta</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">Se mancano dati chiave, li chiede subito invece di lasciare al team un lead rumoroso da rincorrere.</p>
+                </div>
+                <div class="rounded-3xl bg-white border border-sky-100 p-6 shadow-sm">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini prova</p>
+                    <p class="font-bold text-brand-blue mb-2">Domande ricorrenti</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">Parcheggio, check-in, animali e servizi vengono gestiti prima, così la reception resta libera per il follow-up importante.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -261,7 +298,7 @@
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cosa fa <span
                         class="text-brand-orange">Zirèl Hotel</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Trasforma un visitatore del sito in una richiesta chiara, già pronta per il tuo team.</p>
+                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Trasforma un visitatore del sito in una richiesta chiara, già pronta per il tuo team. Se vuoi entrare nei dettagli, trovi anche le nostre <a href="guide/index.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">guide hotel</a>.</p>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -298,11 +335,13 @@
                     <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Vedrai come raccoglie i dati giusti e prepara un passaggio operativo chiaro. Subito.</p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="hotel-demo.html"
-                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
+                            data-track="cta" data-track-location="hotel_demo_section" data-track-label="hotel section live demo">
                             Apri demo Hotel
                         </a>
                         <a href="pricing-hotel.html"
-                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-lg">
+                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-lg"
+                            data-track="cta" data-track-location="hotel_demo_section" data-track-label="hotel section pricing">
                             Vedi piani hotel
                         </a>
                     </div>
@@ -401,15 +440,41 @@
         </div>
     </section>
 
+    <section class="py-24 bg-white" id="guide-utili">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Guide <span
+                        class="text-brand-orange">utili</span></h2>
+                <p class="text-brand-blue/60 max-w-3xl mx-auto text-lg">Due approfondimenti per chi vuole proteggere meglio le richieste dirette, alleggerire la reception e usare i canali di contatto in modo piu ordinato.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <a href="guide/automazione-richieste-hotel.html" class="zirel-card group">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-4">Guida SEO</p>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue group-hover:text-brand-orange transition-colors">Automazione richieste hotel: meno contatti dispersi, piu follow-up utile</h3>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Una guida concreta su dove si perdono le richieste in hotel e come rendere il primo contatto piu utile per la struttura.</p>
+                    <span class="font-bold text-brand-orange">Leggi la guida</span>
+                </a>
+                <a href="guide/whatsapp-hotel-prenotazioni.html" class="zirel-card group">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-4">Guida SEO</p>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue group-hover:text-brand-orange transition-colors">WhatsApp per hotel: utile per le prenotazioni solo se il flusso e ordinato</h3>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Un approfondimento dedicato a WhatsApp come canale di richiesta e follow-up, con un taglio operativo e non generico.</p>
+                    <span class="font-bold text-brand-orange">Leggi la guida</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section class="py-24 relative overflow-hidden" id="contatti">
         <div class="container mx-auto px-4 md:px-8">
             <div
                 class="hotel-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
                 <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Provalo sul sito della tua struttura.</h2>
-                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Partiamo da una demo guidata e ti facciamo vedere il flusso più adatto al tuo hotel.</p>
+                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Ti facciamo vedere dove si disperdono oggi le richieste dirette e quale flusso ti aiuta davvero a recuperarle.</p>
                 <div class="flex justify-center">
                     <a href="contatti.html"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Richiedi la prova</a>
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95"
+                        data-track="cta" data-track-location="hotel_final_cta" data-track-label="hotel final demo">Prenota una demo guidata</a>
                 </div>
             </div>
         </div>
@@ -427,7 +492,7 @@
             <div class="footer-grid">
                 <div class="footer-info">
                     <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
-                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e ordinare il primo contatto senza perdere occasioni.</p>
+                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e attivare flussi utili per hotel, ristoranti e attività di servizio.</p>
                 </div>
                 <div class="footer-links">
                     <h4>Soluzioni</h4>
@@ -439,21 +504,21 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Demo e Accesso</h4>
+                    <h4>Accesso</h4>
                     <ul>
                         <li><a href="demo.html">Demo Restaurant</a></li>
                         <li><a href="hotel-demo.html">Demo Hotel</a></li>
                         <li><a href="professional-demo.html">Demo Professional</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Registrati</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
+                    <h4>Risorse</h4>
                     <ul>
-                        <li><a href="pricing-hotel.html">Pricing Hotel</a></li>
+                        <li><a href="guide/index.html">Guide</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>

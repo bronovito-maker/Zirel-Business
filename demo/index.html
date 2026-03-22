@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zirèl | Il receptionist automatico per chi non può permettersi richieste perse</title>
+    <title>Zirèl | Receptionist automatico per hotel, ristoranti e professionisti</title>
     <meta name="description"
-        content="Zirèl risponde ai clienti, raccoglie richieste e attiva flussi operativi per hotel, ristoranti e attività di servizio. Scopri le soluzioni per non perdere richieste dal sito.">
+        content="Zirèl e il receptionist automatico per hotel, ristoranti e professionisti: risponde ai clienti, raccoglie richieste e ordina il primo contatto senza perdere opportunita.">
 
     <!-- SEO & Social Sharing -->
     <link rel="canonical" href="https://zirel.org" />
     <meta property="og:title"
-        content="Zirèl | Il receptionist automatico per chi non può permettersi richieste perse." />
+        content="Zirèl | Receptionist automatico per hotel, ristoranti e professionisti." />
     <meta property="og:description"
-        content="Zirèl risponde ai clienti, raccoglie richieste e attiva flussi reali per hotel, ristoranti e attività di servizio." />
+        content="Zirèl risponde ai clienti, raccoglie richieste e ordina il primo contatto per hotel, ristoranti e professionisti." />
     <meta property="og:url" content="https://zirel.org" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://zirel.org/hero_premium.png" />
@@ -22,11 +22,31 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title"
-        content="Zirèl | Il receptionist automatico per chi non può permettersi richieste perse." />
+        content="Zirèl | Receptionist automatico per hotel, ristoranti e professionisti." />
     <meta name="twitter:description"
-        content="Zirèl risponde ai clienti, raccoglie richieste e attiva flussi reali per hotel, ristoranti e attività di servizio." />
+        content="Zirèl risponde ai clienti, raccoglie richieste e ordina il primo contatto per hotel, ristoranti e professionisti." />
     <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
     <meta name="twitter:site" content="@zirelcore" />
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Zirèl",
+            "url": "https://zirel.org",
+            "logo": "https://zirel.org/favicon.svg",
+            "sameAs": [
+                "https://zirel.org"
+            ]
+        }
+    </script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Zirèl",
+            "url": "https://zirel.org"
+        }
+    </script>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -109,25 +129,113 @@
         .page-core #features {
             background: linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
         }
+
+
+
+        .core-capability-panel {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(244, 250, 255, 0.98) 100%);
+            border: 1px solid rgba(147, 197, 253, 0.5);
+            box-shadow: 0 24px 60px rgba(2, 132, 199, 0.08);
+        }
+
+        .core-capability-accent {
+            background: linear-gradient(145deg, #0a3552 0%, #0e4a72 55%, #146792 100%);
+            box-shadow: 0 24px 60px rgba(0, 48, 73, 0.18);
+        }
+
+        .core-capability-item {
+            border-top: 1px solid rgba(147, 197, 253, 0.35);
+        }
+
+        .core-capability-item:first-child {
+            border-top: 0;
+        }
+
+        .core-capability-proof {
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.16), rgba(0, 174, 239, 0.1));
+            border: 1px solid rgba(147, 197, 253, 0.45);
+        }
+
+        .core-capability-note {
+            border-top: 1px dashed rgba(255, 255, 255, 0.18);
+        }
+
+        .core-editorial-shell {
+            background:
+                radial-gradient(circle at top left, rgba(0, 174, 239, 0.12), transparent 26%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 250, 255, 0.96) 100%);
+            border: 1px solid rgba(147, 197, 253, 0.55);
+            box-shadow: 0 28px 70px rgba(2, 132, 199, 0.10);
+        }
+
+        .core-editorial-spotlight {
+            background: linear-gradient(150deg, #07304a 0%, #0d4f77 58%, #1492cb 100%);
+            box-shadow: 0 30px 70px rgba(0, 48, 73, 0.18);
+        }
+
+        .core-editorial-rail {
+            border-top: 1px solid rgba(147, 197, 253, 0.32);
+        }
+
+        .core-editorial-rail:first-child {
+            border-top: 0;
+        }
+
+        .core-editorial-case {
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(147, 197, 253, 0.38);
+            box-shadow: 0 18px 40px rgba(2, 132, 199, 0.07);
+        }
+
+        .core-editorial-case.featured {
+            transform: translateY(-12px);
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
+            border-color: rgba(255, 140, 66, 0.32);
+            box-shadow: 0 24px 48px rgba(255, 140, 66, 0.12);
+        }
+
+        .core-editorial-tag {
+            background: rgba(255, 140, 66, 0.12);
+            color: #e67e22;
+        }
+
+        .core-final-panel {
+            background:
+                radial-gradient(circle at top left, rgba(255, 140, 66, 0.2), transparent 26%),
+                radial-gradient(circle at bottom right, rgba(0, 174, 239, 0.16), transparent 32%),
+                linear-gradient(145deg, #072f48 0%, #0c4c73 55%, #138bc2 100%);
+            box-shadow: 0 34px 90px rgba(0, 48, 73, 0.22);
+        }
+
+        .core-final-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        @media (max-width: 1024px) {
+            .core-editorial-case.featured {
+                transform: none;
+            }
+        }
     </style>
     <!-- Vercel Analytics -->
     <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body class="page-core font-sans text-brand-blue bg-white overflow-x-hidden">
+<body class="page-core font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="core">
 
     <!-- 1. Header & Navigation -->
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html" class="nav-link">HOME</a></li>
             <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
             <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
             <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li><a href="faq.html" class="nav-link">FAQ</a></li>
             <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
         <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
@@ -144,20 +252,35 @@
             <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
                 <span
                     class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-slate-200 shadow-sm">
-                    Ogni richiesta, gestita.
+                    Ogni richiesta importante, salvata.
                 </span>
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
-                    Il receptionist automatico
-                    <span class="text-brand-orange italic">per chi non può permettersi richieste perse.</span>
+                    Non lasciare richieste, tavoli
+                    <span class="text-brand-orange italic">o appuntamenti senza risposta.</span>
                 </h1>
                 <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
-                    Risponde ai clienti, raccoglie richieste e attiva il prossimo passo operativo nel modo giusto per il tuo settore.<br /><br />
-                    Meno richieste perse. Più contatti utili da lavorare.
+                    Zirèl risponde dal sito, raccoglie i dati che servono e attiva il prossimo passo operativo nel modo giusto per hotel, ristoranti e attività professionali.<br /><br />
+                    Meno richieste perse. Più contatti davvero lavorabili.
                 </p>
+                <div class="grid sm:grid-cols-3 gap-3 max-w-2xl mb-8 text-left">
+                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Hotel</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">Protegge richieste dirette e follow-up</p>
+                    </div>
+                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Restaurant</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">Riduce caos e tavoli persi durante il servizio</p>
+                    </div>
+                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
+                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">Professional</p>
+                        <p class="text-sm font-bold text-brand-blue mt-1">Filtra intake e protegge agenda e segreteria</p>
+                    </div>
+                </div>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <a href="contatti.html"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
-                        Trova il flusso giusto
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20"
+                        data-track="cta" data-track-location="core_hero" data-track-label="core hero demo">
+                        Richiedi una demo guidata
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
@@ -165,10 +288,15 @@
                         </svg>
                     </a>
                     <a href="#soluzioni"
-                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all text-center text-brand-blue shadow-sm">
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all text-center text-brand-blue shadow-sm"
+                        data-track="cta" data-track-location="core_hero" data-track-label="core hero choose sector">
                         Scegli il tuo settore
                     </a>
                 </div>
+                <p class="text-sm md:text-base text-brand-blue/60 mt-6 max-w-2xl">
+                    Se vuoi entrare dai problemi piu cercati su Google, puoi partire anche dalle
+                    <a href="guide/index.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">guide per ristoranti, hotel e professionisti</a>.
+                </p>
             </div>
             <div class="md:w-2/5 flex justify-center items-center relative">
                 <div
@@ -288,6 +416,28 @@
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
     </header>
 
+    <section class="py-12 bg-white border-y border-slate-100">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini prova</p>
+                    <p class="font-bold text-brand-blue mb-2">Stesso motore, tre contesti</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">Zirèl non cambia brand a ogni settore: cambia il flusso, il linguaggio e il tipo di dato raccolto.</p>
+                </div>
+                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini caso</p>
+                    <p class="font-bold text-brand-blue mb-2">Richiesta fuori orario</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">Quando il team non risponde, Zirèl evita che il contatto si raffreddi e prepara già il passo successivo.</p>
+                </div>
+                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini caso</p>
+                    <p class="font-bold text-brand-blue mb-2">Richiesta incompleta</p>
+                    <p class="text-sm text-brand-blue/70 leading-relaxed">Se mancano dati chiave, li raccoglie prima: il team riceve meno rumore e più richieste utili.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 3. Sezione Soluzioni -->
     <section class="py-24 bg-white" id="soluzioni">
         <div class="container mx-auto px-4 md:px-8">
@@ -308,11 +458,13 @@
                         disponibilità e follow-up.</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="hotel.html"
-                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all">
+                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution hotel">
                             Vedi la soluzione hotel
                         </a>
                         <a href="hotel-demo.html"
-                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all">
+                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution hotel demo">
                             Prova la demo hotel
                         </a>
                     </div>
@@ -326,11 +478,13 @@
                         conferma solo quando il flusso è reale.</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="restaurant.html"
-                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all">
+                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution restaurant">
                             Vedi la soluzione restaurant
                         </a>
                         <a href="demo.html"
-                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all">
+                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution restaurant demo">
                             Prova la demo restaurant
                         </a>
                     </div>
@@ -344,11 +498,13 @@
                         appuntamenti per studi medici, legali e professionisti.</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                         <a href="professional.html"
-                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all">
+                            class="px-5 py-2.5 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg shadow-brand-orange/15 hover:-translate-y-0.5 transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution professional">
                             Vedi la soluzione professional
                         </a>
                         <a href="professional-demo.html"
-                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all">
+                            class="px-5 py-2.5 rounded-full border-2 border-brand-blue/15 bg-white text-brand-blue text-sm font-bold hover:bg-brand-sand transition-all"
+                            data-track="cta" data-track-location="core_solutions" data-track-label="core solution professional demo">
                             Prova la demo professional
                         </a>
                     </div>
@@ -370,59 +526,86 @@
                 </p>
                 <div class="mt-8">
                     <a href="demo.html"
-                        class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20">
-                        Prova una demo
+                        class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20"
+                        data-track="cta" data-track-location="core_features" data-track-label="core features demo">
+                        Prova una demo reale
                     </a>
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
-                <div class="zirel-card group">
-                    <div
-                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-zirel-gradient group-hover:text-white transition-all">
-                        🎯</div>
-                    <h4 class="text-xl font-bold mb-3 leading-tight">Parla come il tuo brand</h4>
-                    <p class="text-brand-blue/60 text-sm leading-relaxed">
-                        Risponde con il tono, il ritmo e il livello di precisione coerenti con la tua attività.
-                    </p>
-                </div>
-                <div class="zirel-card group">
-                    <div
-                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-zirel-gradient group-hover:text-white transition-all">
-                        🗂️</div>
-                    <h4 class="text-xl font-bold mb-3 leading-tight">Usa dati reali</h4>
-                    <p class="text-brand-blue/60 text-sm leading-relaxed">
-                        Lavora su informazioni strutturate e conoscenza reale del tuo business, non su risposte
-                        improvvisate.
-                    </p>
-                </div>
-                <div class="zirel-card group">
-                    <div
-                        class="w-14 h-14 bg-brand-cyan/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-cyan group-hover:text-white transition-all">
-                        ⚙️</div>
-                    <h4 class="text-xl font-bold mb-3 leading-tight">Attiva workflow reali</h4>
-                    <p class="text-brand-blue/60 text-sm leading-relaxed">
-                        Non si ferma alla chat: registra richieste, salva lead e avvia azioni operative concrete.
-                    </p>
-                </div>
-                <div class="zirel-card group">
-                    <div
-                        class="w-14 h-14 bg-brand-sand-dark/30 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-brand-blue group-hover:text-white transition-all">
-                        ✉️</div>
-                    <h4 class="text-xl font-bold mb-3 leading-tight">Conferme brandizzate</h4>
-                    <p class="text-brand-blue/60 text-sm leading-relaxed">
-                        Invia notifiche, riepiloghi e conferme coerenti con il brand del tenant e con il contesto.
-                    </p>
-                </div>
-                <div class="zirel-card group">
-                    <div
-                        class="w-14 h-14 bg-brand-orange/10 rounded-2xl flex items-center justify-center mb-6 text-2xl group-hover:bg-zirel-gradient group-hover:text-white transition-all">
-                        🧩</div>
-                    <h4 class="text-xl font-bold mb-3 leading-tight">Logiche per settore</h4>
-                    <p class="text-brand-blue/60 text-sm leading-relaxed">
-                        Si adatta a hotel, ristoranti e attività di servizio con flussi dedicati, non con un template
-                        unico per tutti.
-                    </p>
+            <div class="core-capability-panel rounded-[2.5rem] overflow-hidden">
+                <div class="grid lg:grid-cols-[1.1fr_1.6fr]">
+                    <div class="core-capability-accent p-10 md:p-12 text-white">
+                        <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Motore operativo</p>
+                        <h3 class="text-3xl md:text-4xl font-black leading-tight mb-5">Non una chat da mettere online.<br>Una presenza che regge il lavoro vero.</h3>
+                        <p class="text-white/80 text-lg leading-relaxed mb-8">Zirèl tiene insieme tono, dati, regole e passaggi operativi. Per questo non sembra un widget appeso al sito, ma una parte credibile del tuo business.</p>
+                        <div class="core-capability-proof rounded-[1.75rem] px-5 py-5 mb-8">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-white/55 font-bold mb-2">Quando funziona davvero</p>
+                            <p class="text-base font-bold leading-relaxed">Quando una richiesta non si limita a ricevere una risposta, ma esce già più chiara, più qualificata e più pronta per il team.</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="rounded-2xl bg-white/10 border border-white/10 px-5 py-4">
+                                <p class="text-sm font-bold">Ogni risposta prepara il prossimo passo</p>
+                            </div>
+                            <div class="rounded-2xl bg-white/10 border border-white/10 px-5 py-4">
+                                <p class="text-sm font-bold">Ogni settore usa logiche davvero sue</p>
+                            </div>
+                        </div>
+                        <div class="core-capability-note mt-8 pt-6">
+                            <p class="text-white/68 leading-relaxed">Se oggi il contatto iniziale si perde tra messaggi, richieste vaghe e follow-up spezzati, Zirèl serve esattamente a rimettere ordine lì.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/80 px-6 md:px-10 py-8 md:py-10">
+                        <div class="core-capability-item py-6 md:py-7">
+                            <div class="flex items-start gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🎯</div>
+                                <div>
+                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Parla come il tuo brand</h4>
+                                    <p class="text-brand-blue/65 leading-relaxed">Risponde con tono, ritmo e livello di precisione coerenti con la tua attività, senza sembrare un componente esterno o improvvisato.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="core-capability-item py-6 md:py-7">
+                            <div class="flex items-start gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🗂️</div>
+                                <div>
+                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Usa dati reali</h4>
+                                    <p class="text-brand-blue/65 leading-relaxed">Lavora su informazioni strutturate, regole e contenuti reali del business. Non improvvisa: restituisce risposte che il team può difendere.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="core-capability-item py-6 md:py-7">
+                            <div class="flex items-start gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-brand-cyan/10 flex items-center justify-center text-2xl flex-shrink-0">⚙️</div>
+                                <div>
+                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Attiva workflow reali</h4>
+                                    <p class="text-brand-blue/65 leading-relaxed">Non si ferma alla conversazione: registra richieste, salva lead, filtra casi e avvia azioni concrete nel momento giusto.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="core-capability-item py-6 md:py-7">
+                            <div class="flex items-start gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-brand-sand-dark/40 flex items-center justify-center text-2xl flex-shrink-0">✉️</div>
+                                <div>
+                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Conferme brandizzate</h4>
+                                    <p class="text-brand-blue/65 leading-relaxed">Riepiloghi, notifiche e conferme restano coerenti con il tenant e con il contesto, così il cliente percepisce continuità e controllo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="core-capability-item py-6 md:py-7">
+                            <div class="flex items-start gap-5">
+                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🧩</div>
+                                <div>
+                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Logiche per settore</h4>
+                                    <p class="text-brand-blue/65 leading-relaxed">Hotel, ristoranti e attività professionali non ricevono lo stesso template: cambiano passaggi, linguaggio e obiettivo operativo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 rounded-[2rem] bg-brand-blue/[0.03] border border-brand-blue/10 px-6 py-6">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Firma del prodotto</p>
+                            <p class="text-xl md:text-2xl font-black text-brand-blue leading-tight">Parla bene. Raccoglie meglio. Fa avanzare il lavoro.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -434,34 +617,68 @@
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Perché <span
                         class="text-brand-orange">Zirèl</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto">Tecnologia complessa. Resa semplice per chi lavora ogni
-                    giorno.</p>
+                <p class="text-brand-blue/60 max-w-3xl mx-auto">Non perché “fa AI”, ma perché protegge il lavoro dove di solito si rompe: primo contatto, richieste frammentate, tempi di risposta e passaggio al team.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="zirel-card">
-                    <h3 class="text-2xl font-bold mb-4">Più flessibile</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Un solo motore. Linguaggi diversi per ogni settore.
-                    </p>
-                </div>
-                <div class="zirel-card">
-                    <h3 class="text-2xl font-bold mb-4">Più concreto</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Ogni conversazione porta a un'azione reale.
-                        Tracciabile.</p>
-                </div>
-                <div class="zirel-card">
-                    <h3 class="text-2xl font-bold mb-4">Più controllabile</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Regole, knowledge base e workflow restano sotto il tuo
-                        controllo.</p>
+            <div class="core-editorial-shell rounded-[2.75rem] p-6 md:p-8 lg:p-10">
+                <div class="grid lg:grid-cols-[1.1fr_1.55fr] gap-6 lg:gap-8 items-stretch">
+                    <div class="core-editorial-spotlight rounded-[2.5rem] p-8 md:p-10 text-white flex flex-col justify-between">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Per chi non vuole solo “rispondere meglio”</p>
+                            <h3 class="text-3xl md:text-4xl font-black leading-tight mb-5">Zirèl diventa memorabile quando il cliente percepisce ordine e il team sente meno attrito.</h3>
+                            <p class="text-white/80 text-lg leading-relaxed">Non vende un effetto wow da demo. Vende una sensazione più rara: richieste che arrivano già più leggibili, più sensate, più gestibili.</p>
+                        </div>
+                        <div class="mt-8 space-y-3">
+                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">Meno rumore operativo</div>
+                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">Più continuità tra sito, tono e azione</div>
+                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">Più controllo senza irrigidire l’esperienza</div>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <article class="core-editorial-case rounded-[2rem] p-6 md:p-7">
+                            <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Hotel</div>
+                            <h3 class="text-2xl font-black text-brand-blue mb-3">Protegge le richieste dirette mentre la reception lavora.</h3>
+                            <p class="text-brand-blue/70 leading-relaxed mb-5">Lead più completi, follow-up meno dispersi, meno occasioni perse perché la richiesta è arrivata nell’orario sbagliato.</p>
+                            <div class="core-editorial-rail pt-4">
+                                <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
+                                <p class="text-sm text-brand-blue/65 mt-1">La struttura sembra più pronta, anche quando il team non è immediatamente disponibile.</p>
+                            </div>
+                        </article>
+
+                        <article class="core-editorial-case featured rounded-[2rem] p-6 md:p-7">
+                            <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Restaurant</div>
+                            <h3 class="text-2xl font-black text-brand-blue mb-3">Toglie pressione alla sala senza far sparire il calore del locale.</h3>
+                            <p class="text-brand-blue/70 leading-relaxed mb-5">Prenotazioni, FAQ e richieste operative vengono assorbite meglio, così il servizio resta concentrato sul tavolo e non sul telefono.</p>
+                            <div class="core-editorial-rail pt-4">
+                                <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
+                                <p class="text-sm text-brand-blue/65 mt-1">Il locale sembra più presente, non più automatizzato.</p>
+                            </div>
+                        </article>
+
+                        <article class="core-editorial-case rounded-[2rem] p-6 md:p-7 md:col-span-2">
+                            <div class="grid md:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
+                                <div>
+                                    <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Professional</div>
+                                    <h3 class="text-2xl font-black text-brand-blue mb-3">Pulisce l’agenda prima ancora di riempirla.</h3>
+                                </div>
+                                <div>
+                                    <p class="text-brand-blue/70 leading-relaxed mb-4">Il primo contatto viene filtrato prima, così il team dedica tempo ai casi giusti e non rincorre richieste vaghe o premature.</p>
+                                    <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
+                                    <p class="text-sm text-brand-blue/65 mt-1">Più selezione, più chiarezza, più autorevolezza nel modo in cui si accoglie il cliente.</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
                 </div>
             </div>
 
-            <div class="max-w-4xl mx-auto bg-brand-sand/20 p-8 md:p-12 rounded-[3rem] relative mt-20 text-center">
+            <div class="max-w-4xl mx-auto bg-brand-sand/20 p-8 md:p-12 rounded-[3rem] relative mt-14 text-center">
                 <h3 class="text-2xl md:text-4xl font-black text-brand-blue mb-4">Vederlo è diverso.</h3>
-                <p class="text-brand-blue/70 text-lg max-w-2xl mx-auto mb-8">Ti mostriamo un flusso reale per il tuo
-                    settore. In pochi minuti.</p>
+                <p class="text-brand-blue/70 text-lg max-w-2xl mx-auto mb-8">Ti mostriamo un flusso reale per il tuo settore e capisci subito dove oggi stai perdendo richieste utili, tempo operativo o qualità nel primo contatto.</p>
                 <a href="demo.html"
-                    class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20">
+                    class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20"
+                    data-track="cta" data-track-location="core_why_zirel" data-track-label="core why zirel demo">
                     Guarda un flusso reale
                 </a>
             </div>
@@ -484,7 +701,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Come evitate risposte sbagliate o informazioni inventate ai miei clienti?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Precisione assoluta.</strong> Zirèl risponde
@@ -499,7 +720,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Ho già un sito web fatto da un'agenzia, posso usarlo comunque?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Integrazione invisibile.</strong> Che il tuo sito
@@ -514,7 +739,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>I miei clienti non sono “tecnici”. Rischio di complicare l’esperienza?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Semplicità universale.</strong> Zirèl parla in
@@ -529,7 +758,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Ma la privacy? I dati dei miei clienti dove finiscono?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>La tua privacy al primo posto.</strong> Tutti i
@@ -544,7 +777,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Se cambiano prezzi, regole o disponibilità, devo chiamare un tecnico?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Controllo totale.</strong> No. Zirèl lavora su
@@ -559,7 +796,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Quanto ci vuole per attivare una soluzione Zirèl?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Attivazione rapida.</strong> Il tempo dipende
@@ -575,7 +816,11 @@
                     <button
                         class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
                         <span>Posso disdire quando voglio?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        <span class="faq-icon text-2xl transition-transform duration-300">
+                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
+                            </svg>
+                        </span>
                     </button>
                     <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
                         <p class="p-6 pt-2 text-brand-blue/70"><strong>Massima flessibilità.</strong> I nostri piani
@@ -591,13 +836,22 @@
     <section class="py-24 relative overflow-hidden" id="contatti">
         <div class="container mx-auto px-4 md:px-8">
             <div
-                class="core-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
-                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Scopri il flusso giusto per il tuo business.</h2>
-                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Tu ci racconti come arrivano oggi le richieste. Noi ti mostriamo come trasformarle in contatti più ordinati e gestibili.</p>
-                <div class="flex justify-center">
+                class="core-final-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-16 lg:p-20 text-center text-white relative z-10 transition-all duration-500 hover:shadow-2xl">
+                <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Ultimo passaggio</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Se il tuo sito oggi riceve richieste, può già lavorare meglio di così.</h2>
+                <p class="text-lg text-white/78 mb-8 max-w-3xl mx-auto">Tu ci racconti come arrivano oggi messaggi, prenotazioni o appuntamenti. Noi ti facciamo vedere un flusso credibile, coerente col tuo brand e pensato per togliere attrito al team.</p>
+                <div class="flex flex-wrap justify-center gap-3 mb-10">
+                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Hotel</div>
+                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Restaurant</div>
+                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Professional</div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                     <a href="contatti.html"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Richiedi
-                        il flusso giusto</a>
+                        class="bg-white text-brand-blue px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
+                        data-track="cta" data-track-location="core_final_cta" data-track-label="core final demo">Richiedi una demo guidata</a>
+                    <a href="guide/index.html"
+                        class="text-white px-8 py-4 rounded-full text-base font-bold border border-white/18 bg-white/8 hover:bg-white/14 transition-all"
+                        data-track="cta" data-track-location="core_final_cta" data-track-label="core final guides">Leggi prima le guide</a>
                 </div>
             </div>
         </div>
@@ -628,20 +882,20 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Demo e Accesso</h4>
+                    <h4>Accesso</h4>
                     <ul>
                         <li><a href="demo.html">Demo Restaurant</a></li>
                         <li><a href="hotel-demo.html">Demo Hotel</a></li>
                         <li><a href="professional-demo.html">Demo Professional</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Registrati</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
+                    <h4>Risorse</h4>
                     <ul>
+                        <li><a href="guide/index.html">Guide</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                         <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>

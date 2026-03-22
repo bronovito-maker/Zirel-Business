@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI per ristoranti: gestire richieste e prenotazioni senza aumentare il caos | Zirèl</title>
+    <meta name="description"
+        content="Scopri come usare l'AI per ristoranti per rispondere piu in fretta, raccogliere prenotazioni meglio e alleggerire il lavoro del locale nei momenti piu delicati.">
+
+    <link rel="canonical" href="https://zirel.org/guide/ai-per-ristoranti" />
+    <meta property="og:title"
+        content="AI per ristoranti: gestire richieste e prenotazioni senza aumentare il caos | Zirèl" />
+    <meta property="og:description"
+        content="Una guida pratica per capire come l'AI puo aiutare un ristorante a rispondere meglio, raccogliere richieste piu chiare e perdere meno tavoli." />
+    <meta property="og:url" content="https://zirel.org/guide/ai-per-ristoranti" />
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="https://zirel.org/food_premium.png" />
+    <meta property="og:site_name" content="Zirèl Restaurant" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title"
+        content="AI per ristoranti: gestire richieste e prenotazioni senza aumentare il caos | Zirèl" />
+    <meta name="twitter:description"
+        content="Come usare l'AI per alleggerire il primo contatto nei ristoranti senza aumentare la complessita operativa." />
+    <meta name="twitter:image" content="https://zirel.org/food_premium.png" />
+    <meta name="twitter:site" content="@zirelcore" />
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://zirel.org/"},
+                {"@type": "ListItem", "position": 2, "name": "Guide", "item": "https://zirel.org/guide/"},
+                {"@type": "ListItem", "position": 3, "name": "AI per ristoranti", "item": "https://zirel.org/guide/ai-per-ristoranti"}
+            ]
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css?v=3">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .guide-page {
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 20%);
+        }
+
+        .guide-hero {
+            background:
+                radial-gradient(circle at top right, rgba(255, 140, 66, 0.12), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(253, 240, 213, 0.72), transparent 35%);
+        }
+
+        .guide-shell {
+            border: 1px solid rgba(253, 224, 190, 0.9);
+            box-shadow: 0 24px 60px rgba(124, 45, 18, 0.10);
+            background: linear-gradient(180deg, #fffaf5 0%, #fff3e3 100%);
+        }
+
+        .guide-highlight {
+            background: linear-gradient(180deg, #fff6ec 0%, #fff1de 100%);
+            border: 1px solid rgba(253, 224, 190, 0.9);
+        }
+
+        .guide-page .zirel-card {
+            border-color: rgba(253, 224, 190, 0.8);
+            box-shadow: 0 18px 42px rgba(124, 45, 18, 0.07);
+        }
+
+        .guide-page .faq-item {
+            border-color: rgba(253, 240, 213, 0.95) !important;
+        }
+
+        .guide-page .faq-answer {
+            background: rgba(255, 247, 237, 0.9);
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="guide-page font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="../index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Guide</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="../restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="../hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="../professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="../guide/index.html" class="nav-link">GUIDE</a></li>
+            <li><a href="../pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="../contatti.html" class="nav-link">CONTATTI</a></li>
+            <li class="cta-nav-mobile-li"><a href="../login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="../contatti.html" class="cta-nav cta-nav-desktop">RICHIEDI DEMO</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 md:pt-44 md:pb-28 guide-hero relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 relative z-10">
+            <nav class="mb-8 text-sm text-brand-blue/60 font-semibold">
+                <a href="../index.html" class="hover:text-brand-orange transition-colors">Home</a>
+                <span class="mx-2">/</span>
+                <a href="./index.html" class="hover:text-brand-orange transition-colors">Guide</a>
+                <span class="mx-2">/</span>
+                <span>AI per ristoranti</span>
+            </nav>
+            <div class="max-w-4xl">
+                <div class="mb-6 flex flex-wrap gap-3 items-center">
+                    <span
+                        class="inline-flex bg-white/90 text-brand-orange px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider border border-orange-100 shadow-sm">
+                        Guida Restaurant
+                    </span>
+                    <a href="../restaurant.html"
+                        class="inline-flex text-sm font-bold text-brand-blue/70 hover:text-brand-orange transition-colors">
+                        Vai alla soluzione Zirèl Restaurant
+                    </a>
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    AI per ristoranti:
+                    <span class="text-brand-orange italic">meno richieste perse, meno caos durante il servizio.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 max-w-3xl leading-relaxed mb-10">
+                    Quando il locale e pieno, ogni richiesta in piu arriva nel momento peggiore. Il punto non e solo rispondere:
+                    e farlo in modo ordinato, veloce e sostenibile, senza togliere attenzione alla sala e senza perdere clienti.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="../restaurant.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-xl shadow-brand-orange/30 border border-white/20">
+                        Scopri Zirèl Restaurant
+                    </a>
+                    <a href="../contatti.html"
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-orange-100 bg-white hover:bg-orange-50 transition-all text-center text-brand-blue shadow-sm">
+                        Richiedi una demo guidata
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-sand/70 rounded-full blur-3xl -ml-48 -mb-48"></div>
+    </header>
+
+    <main>
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="guide-shell rounded-[2.5rem] p-8 md:p-10 lg:p-12">
+                    <div class="grid lg:grid-cols-[1.3fr_0.9fr] gap-10 items-start">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.18em] text-brand-blue/45 font-bold mb-4">Idea chiave</p>
+                            <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Il problema non e avere piu richieste.<br><span
+                                    class="text-brand-orange">E riuscire a gestirle bene quando arrivano tutte insieme.</span></h2>
+                            <p class="text-lg text-brand-blue/70 leading-relaxed mb-5">
+                                Durante il servizio, il telefono suona, entrano messaggi, qualcuno vuole prenotare e qualcun altro chiede
+                                menu, orari, allergie o tavoli per gruppi. In quei momenti il rischio non e solo rispondere tardi:
+                                e rispondere in modo incompleto, confuso o non rispondere affatto.
+                            </p>
+                            <p class="text-lg text-brand-blue/70 leading-relaxed">
+                                Un sistema di AI per ristoranti puo aiutare proprio in questa fase: gestisce le richieste piu frequenti,
+                                raccoglie le informazioni utili e rende il primo contatto piu chiaro prima che arrivi al team. Se vuoi vedere come questo approccio prende forma in una pagina soluzione vera, puoi approfondire direttamente <a href="../restaurant.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">Zirèl Restaurant</a>.
+                            </p>
+                        </div>
+                        <div class="zirel-card">
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Cosa ottieni</p>
+                            <div class="space-y-4">
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2">Meno interruzioni in sala</h3>
+                                    <p class="text-brand-blue/70">Le richieste semplici non interrompono ogni volta il lavoro operativo.</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2">Richieste piu chiare</h3>
+                                    <p class="text-brand-blue/70">Nome, orario, numero persone e dettagli utili arrivano in modo piu ordinato.</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-2">Meno tavoli persi</h3>
+                                    <p class="text-brand-blue/70">Riduci il rischio che il cliente si raffreddi mentre il team e impegnato altrove.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-[#fff8ef]">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Perche molti ristoranti <span
+                            class="text-brand-orange">perdono richieste nei momenti peggiori</span></h2>
+                    <p class="text-brand-blue/60 max-w-3xl mx-auto text-lg">
+                        Molti locali non hanno un problema di domanda. Hanno un problema di gestione del primo contatto quando il team e gia sotto pressione.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="zirel-card">
+                        <h3 class="text-2xl font-bold mb-4">Telefonate senza risposta</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">
+                            Quando il servizio accelera, una chiamata persa puo diventare una prenotazione persa senza nemmeno accorgersene.
+                        </p>
+                    </div>
+                    <div class="zirel-card">
+                        <h3 class="text-2xl font-bold mb-4">Messaggi letti troppo tardi</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">
+                            Se la prima risposta arriva quando il cliente ha gia cambiato idea, il problema non e il canale: e il timing.
+                        </p>
+                    </div>
+                    <div class="zirel-card">
+                        <h3 class="text-2xl font-bold mb-4">Richieste incomplete</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">
+                            Orari confusi, gruppi non specificati, dati mancanti: il team si ritrova a rincorrere dettagli invece di confermare.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="grid lg:grid-cols-2 gap-10 items-start">
+                    <div>
+                        <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Cosa puo fare davvero <span
+                                class="text-brand-orange">un sistema di AI per ristoranti</span></h2>
+                        <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">
+                            Quando si parla di AI per ristoranti, il rischio e immaginare qualcosa di troppo astratto. In realta il valore piu concreto e molto piu semplice:
+                            alleggerire il primo contatto senza rendere piu fragile il flusso operativo.
+                        </p>
+                        <p class="text-lg text-brand-blue/70 leading-relaxed">
+                            Non si tratta di sostituire il rapporto con il cliente. Si tratta di evitare che domande semplici, ripetitive o incomplete interrompano continuamente il lavoro del locale. Per altri approfondimenti dello stesso cluster puoi partire anche dall'<a href="./index.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">indice delle guide Zirèl</a>.
+                        </p>
+                    </div>
+                    <div class="guide-highlight rounded-[2rem] p-8">
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Automazione utile</p>
+                        <div class="space-y-4 text-brand-blue/75">
+                            <p><strong class="text-brand-blue">Risposte immediate:</strong> alle richieste ricorrenti che oggi rubano tempo al team.</p>
+                            <p><strong class="text-brand-blue">Raccolta dati:</strong> per prenotazioni piu leggibili e meno follow-up inutili.</p>
+                            <p><strong class="text-brand-blue">Chiarezza operativa:</strong> nelle richieste vaghe o poco precise.</p>
+                            <p><strong class="text-brand-blue">Continuita:</strong> anche quando nessuno puo intervenire subito.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-[#fff8ef]">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Quali richieste conviene <span
+                            class="text-brand-orange">automatizzare per prime</span></h2>
+                    <p class="text-brand-blue/60 max-w-3xl mx-auto text-lg">
+                        Nei ristoranti conviene partire dalle richieste piu frequenti e piu standardizzabili, non da tutto insieme.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="zirel-card">
+                        <h3 class="text-xl font-bold mb-3">Prenotazioni tavolo</h3>
+                        <p class="text-brand-blue/70 text-sm leading-relaxed">Nome, telefono, data, ora e persone raccolti in modo piu ordinato.</p>
+                    </div>
+                    <div class="zirel-card">
+                        <h3 class="text-xl font-bold mb-3">Orari e apertura</h3>
+                        <p class="text-brand-blue/70 text-sm leading-relaxed">Le domande ricorrenti smettono di interrompere il servizio ogni volta.</p>
+                    </div>
+                    <div class="zirel-card">
+                        <h3 class="text-xl font-bold mb-3">Menu e allergie</h3>
+                        <p class="text-brand-blue/70 text-sm leading-relaxed">Informazioni pratiche, utili e coerenti con il contesto del locale.</p>
+                    </div>
+                    <div class="zirel-card">
+                        <h3 class="text-xl font-bold mb-3">Gruppi e casi speciali</h3>
+                        <p class="text-brand-blue/70 text-sm leading-relaxed">Le richieste fuori standard vengono chiarite prima di finire nel caos del team.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="grid lg:grid-cols-2 gap-10 items-start">
+                    <div class="zirel-card">
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Quando ha senso</p>
+                        <h2 class="text-3xl md:text-4xl font-black mb-6 text-brand-blue">Dove l'automazione aiuta davvero</h2>
+                        <div class="space-y-4 text-brand-blue/70 leading-relaxed">
+                            <p>Ha molto senso se il telefono interrompe spesso il servizio, arrivano molte domande ripetitive, le richieste entrano anche fuori orario o il team e piccolo.</p>
+                            <p>Ha meno senso se il locale riceve pochissime richieste o se il processo attuale e gia molto semplice e ben assorbito dal team.</p>
+                        </div>
+                    </div>
+                    <div class="zirel-card">
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Rischio da evitare</p>
+                        <h2 class="text-3xl md:text-4xl font-black mb-6 text-brand-blue">Automatizzare male crea solo piu rumore</h2>
+                        <div class="space-y-4 text-brand-blue/70 leading-relaxed">
+                            <p>Se il sistema risponde in modo generico, non raccoglie le informazioni giuste o promette troppo, non sta aiutando il ristorante: sta solo spostando il problema da un canale all'altro.</p>
+                            <p>La parte importante non e "mettere un chatbot". E progettare un flusso che abbia senso per il locale, per i suoi clienti e per il suo modo di lavorare.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-[#fff8ef]">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="guide-shell rounded-[2.5rem] p-8 md:p-12">
+                    <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Come lo affronta Zirèl</p>
+                            <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Zirèl aiuta il locale a rendere il primo contatto <span
+                                    class="text-brand-orange">piu semplice da gestire</span></h2>
+                            <p class="text-lg text-brand-blue/70 leading-relaxed mb-5">
+                                Per il settore restaurant, Zirèl aiuta a rispondere alle richieste ricorrenti, raccogliere prenotazioni e dati utili in modo piu ordinato e ridurre il rumore operativo durante il servizio.
+                            </p>
+                            <p class="text-lg text-brand-blue/70 leading-relaxed">
+                                L'obiettivo non e aggiungere complessita. E trasformare una richiesta vaga in un contatto piu chiaro da lavorare per il team.
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <a href="../restaurant.html"
+                                class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                                Scopri Zirèl Restaurant
+                            </a>
+                            <a href="../demo.html"
+                                class="px-8 py-4 rounded-full text-lg font-bold border-2 border-brand-blue/20 bg-white hover:bg-brand-sand transition-all text-center text-brand-blue shadow-sm">
+                                Apri la demo Restaurant
+                            </a>
+                            <a href="../contatti.html"
+                                class="px-8 py-4 rounded-full text-lg font-bold border-2 border-orange-100 bg-orange-50 hover:bg-orange-100 transition-all text-center text-brand-blue shadow-sm">
+                                Parliamone in 15 minuti
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-white" id="faq">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Domande <span
+                            class="text-brand-orange">frequenti</span></h2>
+                    <p class="text-brand-blue/60 max-w-2xl mx-auto">Le obiezioni piu comuni quando si parla di AI applicata a un ristorante vero, non a un caso teorico.</p>
+                </div>
+                <div class="max-w-4xl mx-auto faq-grid space-y-4">
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Un sistema di AI per ristoranti sostituisce il personale?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. Serve ad alleggerire il lavoro nelle richieste iniziali e ripetitive, cosi il team puo concentrarsi meglio sulle attivita a maggior valore.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Puo essere utile anche per un ristorante non grande?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-6 pt-2 text-brand-blue/70">Si, soprattutto se il problema non e la dimensione del locale ma il fatto che le richieste arrivano nei momenti sbagliati o in modo poco ordinato.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Ha senso se ricevo gia richieste dal sito?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-6 pt-2 text-brand-blue/70">Si. In molti casi il problema non e generare piu traffico, ma gestire meglio le richieste che stanno gia arrivando.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+                        <button class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
+                            <span>Bisogna cambiare completamente il sito?</span>
+                            <span class="faq-icon text-2xl transition-transform duration-300"></span>
+                        </button>
+                        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-6 pt-2 text-brand-blue/70">No. L'obiettivo e migliorare il modo in cui il primo contatto viene raccolto e gestito, non stravolgere per forza tutta la presenza online.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 relative overflow-hidden">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="guide-highlight rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-20 text-center text-brand-blue relative z-10">
+                    <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Se il tuo ristorante riceve gia richieste, il punto non e farne arrivare di piu.</h2>
+                    <p class="text-lg text-brand-blue/70 mb-10 max-w-3xl mx-auto italic">
+                        Il punto e renderle piu chiare, piu gestibili e meno dipendenti dal caos del servizio. Zirèl lavora proprio in questo spazio.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="../restaurant.html"
+                            class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">
+                            Vai a Zirèl Restaurant
+                        </a>
+                        <a href="../contatti.html"
+                            class="px-10 py-5 rounded-full text-xl font-black border-2 border-orange-100 bg-white hover:bg-orange-50 transition-all text-brand-blue shadow-sm">
+                            Richiedi una demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="../index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e ordinare il primo contatto senza perdere occasioni.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../restaurant.html">Restaurant</a></li>
+                        <li><a href="../hotel.html">Hotel</a></li>
+                        <li><a href="../professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Supporto</h4>
+                    <ul>
+                        <li><a href="../guide/index.html">Indice guide</a></li>
+                        <li><a href="../contatti.html">Contatti</a></li>
+                        <li><a href="../faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Risorse</h4>
+                    <ul>
+                        <li><a href="../pricing.html">Pricing per settore</a></li>
+                        <li><a href="../privacy.html">Privacy Policy</a></li>
+                        <li><a href="../cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

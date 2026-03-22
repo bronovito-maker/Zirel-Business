@@ -284,17 +284,16 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body>
+<body data-page-type="restaurant-demo">
     <nav class="navbar" id="navbar">
         <a href="restaurant.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Restaurant</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html" class="nav-link">HOME</a></li>
             <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
             <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
             <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
             <li><a href="pricing-restaurant.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li><a href="faq.html" class="nav-link">FAQ</a></li>
             <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
         <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
@@ -313,15 +312,35 @@
                 Demo Live Zirèl Restaurant
             </span>
             <h1 class="demo-font">Chiringuito <span>da Gino</span></h1>
-            <p>Un ristorante fittizio ma realistico, costruito per mostrarti come il receptionist automatico può apparire e lavorare sul sito di un locale vero.</p>
+            <p>Un ristorante fittizio ma realistico, costruito per mostrarti come il receptionist automatico può apparire e lavorare sul sito di un locale vero, proprio nei momenti in cui di solito perdi richieste o interrompi il servizio.</p>
             <div class="hero-actions">
-                <a href="#n8n-widget-mock" onclick="return openDemoChat(event)" class="btn btn-primary">Prova il flusso di prenotazione</a>
-                <a href="restaurant.html" class="btn btn-secondary">Vedi la soluzione restaurant</a>
+                <a href="#n8n-widget-mock" onclick="return openDemoChat(event)" class="btn btn-primary" data-track="cta" data-track-location="restaurant_demo_hero" data-track-label="restaurant demo open chat">Prova il flusso di prenotazione</a>
+                <a href="restaurant.html" class="btn btn-secondary" data-track="cta" data-track-location="restaurant_demo_hero" data-track-label="restaurant demo solution">Vedi la soluzione restaurant</a>
             </div>
             <p class="mt-6 text-sm md:text-base text-white/80 max-w-2xl mx-auto">Qui la chat è già configurata per
                 mostrarti prenotazione tavolo, FAQ, orari e richieste reali in azione.</p>
         </div>
     </header>
+
+    <section class="container py-10">
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="info-text rounded-[2rem] p-6">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini prova</p>
+                <p class="font-bold text-brand-blue mb-2">Prenotazione standard</p>
+                <p class="text-sm text-brand-blue/70 leading-relaxed">Guarda come raccoglie nome, orario e persone senza creare passaggi inutili.</p>
+            </div>
+            <div class="info-text rounded-[2rem] p-6">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Mini prova</p>
+                <p class="font-bold text-brand-blue mb-2">FAQ ricorrenti</p>
+                <p class="text-sm text-brand-blue/70 leading-relaxed">Orari, menu e logistica vengono gestiti prima che il team debba intervenire.</p>
+            </div>
+            <div class="info-text rounded-[2rem] p-6">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Se ti convince</p>
+                <p class="font-bold text-brand-blue mb-2">Passa alla demo guidata</p>
+                <p class="text-sm text-brand-blue/70 leading-relaxed">Ti mostriamo come adattare il flusso al tuo locale, non a un template generico.</p>
+            </div>
+        </div>
+    </section>
 
     <section id="menu" class="container">
         <h2 class="section-title demo-font">Esperienze <span>di Gusto</span></h2>
@@ -512,12 +531,23 @@
     </script>
     <script type="module" src="/chat.js" data-tenant-id="chiringuito_gino_001"></script>
     <script type="module" src="/ui-helpers.js"></script>
+    <section class="container pb-16">
+        <div class="info-text rounded-[2rem] p-8 text-center">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Passo successivo</p>
+            <h2 class="text-3xl md:text-4xl font-black text-brand-blue mb-4">Vuoi questo flusso sul sito del tuo locale?</h2>
+            <p class="text-brand-blue/70 max-w-2xl mx-auto mb-6">Ti facciamo vedere dove oggi perdi richieste e come adattare Zirèl al tuo servizio, al tuo tono e al tuo modo di lavorare.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="contatti.html" class="btn btn-primary" data-track="cta" data-track-location="restaurant_demo_final" data-track-label="restaurant demo final contact">Prenota una demo guidata</a>
+                <a href="pricing-restaurant.html" class="btn btn-secondary" data-track="cta" data-track-location="restaurant_demo_final" data-track-label="restaurant demo final pricing">Vedi il pricing restaurant</a>
+            </div>
+        </div>
+    </section>
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-info">
                     <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
-                    <p>Soluzioni operative per rispondere ai clienti, raccogliere prenotazioni e ordinare il primo contatto senza perdere tavoli.</p>
+                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e attivare flussi utili per hotel, ristoranti e attività di servizio.</p>
                 </div>
                 <div class="footer-links">
                     <h4>Soluzioni</h4>
@@ -529,21 +559,21 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Demo e Accesso</h4>
+                    <h4>Accesso</h4>
                     <ul>
                         <li><a href="demo.html">Demo Restaurant</a></li>
                         <li><a href="hotel-demo.html">Demo Hotel</a></li>
                         <li><a href="professional-demo.html">Demo Professional</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Registrati</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
+                    <h4>Risorse</h4>
                     <ul>
-                        <li><a href="pricing-restaurant.html">Pricing Restaurant</a></li>
+                        <li><a href="guide/index.html">Guide</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>

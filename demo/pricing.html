@@ -80,17 +80,16 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body class="pricing-core">
+<body class="pricing-core" data-page-type="pricing">
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html" class="nav-link">HOME</a></li>
             <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
             <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
             <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li><a href="faq.html" class="nav-link">FAQ</a></li>
             <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
         <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
@@ -105,6 +104,16 @@
         <div class="container">
             <h1>Un sistema. <span class="zirel-brand">Tre settori.</span></h1>
             <p>Scegli il piano giusto in base a come arrivano oggi le richieste nel tuo business: dal sito subito, e su WhatsApp ufficiale nei piani superiori.</p>
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="contatti.html" class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all text-center"
+                    data-track="cta" data-track-location="pricing_hero" data-track-label="pricing hero guided demo">
+                    Fatti consigliare il piano giusto
+                </a>
+                <a href="#faq" class="px-8 py-4 rounded-full text-lg font-bold border-2 border-white/30 bg-white/10 text-white hover:bg-white/20 transition-all text-center"
+                    data-track="cta" data-track-location="pricing_hero" data-track-label="pricing hero faq">
+                    Chiarisci prima i dubbi
+                </a>
+            </div>
         </div>
     </header>
 
@@ -130,7 +139,8 @@
                         <li>CTA orientate al locale</li>
                     </ul>
                     <a href="pricing-restaurant.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
+                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing restaurant">
                         Apri Restaurant
                     </a>
                 </div>
@@ -147,7 +157,8 @@
                         <li>CTA orientate alla struttura</li>
                     </ul>
                     <a href="pricing-hotel.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
+                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing hotel">
                         Apri Hotel
                     </a>
                 </div>
@@ -163,7 +174,8 @@
                         <li>CTA orientate al processo di studio</li>
                     </ul>
                     <a href="pricing-professional.html"
-                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center">
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center"
+                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing professional">
                         Apri Professional
                     </a>
                 </div>
@@ -186,6 +198,15 @@
                     <h3 class="text-2xl font-black text-brand-blue mb-3">Scelta rapida</h3>
                     <p class="text-brand-blue/70 leading-relaxed">Scegli il settore e apri il listino dedicato. Se hai un caso ibrido, ti guidiamo noi.</p>
                 </div>
+            </div>
+            <div class="mt-12 max-w-4xl mx-auto rounded-[2rem] bg-white border border-sky-100 p-8 text-center shadow-sm">
+                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Scelta rapida</p>
+                <h3 class="text-2xl md:text-3xl font-black text-brand-blue mb-4">Non sei sicuro del settore o del piano?</h3>
+                <p class="text-brand-blue/70 mb-6">Ti diciamo noi quale demo vedere, quale listino aprire e se ha senso partire dal sito, da WhatsApp o da entrambi.</p>
+                <a href="contatti.html" class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all"
+                    data-track="cta" data-track-location="pricing_mid_cta" data-track-label="pricing contact help">
+                    Parliamone prima di scegliere
+                </a>
             </div>
         </div>
     </section>
@@ -310,20 +331,20 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Demo e Accesso</h4>
+                    <h4>Accesso</h4>
                     <ul>
                         <li><a href="demo.html">Demo Restaurant</a></li>
                         <li><a href="hotel-demo.html">Demo Hotel</a></li>
                         <li><a href="professional-demo.html">Demo Professional</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Registrati</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
+                    <h4>Risorse</h4>
                     <ul>
+                        <li><a href="guide/index.html">Guide</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                         <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Zirèl: SEO, richieste, prenotazioni e primo contatto | Zirèl</title>
+    <meta name="description"
+        content="Le guide Zirèl per ristoranti, hotel e professionisti: approfondimenti pratici su richieste, prenotazioni, intake iniziale e automazione del primo contatto.">
+    <link rel="canonical" href="https://zirel.org/guide/" />
+    <meta property="og:title" content="Guide Zirèl: SEO, richieste, prenotazioni e primo contatto | Zirèl" />
+    <meta property="og:description"
+        content="Una raccolta di guide per capire come organizzare meglio il primo contatto in ristoranti, hotel e studi professionali." />
+    <meta property="og:url" content="https://zirel.org/guide/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://zirel.org/hero_premium.png" />
+    <meta property="og:site_name" content="Zirèl Guide" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Guide Zirèl: SEO, richieste, prenotazioni e primo contatto | Zirèl" />
+    <meta name="twitter:description"
+        content="Guide pratiche per ristoranti, hotel e professionisti su automazione, prenotazioni, richieste e intake iniziale." />
+    <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
+    <meta name="twitter:site" content="@zirelcore" />
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://zirel.org/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Guide",
+                    "item": "https://zirel.org/guide/"
+                }
+            ]
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            orange: '#FF8C42',
+                            'orange-dark': '#E67E22',
+                            blue: '#003049',
+                            'blue-dark': '#001D2D',
+                            cyan: '#00AEEF',
+                            sand: '#FDF0D5',
+                            'sand-dark': '#F2E5C8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        'zirel': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css?v=3">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .guide-index-page {
+            background: linear-gradient(180deg, #eef6ff 0%, #ffffff 20%);
+        }
+
+        .guide-index-hero {
+            background:
+                radial-gradient(circle at top right, rgba(0, 174, 239, 0.16), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(255, 140, 66, 0.10), transparent 32%);
+        }
+
+        .guide-index-page .zirel-card {
+            border-color: rgba(203, 213, 225, 0.65);
+        }
+    </style>
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body class="guide-index-page font-sans text-brand-blue bg-white overflow-x-hidden">
+
+    <nav class="navbar" id="navbar">
+        <a href="../index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Guide</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="../restaurant.html" class="nav-link">RESTAURANT</a></li>
+            <li><a href="../hotel.html" class="nav-link">HOTEL</a></li>
+            <li><a href="../professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="../guide/index.html" class="nav-link">GUIDE</a></li>
+            <li><a href="../pricing.html" class="nav-link">PRICING</a></li>
+            <li><a href="../contatti.html" class="nav-link">CONTATTI</a></li>
+            <li class="cta-nav-mobile-li"><a href="../login.html" class="cta-nav">LOGIN</a></li>
+        </ul>
+        <a href="../contatti.html" class="cta-nav cta-nav-desktop">RICHIEDI DEMO</a>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 md:pt-44 md:pb-28 guide-index-hero relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 relative z-10">
+            <nav class="mb-8 text-sm text-brand-blue/60 font-semibold">
+                <a href="../index.html" class="hover:text-brand-orange transition-colors">Home</a>
+                <span class="mx-2">/</span>
+                <span>Guide</span>
+            </nav>
+            <div class="max-w-4xl">
+                <span
+                    class="inline-flex bg-white/90 text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider border border-slate-200 shadow-sm mb-6">
+                    Indice Guide
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
+                    Guide Zirèl:
+                    <span class="text-brand-orange italic">richieste, prenotazioni e primo contatto.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-brand-blue/80 max-w-3xl leading-relaxed">
+                    Una raccolta ordinata di contenuti per ristoranti, hotel e professionisti che vogliono capire dove si perde valore nel primo contatto e come renderlo piu chiaro, piu veloce e piu sostenibile.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cluster <span class="text-brand-orange">Restaurant</span></h2>
+                    <p class="text-brand-blue/60 max-w-3xl text-lg">Guide pensate per locali che vogliono ridurre richieste perse, aumentare prenotazioni e ordinare il contatto iniziale durante il servizio.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <a href="./ai-per-ristoranti.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">AI per ristoranti</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Come usare l'automazione per gestire richieste e prenotazioni senza aumentare il caos operativo.</p>
+                    </a>
+                    <a href="./come-aumentare-prenotazioni-ristorante.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">Come aumentare le prenotazioni di un ristorante</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Un taglio piu orientato al risultato per capire dove si perdono tavoli e come migliorare il flusso.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-sky-50/40">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cluster <span class="text-brand-orange">Hotel</span></h2>
+                    <p class="text-brand-blue/60 max-w-3xl text-lg">Guide dedicate a richieste dirette, follow-up iniziale, reception e uso di canali come WhatsApp senza dispersione.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <a href="./automazione-richieste-hotel.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">Automazione richieste hotel</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Come rispondere prima e perdere meno prenotazioni lavorando meglio il primo contatto.</p>
+                    </a>
+                    <a href="./whatsapp-hotel-prenotazioni.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">WhatsApp per hotel e prenotazioni</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Come usare WhatsApp in modo piu sostenibile per la reception e piu chiaro per gli ospiti.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-white">
+            <div class="container mx-auto px-4 md:px-8">
+                <div class="mb-16">
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 text-brand-blue">Cluster <span class="text-brand-orange">Professional</span></h2>
+                    <p class="text-brand-blue/60 max-w-3xl text-lg">Guide per studi e professionisti che vogliono rendere piu ordinato l'intake iniziale, filtrare meglio le richieste e proteggere agenda e team.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <a href="./gestione-primo-contatto-studi-professionali.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">Gestione del primo contatto per studi professionali</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Come far arrivare al team richieste piu chiare, utili e sostenibili gia nel primo filtro.</p>
+                    </a>
+                    <a href="./come-filtrare-richieste-clienti-prima-appuntamento.html" class="zirel-card group">
+                        <h3 class="text-2xl font-bold mb-4 group-hover:text-brand-orange transition-colors">Come filtrare le richieste dei clienti prima dell'appuntamento</h3>
+                        <p class="text-brand-blue/70 leading-relaxed">Come evitare agenda piena ma poco produttiva e migliorare il passaggio verso call e appuntamenti.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="../index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e ordinare il primo contatto senza perdere occasioni.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Soluzioni</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../restaurant.html">Restaurant</a></li>
+                        <li><a href="../hotel.html">Hotel</a></li>
+                        <li><a href="../professional.html">Professional</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Supporto</h4>
+                    <ul>
+                        <li><a href="../guide/index.html">Indice guide</a></li>
+                        <li><a href="../contatti.html">Contatti</a></li>
+                        <li><a href="../faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Risorse</h4>
+                    <ul>
+                        <li><a href="../pricing.html">Pricing per settore</a></li>
+                        <li><a href="../privacy.html">Privacy Policy</a></li>
+                        <li><a href="../cookie.html">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+
+</html>

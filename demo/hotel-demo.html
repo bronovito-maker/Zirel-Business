@@ -94,18 +94,17 @@
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
-<body class="font-sans text-brand-blue bg-white overflow-x-hidden">
+<body class="font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="hotel-demo">
 
     <nav class="navbar" id="navbar">
         <a href="hotel-demo.html" class="logo"><span class="zirel-brand">Hotel</span> <span>Rivamare</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html" class="nav-link">HOME</a></li>
             <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
             <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
             <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
+            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
             <li><a href="pricing-hotel.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li><a href="faq.html" class="nav-link">FAQ</a></li>
             <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
         </ul>
         <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
@@ -129,15 +128,17 @@
                 </h1>
                 <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
                     Qui provi un flusso reale: domande su camere, servizi, check-in e richieste soggiorno.<br /><br />
-                    Nessuna simulazione astratta. Vedi esattamente come lavorerebbe sul sito del tuo hotel.
+                    Nessuna simulazione astratta. Vedi esattamente come lavorerebbe sul sito del tuo hotel quando una richiesta diretta rischia di perdersi.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <a href="#chat-live" onclick="return openDemoChat(event)"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20"
+                        data-track="cta" data-track-location="hotel_demo_hero" data-track-label="hotel demo open chat">
                         Prova il flusso soggiorno
                     </a>
                     <a href="hotel.html"
-                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
+                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm"
+                        data-track="cta" data-track-location="hotel_demo_hero" data-track-label="hotel demo solution">
                         Vedi la soluzione hotel
                     </a>
                 </div>
@@ -187,7 +188,8 @@
                             <div class="mt-4 flex items-center justify-between gap-3">
                                 <span class="text-xs font-bold uppercase tracking-[0.14em] text-brand-orange">Reception live</span>
                                 <button onclick="openDemoChat()"
-                                    class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg">Scrivi
+                                    class="px-4 py-2 rounded-full bg-zirel-gradient text-white text-sm font-bold shadow-lg"
+                                    data-track="cta" data-track-location="hotel_demo_mockup" data-track-label="hotel demo mockup open chat">Scrivi
                                     ora</button>
                             </div>
                         </div>
@@ -207,14 +209,16 @@
                     <h2 class="text-3xl md:text-5xl font-black mb-6 text-brand-blue">Cosa provi su questo <span
                             class="text-brand-orange">sito demo</span></h2>
                     <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">Apri la chat e fai domande come un ospite reale.</p>
-                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Vedrai tono, raccolta dati e passaggio al team. In pochi secondi.</p>
+                    <p class="text-lg text-brand-blue/70 leading-relaxed mb-8">Vedrai tono, raccolta dati e passaggio al team. In pochi secondi capisci se il flusso regge nel tuo contesto.</p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="contatti.html"
-                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20">
-                            Richiedi la prova sul tuo sito
+                            class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
+                            data-track="cta" data-track-location="hotel_demo_section" data-track-label="hotel demo contact">
+                            Prenota una demo guidata
                         </a>
                         <a href="hotel.html"
-                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm">
+                            class="px-8 py-4 rounded-full text-lg font-bold border-2 border-sky-100 bg-white hover:bg-sky-50 transition-all text-center text-brand-blue shadow-sm"
+                            data-track="cta" data-track-location="hotel_demo_section" data-track-label="hotel demo solution section">
                             Vedi la soluzione hotel
                         </a>
                     </div>
@@ -275,10 +279,11 @@
             <div
                 class="hotel-demo-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center text-brand-blue relative z-10 transition-all duration-500 hover:shadow-2xl">
                 <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Vuoi questo flusso sul sito del tuo hotel?</h2>
-                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Partiamo da una demo guidata e vediamo come adattarlo alla tua struttura.</p>
+                <p class="text-lg text-brand-blue/70 mb-10 max-w-2xl mx-auto italic">Partiamo da una demo guidata e vediamo come adattarlo alla tua struttura, al tuo team e al tuo tipo di richieste dirette.</p>
                 <div class="flex justify-center">
                     <a href="contatti.html"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95">Richiedi la prova</a>
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:shadow-brand-orange/40 transition-all active:scale-95"
+                        data-track="cta" data-track-location="hotel_demo_final" data-track-label="hotel demo final contact">Prenota una demo guidata</a>
                 </div>
             </div>
         </div>
@@ -289,7 +294,7 @@
             <div class="footer-grid">
                 <div class="footer-info">
                     <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
-                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e ordinare il primo contatto senza perdere occasioni.</p>
+                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e attivare flussi utili per hotel, ristoranti e attività di servizio.</p>
                 </div>
                 <div class="footer-links">
                     <h4>Soluzioni</h4>
@@ -301,21 +306,21 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Demo e Accesso</h4>
+                    <h4>Accesso</h4>
                     <ul>
                         <li><a href="demo.html">Demo Restaurant</a></li>
                         <li><a href="hotel-demo.html">Demo Hotel</a></li>
                         <li><a href="professional-demo.html">Demo Professional</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Registrati</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
+                    <h4>Risorse</h4>
                     <ul>
-                        <li><a href="pricing-hotel.html">Pricing Hotel</a></li>
+                        <li><a href="guide/index.html">Guide</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="pricing.html">Pricing per settore</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="cookie.html">Cookie Policy</a></li>
                     </ul>
