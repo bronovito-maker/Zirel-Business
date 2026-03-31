@@ -47,8 +47,15 @@
         return /^[\p{L}\p{N}\p{Emoji_Presentation}\p{Extended_Pictographic}\s._-]{1,4}$/u.test(raw) ? raw : '💬';
     }
 
+    function sanitizeTimeout(value, fallback = 30000) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(Math.max(parsed, 5000), 120000);
+    }
+
     const tenantId = sanitizeTenantId(me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official');
     const webhookUrl = me?.getAttribute('data-webhook-url') || cfg.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
+    const chatTimeoutMs = sanitizeTimeout(me?.getAttribute('data-timeout-ms') || cfg.chatTimeoutMs || 30000);
 
     // Sessione runtime: resta stabile finche la pagina e aperta, ma si resetta al reload.
     // In questo modo un refresh forza una nuova conversazione e non riprende
@@ -447,6 +454,10 @@
         container.appendChild(loadingMsg);
         container.scrollTop = container.scrollHeight;
 
+        const slowResponseTimer = setTimeout(() => {
+            loadingMsg.innerText = 'Sto ancora recuperando la risposta...';
+        }, 8000);
+
         console.log(`[Zirèl Chat] Sending message for tenant: ${tenantId}`);
 
         try {
@@ -469,7 +480,7 @@
                         trace_id: traceId,
                     },
                 }),
-            }, 12000);
+            }, chatTimeoutMs);
 
             if (!response.ok) {
                 throw new Error(`CHAT_HTTP_${response.status}`);
@@ -507,10 +518,14 @@
             loadingMsg.remove();
             const botMsg = document.createElement('div');
             botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
-            botMsg.innerText = 'Non sono riuscito a contattare il server. Riprova tra poco.';
+            botMsg.innerText = e?.name === 'AbortError'
+                ? 'La risposta sta impiegando troppo tempo. Riprova tra poco.'
+                : 'Non sono riuscito a contattare il server. Riprova tra poco.';
             container.appendChild(botMsg);
             container.scrollTop = container.scrollHeight;
             console.error('Chat error:', e);
+        } finally {
+            clearTimeout(slowResponseTimer);
         }
     };
 
