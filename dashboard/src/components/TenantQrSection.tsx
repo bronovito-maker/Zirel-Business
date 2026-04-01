@@ -340,29 +340,32 @@ const TenantQrSection = ({ tenantId, formData }: TenantQrSectionProps) => {
                     </div>
                 </div>
 
-                <div className="rounded-[2rem] border border-[#F2E5C8] bg-[#FFFAF1] p-5">
+                <div className="min-w-0 rounded-[2rem] border border-[#F2E5C8] bg-[#FFFAF1] p-5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 text-center">Anteprima QR</p>
-                    <div className="mt-4 rounded-[1.75rem] border border-[#F2E5C8] bg-white shadow-sm overflow-hidden">
+                    <div className="mt-4 overflow-hidden rounded-[1.75rem] border border-[#F2E5C8] bg-white shadow-sm">
                         <div style={{ background: `linear-gradient(135deg, ${widgetColor} 0%, ${widgetColor}CC 100%)` }} className="px-5 py-4 text-white">
                             <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/75">Zirèl QR Concierge</div>
                             <div className="mt-2 text-xl font-black leading-tight">{title}</div>
                             <p className="mt-2 text-sm leading-relaxed text-white/85">{subtitle}</p>
                         </div>
-                        <div className="space-y-4 px-5 py-5 text-center">
+                        <div className="space-y-4 px-4 py-5 text-center sm:px-5">
                             <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-semibold text-slate-700">
                                 {icon} {previewTarget?.label || 'Struttura'}
                             </div>
-                            <div className="mx-auto grid h-[230px] w-[230px] place-items-center rounded-[1.75rem] border border-[#F2E5C8] bg-white p-4">
+                            <div className="mx-auto grid aspect-square w-full max-w-[230px] place-items-center overflow-hidden rounded-[1.75rem] border border-[#F2E5C8] bg-white p-4">
                                 {isGenerating ? (
                                     <RefreshCw className="h-10 w-10 animate-spin text-[#FF8C42]" />
                                 ) : previewSvg ? (
-                                    <div className="h-full w-full" dangerouslySetInnerHTML={{ __html: previewSvg }} />
+                                    <div
+                                        className="h-full w-full [&>svg]:h-full [&>svg]:w-full [&>svg]:max-h-full [&>svg]:max-w-full"
+                                        dangerouslySetInnerHTML={{ __html: previewSvg }}
+                                    />
                                 ) : (
                                     <div className="text-sm text-slate-400">Nessun QR da mostrare</div>
                                 )}
                             </div>
                             <div className="text-sm font-semibold text-slate-800">{cta}</div>
-                            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 break-all">
+                            <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500 break-all">
                                 {previewTarget?.url || baseChatUrl || 'Configura il tenant per ottenere il link pubblico.'}
                             </div>
                             {previewTarget ? (
