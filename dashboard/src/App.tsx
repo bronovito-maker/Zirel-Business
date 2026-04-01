@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import PublicDataDeletionPage from './components/PublicDataDeletionPage';
 import DashboardHelpPage from './components/DashboardHelpPage';
+import PublicChatPage from './components/PublicChatPage';
 import { isAuthenticated, logout } from './lib/auth';
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
       <Toaster position="top-center" />
       {pathname === '/meta/data-deletion' ? (
         <PublicDataDeletionPage />
+      ) : pathname === '/chat' ? (
+        <PublicChatPage />
       ) : pathname === '/help' ? (
         !isAuth ? <Login onLogin={handleLogin} /> : <DashboardHelpPage />
       ) : !isAuth ? (

@@ -61,6 +61,9 @@ const parseArgs = () => {
     delayMs: 500,
     tenantId: '',
     sessionId: '',
+    room: '',
+    area: '',
+    source: 'cli-e2e',
   };
 
   for (let index = 0; index < args.length; index += 1) {
@@ -70,6 +73,9 @@ const parseArgs = () => {
     if (arg === '--delay') options.delayMs = Number(args[index + 1] || '500');
     if (arg === '--tenant') options.tenantId = args[index + 1];
     if (arg === '--session') options.sessionId = args[index + 1];
+    if (arg === '--room') options.room = args[index + 1];
+    if (arg === '--area') options.area = args[index + 1];
+    if (arg === '--source') options.source = args[index + 1];
   }
 
   return options;
@@ -113,11 +119,18 @@ const main = async () => {
     const payload = {
       chatInput: message,
       sessionId,
+      room: options.room || '',
+      area: options.area || '',
+      source: options.source,
+      entryUrl: '',
       metadata: {
         tenant_id: tenantId,
         client: 'cli-e2e',
         protocol_version: '1.1',
         trace_id: traceId,
+        room: options.room || '',
+        area: options.area || '',
+        source: options.source,
       },
     };
 

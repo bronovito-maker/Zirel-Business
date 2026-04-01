@@ -129,6 +129,28 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
 
     const selectedConversation = conversations.find((conversation) => conversation.id === selectedConversationId) || null;
 
+    const extractMessageContext = (message: WhatsAppMessageSummary) => {
+        const provider = (message.provider_payload_json || {}) as Record<string, unknown>;
+        const room = typeof provider.room === 'string' ? provider.room.trim() : '';
+        const area = typeof provider.area === 'string' ? provider.area.trim() : '';
+        const source = typeof provider.source === 'string' ? provider.source.trim() : '';
+
+        return {
+            room,
+            area,
+            source,
+        };
+    };
+
+    const selectedConversationContext = (() => {
+        for (const message of messages) {
+            const context = extractMessageContext(message);
+            if (context.room || context.area || context.source) return context;
+        }
+
+        return { room: '', area: '', source: '' };
+    })();
+
     const extractMessageText = (message: WhatsAppMessageSummary) => {
         const provider = message.provider_payload_json || {};
         const providerText =
@@ -333,6 +355,25 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
                                             <p className="text-sm text-gray-500 mt-1">
                                                 {selectedConversation.customer_phone_normalized || selectedConversation.external_contact_id || 'numero non disponibile'}
                                             </p>
+                                            {selectedConversationContext.room || selectedConversationContext.area || selectedConversationContext.source ? (
+                                                <div className="mt-3 flex flex-wrap gap-2">
+                                                    {selectedConversationContext.room ? (
+                                                        <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-700">
+                                                            Camera {selectedConversationContext.room}
+                                                        </span>
+                                                    ) : null}
+                                                    {selectedConversationContext.area ? (
+                                                        <span className="inline-flex items-center rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-violet-700">
+                                                            Area {selectedConversationContext.area}
+                                                        </span>
+                                                    ) : null}
+                                                    {selectedConversationContext.source ? (
+                                                        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-amber-700">
+                                                            {selectedConversationContext.source}
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            ) : null}
                                         </div>
                                         <div className="flex flex-wrap items-center gap-2">
                                             <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] ${(statusMeta[selectedConversation.status] || statusMeta.ai_active).tone}`}>
@@ -363,12 +404,32 @@ const WhatsAppHandoffPanel = ({ tenantId }: WhatsAppHandoffPanelProps) => {
                                                     ? 'bg-zirel-gradient text-white rounded-br-md'
                                                     : 'bg-white text-gray-900 border border-gray-100 rounded-bl-md';
                                                 const metaTone = isOutbound ? 'text-white/80' : 'text-gray-400';
+                                                const context = extractMessageContext(message);
                                                 return (
                                                     <div key={message.id} className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}>
                                                         <div className={`max-w-[85%] md:max-w-[72%] px-4 py-3 rounded-3xl shadow-sm ${bubbleTone}`}>
                                                             <div className={`text-[11px] font-bold uppercase tracking-[0.14em] mb-2 ${metaTone}`}>
                                                                 {isOutbound ? `${message.sender_role || 'ai'} · ${message.delivery_status || 'inviato'}` : `${message.sender_role || 'customer'} · ${message.processing_status || 'ricevuto'}`}
                                                             </div>
+                                                            {context.room || context.area || context.source ? (
+                                                                <div className={`mb-3 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-[0.12em] ${metaTone}`}>
+                                                                    {context.room ? (
+                                                                        <span className={`rounded-full px-2.5 py-1 ${isOutbound ? 'bg-white/15 text-white' : 'bg-sky-50 text-sky-700 border border-sky-200'}`}>
+                                                                            Camera {context.room}
+                                                                        </span>
+                                                                    ) : null}
+                                                                    {context.area ? (
+                                                                        <span className={`rounded-full px-2.5 py-1 ${isOutbound ? 'bg-white/15 text-white' : 'bg-violet-50 text-violet-700 border border-violet-200'}`}>
+                                                                            Area {context.area}
+                                                                        </span>
+                                                                    ) : null}
+                                                                    {context.source ? (
+                                                                        <span className={`rounded-full px-2.5 py-1 ${isOutbound ? 'bg-white/15 text-white' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                                                                            {context.source}
+                                                                        </span>
+                                                                    ) : null}
+                                                                </div>
+                                                            ) : null}
                                                             <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-[15px]">
                                                                 {extractMessageText(message)}
                                                             </p>

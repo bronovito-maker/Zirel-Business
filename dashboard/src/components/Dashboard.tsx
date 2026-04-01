@@ -10,6 +10,7 @@ import BillingSection from './BillingSection';
 import AnalyticsSection from './AnalyticsSection';
 import WhatsAppHandoffPanel from './WhatsAppHandoffPanel';
 import WhatsAppChannelCard from './WhatsAppChannelCard';
+import TenantQrSection from './TenantQrSection';
 import toast from 'react-hot-toast';
 
 interface DashboardProps {
@@ -1246,6 +1247,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         </div>
                                     </div>
                                 </div>
+
+                                <TenantQrSection
+                                    tenantId={tenantId || undefined}
+                                    formData={formData}
+                                />
 
                             </section>
                                 </div>

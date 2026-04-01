@@ -1,0 +1,444 @@
+{
+  "name": "Zirèl - Inoltra_Richiesta_Reception",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "tenant_id"
+            },
+            {
+              "name": "business_type"
+            },
+            {
+              "name": "request_type"
+            },
+            {
+              "name": "request_text"
+            },
+            {
+              "name": "requested_time"
+            },
+            {
+              "name": "room"
+            },
+            {
+              "name": "area"
+            },
+            {
+              "name": "guest_name"
+            },
+            {
+              "name": "telefono"
+            },
+            {
+              "name": "nome_attivita"
+            },
+            {
+              "name": "notification_email"
+            },
+            {
+              "name": "internal_email"
+            },
+            {
+              "name": "billing_email"
+            },
+            {
+              "name": "telegram_chat_id"
+            },
+            {
+              "name": "trace_id"
+            },
+            {
+              "name": "session_id"
+            },
+            {
+              "name": "source"
+            }
+          ]
+        }
+      },
+      "id": "3b581ce1-0ed8-446d-87dd-3d8233fd8eba",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -6816,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "943f83f9-910f-46c1-92f2-c2bf0d571144",
+              "leftValue": "={{ String($json.business_type || \"\").trim().toLowerCase() === \"hotel\" || !String($json.business_type || \"\").trim() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "45370a7f-56ab-46a7-b9f3-39fd5395ba85",
+      "name": "Check Hotel Sector",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6592,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "08b4ab4e-0ba6-4d3c-bc51-e290e679bc4a",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "1abc96e7-11f9-47c2-9cb9-bb6b0ede2931",
+              "name": "code",
+              "value": "UNSUPPORTED_SECTOR",
+              "type": "string"
+            },
+            {
+              "id": "7fc2b7d9-4f39-4e75-875f-45359623caec",
+              "name": "message",
+              "value": "Questo workflow gestisce solo richieste reception hotel.",
+              "type": "string"
+            },
+            {
+              "id": "0a51ac77-c4ba-4d01-b0b4-4deddc0d3d6a",
+              "name": "final_reply",
+              "value": "Posso inoltrare richieste reception solo per strutture hotel.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "afa89d1e-d8d9-4dd6-8b2b-fde3f8925437",
+      "name": "Unsupported Sector Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6368,
+        -368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const value = $json || {};\nconst normalize = (v) => String(v || '').replace(/\\s+/g, ' ').trim();\nconst titleCase = (v) => normalize(v)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\n\nconst trace_id = normalize(value.trace_id) || (globalThis.crypto?.randomUUID?.() || 'trace_' + Date.now());\nconst session_id = normalize(value.session_id) || 'session_' + Date.now();\nconst source = normalize(value.source || 'chat_widget') || 'chat_widget';\nconst tenant_id = normalize(value.tenant_id);\nconst business_type = normalize(value.business_type || 'hotel').toLowerCase() || 'hotel';\nconst room = normalize(value.room);\nconst area = normalize(value.area);\nconst guest_name = titleCase(value.guest_name);\nconst telefono = normalize(value.telefono).replace(/[^\\d+\\s]/g, '');\nconst nome_attivita = normalize(value.nome_attivita || 'Hotel');\nconst request_text = normalize(value.request_text);\nconst requested_time = normalize(value.requested_time);\nconst rawType = normalize(value.request_type).toLowerCase();\nconst notification_email = normalize(value.notification_email).toLowerCase();\nconst internal_email = normalize(value.internal_email).toLowerCase();\nconst billing_email = normalize(value.billing_email).toLowerCase();\nconst telegram_chat_id = normalize(value.telegram_chat_id);\n\nconst inferRequestType = (text) => {\n  const t = normalize(text).toLowerCase();\n  if (!t) return 'generic_request';\n  if (/taxi|cab|transfer/.test(t)) return 'taxi_booking';\n  if (/asciugaman|cuscin|copert|lenzuol|sapone|carta igienica|pulizia|rifare la camera/.test(t)) return 'housekeeping';\n  if (/tv|televisione|aria condizionata|condizionatore|wifi|wi-fi|frigo|lampad|guast|non funziona|rotto|rotta|manutenzione/.test(t)) return 'maintenance';\n  if (/acqua|phon|asciugacapelli|adattatore|ferro da stiro|bollitore/.test(t)) return 'amenities';\n  if (/sveglia|wake up|svegliatemi/.test(t)) return 'wakeup_call';\n  if (/reception|richiam|chiamatemi|operatore/.test(t)) return 'reception_callback';\n  return 'generic_request';\n};\n\nconst allowedTypes = new Set(['housekeeping', 'maintenance', 'amenities', 'taxi_booking', 'wakeup_call', 'reception_callback', 'generic_request']);\nconst request_type = allowedTypes.has(rawType) ? rawType : inferRequestType(request_text || rawType);\n\nconst internalRecipient = notification_email || internal_email || billing_email || '';\n\nlet validation_code = '';\nlet validation_message = '';\nif (!tenant_id) {\n  validation_code = 'MISSING_TENANT_ID';\n  validation_message = 'Tenant mancante.';\n} else if (!request_text) {\n  validation_code = 'MISSING_REQUEST_TEXT';\n  validation_message = 'Richiesta reception mancante.';\n} else if (!telegram_chat_id && !internalRecipient) {\n  validation_code = 'MISSING_INTERNAL_NOTIFICATION_CHANNEL';\n  validation_message = 'Manca un canale interno per inoltrare la richiesta alla reception.';\n}\n\nreturn [{\n  json: {\n    ...value,\n    tenant_id,\n    trace_id,\n    session_id,\n    source,\n    business_type,\n    room,\n    area,\n    guest_name,\n    telefono,\n    nome_attivita,\n    request_type,\n    request_text,\n    requested_time,\n    notification_email,\n    internal_email,\n    billing_email,\n    telegram_chat_id,\n    internal_recipient_email: internalRecipient,\n    validation_code,\n    validation_message,\n    is_valid_payload: !validation_code,\n  },\n}];"
+      },
+      "id": "b6fce3db-03b9-4290-9950-09d200dda4cd",
+      "name": "Normalize & Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6368,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3e810a27-ddcf-4fa5-88d1-4266be223c09",
+              "leftValue": "={{ !!$json.validation_code }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cc16ba04-55cf-4967-b4a0-a7d595c68360",
+      "name": "Check Valid Payload",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -6144,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b0996d64-5b1b-4dd1-ad96-827a86b23f9c",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "5162f889-f00f-4850-94fb-94a9db7a8f99",
+              "name": "code",
+              "value": "={{ $json.validation_code }}",
+              "type": "string"
+            },
+            {
+              "id": "bc03bb33-667a-4a57-88e8-a02babe6cce9",
+              "name": "message",
+              "value": "={{ $json.validation_message }}",
+              "type": "string"
+            },
+            {
+              "id": "8447dff1-351d-42ab-a130-548b831fdfea",
+              "name": "final_reply",
+              "value": "Per inoltrare la richiesta alla reception mi serve una richiesta chiara e almeno un canale interno attivo per avvisare lo staff.",
+              "type": "string"
+            },
+            {
+              "id": "c59ea695-daec-40f1-b130-b43d3b8cdac8",
+              "name": "tenant_id",
+              "value": "={{ $json.tenant_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5b76bddb-91de-49ae-aa04-abae10e7cd31",
+              "name": "trace_id",
+              "value": "={{ $json.trace_id }}",
+              "type": "string"
+            },
+            {
+              "id": "4c511984-3f69-404e-b07c-a0a04f0b216c",
+              "name": "session_id",
+              "value": "={{ $json.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ae8500a9-b1e7-4cd5-a466-55157111a4f3",
+      "name": "Invalid Payload Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5920,
+        -464
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize & Validate Request').item.json;\nconst payload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  nome_struttura: input.nome_attivita || 'Hotel',\n  request_type: input.request_type,\n  request_text: input.request_text,\n  requested_time: input.requested_time || null,\n  room: input.room || null,\n  area: input.area || null,\n  guest_name: input.guest_name || null,\n  telefono: input.telefono || null,\n  source: input.source || 'chat_widget',\n  internal_email: input.internal_recipient_email || null,\n  telegram_chat_id: input.telegram_chat_id || null,\n};\n\nconst rows = [];\nconst dedupeBase = input.tenant_id + ':reception_request:' + input.trace_id;\nconst now = new Date().toISOString();\n\nif (input.telegram_chat_id) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_hotel',\n      template_key: 'hotel_reception_request_internal',\n      related_entity_type: 'reception_request',\n      related_entity_id: input.trace_id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: input.trace_id,\n      dedupe_key: dedupeBase + ':telegram_internal_hotel',\n      payload,\n    },\n  });\n}\n\nif (input.internal_recipient_email) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_hotel',\n      template_key: 'hotel_reception_request_internal',\n      related_entity_type: 'reception_request',\n      related_entity_id: input.trace_id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: input.trace_id,\n      dedupe_key: dedupeBase + ':email_internal_hotel',\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+      },
+      "id": "14321928-34e2-49a6-be26-27e45bd084f3",
+      "name": "Build Notification Outbox Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5696,
+        -656
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "notification_outbox",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tenant_id",
+              "fieldValue": "={{ $json.tenant_id }}"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "={{ $json.channel }}"
+            },
+            {
+              "fieldId": "template_key",
+              "fieldValue": "={{ $json.template_key }}"
+            },
+            {
+              "fieldId": "related_entity_type",
+              "fieldValue": "={{ $json.related_entity_type }}"
+            },
+            {
+              "fieldId": "related_entity_id",
+              "fieldValue": "={{ $json.related_entity_id || null }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "retry_count",
+              "fieldValue": "={{ $json.retry_count }}"
+            },
+            {
+              "fieldId": "max_retries",
+              "fieldValue": "={{ $json.max_retries }}"
+            },
+            {
+              "fieldId": "next_retry_at",
+              "fieldValue": "={{ $json.next_retry_at }}"
+            },
+            {
+              "fieldId": "trace_id",
+              "fieldValue": "={{ $json.trace_id }}"
+            },
+            {
+              "fieldId": "nome_attivita",
+              "fieldValue": "={{ $json.payload?.nome_struttura || null }}"
+            },
+            {
+              "fieldId": "dedupe_key",
+              "fieldValue": "={{ $json.dedupe_key }}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{ $json.payload }}"
+            }
+          ]
+        }
+      },
+      "id": "417d8c85-cdbb-498e-a4b1-fd69774538a4",
+      "name": "Insert Outbox Rows",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5472,
+        -752
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "bEyN805IWleebXdC",
+          "name": "Supabase account - Zirèl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Normalize & Validate Request').item.json;\nconst locationLabel = input.room\n  ? 'per la camera ' + input.room\n  : input.area\n    ? 'per l\\'area ' + input.area\n    : 'alla reception';\n\nreturn [{\n  json: {\n    success: true,\n    code: 'RECEPTION_REQUEST_FORWARDED',\n    message: 'Richiesta inoltrata alla reception.',\n    tenant_id: input.tenant_id,\n    trace_id: input.trace_id,\n    session_id: input.session_id,\n    request_type: input.request_type,\n    room: input.room || '',\n    area: input.area || '',\n    source: input.source || 'chat_widget',\n    final_reply: 'Perfetto, inoltro subito la richiesta alla reception ' + locationLabel + '.',\n  },\n}];"
+      },
+      "id": "6d6b69fd-8478-4df4-babf-89cb9988971d",
+      "name": "Build Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5472,
+        -560
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Check Hotel Sector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Hotel Sector": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Sector Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Check Valid Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Valid Payload": {
+      "main": [
+        [
+          {
+            "node": "Invalid Payload Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Notification Outbox Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Notification Outbox Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Outbox Rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "07043dbd-e053-4592-9906-5f91d102ce9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  },
+  "id": "HgQgsPOd7T4",
+  "tags": []
+}
