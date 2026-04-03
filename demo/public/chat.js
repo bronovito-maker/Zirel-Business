@@ -56,6 +56,8 @@
     const tenantId = sanitizeTenantId(me?.getAttribute('data-tenant-id') || cfg.tenantId || 'zirel_official');
     const webhookUrl = me?.getAttribute('data-webhook-url') || cfg.webhookUrl || 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat';
     const chatTimeoutMs = sanitizeTimeout(me?.getAttribute('data-timeout-ms') || cfg.chatTimeoutMs || 30000);
+    let tenantServiceDisabled = false;
+    let tenantServicePublicMessage = 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.';
 
     // Sessione runtime: resta stabile finche la pagina e aperta, ma si resetta al reload.
     // In questo modo un refresh forza una nuova conversazione e non riprende
@@ -141,6 +143,9 @@
 
             const data = await response.json();
             const config = data?.config || window.ZirelWidgetConfig || {};
+            tenantServiceDisabled = Boolean(data?.disabled || config?.disabled);
+            tenantServicePublicMessage = String(data?.service_public_message || config?.service_public_message || tenantServicePublicMessage).trim() || tenantServicePublicMessage;
+            applyServiceVisibility(tenantServiceDisabled);
 
             const {
                 widget_title,
@@ -192,10 +197,10 @@
             }
             if (welcome_message) {
                 const welcomeEl = document.getElementById('zirel-welcome-message');
-                if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(welcome_message);
+                if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(tenantServiceDisabled ? tenantServicePublicMessage : welcome_message);
             }
             if (quick_replies) {
-                renderQuickReplies(quick_replies);
+                renderQuickReplies(tenantServiceDisabled ? [] : quick_replies);
             }
             if (Array.isArray(teaser_messages) && teaser_messages.length) {
                 window.zirelTooltipMessages = teaser_messages
@@ -205,6 +210,8 @@
             }
         } catch (err) {
             console.warn('[Zirèl] Error applying dynamic customization, using defaults:', err);
+            tenantServiceDisabled = false;
+            applyServiceVisibility(false);
             // Fallback to static window config if available
             const {
                 widget_title,
@@ -290,7 +297,31 @@
         if (window.tooltipTimer) clearTimeout(window.tooltipTimer);
     }
 
+    function applyServiceVisibility(disabled) {
+        const widget = document.getElementById('n8n-widget-mock');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+        const tooltip = document.getElementById('chat-tooltip');
+
+        hideTooltip();
+
+        if (disabled) {
+            if (widget) {
+                widget.classList.remove('scale-100');
+                widget.classList.add('scale-0');
+                widget.style.display = 'none';
+            }
+            if (toggleBtn) toggleBtn.style.display = 'none';
+            if (tooltip) tooltip.style.display = 'none';
+            return;
+        }
+
+        if (widget) widget.style.display = '';
+        if (toggleBtn) toggleBtn.style.display = '';
+        if (tooltip) tooltip.style.display = '';
+    }
+
     function showAndCycleTooltip() {
+        if (tenantServiceDisabled) return;
         const tooltip = document.getElementById('chat-tooltip');
         const widget = document.getElementById('n8n-widget-mock');
         const tooltipMessages = Array.isArray(window.zirelTooltipMessages) && window.zirelTooltipMessages.length
@@ -375,6 +406,7 @@
         if (event && typeof event.preventDefault === 'function') {
             event.preventDefault();
         }
+        if (tenantServiceDisabled) return false;
 
         const widget = document.getElementById('n8n-widget-mock');
         const icon = document.getElementById('toggle-icon-open');
@@ -398,6 +430,7 @@
     };
 
     window.toggleDemo = function () {
+        if (tenantServiceDisabled) return false;
         const widget = document.getElementById('n8n-widget-mock');
         const icon = document.getElementById('toggle-icon-open');
         const toggleBtn = document.getElementById('chat-toggle-btn');
@@ -435,6 +468,14 @@
         const container = document.getElementById('chat-messages');
         if (!container) {
             console.warn('[Zirèl] Chat container non trovato.');
+            return;
+        }
+        if (tenantServiceDisabled) {
+            const botMsg = document.createElement('div');
+            botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
+            botMsg.innerText = tenantServicePublicMessage;
+            container.appendChild(botMsg);
+            container.scrollTop = container.scrollHeight;
             return;
         }
         const quickReplies = document.getElementById('quick-replies-container');

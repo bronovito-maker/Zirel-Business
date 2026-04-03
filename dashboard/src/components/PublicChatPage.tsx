@@ -3,6 +3,9 @@ import { Loader2, MapPin, MessageSquare, Send, Sparkles } from 'lucide-react';
 
 type WidgetConfig = {
     tenant_id: string;
+    service_status?: string;
+    service_public_message?: string;
+    disabled?: boolean;
     widget_title: string;
     widget_subtitle: string;
     widget_color: string;
@@ -113,6 +116,7 @@ const PublicChatPage = () => {
     const [isBootLoading, setIsBootLoading] = useState(true);
     const [isSending, setIsSending] = useState(false);
     const [loadError, setLoadError] = useState('');
+    const [isServiceDisabled, setIsServiceDisabled] = useState(false);
     const listRef = useRef<HTMLDivElement | null>(null);
 
     const contextLabel = buildContextLabel(room, area);
@@ -134,20 +138,28 @@ const PublicChatPage = () => {
 
                 const data = await response.json();
                 const nextConfig = { ...DEFAULT_CONFIG, ...(data?.config || {}), tenant_id: tenantId } as WidgetConfig;
+                const disabled = Boolean(data?.disabled || nextConfig.disabled);
+                const publicMessage =
+                    String(data?.service_public_message || nextConfig.service_public_message || '').trim() ||
+                    'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.';
 
                 if (cancelled) return;
                 setConfig(nextConfig);
+                setIsServiceDisabled(disabled);
                 setMessages([
                     {
                         id: 'welcome',
                         role: 'assistant',
-                        text: nextConfig.welcome_message || DEFAULT_CONFIG.welcome_message,
+                        text: disabled
+                            ? publicMessage
+                            : nextConfig.welcome_message || DEFAULT_CONFIG.welcome_message,
                     },
                 ]);
             } catch (error) {
                 console.error('[Zirel Public Chat] Config load failed:', error);
                 if (cancelled) return;
                 setConfig({ ...DEFAULT_CONFIG, tenant_id: tenantId });
+                setIsServiceDisabled(false);
                 setMessages([{ id: 'welcome', role: 'assistant', text: DEFAULT_CONFIG.welcome_message }]);
                 setLoadError('Sto usando la configurazione base perché non sono riuscito a caricare la personalizzazione del tenant.');
             } finally {
@@ -169,6 +181,19 @@ const PublicChatPage = () => {
     const submitMessage = async (text: string) => {
         const cleaned = String(text || '').trim();
         if (!cleaned || !tenantId || isSending) return;
+        if (isServiceDisabled) {
+            setMessages((current) => [
+                ...current,
+                {
+                    id: `${Date.now()}_disabled`,
+                    role: 'error',
+                    text:
+                        config.service_public_message ||
+                        'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.',
+                },
+            ]);
+            return;
+        }
 
         const traceId = window.crypto?.randomUUID?.() || `trace_${Date.now()}`;
         setIsSending(true);
@@ -311,7 +336,7 @@ const PublicChatPage = () => {
                                 key={item.label}
                                 type="button"
                                 onClick={() => submitMessage(item.prompt)}
-                                disabled={isSending}
+                                disabled={isSending || isServiceDisabled}
                                 className="rounded-full border border-sky-200 bg-[#F8FDFF] px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {item.label}
@@ -331,12 +356,13 @@ const PublicChatPage = () => {
                                 }
                             }}
                             placeholder="Scrivi qui la tua richiesta…"
+                            disabled={isSending || isServiceDisabled}
                             className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none ring-0 transition focus:border-[#FF8C42] focus:bg-white"
                         />
                         <button
                             type="button"
                             onClick={() => submitMessage(draft)}
-                            disabled={isSending || !draft.trim()}
+                            disabled={isSending || isServiceDisabled || !draft.trim()}
                             className="inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition disabled:cursor-not-allowed disabled:opacity-50"
                             style={{ backgroundColor: config.widget_color || '#FF8C42' }}
                             aria-label="Invia messaggio"

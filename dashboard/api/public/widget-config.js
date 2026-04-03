@@ -184,6 +184,11 @@ function buildPublicWidgetConfig(row) {
 
     return {
         tenant_id: normalizeString(row.tenant_id),
+        service_status: normalizeString(row.service_status || 'active').toLowerCase() || 'active',
+        service_public_message:
+            normalizeString(row.service_public_message) ||
+            'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.',
+        disabled: normalizeString(row.service_status || 'active').toLowerCase() !== 'active',
         widget_title: businessName,
         widget_subtitle: normalizeString(row.widget_subtitle) || 'Assistente online',
         widget_color: normalizeString(row.widget_color) || DEFAULT_WIDGET_COLOR,
@@ -254,8 +259,16 @@ export default async function handler(req, res) {
             });
         }
 
+        const serviceStatus = normalizeString(data.service_status || 'active').toLowerCase() || 'active';
+        const disabled = serviceStatus !== 'active';
+
         return json(res, 200, {
             ok: true,
+            disabled,
+            service_status: serviceStatus,
+            service_public_message:
+                normalizeString(data.service_public_message) ||
+                'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.',
             config: buildPublicWidgetConfig(data),
         });
     } catch (error) {
