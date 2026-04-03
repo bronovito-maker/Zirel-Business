@@ -1,14 +1,9 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { repoRoot, whatsappWorkflowFiles } from './workflow-manifest.mjs';
 
-const root = '/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl';
-
-const paths = {
-  ingestion: `${root}/n8n_workflows/whatsapp_v3_ingestion.json`,
-  processor: `${root}/n8n_workflows/whatsapp_v3_processor.json`,
-  outboundSender: `${root}/n8n_workflows/whatsapp_v3_outbound_sender.json`,
-  aiOrchestrator: `${root}/n8n_workflows/whatsapp_v3_ai_orchestrator.json`,
-};
+const root = repoRoot;
+const paths = whatsappWorkflowFiles;
 
 const credentials = {
   supabaseApi: {
@@ -18,6 +13,7 @@ const credentials = {
 };
 
 const writeJson = (path, data) => {
+  fs.mkdirSync(root + '/n8n_workflows', { recursive: true });
   fs.writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`);
 };
 

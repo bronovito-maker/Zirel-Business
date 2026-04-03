@@ -1,0 +1,113 @@
+{
+  "updatedAt": "2026-03-17T00:09:04.862Z",
+  "createdAt": "2026-02-27T00:14:12.206Z",
+  "id": "Vy3gIuadE1tNRaYt",
+  "name": "Zirèl - Notifiche_Prenotazione",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nuova-prenotazione",
+        "options": {}
+      },
+      "name": "Webhook da Supabase",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        736,
+        32
+      ],
+      "id": "afc89fc6-5d28-4ab7-a4f5-3d94ca780747",
+      "webhookId": "nuova-prenotazione-hook"
+    },
+    {
+      "parameters": {
+        "chatId": "112661106",
+        "text": "=🔔 NUOVA PRENOTAZIONE Zirèl\n\n👤 Cliente: {{ $('Webhook da Supabase').item.json.body.record.nome_cliente }}\n📅 Data: {{ $('Webhook da Supabase').item.json.body.record.data_prenotazione }}\n⏰ Ora: {{ $('Webhook da Supabase').item.json.body.record.ora }}\n👥 Persone: {{ $('Webhook da Supabase').item.json.body.record.persone }}\n📞 Telefono: {{ $('Webhook da Supabase').item.json.body.record.telefono }}\n📝 Note: {{ $('Webhook da Supabase').item.json.body.record.note_prenotazione ? '\\n' + $('Webhook da Supabase').item.json.body.record.note_prenotazione : '' }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ ACCETTA",
+                    "additionalFields": {
+                      "callback_data": "={{ String($('Webhook da Supabase').item.json.body.record.id) }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        32
+      ],
+      "id": "dc23a6f9-333d-4453-8cd7-30bff6aa64db",
+      "name": "Telegram - Invia Messaggio",
+      "webhookId": "464a3a68-ff60-4ae9-ac08-5140a1804aec",
+      "credentials": {
+        "telegramApi": {
+          "id": "MHrNkPgbqU0Q6vyM",
+          "name": "TG_Zirèl"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook da Supabase": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Invia Messaggio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM",
+      "sheetId": 0,
+      "lastIndexChecked": 7
+    },
+    "node:QUANDO ARRIVA UNA NUOVA REGISTRAZIONE": {
+      "documentId": "1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM",
+      "sheetId": 0,
+      "lastIndexChecked": 9
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "44622a62-906e-4674-a454-38b8cddf7581",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-27T00:14:12.206Z",
+      "createdAt": "2026-02-27T00:14:12.206Z",
+      "role": "workflow:owner",
+      "workflowId": "Vy3gIuadE1tNRaYt",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}

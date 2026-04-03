@@ -1,10 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { whatsappWorkflowFiles } from '../scripts/workflow-manifest.mjs';
 
-const root = '/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl';
-
-const readJson = (relativePath) =>
-  JSON.parse(fs.readFileSync(`${root}/${relativePath}`, 'utf8'));
+const readJson = (absolutePath) =>
+  JSON.parse(fs.readFileSync(absolutePath, 'utf8'));
 
 const getNode = (workflow, name) => {
   const node = workflow.nodes.find((item) => item.name === name);
@@ -12,10 +11,10 @@ const getNode = (workflow, name) => {
   return node;
 };
 
-const ingestion = readJson('n8n_workflows/whatsapp_v3_ingestion.json');
-const processor = readJson('n8n_workflows/whatsapp_v3_processor.json');
-const outboundSender = readJson('n8n_workflows/whatsapp_v3_outbound_sender.json');
-const aiOrchestrator = readJson('n8n_workflows/whatsapp_v3_ai_orchestrator.json');
+const ingestion = readJson(whatsappWorkflowFiles.ingestion);
+const processor = readJson(whatsappWorkflowFiles.processor);
+const outboundSender = readJson(whatsappWorkflowFiles.outboundSender);
+const aiOrchestrator = readJson(whatsappWorkflowFiles.aiOrchestrator);
 
 assert.equal(ingestion.name, 'WhatsApp 1 - Webhook Ingestion (V3.2 Hardened)');
 assert.equal(processor.name, 'WhatsApp 2 - Event Processor (V3.2 Hardened)');

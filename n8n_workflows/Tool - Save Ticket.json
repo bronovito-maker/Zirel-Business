@@ -1,0 +1,914 @@
+{
+  "updatedAt": "2026-02-08T21:03:55.831Z",
+  "createdAt": "2026-02-01T14:47:22.060Z",
+  "id": "zgpY-BqQHsSnNzpM0JIMH",
+  "name": "Tool - Save Ticket",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "description"
+            },
+            {
+              "name": "city"
+            },
+            {
+              "name": "address"
+            },
+            {
+              "name": "phone"
+            },
+            {
+              "name": "category"
+            },
+            {
+              "name": "price_min",
+              "type": "number"
+            },
+            {
+              "name": "price_max",
+              "type": "number"
+            },
+            {
+              "name": "chat_session_id"
+            },
+            {
+              "name": "photo_url"
+            },
+            {
+              "name": "customer_name"
+            },
+            {
+              "name": "chat_history"
+            },
+            {
+              "name": "ai_suggested_tools"
+            },
+            {
+              "name": "user_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1424,
+        304
+      ],
+      "id": "dd0cd577-ddb5-4df8-acb5-3510947e369c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "chatId": "-5256535318",
+        "text": "=🚨 *NUOVA RICHIESTA INTERVENTO* 🚨\n\n*🔧 TIPO:* {{ $('Salva Ticket').item.json.category.toUpperCase() }}\n*📝 PROBLEMA:* {{ $('Salva Ticket').item.json.description }}\n*📍 DOVE:* {{ $('Salva Ticket').item.json.city.toUpperCase() }}\n*💰 STIMA:* {{ $('Salva Ticket').item.json.price_range_min }} - {{ $('Salva Ticket').item.json.price_range_max }} €\n\n👇 *CLICCA PER ACCETTARE E VEDERE I DATI:*\n{{ $json.magicLink }}\n\n{{ $now.setZone('Europe/Rome').format('dd/MM/yyyy HH:mm') }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        400
+      ],
+      "id": "0a426e4b-c5a8-49b1-bc4d-1f6d49eff292",
+      "name": "Send a text message",
+      "webhookId": "ba20299c-6531-467f-83d4-5fa3e81fbaa2",
+      "credentials": {
+        "telegramApi": {
+          "id": "0EcMU97d1S3JTqiG",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera i dati del ticket direttamente dal nodo di creazione\n// Usiamo .first() per prendere il primo item, dato che il workflow gestisce una richiesta alla volta\nconst ticketData = $('Salva Ticket').first().json;\n\n// Recupera l'ID corretto del ticket\nconst ticketId = ticketData.id;\n\n// Costruisci il Magic Link\nconst magicLink = `https://nikituttofare.com/technician/job/${ticketId}`;\n// Restituisci i dati del ticket (che includono photo_url) + il magicLink\n// In questo modo il nodo \"If\" successivo troverà il campo photo_url\nreturn {\n  json: {\n    ...ticketData,\n    magicLink: magicLink\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        304
+      ],
+      "id": "a29dd7fe-02f1-4584-b49b-26b79cba6f2c",
+      "name": "Generate Magic Link"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0fcf4a89-cb91-402a-b6f5-0915d47acae1",
+              "leftValue": "={{ $json.photo_url && $json.photo_url !== \"null\" && $json.photo_url !== \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -320,
+        304
+      ],
+      "id": "52fd2de6-8063-424a-84de-ea03de02d1a3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "-5256535318",
+        "file": "={{ $('Salva Ticket').item.json.photo_url }}",
+        "additionalFields": {
+          "caption": "=🚨 *NUOVA RICHIESTA INTERVENTO* 🚨\n\n*🔧 TIPO:* {{ $('Salva Ticket').item.json.category.toUpperCase() }}\n*📝 PROBLEMA:* {{ $('Salva Ticket').item.json.description }}\n*📍 DOVE:* {{ $('Salva Ticket').item.json.city.toUpperCase() }}\n*💰 STIMA:* {{ $('Salva Ticket').item.json.price_range_min }} - {{ $('Salva Ticket').item.json.price_range_max }} €\n\n👇 *CLICCA PER ACCETTARE E VEDERE I DATI:*\n{{ $json.magicLink }}\n\n{{ $now.setZone('Europe/Rome').format('dd/MM/yyyy HH:mm') }}",
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        208
+      ],
+      "id": "a1160425-23ee-478f-ba24-220027fe6416",
+      "name": "Send a photo message",
+      "webhookId": "63c90491-de0d-4280-bfdf-207116f66ceb",
+      "credentials": {
+        "telegramApi": {
+          "id": "0EcMU97d1S3JTqiG",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "messages",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ticket_id",
+              "fieldValue": "={{ $('Salva Ticket').item.json.id }}"
+            },
+            {
+              "fieldId": "role",
+              "fieldValue": "system"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "Log completo conversazione AI"
+            },
+            {
+              "fieldId": "meta_data",
+              "fieldValue": "={{ \n  (() => {\n    // 1. Recuperiamo il dato grezzo dal nodo trigger\n    const data = $('When Executed by Another Workflow').item.json.chat_history;\n\n    // 2. Controllo: È già un oggetto? (Caso probabile)\n    if (typeof data === 'object' && data !== null) {\n      return data; \n    }\n\n    // 3. Controllo: È una stringa? Allora la parsiamo.\n    if (typeof data === 'string') {\n      try {\n        // Se è una stringa vuota o \"null\", restituisci array vuoto\n        if (data === \"null\" || data.trim() === \"\") return [];\n        \n        // Altrimenti prova a convertirla\n        return JSON.parse(data);\n      } catch (e) {\n        // Se la stringa è rotta, non bloccare tutto: ritorna vuoto\n        return []; \n      }\n    }\n\n    // 4. Fallback per sicurezza (es. undefined)\n    return [];\n  })()\n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        304
+      ],
+      "id": "9d602369-33c9-4a7b-aff9-3804c92a3b3c",
+      "name": "Salva Chat History",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JeLHXdm4YoHRP9wb",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "tickets",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "address",
+              "fieldValue": "={{ $json.address }}"
+            },
+            {
+              "fieldId": "city",
+              "fieldValue": "={{ $json.city }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.category ? $json.category : 'generic' }}"
+            },
+            {
+              "fieldId": "contact_phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "new"
+            },
+            {
+              "fieldId": "price_range_min",
+              "fieldValue": "={{ $json.price_min }}"
+            },
+            {
+              "fieldId": "price_range_max",
+              "fieldValue": "={{ $json.price_max }}"
+            },
+            {
+              "fieldId": "photo_url",
+              "fieldValue": "={{ $json.photo_url }}"
+            },
+            {
+              "fieldId": "chat_session_id",
+              "fieldValue": "={{ $json.chat_session_id }}"
+            },
+            {
+              "fieldId": "customer_name",
+              "fieldValue": "={{ $json.customer_name }}"
+            },
+            {
+              "fieldId": "meta_data",
+              "fieldValue": "={{ { ai_suggested_tools: $json.ai_suggested_tools } }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        304
+      ],
+      "id": "2b2f2bc8-250e-4b71-b01a-511009a7ebde",
+      "name": "Salva Ticket",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JeLHXdm4YoHRP9wb",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "technician_notifications",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ticket_id",
+              "fieldValue": "={{ $('Salva Ticket').item.json.id }}"
+            },
+            {
+              "fieldId": "technician_id",
+              "fieldValue": "={{ $json.result.chat.id }}"
+            },
+            {
+              "fieldId": "message_content",
+              "fieldValue": "={{ $json.result.caption }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "sent"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldId": "meta_data",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.chat_history }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        304
+      ],
+      "id": "72ad1c7a-0b10-49bd-9f39-63105a557a48",
+      "name": "Salva Technician",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JeLHXdm4YoHRP9wb",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.messages\nSET ticket_id = $1\nWHERE chat_session_id = $2\nAND ticket_id IS NULL;",
+        "options": {
+          "queryReplacement": "={{ [ $json.id, $json.chat_session_id ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -992,
+        304
+      ],
+      "id": "8599e443-fc44-4ef7-a898-f14f442f0a3b",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Salva Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Magic Link": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message": {
+      "main": [
+        [
+          {
+            "node": "Salva Technician",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Salva Technician",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva Chat History": {
+      "main": [
+        [
+          {
+            "node": "Generate Magic Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva Ticket": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Salva Chat History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "19ea6970-1c8c-4358-ad2f-54f08b747418",
+  "activeVersionId": "19ea6970-1c8c-4358-ad2f-54f08b747418",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-01T14:47:22.060Z",
+      "createdAt": "2026-02-01T14:47:22.060Z",
+      "role": "workflow:owner",
+      "workflowId": "zgpY-BqQHsSnNzpM0JIMH",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-08T21:03:58.504Z",
+    "createdAt": "2026-02-08T21:03:55.830Z",
+    "versionId": "19ea6970-1c8c-4358-ad2f-54f08b747418",
+    "workflowId": "zgpY-BqQHsSnNzpM0JIMH",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "description"
+              },
+              {
+                "name": "city"
+              },
+              {
+                "name": "address"
+              },
+              {
+                "name": "phone"
+              },
+              {
+                "name": "category"
+              },
+              {
+                "name": "price_min",
+                "type": "number"
+              },
+              {
+                "name": "price_max",
+                "type": "number"
+              },
+              {
+                "name": "chat_session_id"
+              },
+              {
+                "name": "photo_url"
+              },
+              {
+                "name": "customer_name"
+              },
+              {
+                "name": "chat_history"
+              },
+              {
+                "name": "ai_suggested_tools"
+              },
+              {
+                "name": "user_id"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -1424,
+          304
+        ],
+        "id": "dd0cd577-ddb5-4df8-acb5-3510947e369c",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "chatId": "-5256535318",
+          "text": "=🚨 *NUOVA RICHIESTA INTERVENTO* 🚨\n\n*🔧 TIPO:* {{ $('Salva Ticket').item.json.category.toUpperCase() }}\n*📝 PROBLEMA:* {{ $('Salva Ticket').item.json.description }}\n*📍 DOVE:* {{ $('Salva Ticket').item.json.city.toUpperCase() }}\n*💰 STIMA:* {{ $('Salva Ticket').item.json.price_range_min }} - {{ $('Salva Ticket').item.json.price_range_max }} €\n\n👇 *CLICCA PER ACCETTARE E VEDERE I DATI:*\n{{ $json.magicLink }}\n\n{{ $now.setZone('Europe/Rome').format('dd/MM/yyyy HH:mm') }}",
+          "additionalFields": {
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          400
+        ],
+        "id": "0a426e4b-c5a8-49b1-bc4d-1f6d49eff292",
+        "name": "Send a text message",
+        "webhookId": "ba20299c-6531-467f-83d4-5fa3e81fbaa2",
+        "credentials": {
+          "telegramApi": {
+            "id": "0EcMU97d1S3JTqiG",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Recupera i dati del ticket direttamente dal nodo di creazione\n// Usiamo .first() per prendere il primo item, dato che il workflow gestisce una richiesta alla volta\nconst ticketData = $('Salva Ticket').first().json;\n\n// Recupera l'ID corretto del ticket\nconst ticketId = ticketData.id;\n\n// Costruisci il Magic Link\nconst magicLink = `https://nikituttofare.com/technician/job/${ticketId}`;\n// Restituisci i dati del ticket (che includono photo_url) + il magicLink\n// In questo modo il nodo \"If\" successivo troverà il campo photo_url\nreturn {\n  json: {\n    ...ticketData,\n    magicLink: magicLink\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -544,
+          304
+        ],
+        "id": "a29dd7fe-02f1-4584-b49b-26b79cba6f2c",
+        "name": "Generate Magic Link"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "0fcf4a89-cb91-402a-b6f5-0915d47acae1",
+                "leftValue": "={{ $json.photo_url && $json.photo_url !== \"null\" && $json.photo_url !== \"\" }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -320,
+          304
+        ],
+        "id": "52fd2de6-8063-424a-84de-ea03de02d1a3",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "operation": "sendPhoto",
+          "chatId": "-5256535318",
+          "file": "={{ $('Salva Ticket').item.json.photo_url }}",
+          "additionalFields": {
+            "caption": "=🚨 *NUOVA RICHIESTA INTERVENTO* 🚨\n\n*🔧 TIPO:* {{ $('Salva Ticket').item.json.category.toUpperCase() }}\n*📝 PROBLEMA:* {{ $('Salva Ticket').item.json.description }}\n*📍 DOVE:* {{ $('Salva Ticket').item.json.city.toUpperCase() }}\n*💰 STIMA:* {{ $('Salva Ticket').item.json.price_range_min }} - {{ $('Salva Ticket').item.json.price_range_max }} €\n\n👇 *CLICCA PER ACCETTARE E VEDERE I DATI:*\n{{ $json.magicLink }}\n\n{{ $now.setZone('Europe/Rome').format('dd/MM/yyyy HH:mm') }}",
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          208
+        ],
+        "id": "a1160425-23ee-478f-ba24-220027fe6416",
+        "name": "Send a photo message",
+        "webhookId": "63c90491-de0d-4280-bfdf-207116f66ceb",
+        "credentials": {
+          "telegramApi": {
+            "id": "0EcMU97d1S3JTqiG",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "messages",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "ticket_id",
+                "fieldValue": "={{ $('Salva Ticket').item.json.id }}"
+              },
+              {
+                "fieldId": "role",
+                "fieldValue": "system"
+              },
+              {
+                "fieldId": "content",
+                "fieldValue": "Log completo conversazione AI"
+              },
+              {
+                "fieldId": "meta_data",
+                "fieldValue": "={{ \n  (() => {\n    // 1. Recuperiamo il dato grezzo dal nodo trigger\n    const data = $('When Executed by Another Workflow').item.json.chat_history;\n\n    // 2. Controllo: È già un oggetto? (Caso probabile)\n    if (typeof data === 'object' && data !== null) {\n      return data; \n    }\n\n    // 3. Controllo: È una stringa? Allora la parsiamo.\n    if (typeof data === 'string') {\n      try {\n        // Se è una stringa vuota o \"null\", restituisci array vuoto\n        if (data === \"null\" || data.trim() === \"\") return [];\n        \n        // Altrimenti prova a convertirla\n        return JSON.parse(data);\n      } catch (e) {\n        // Se la stringa è rotta, non bloccare tutto: ritorna vuoto\n        return []; \n      }\n    }\n\n    // 4. Fallback per sicurezza (es. undefined)\n    return [];\n  })()\n}}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          304
+        ],
+        "id": "9d602369-33c9-4a7b-aff9-3804c92a3b3c",
+        "name": "Salva Chat History",
+        "credentials": {
+          "supabaseApi": {
+            "id": "JeLHXdm4YoHRP9wb",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "tickets",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "description",
+                "fieldValue": "={{ $json.description }}"
+              },
+              {
+                "fieldId": "address",
+                "fieldValue": "={{ $json.address }}"
+              },
+              {
+                "fieldId": "city",
+                "fieldValue": "={{ $json.city }}"
+              },
+              {
+                "fieldId": "category",
+                "fieldValue": "={{ $json.category ? $json.category : 'generic' }}"
+              },
+              {
+                "fieldId": "contact_phone",
+                "fieldValue": "={{ $json.phone }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "new"
+              },
+              {
+                "fieldId": "price_range_min",
+                "fieldValue": "={{ $json.price_min }}"
+              },
+              {
+                "fieldId": "price_range_max",
+                "fieldValue": "={{ $json.price_max }}"
+              },
+              {
+                "fieldId": "photo_url",
+                "fieldValue": "={{ $json.photo_url }}"
+              },
+              {
+                "fieldId": "chat_session_id",
+                "fieldValue": "={{ $json.chat_session_id }}"
+              },
+              {
+                "fieldId": "customer_name",
+                "fieldValue": "={{ $json.customer_name }}"
+              },
+              {
+                "fieldId": "meta_data",
+                "fieldValue": "={{ { ai_suggested_tools: $json.ai_suggested_tools } }}"
+              },
+              {
+                "fieldId": "user_id",
+                "fieldValue": "={{ $json.user_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -1200,
+          304
+        ],
+        "id": "2b2f2bc8-250e-4b71-b01a-511009a7ebde",
+        "name": "Salva Ticket",
+        "credentials": {
+          "supabaseApi": {
+            "id": "JeLHXdm4YoHRP9wb",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "technician_notifications",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "ticket_id",
+                "fieldValue": "={{ $('Salva Ticket').item.json.id }}"
+              },
+              {
+                "fieldId": "technician_id",
+                "fieldValue": "={{ $json.result.chat.id }}"
+              },
+              {
+                "fieldId": "message_content",
+                "fieldValue": "={{ $json.result.caption }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "sent"
+              },
+              {
+                "fieldId": "sent_at",
+                "fieldValue": "={{ new Date().toISOString() }}"
+              },
+              {
+                "fieldId": "meta_data",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.chat_history }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          128,
+          304
+        ],
+        "id": "72ad1c7a-0b10-49bd-9f39-63105a557a48",
+        "name": "Salva Technician",
+        "credentials": {
+          "supabaseApi": {
+            "id": "JeLHXdm4YoHRP9wb",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE public.messages\nSET ticket_id = $1\nWHERE chat_session_id = $2\nAND ticket_id IS NULL;",
+          "options": {
+            "queryReplacement": "={{ [ $json.id, $json.chat_session_id ] }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -992,
+          304
+        ],
+        "id": "8599e443-fc44-4ef7-a898-f14f442f0a3b",
+        "name": "Execute a SQL query",
+        "credentials": {
+          "postgres": {
+            "id": "y26w3cf5oDEAQXdB",
+            "name": "Postgres account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Salva Ticket",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Magic Link": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Send a photo message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a photo message": {
+        "main": [
+          [
+            {
+              "node": "Salva Technician",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a text message": {
+        "main": [
+          [
+            {
+              "node": "Salva Technician",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Salva Chat History": {
+        "main": [
+          [
+            {
+              "node": "Generate Magic Link",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Salva Ticket": {
+        "main": [
+          [
+            {
+              "node": "Execute a SQL query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute a SQL query": {
+        "main": [
+          [
+            {
+              "node": "Salva Chat History",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 19ea6970",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}

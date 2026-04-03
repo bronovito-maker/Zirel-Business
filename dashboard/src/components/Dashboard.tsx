@@ -1,17 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { Save, LogOut, Store, Clock, Utensils, Megaphone, CheckCircle2, Link as LinkIcon, Info, Loader2, Settings, CalendarDays, FileText, Shield, Copy, RefreshCw, Eye, EyeOff, CreditCard, BarChart3, MessageSquare, Menu, X, Search, CircleHelp } from 'lucide-react';
 import { saveAuthToken, getCurrentTenantId } from '../lib/auth';
 import { getTenantData, updateTenantData, regenerateTenantToken, markApiTokenRevealed } from '../lib/supabase-helpers';
 import { syncTenantFieldState } from '../lib/tenant-form';
 import type { TenantData } from '../types';
-import Reservations from './Reservations';
-import DocumentManager from './DocumentManager';
-import BillingSection from './BillingSection';
-import AnalyticsSection from './AnalyticsSection';
-import WhatsAppHandoffPanel from './WhatsAppHandoffPanel';
-import WhatsAppChannelCard from './WhatsAppChannelCard';
-import TenantQrSection from './TenantQrSection';
 import toast from 'react-hot-toast';
+
+const Reservations = lazy(() => import('./Reservations'));
+const DocumentManager = lazy(() => import('./DocumentManager'));
+const BillingSection = lazy(() => import('./BillingSection'));
+const AnalyticsSection = lazy(() => import('./AnalyticsSection'));
+const WhatsAppHandoffPanel = lazy(() => import('./WhatsAppHandoffPanel'));
+const WhatsAppChannelCard = lazy(() => import('./WhatsAppChannelCard'));
+const TenantQrSection = lazy(() => import('./TenantQrSection'));
 
 interface DashboardProps {
     onLogout: () => void;
@@ -82,6 +83,13 @@ type ProductAccessState = 'open' | 'warning' | 'limited' | 'suspended';
 type DashboardTab = 'analytics' | 'impostazioni' | 'prenotazioni' | 'documenti' | 'sicurezza' | 'integrazione' | 'conversazioni' | 'abbonamento';
 
 const BILLING_GRACE_DAYS = 7;
+
+const DashboardSectionFallback = () => (
+    <div className="flex min-h-[240px] items-center justify-center text-sm font-medium text-gray-500">
+        <Loader2 className="mr-3 h-4 w-4 animate-spin" />
+        Caricamento modulo...
+    </div>
+);
 
 const DASHBOARD_TABS: Array<{ id: DashboardTab; label: string; shortLabel: string; icon: typeof BarChart3; description: string }> = [
     { id: 'analytics', label: 'Analytics', shortLabel: 'Analytics', icon: BarChart3, description: 'Metriche, trend e stato operativo del concierge.' },
@@ -888,6 +896,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         )}
 
                         <div className={shouldLockActiveTab ? 'pointer-events-none select-none opacity-60 blur-[1.5px]' : ''}>
+                            <Suspense fallback={<DashboardSectionFallback />}>
                             {activeTab === 'analytics' ? (
                                 <AnalyticsSection />
                             ) : activeTab === 'prenotazioni' ? (
@@ -1401,6 +1410,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
                         </div>
                             )}
+                            </Suspense>
                         </div>
                     </div>
                 </div>

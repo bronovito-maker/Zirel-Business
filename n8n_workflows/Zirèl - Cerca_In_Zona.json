@@ -1,0 +1,726 @@
+{
+  "updatedAt": "2026-03-31T19:57:22.466Z",
+  "createdAt": "2026-03-31T18:53:28.173Z",
+  "id": "m5YeTgY77TtrNbyS",
+  "name": "Zirèl - Cerca_In_Zona",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "tenant_id"
+            },
+            {
+              "name": "trace_id"
+            },
+            {
+              "name": "session_id"
+            },
+            {
+              "name": "user_request"
+            },
+            {
+              "name": "business_type"
+            },
+            {
+              "name": "nome_attivita"
+            },
+            {
+              "name": "indirizzo"
+            },
+            {
+              "name": "orari_apertura"
+            },
+            {
+              "name": "current_date"
+            },
+            {
+              "name": "current_time"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "3bb49cf6-5530-4535-b2bd-6fed01653356",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\n\nconst normalize = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst lower = (value) => normalize(value).toLowerCase();\n\nconst tenant_id = normalize(input.tenant_id);\nconst trace_id = normalize(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalize(input.session_id) || `session_${Date.now()}`;\n\nconst user_request = normalize(input.user_request);\nconst business_type = lower(input.business_type || 'professional');\nconst nome_attivita = normalize(input.nome_attivita);\nconst indirizzo = normalize(input.indirizzo);\nconst orari_apertura = normalize(input.orari_apertura);\nconst current_date = normalize(input.current_date);\nconst current_time = normalize(input.current_time);\n\nconst requestLower = user_request.toLowerCase();\n\nconst knownCities = [\n  'rimini',\n  'riccione',\n  'cattolica',\n  'misano adriatico',\n  'misano',\n  'bellaria',\n  'igea marina',\n  'santarcangelo',\n  'cesenatico',\n  'pesaro',\n  'ravenna'\n];\n\nfunction titleCase(value) {\n  return normalize(value)\n    .split(' ')\n    .filter(Boolean)\n    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())\n    .join(' ');\n}\n\nfunction extractCityFromRequest(text) {\n  const normalized = lower(text);\n  const found = knownCities.find(city => normalized.includes(city));\n  return found ? titleCase(found) : '';\n}\n\nfunction extractCityFromAddress(address) {\n  const raw = normalize(address);\n  if (!raw) return '';\n\n  let match = raw.match(/-\\s*\\d{5}\\s+([^()\\-]+?)\\s*\\([A-Z]{2}\\)\\s*$/i);\n  if (match) return titleCase(match[1]);\n\n  match = raw.match(/\\b\\d{5}\\s+([^()\\-]+?)\\s*(?:\\([A-Z]{2}\\))?\\s*$/i);\n  if (match) return titleCase(match[1]);\n\n  const found = knownCities.find(city => lower(raw).includes(city));\n  if (found) return titleCase(found);\n\n  const parts = raw.split(',').map(s => normalize(s)).filter(Boolean);\n  if (parts.length > 0) {\n    const last = parts[parts.length - 1].replace(/\\([A-Z]{2}\\)/g, '').trim();\n    if (last) return titleCase(last);\n  }\n\n  return '';\n}\n\nfunction detectTimeContext(text) {\n  const t = lower(text);\n\n  if (/questo weekend|fine settimana|questo fine settimana/.test(t)) return 'weekend';\n  if (/stasera|questa sera/.test(t)) return 'stasera';\n  if (/dopo cena/.test(t)) return 'dopo_cena';\n  if (/stanotte|questa notte/.test(t)) return 'stanotte';\n  if (/\\boggi\\b/.test(t)) return 'oggi';\n  if (/\\bdomani\\b/.test(t)) return 'domani';\n  if (/ora|adesso|aperto ora/.test(t)) return 'ora';\n  return '';\n}\n\nfunction detectQueryType(text) {\n  const t = lower(text);\n\n  if (/farmacia.*di turno|di turno.*farmacia/.test(t)) return 'pharmacy_on_duty';\n  if (/farmacia.*(aperta|aperto|ora|adesso)|aperta ora.*farmacia/.test(t)) return 'pharmacy_open_now';\n  if (/guardia medica|continuit[aà] assistenziale/.test(t)) return 'medical_guard';\n  if (/pronto soccorso/.test(t)) return 'emergency_room';\n  if (/taxi|cab/.test(t)) return 'taxi';\n  if (/parcheggio|parcheggi/.test(t)) return 'parking';\n  if (/tabaccaio|tabacchi|sigarette|bollo/.test(t)) return 'tobacco';\n  if (/sexy shop|sex shop/.test(t)) return 'sexy_shop';\n  if (/supermercato|market|alimentari/.test(t)) return 'supermarket';\n  if (/spiaggia|lido|stabilimento balneare/.test(t)) return 'beach';\n  if (/discoteca|discoteche|club|locale notturno/.test(t)) return 'nightlife';\n  if (/bar|pub|cocktail bar|aperitivo/.test(t)) return 'bar';\n  if (/evento|eventi|festival|concerto|concerti|cosa posso fare|cosa fare|cosa c['’]e|cosa cè|serata|serate/.test(t)) return 'events';\n  return 'poi_generic';\n}\n\nconst query_type = detectQueryType(user_request);\nconst time_context = detectTimeContext(user_request);\n\nconst city_from_request = extractCityFromRequest(user_request);\nconst city_from_address = extractCityFromAddress(indirizzo);\nconst resolved_location = city_from_request || city_from_address;\n\nconst is_time_sensitive = [\n  'pharmacy_on_duty',\n  'pharmacy_open_now',\n  'medical_guard',\n  'emergency_room'\n].includes(query_type) || ['ora', 'oggi', 'stasera', 'stanotte'].includes(time_context);\n\nlet needs_clarification = false;\nlet clarification_reason = '';\n\nif (!user_request) {\n  needs_clarification = true;\n  clarification_reason = 'missing_request';\n} else if (!resolved_location) {\n  needs_clarification = true;\n  clarification_reason = 'missing_location';\n}\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    user_request,\n    business_type,\n    nome_attivita,\n    indirizzo,\n    orari_apertura,\n    current_date,\n    current_time,\n    query_type,\n    time_context,\n    is_time_sensitive,\n    city_from_request,\n    city_from_address,\n    resolved_location,\n    needs_clarification,\n    clarification_reason,\n    success: false,\n    code: '',\n    message: '',\n    final_reply: ''\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "fdf845d5-ebb3-4d83-be60-9bfa1ac18455",
+      "name": "Normalize Local Search Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f63e24d7-92dd-43be-bc77-ce4acc42446d",
+              "leftValue": "={{ $json.needs_clarification }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "ff7efe24-6f90-40a2-81b1-8087b77fc26c",
+      "name": "Need Clarification?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7af98584-af5f-4ade-bb1e-0135bc91b625",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "07d14cb7-df8d-44ab-a453-9602faa4180b",
+              "name": "code",
+              "value": "LOCAL_SEARCH_NEEDS_CLARIFICATION",
+              "type": "string"
+            },
+            {
+              "id": "5839d54e-ab09-496c-b1b4-c5f8e23daad4",
+              "name": "message",
+              "value": "Local search needs clarification.",
+              "type": "string"
+            },
+            {
+              "id": "e239446e-bed3-4dc3-8d8a-c753b4641a27",
+              "name": "final_reply",
+              "value": "={{ $json.clarification_reason === 'missing_request'\n  ? 'Dimmi pure cosa stai cercando in zona e ti aiuto a verificare.'\n  : 'Certo. Mi dici la città o la zona precisa così verifico meglio cosa c’è vicino?'\n}}",
+              "type": "string"
+            },
+            {
+              "id": "db6adf0c-5a54-4823-a659-a2f53293f68e",
+              "name": "tenant_id",
+              "value": "={{ $json.tenant_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9683edae-1fa1-4898-a28f-31d84e1e012d",
+              "name": "trace_id",
+              "value": "={{ $json.trace_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6da1ec4e-00d2-4a9e-9640-4b0413e70098",
+              "name": "session_id",
+              "value": "={{ $json.session_id }}",
+              "type": "string"
+            },
+            {
+              "id": "eb67189f-095c-4906-a4c2-18d2768df456",
+              "name": "query_type",
+              "value": "={{ $json.query_type }}",
+              "type": "string"
+            },
+            {
+              "id": "c06181d0-cbca-420b-abb8-b0a7bd8cdfc7",
+              "name": "resolved_location",
+              "value": "={{ $json.resolved_location }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -304
+      ],
+      "id": "b7da9c0d-480f-47e1-b359-91aa77fa4163",
+      "name": "Clarification Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\n\nconst queryType = String(input.query_type || 'poi_generic').trim();\nconst location = String(input.resolved_location || '').trim();\nconst request = String(input.user_request || '').trim();\nconst timeContext = String(input.time_context || '').trim();\nconst rawRequest = request.toLowerCase();\n\nconst searchLocation = location ? `${location}, Emilia-Romagna, Italy` : '';\nlet serp_engine = 'google';\nlet search_query = request;\n\nconst stripLocationFromRequest = (text, city) => {\n  if (!text) return '';\n  let cleaned = text.toLowerCase();\n\n  if (city) {\n    const escapedCity = city.toLowerCase().replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n    cleaned = cleaned.replace(new RegExp(`\\\\b${escapedCity}\\\\b`, 'gi'), ' ');\n  }\n\n  cleaned = cleaned\n    .replace(/cosa posso fare/gi, ' ')\n    .replace(/cosa fare/gi, ' ')\n    .replace(/che eventi ci sono/gi, ' ')\n    .replace(/che eventi/gi, ' ')\n    .replace(/ci sono/gi, ' ')\n    .replace(/in zona/gi, ' ')\n    .replace(/qui vicino/gi, ' ')\n    .replace(/vicino all['’]hotel/gi, ' ')\n    .replace(/nei dintorni/gi, ' ')\n    .replace(/[?.,!]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return cleaned;\n};\n\nconst cleanedRequest = stripLocationFromRequest(request, location);\n\nconst wantsNightlife = /discoteca|discoteche|club|serata|serate|locale notturno/.test(rawRequest);\nconst wantsConcerts = /concerto|concerti|live/.test(rawRequest);\nconst wantsFestival = /festival|fiera/.test(rawRequest);\n\nswitch (queryType) {\n  case 'events':\n    if (wantsNightlife) {\n      if (timeContext === 'weekend') {\n        search_query = `discoteche ${location} questo weekend`;\n      } else if (timeContext === 'stasera' || timeContext === 'dopo_cena') {\n        search_query = `discoteche ${location} stasera`;\n      } else {\n        search_query = `discoteche ${location} eventi`;\n      }\n    } else if (wantsConcerts) {\n      if (timeContext === 'weekend') {\n        search_query = `concerti ${location} questo weekend`;\n      } else if (timeContext === 'stasera') {\n        search_query = `concerti ${location} stasera`;\n      } else {\n        search_query = `concerti ${location}`;\n      }\n    } else if (wantsFestival) {\n      if (timeContext === 'weekend') {\n        search_query = `festival ${location} questo weekend`;\n      } else {\n        search_query = `festival ${location}`;\n      }\n    } else {\n      if (timeContext === 'weekend') {\n        search_query = `eventi ${location} questo weekend`;\n      } else if (timeContext === 'stasera' || timeContext === 'dopo_cena') {\n        search_query = `eventi ${location} stasera`;\n      } else {\n        search_query = `eventi ${location}`;\n      }\n    }\n    break;\n\n  case 'nightlife':\n    search_query = `discoteche ${location} ${timeContext === 'weekend' ? 'questo weekend' : timeContext === 'stasera' || timeContext === 'dopo_cena' ? 'stasera' : ''}`.trim();\n    break;\n\n  case 'pharmacy_on_duty':\n    search_query = `farmacie di turno ${location}`;\n    break;\n\n  case 'pharmacy_open_now':\n    search_query = `farmacia aperta ${location}`;\n    break;\n\n  case 'medical_guard':\n    search_query = `guardia medica ${location} contatti`;\n    break;\n\n  case 'emergency_room':\n    search_query = `pronto soccorso ${location} indirizzo`;\n    break;\n\n  case 'taxi':\n    search_query = `taxi ${location} numero telefono`;\n    break;\n\n  case 'parking':\n    search_query = `parcheggio vicino hotel ${location}`;\n    break;\n\n  case 'tobacco':\n    search_query = `tabacchi vicino hotel ${location}`;\n    break;\n\n  case 'sexy_shop':\n    search_query = `sexy shop vicino hotel ${location}`;\n    break;\n\n  case 'supermarket':\n    search_query = `supermercato vicino hotel ${location}`;\n    break;\n\n  case 'beach':\n    search_query = `spiaggia attrezzata vicino ${location}`;\n    break;\n\n  case 'bar':\n    search_query = `bar ${location} ${timeContext === 'dopo_cena' || timeContext === 'stasera' ? 'aperto' : ''}`.trim();\n    break;\n\n  default:\n    search_query = `${cleanedRequest || request} ${location}`.trim();\n    break;\n}\n\nconst max_results = ['pharmacy_on_duty', 'pharmacy_open_now', 'medical_guard', 'emergency_room'].includes(queryType) ? 5 : 3;\n\nreturn [{\n  json: {\n    ...input,\n    serp_engine,\n    search_query,\n    search_location: searchLocation,\n    max_results\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "423e712a-01d0-463c-b045-dc7c61279947",
+      "name": "Build Search Query"
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "={{ $json.serp_engine }}"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.search_query }}"
+            },
+            {
+              "name": "location",
+              "value": "={{ $json.search_location }}"
+            },
+            {
+              "name": "hl",
+              "value": "it"
+            },
+            {
+              "name": "gl",
+              "value": "it"
+            },
+            {
+              "name": "google_domain",
+              "value": "google.it"
+            },
+            {
+              "name": "num",
+              "value": "={{ $json.max_results }}"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $env.SERPAPI_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "b5d04306-4439-42ea-9544-20a393a97917",
+      "name": "HTTP Request a SerpApi",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json || {};\nconst meta = $('Build Search Query').first().json;\n\nconst query_type = meta.query_type;\nconst resolved_location = meta.resolved_location;\nconst is_time_sensitive = Boolean(meta.is_time_sensitive);\n\nconst normalizedResults = [];\n\nif (Array.isArray(response.events_results)) {\n  for (const event of response.events_results.slice(0, 3)) {\n    normalizedResults.push({\n      name: event.title || '',\n      address: event.venue?.name || '',\n      notes: event.date?.when || '',\n      link: event.link || ''\n    });\n  }\n}\n\nconst localPlaces = Array.isArray(response.local_results)\n  ? response.local_results\n  : Array.isArray(response.local_results?.places)\n    ? response.local_results.places\n    : [];\n\nif (!normalizedResults.length && localPlaces.length) {\n  for (const place of localPlaces.slice(0, 3)) {\n    normalizedResults.push({\n      name: place.title || place.name || '',\n      address: place.address || '',\n      notes: place.hours || place.description || '',\n      link: place.website || place.directions || place.link || ''\n    });\n  }\n}\n\nif (!normalizedResults.length && Array.isArray(response.organic_results)) {\n  for (const item of response.organic_results.slice(0, 5)) {\n    const title = item.title || '';\n    const snippet = item.snippet || '';\n    const link = item.link || '';\n    const displayed = item.displayed_link || '';\n    const combined = `${title} ${snippet}`.toLowerCase();\n\n    const relevant =\n      query_type === 'pharmacy_on_duty'\n        ? /farmacia|di turno|turno/.test(combined)\n        : query_type === 'pharmacy_open_now'\n          ? /farmacia|aperta|orari/.test(combined)\n          : query_type === 'medical_guard'\n            ? /guardia medica|continuit|medica/.test(combined)\n            : query_type === 'emergency_room'\n              ? /pronto soccorso|ospedale/.test(combined)\n              : true;\n\n    if (!relevant) continue;\n\n    normalizedResults.push({\n      name: title,\n      address: displayed,\n      notes: snippet,\n      link\n    });\n\n    if (normalizedResults.length >= 3) break;\n  }\n}\n\nlet success = normalizedResults.length > 0;\nlet code = success ? 'LOCAL_SEARCH_OK' : 'LOCAL_SEARCH_NO_CLEAR_RESULTS';\nlet message = success ? 'Risultati locali trovati.' : 'Nessun risultato affidabile trovato.';\nlet final_reply = '';\n\nif (success) {\n  const lines = normalizedResults.map((result, index) => {\n    const parts = [\n      `${index + 1}. ${result.name}`.trim(),\n      result.address ? `- ${result.address}` : '',\n      result.notes ? `(${result.notes})` : '',\n      result.link ? `${result.link}` : ''\n    ].filter(Boolean);\n\n    return parts.join(' ');\n  });\n\n  final_reply = `Ho trovato queste opzioni${resolved_location ? ` vicino a ${resolved_location}` : ''}:\\n\\n${lines.join('\\n')}`;\n\n  if (is_time_sensitive) {\n    final_reply += '\\n\\nSe si tratta di un servizio sensibile all’orario, ti consiglio comunque una verifica rapida prima di metterti in viaggio.';\n  }\n} else {\n  final_reply = is_time_sensitive\n    ? `Non riesco a verificare con certezza un risultato aggiornato${resolved_location ? ` per ${resolved_location}` : ''} in questo momento. Se vuoi, dimmi una zona più precisa e provo una ricerca più mirata.`\n    : `Non ho trovato un risultato abbastanza chiaro${resolved_location ? ` per ${resolved_location}` : ''}. Se vuoi, dimmi una zona o una città più precisa e riprovo.`;\n}\n\nreturn [{\n  json: {\n    ...meta,\n    success,\n    code,\n    message,\n    final_reply,\n    results: normalizedResults\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -96
+      ],
+      "id": "a1cf0330-ae46-4f76-be4e-cfb7dfafbd75",
+      "name": "Normalize Search Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json || {};\n\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    final_reply: input.final_reply || 'Ho completato la ricerca.',\n    query_type: input.query_type || '',\n    resolved_location: input.resolved_location || '',\n    result_count: Array.isArray(input.results) ? input.results.length : 0,\n    results: Array.isArray(input.results) ? input.results.slice(0, 3) : []\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -96
+      ],
+      "id": "8c0e6800-52b2-4701-b8d6-cba1aeb7e25f",
+      "name": "Build Final Response"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Normalize Local Search Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Local Search Request": {
+      "main": [
+        [
+          {
+            "node": "Need Clarification?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need Clarification?": {
+      "main": [
+        [
+          {
+            "node": "Clarification Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Search Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clarification Response": {
+      "main": [
+        []
+      ]
+    },
+    "Build Search Query": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request a SerpApi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request a SerpApi": {
+      "main": [
+        [
+          {
+            "node": "Normalize Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Search Results": {
+      "main": [
+        [
+          {
+            "node": "Build Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "eeb7d27b-2aa6-4c0b-9cdc-58989ab57b2a",
+  "activeVersionId": "eeb7d27b-2aa6-4c0b-9cdc-58989ab57b2a",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-31T18:53:28.173Z",
+      "createdAt": "2026-03-31T18:53:28.173Z",
+      "role": "workflow:owner",
+      "workflowId": "m5YeTgY77TtrNbyS",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-31T19:57:23.912Z",
+    "createdAt": "2026-03-31T19:57:22.471Z",
+    "versionId": "eeb7d27b-2aa6-4c0b-9cdc-58989ab57b2a",
+    "workflowId": "m5YeTgY77TtrNbyS",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "tenant_id"
+              },
+              {
+                "name": "trace_id"
+              },
+              {
+                "name": "session_id"
+              },
+              {
+                "name": "user_request"
+              },
+              {
+                "name": "business_type"
+              },
+              {
+                "name": "nome_attivita"
+              },
+              {
+                "name": "indirizzo"
+              },
+              {
+                "name": "orari_apertura"
+              },
+              {
+                "name": "current_date"
+              },
+              {
+                "name": "current_time"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          -96
+        ],
+        "id": "3bb49cf6-5530-4535-b2bd-6fed01653356",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json || {};\n\nconst normalize = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst lower = (value) => normalize(value).toLowerCase();\n\nconst tenant_id = normalize(input.tenant_id);\nconst trace_id = normalize(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalize(input.session_id) || `session_${Date.now()}`;\n\nconst user_request = normalize(input.user_request);\nconst business_type = lower(input.business_type || 'professional');\nconst nome_attivita = normalize(input.nome_attivita);\nconst indirizzo = normalize(input.indirizzo);\nconst orari_apertura = normalize(input.orari_apertura);\nconst current_date = normalize(input.current_date);\nconst current_time = normalize(input.current_time);\n\nconst requestLower = user_request.toLowerCase();\n\nconst knownCities = [\n  'rimini',\n  'riccione',\n  'cattolica',\n  'misano adriatico',\n  'misano',\n  'bellaria',\n  'igea marina',\n  'santarcangelo',\n  'cesenatico',\n  'pesaro',\n  'ravenna'\n];\n\nfunction titleCase(value) {\n  return normalize(value)\n    .split(' ')\n    .filter(Boolean)\n    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())\n    .join(' ');\n}\n\nfunction extractCityFromRequest(text) {\n  const normalized = lower(text);\n  const found = knownCities.find(city => normalized.includes(city));\n  return found ? titleCase(found) : '';\n}\n\nfunction extractCityFromAddress(address) {\n  const raw = normalize(address);\n  if (!raw) return '';\n\n  let match = raw.match(/-\\s*\\d{5}\\s+([^()\\-]+?)\\s*\\([A-Z]{2}\\)\\s*$/i);\n  if (match) return titleCase(match[1]);\n\n  match = raw.match(/\\b\\d{5}\\s+([^()\\-]+?)\\s*(?:\\([A-Z]{2}\\))?\\s*$/i);\n  if (match) return titleCase(match[1]);\n\n  const found = knownCities.find(city => lower(raw).includes(city));\n  if (found) return titleCase(found);\n\n  const parts = raw.split(',').map(s => normalize(s)).filter(Boolean);\n  if (parts.length > 0) {\n    const last = parts[parts.length - 1].replace(/\\([A-Z]{2}\\)/g, '').trim();\n    if (last) return titleCase(last);\n  }\n\n  return '';\n}\n\nfunction detectTimeContext(text) {\n  const t = lower(text);\n\n  if (/questo weekend|fine settimana|questo fine settimana/.test(t)) return 'weekend';\n  if (/stasera|questa sera/.test(t)) return 'stasera';\n  if (/dopo cena/.test(t)) return 'dopo_cena';\n  if (/stanotte|questa notte/.test(t)) return 'stanotte';\n  if (/\\boggi\\b/.test(t)) return 'oggi';\n  if (/\\bdomani\\b/.test(t)) return 'domani';\n  if (/ora|adesso|aperto ora/.test(t)) return 'ora';\n  return '';\n}\n\nfunction detectQueryType(text) {\n  const t = lower(text);\n\n  if (/farmacia.*di turno|di turno.*farmacia/.test(t)) return 'pharmacy_on_duty';\n  if (/farmacia.*(aperta|aperto|ora|adesso)|aperta ora.*farmacia/.test(t)) return 'pharmacy_open_now';\n  if (/guardia medica|continuit[aà] assistenziale/.test(t)) return 'medical_guard';\n  if (/pronto soccorso/.test(t)) return 'emergency_room';\n  if (/taxi|cab/.test(t)) return 'taxi';\n  if (/parcheggio|parcheggi/.test(t)) return 'parking';\n  if (/tabaccaio|tabacchi|sigarette|bollo/.test(t)) return 'tobacco';\n  if (/sexy shop|sex shop/.test(t)) return 'sexy_shop';\n  if (/supermercato|market|alimentari/.test(t)) return 'supermarket';\n  if (/spiaggia|lido|stabilimento balneare/.test(t)) return 'beach';\n  if (/discoteca|discoteche|club|locale notturno/.test(t)) return 'nightlife';\n  if (/bar|pub|cocktail bar|aperitivo/.test(t)) return 'bar';\n  if (/evento|eventi|festival|concerto|concerti|cosa posso fare|cosa fare|cosa c['’]e|cosa cè|serata|serate/.test(t)) return 'events';\n  return 'poi_generic';\n}\n\nconst query_type = detectQueryType(user_request);\nconst time_context = detectTimeContext(user_request);\n\nconst city_from_request = extractCityFromRequest(user_request);\nconst city_from_address = extractCityFromAddress(indirizzo);\nconst resolved_location = city_from_request || city_from_address;\n\nconst is_time_sensitive = [\n  'pharmacy_on_duty',\n  'pharmacy_open_now',\n  'medical_guard',\n  'emergency_room'\n].includes(query_type) || ['ora', 'oggi', 'stasera', 'stanotte'].includes(time_context);\n\nlet needs_clarification = false;\nlet clarification_reason = '';\n\nif (!user_request) {\n  needs_clarification = true;\n  clarification_reason = 'missing_request';\n} else if (!resolved_location) {\n  needs_clarification = true;\n  clarification_reason = 'missing_location';\n}\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    user_request,\n    business_type,\n    nome_attivita,\n    indirizzo,\n    orari_apertura,\n    current_date,\n    current_time,\n    query_type,\n    time_context,\n    is_time_sensitive,\n    city_from_request,\n    city_from_address,\n    resolved_location,\n    needs_clarification,\n    clarification_reason,\n    success: false,\n    code: '',\n    message: '',\n    final_reply: ''\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          -96
+        ],
+        "id": "fdf845d5-ebb3-4d83-be60-9bfa1ac18455",
+        "name": "Normalize Local Search Request"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "f63e24d7-92dd-43be-bc77-ce4acc42446d",
+                "leftValue": "={{ $json.needs_clarification }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          -96
+        ],
+        "id": "ff7efe24-6f90-40a2-81b1-8087b77fc26c",
+        "name": "Need Clarification?"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "7af98584-af5f-4ade-bb1e-0135bc91b625",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "07d14cb7-df8d-44ab-a453-9602faa4180b",
+                "name": "code",
+                "value": "LOCAL_SEARCH_NEEDS_CLARIFICATION",
+                "type": "string"
+              },
+              {
+                "id": "5839d54e-ab09-496c-b1b4-c5f8e23daad4",
+                "name": "message",
+                "value": "Local search needs clarification.",
+                "type": "string"
+              },
+              {
+                "id": "e239446e-bed3-4dc3-8d8a-c753b4641a27",
+                "name": "final_reply",
+                "value": "={{ $json.clarification_reason === 'missing_request'\n  ? 'Dimmi pure cosa stai cercando in zona e ti aiuto a verificare.'\n  : 'Certo. Mi dici la città o la zona precisa così verifico meglio cosa c’è vicino?'\n}}",
+                "type": "string"
+              },
+              {
+                "id": "db6adf0c-5a54-4823-a659-a2f53293f68e",
+                "name": "tenant_id",
+                "value": "={{ $json.tenant_id }}",
+                "type": "string"
+              },
+              {
+                "id": "9683edae-1fa1-4898-a28f-31d84e1e012d",
+                "name": "trace_id",
+                "value": "={{ $json.trace_id }}",
+                "type": "string"
+              },
+              {
+                "id": "6da1ec4e-00d2-4a9e-9640-4b0413e70098",
+                "name": "session_id",
+                "value": "={{ $json.session_id }}",
+                "type": "string"
+              },
+              {
+                "id": "eb67189f-095c-4906-a4c2-18d2768df456",
+                "name": "query_type",
+                "value": "={{ $json.query_type }}",
+                "type": "string"
+              },
+              {
+                "id": "c06181d0-cbca-420b-abb8-b0a7bd8cdfc7",
+                "name": "resolved_location",
+                "value": "={{ $json.resolved_location }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          672,
+          -304
+        ],
+        "id": "b7da9c0d-480f-47e1-b359-91aa77fa4163",
+        "name": "Clarification Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json || {};\n\nconst queryType = String(input.query_type || 'poi_generic').trim();\nconst location = String(input.resolved_location || '').trim();\nconst request = String(input.user_request || '').trim();\nconst timeContext = String(input.time_context || '').trim();\nconst rawRequest = request.toLowerCase();\n\nconst searchLocation = location ? `${location}, Emilia-Romagna, Italy` : '';\nlet serp_engine = 'google';\nlet search_query = request;\n\nconst stripLocationFromRequest = (text, city) => {\n  if (!text) return '';\n  let cleaned = text.toLowerCase();\n\n  if (city) {\n    const escapedCity = city.toLowerCase().replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n    cleaned = cleaned.replace(new RegExp(`\\\\b${escapedCity}\\\\b`, 'gi'), ' ');\n  }\n\n  cleaned = cleaned\n    .replace(/cosa posso fare/gi, ' ')\n    .replace(/cosa fare/gi, ' ')\n    .replace(/che eventi ci sono/gi, ' ')\n    .replace(/che eventi/gi, ' ')\n    .replace(/ci sono/gi, ' ')\n    .replace(/in zona/gi, ' ')\n    .replace(/qui vicino/gi, ' ')\n    .replace(/vicino all['’]hotel/gi, ' ')\n    .replace(/nei dintorni/gi, ' ')\n    .replace(/[?.,!]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return cleaned;\n};\n\nconst cleanedRequest = stripLocationFromRequest(request, location);\n\nconst wantsNightlife = /discoteca|discoteche|club|serata|serate|locale notturno/.test(rawRequest);\nconst wantsConcerts = /concerto|concerti|live/.test(rawRequest);\nconst wantsFestival = /festival|fiera/.test(rawRequest);\n\nswitch (queryType) {\n  case 'events':\n    if (wantsNightlife) {\n      if (timeContext === 'weekend') {\n        search_query = `discoteche ${location} questo weekend`;\n      } else if (timeContext === 'stasera' || timeContext === 'dopo_cena') {\n        search_query = `discoteche ${location} stasera`;\n      } else {\n        search_query = `discoteche ${location} eventi`;\n      }\n    } else if (wantsConcerts) {\n      if (timeContext === 'weekend') {\n        search_query = `concerti ${location} questo weekend`;\n      } else if (timeContext === 'stasera') {\n        search_query = `concerti ${location} stasera`;\n      } else {\n        search_query = `concerti ${location}`;\n      }\n    } else if (wantsFestival) {\n      if (timeContext === 'weekend') {\n        search_query = `festival ${location} questo weekend`;\n      } else {\n        search_query = `festival ${location}`;\n      }\n    } else {\n      if (timeContext === 'weekend') {\n        search_query = `eventi ${location} questo weekend`;\n      } else if (timeContext === 'stasera' || timeContext === 'dopo_cena') {\n        search_query = `eventi ${location} stasera`;\n      } else {\n        search_query = `eventi ${location}`;\n      }\n    }\n    break;\n\n  case 'nightlife':\n    search_query = `discoteche ${location} ${timeContext === 'weekend' ? 'questo weekend' : timeContext === 'stasera' || timeContext === 'dopo_cena' ? 'stasera' : ''}`.trim();\n    break;\n\n  case 'pharmacy_on_duty':\n    search_query = `farmacie di turno ${location}`;\n    break;\n\n  case 'pharmacy_open_now':\n    search_query = `farmacia aperta ${location}`;\n    break;\n\n  case 'medical_guard':\n    search_query = `guardia medica ${location} contatti`;\n    break;\n\n  case 'emergency_room':\n    search_query = `pronto soccorso ${location} indirizzo`;\n    break;\n\n  case 'taxi':\n    search_query = `taxi ${location} numero telefono`;\n    break;\n\n  case 'parking':\n    search_query = `parcheggio vicino hotel ${location}`;\n    break;\n\n  case 'tobacco':\n    search_query = `tabacchi vicino hotel ${location}`;\n    break;\n\n  case 'sexy_shop':\n    search_query = `sexy shop vicino hotel ${location}`;\n    break;\n\n  case 'supermarket':\n    search_query = `supermercato vicino hotel ${location}`;\n    break;\n\n  case 'beach':\n    search_query = `spiaggia attrezzata vicino ${location}`;\n    break;\n\n  case 'bar':\n    search_query = `bar ${location} ${timeContext === 'dopo_cena' || timeContext === 'stasera' ? 'aperto' : ''}`.trim();\n    break;\n\n  default:\n    search_query = `${cleanedRequest || request} ${location}`.trim();\n    break;\n}\n\nconst max_results = ['pharmacy_on_duty', 'pharmacy_open_now', 'medical_guard', 'emergency_room'].includes(queryType) ? 5 : 3;\n\nreturn [{\n  json: {\n    ...input,\n    serp_engine,\n    search_query,\n    search_location: searchLocation,\n    max_results\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          -96
+        ],
+        "id": "423e712a-01d0-463c-b045-dc7c61279947",
+        "name": "Build Search Query"
+      },
+      {
+        "parameters": {
+          "url": "https://serpapi.com/search.json",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "engine",
+                "value": "={{ $json.serp_engine }}"
+              },
+              {
+                "name": "q",
+                "value": "={{ $json.search_query }}"
+              },
+              {
+                "name": "location",
+                "value": "={{ $json.search_location }}"
+              },
+              {
+                "name": "hl",
+                "value": "it"
+              },
+              {
+                "name": "gl",
+                "value": "it"
+              },
+              {
+                "name": "google_domain",
+                "value": "google.it"
+              },
+              {
+                "name": "num",
+                "value": "={{ $json.max_results }}"
+              },
+              {
+                "name": "api_key",
+                "value": "={{ $env.SERPAPI_API_KEY }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1120,
+          -96
+        ],
+        "id": "b5d04306-4439-42ea-9544-20a393a97917",
+        "name": "HTTP Request a SerpApi",
+        "retryOnFail": false,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const response = $json || {};\nconst meta = $('Build Search Query').first().json;\n\nconst query_type = meta.query_type;\nconst resolved_location = meta.resolved_location;\nconst is_time_sensitive = Boolean(meta.is_time_sensitive);\n\nconst normalizedResults = [];\n\nif (Array.isArray(response.events_results)) {\n  for (const event of response.events_results.slice(0, 3)) {\n    normalizedResults.push({\n      name: event.title || '',\n      address: event.venue?.name || '',\n      notes: event.date?.when || '',\n      link: event.link || ''\n    });\n  }\n}\n\nconst localPlaces = Array.isArray(response.local_results)\n  ? response.local_results\n  : Array.isArray(response.local_results?.places)\n    ? response.local_results.places\n    : [];\n\nif (!normalizedResults.length && localPlaces.length) {\n  for (const place of localPlaces.slice(0, 3)) {\n    normalizedResults.push({\n      name: place.title || place.name || '',\n      address: place.address || '',\n      notes: place.hours || place.description || '',\n      link: place.website || place.directions || place.link || ''\n    });\n  }\n}\n\nif (!normalizedResults.length && Array.isArray(response.organic_results)) {\n  for (const item of response.organic_results.slice(0, 5)) {\n    const title = item.title || '';\n    const snippet = item.snippet || '';\n    const link = item.link || '';\n    const displayed = item.displayed_link || '';\n    const combined = `${title} ${snippet}`.toLowerCase();\n\n    const relevant =\n      query_type === 'pharmacy_on_duty'\n        ? /farmacia|di turno|turno/.test(combined)\n        : query_type === 'pharmacy_open_now'\n          ? /farmacia|aperta|orari/.test(combined)\n          : query_type === 'medical_guard'\n            ? /guardia medica|continuit|medica/.test(combined)\n            : query_type === 'emergency_room'\n              ? /pronto soccorso|ospedale/.test(combined)\n              : true;\n\n    if (!relevant) continue;\n\n    normalizedResults.push({\n      name: title,\n      address: displayed,\n      notes: snippet,\n      link\n    });\n\n    if (normalizedResults.length >= 3) break;\n  }\n}\n\nlet success = normalizedResults.length > 0;\nlet code = success ? 'LOCAL_SEARCH_OK' : 'LOCAL_SEARCH_NO_CLEAR_RESULTS';\nlet message = success ? 'Risultati locali trovati.' : 'Nessun risultato affidabile trovato.';\nlet final_reply = '';\n\nif (success) {\n  const lines = normalizedResults.map((result, index) => {\n    const parts = [\n      `${index + 1}. ${result.name}`.trim(),\n      result.address ? `- ${result.address}` : '',\n      result.notes ? `(${result.notes})` : '',\n      result.link ? `${result.link}` : ''\n    ].filter(Boolean);\n\n    return parts.join(' ');\n  });\n\n  final_reply = `Ho trovato queste opzioni${resolved_location ? ` vicino a ${resolved_location}` : ''}:\\n\\n${lines.join('\\n')}`;\n\n  if (is_time_sensitive) {\n    final_reply += '\\n\\nSe si tratta di un servizio sensibile all’orario, ti consiglio comunque una verifica rapida prima di metterti in viaggio.';\n  }\n} else {\n  final_reply = is_time_sensitive\n    ? `Non riesco a verificare con certezza un risultato aggiornato${resolved_location ? ` per ${resolved_location}` : ''} in questo momento. Se vuoi, dimmi una zona più precisa e provo una ricerca più mirata.`\n    : `Non ho trovato un risultato abbastanza chiaro${resolved_location ? ` per ${resolved_location}` : ''}. Se vuoi, dimmi una zona o una città più precisa e riprovo.`;\n}\n\nreturn [{\n  json: {\n    ...meta,\n    success,\n    code,\n    message,\n    final_reply,\n    results: normalizedResults\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1344,
+          -96
+        ],
+        "id": "a1cf0330-ae46-4f76-be4e-cfb7dfafbd75",
+        "name": "Normalize Search Results"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json || {};\n\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    final_reply: input.final_reply || 'Ho completato la ricerca.',\n    query_type: input.query_type || '',\n    resolved_location: input.resolved_location || '',\n    result_count: Array.isArray(input.results) ? input.results.length : 0,\n    results: Array.isArray(input.results) ? input.results.slice(0, 3) : []\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          -96
+        ],
+        "id": "8c0e6800-52b2-4701-b8d6-cba1aeb7e25f",
+        "name": "Build Final Response"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Normalize Local Search Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Local Search Request": {
+        "main": [
+          [
+            {
+              "node": "Need Clarification?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Need Clarification?": {
+        "main": [
+          [
+            {
+              "node": "Clarification Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Search Query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Clarification Response": {
+        "main": [
+          []
+        ]
+      },
+      "Build Search Query": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request a SerpApi",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request a SerpApi": {
+        "main": [
+          [
+            {
+              "node": "Normalize Search Results",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Search Results": {
+        "main": [
+          [
+            {
+              "node": "Build Final Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version eeb7d27b",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}

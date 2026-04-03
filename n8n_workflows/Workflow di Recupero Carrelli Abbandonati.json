@@ -1,0 +1,1102 @@
+{
+  "updatedAt": "2026-02-01T14:57:29.572Z",
+  "createdAt": "2026-02-01T14:47:51.657Z",
+  "id": "8Q27KpNKGoum_eC7jSCnu",
+  "name": "Workflow di Recupero Carrelli Abbandonati",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1120,
+        480
+      ],
+      "id": "740f8333-5363-4f04-992a-b9966ad2006b",
+      "name": "Ogni 1 ora"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": " SELECT * FROM orphan_sessions_view LIMIT 20;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -896,
+        480
+      ],
+      "id": "b1d84d32-9430-4fd1-849c-6ae3dd57d0d8",
+      "name": "Recupera tutti gli ID delle chat abbandonate da più di 2 ore",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -672,
+        480
+      ],
+      "id": "b55d93e4-9746-455d-a0e1-8239291822e7",
+      "name": "Processiamo una chat alla volta per non confondere l'AI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera tutti i messaggi di questo batch\nconst messages = $input.all();\n\n// Se non ci sono messaggi, evita errori\nif (messages.length === 0) {\n  return { json: { transcript: \"\", chat_session_id: null } };\n}\n\n// 1. Crea il transcript (come prima)\nconst transcript = messages\n  .map(m => `${m.json.role ? m.json.role.toUpperCase() : 'UNKNOWN'}: ${m.json.content}`)\n  .join(\"\\n\");\n\n// 2. Recupera l'ID dal primo messaggio (tanto sono tutti della stessa sessione)\n// Questo è il trucco per non perdere il \"filo\"\nconst sessionId = messages[0].json.chat_session_id; \n\nreturn {\n  json: {\n    transcript: transcript,\n    chat_session_id: sessionId // <--- Lo portiamo avanti noi manualmente\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        112
+      ],
+      "id": "6d62e106-1c00-46af-9d6d-951cebf08cf9",
+      "name": "Formatta la Chat per l'AI"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT role, content, chat_session_id\nFROM (\n    SELECT role, content, chat_session_id, created_at\n    FROM messages\n    WHERE chat_session_id = $1\n    ORDER BY created_at DESC\n    LIMIT 30\n) sub\nORDER BY created_at ASC",
+        "options": {
+          "queryReplacement": "={{ [ $json.chat_session_id ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -448,
+        112
+      ],
+      "id": "587dadd0-14a5-4a7a-9b6c-b88e06aa1ebc",
+      "name": "Recupera la Chat History",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "# System Prompt: Lead Recovery Analyst\n\nYou are an expert Sales Analyst AI for \"NikiTuttoFare\".\nYour goal is to identify recoverablke sales leads from abandoned chats.\n\n## SCORING RULES (STRICT)\nYou must follow these rules strictly. Intent alone is NOT enough.\n\n- **SCORE 1-2 (Discard)**: Spam, just \"Hello\", nonsense, or user said \"No thanks\".\n- **SCORE 3-4 (Low - Browser)**: Specific intent (e.g., \"Need plumber\") BUT **NO contact info** (No phone, no full name). Just a location is NOT a contact.\n- **SCORE 5-7 (Medium - Lead)**: Specific intent + **User provided a Name** (e.g., \"I'm Marco\") but no phone.\n- **SCORE 8-10 (High - Hot Lead)**: Specific intent + **PHONE NUMBER** or Email provided.\n\n## OUTPUT JSON\nReturn PURE JSON only.\n\n```json\n{\n  \"detected_intent\": \"Summary...\",\n  \"extracted_contact\": {\n    \"name\": \"...\",\n    \"phone\": \"...\",\n    \"city\": \"...\"\n  },\n  \"lead_score\": 0,\n  \"reasoning\": \"...\",\n  \"status_recommendation\": \"new\" \n}\n\nIMPORTANT\nIf extracted_contact.phone is missing/null, lead_score MUST be 4 or lower. Do not hallucinate contact info.\n\n---",
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e92c64a9-aec7-4a44-af77-98386141b3ad",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        224
+      ],
+      "id": "ff1a48df-dc79-4eed-88c1-0e56eb775d74",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UlhMJWQVjXFDMzf8",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera l'output dell'AI\nconst inputJson = $input.first().json;\nconst aiText = inputJson.output || inputJson.text || \"\";\n\nlet extractedData = {};\nlet leadScore = 0;\n\n// 1. RECUPERO ID SICURO (Il pezzo mancante)\n// Andiamo a prendere l'ID dal nodo precedente che abbiamo sistemato prima\n// Usa .first() perché siamo dentro un loop batch size 1, quindi c'è sempre un solo item attivo\nlet sessionId = null;\ntry {\n    sessionId = $('Formatta la Chat per l\\'AI').first().json.chat_session_id;\n} catch (err) {\n    // Fallback: prova a prenderlo dall'input se l'AI lo ha passato (raro)\n    sessionId = inputJson.chat_session_id;\n}\n\n// --- FUNZIONE SMART PARSER ---\nfunction extractJSON(str) {\n    let firstOpen = str.indexOf('{');\n    if (firstOpen === -1) return null;\n    let balance = 0;\n    let lastClose = -1;\n    for (let i = firstOpen; i < str.length; i++) {\n        if (str[i] === '{') balance++;\n        else if (str[i] === '}') {\n            balance--;\n            if (balance === 0) { lastClose = i; break; }\n        }\n    }\n    return (lastClose !== -1) ? str.substring(firstOpen, lastClose + 1) : null;\n}\n\ntry {\n    const jsonString = extractJSON(aiText);\n    if (jsonString) {\n        const cleanJson = jsonString.replace(/,(\\s*})/g, '$1'); \n        extractedData = JSON.parse(cleanJson);\n        leadScore = extractedData.lead_score || 0;\n    }\n} catch (e) {\n    // Errore parsing silenzioso\n}\n\n// OUTPUT FINALE\nreturn {\n  json: {\n    ...extractedData,\n    lead_score: leadScore,\n    chat_session_id: sessionId // <--- Ora lo includiamo esplicitamente!\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        112
+      ],
+      "id": "8f80896a-e1bb-4259-a1e4-52f2213c117a",
+      "name": "Pulizia JSON"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9c1b9879-1464-4372-a143-c9c9fd960458",
+              "leftValue": "={{ $json.lead_score }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        112
+      ],
+      "id": "47b3cef2-5fa5-4d6a-8d60-2459dbc8717d",
+      "name": "Filtro Qualità"
+    },
+    {
+      "parameters": {
+        "tableId": "leads_recovery",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_session_id",
+              "fieldValue": "={{ $json.chat_session_id }}"
+            },
+            {
+              "fieldId": "detected_intent",
+              "fieldValue": "={{ $json.detected_intent }}"
+            },
+            {
+              "fieldId": "extracted_contact",
+              "fieldValue": "={{ JSON.stringify($json.extracted_contact) }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ $json.lead_score }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "new"
+            },
+            {
+              "fieldId": "abandoned_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        592
+      ],
+      "id": "47a554c6-aaae-427e-9a3b-1abef26d7182",
+      "name": "Inserimento Finale",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JeLHXdm4YoHRP9wb",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "leads_recovery",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "chat_session_id",
+              "fieldValue": "={{ $json.chat_session_id }}"
+            },
+            {
+              "fieldId": "detected_intent",
+              "fieldValue": "={{ $json.detected_intent }}"
+            },
+            {
+              "fieldId": "extracted_contact",
+              "fieldValue": "={{ JSON.stringify($json.extracted_contact) }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ $json.lead_score }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "discarded"
+            },
+            {
+              "fieldId": "abandoned_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        336
+      ],
+      "id": "fb6692e1-44d5-485d-9e6f-afcf2aa26158",
+      "name": "Salva Scartati",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JeLHXdm4YoHRP9wb",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  extracted_contact, \n  detected_intent, \n  lead_score, \n  chat_session_id\nFROM leads_recovery\nWHERE status = 'new'\n  AND lead_score >= 5 -- Solo quelli interessanti\n  AND created_at > (NOW() - INTERVAL '1 hour') -- Solo quelli appena trovati\nORDER BY lead_score DESC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -448,
+        400
+      ],
+      "id": "8d7aee72-9927-4a89-9827-ca34ffab09c4",
+      "name": "Recupera i Lead Appena Salvati",
+      "credentials": {
+        "postgres": {
+          "id": "y26w3cf5oDEAQXdB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1728643-8d4c-4b92-8ba6-ee3e6e468645",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        400
+      ],
+      "id": "1c59c936-64f1-494a-9c98-b6149d61893d",
+      "name": "Controllo Quantità"
+    },
+    {
+      "parameters": {
+        "jsCode": "const leads = $input.all().map(item => item.json);\n\nlet html = `\n<h3>🚀 Report Recupero Lead: ${leads.length} Nuovi Contatti</h3>\n<p>Ecco i clienti che hanno abbandonato la chat nell'ultima ora ma sembrano interessati:</p>\n<table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse; width: 100%;\">\n  <tr style=\"background-color: #f2f2f2;\">\n    <th>Score</th>\n    <th>Cliente (Nome/Tel)</th>\n    <th>Intento</th>\n    <th>Link Chat</th>\n  </tr>\n`;\n\nfor (const lead of leads) {\n  // --- CORREZIONE QUI SOTTO ---\n  let contact = lead.extracted_contact;\n\n  // Se Supabase restituisce il JSON come stringa, facciamo il parse manuale\n  if (typeof contact === 'string') {\n      try {\n          contact = JSON.parse(contact);\n      } catch (e) {\n          contact = {};\n      }\n  }\n  // Se è null o undefined, inizializza vuoto\n  if (!contact) { contact = {}; }\n  \n  const name = contact.name || \"N/D\";\n  const phone = contact.phone || \"N/D\";\n  // -----------------------------\n  \n  // Colore Score: Rosso se alto, Arancio se medio\n  const scoreColor = lead.lead_score >= 8 ? \"#ffcccc\" : \"#fff4cc\";\n\n  html += `\n  <tr>\n    <td style=\"background-color: ${scoreColor}; text-align: center;\"><strong>${lead.lead_score}/10</strong></td>\n    <td>\n      <b>${name}</b><br>\n      📞 <a href=\"tel:${phone}\">${phone}</a>\n    </td>\n    <td>${lead.detected_intent || \"N/D\"}</td>\n    <td><a href=\"https://tuo-crm.com/chats/${lead.chat_session_id}\">Apri Chat</a></td>\n  </tr>\n  `;\n}\n\nhtml += `</table>`;\n\nreturn { json: { email_body: html } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        400
+      ],
+      "id": "3f107d5e-21d1-4620-b41e-bbbafc7f8d9d",
+      "name": "Formatta Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "bronovito@gmail.com",
+        "subject": "=🔥 NikiTuttoFare: Trovati {{ $('Recupera i Lead Appena Salvati').all().length }} Lead da recuperare",
+        "message": "={{ $json.email_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        400
+      ],
+      "id": "93dfdcda-56d8-4812-bc6a-a3484bb9533b",
+      "name": "Invia Email",
+      "webhookId": "b42fd07c-2df2-4d5e-8b72-c1d5d56fefd9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8qyqTd1YjYdRixtv",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Ogni 1 ora": {
+      "main": [
+        [
+          {
+            "node": "Recupera tutti gli ID delle chat abbandonate da più di 2 ore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recupera tutti gli ID delle chat abbandonate da più di 2 ore": {
+      "main": [
+        [
+          {
+            "node": "Processiamo una chat alla volta per non confondere l'AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processiamo una chat alla volta per non confondere l'AI": {
+      "main": [
+        [
+          {
+            "node": "Recupera i Lead Appena Salvati",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Recupera la Chat History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recupera la Chat History": {
+      "main": [
+        [
+          {
+            "node": "Formatta la Chat per l'AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatta la Chat per l'AI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Pulizia JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pulizia JSON": {
+      "main": [
+        [
+          {
+            "node": "Filtro Qualità",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro Qualità": {
+      "main": [
+        [
+          {
+            "node": "Inserimento Finale",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Salva Scartati",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inserimento Finale": {
+      "main": [
+        [
+          {
+            "node": "Processiamo una chat alla volta per non confondere l'AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva Scartati": {
+      "main": [
+        [
+          {
+            "node": "Processiamo una chat alla volta per non confondere l'AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recupera i Lead Appena Salvati": {
+      "main": [
+        [
+          {
+            "node": "Controllo Quantità",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Controllo Quantità": {
+      "main": [
+        [
+          {
+            "node": "Formatta Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatta Email": {
+      "main": [
+        [
+          {
+            "node": "Invia Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Ogni 1 ora": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "22739475-d117-4055-af8c-6885999c86d5",
+  "activeVersionId": "22739475-d117-4055-af8c-6885999c86d5",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-01T14:47:51.657Z",
+      "createdAt": "2026-02-01T14:47:51.657Z",
+      "role": "workflow:owner",
+      "workflowId": "8Q27KpNKGoum_eC7jSCnu",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-01T14:57:32.918Z",
+    "createdAt": "2026-02-01T14:57:29.573Z",
+    "versionId": "22739475-d117-4055-af8c-6885999c86d5",
+    "workflowId": "8Q27KpNKGoum_eC7jSCnu",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -1120,
+          480
+        ],
+        "id": "740f8333-5363-4f04-992a-b9966ad2006b",
+        "name": "Ogni 1 ora"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": " SELECT * FROM orphan_sessions_view LIMIT 20;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -896,
+          480
+        ],
+        "id": "b1d84d32-9430-4fd1-849c-6ae3dd57d0d8",
+        "name": "Recupera tutti gli ID delle chat abbandonate da più di 2 ore",
+        "credentials": {
+          "postgres": {
+            "id": "y26w3cf5oDEAQXdB",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          -672,
+          480
+        ],
+        "id": "b55d93e4-9746-455d-a0e1-8239291822e7",
+        "name": "Processiamo una chat alla volta per non confondere l'AI"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Recupera tutti i messaggi di questo batch\nconst messages = $input.all();\n\n// Se non ci sono messaggi, evita errori\nif (messages.length === 0) {\n  return { json: { transcript: \"\", chat_session_id: null } };\n}\n\n// 1. Crea il transcript (come prima)\nconst transcript = messages\n  .map(m => `${m.json.role ? m.json.role.toUpperCase() : 'UNKNOWN'}: ${m.json.content}`)\n  .join(\"\\n\");\n\n// 2. Recupera l'ID dal primo messaggio (tanto sono tutti della stessa sessione)\n// Questo è il trucco per non perdere il \"filo\"\nconst sessionId = messages[0].json.chat_session_id; \n\nreturn {\n  json: {\n    transcript: transcript,\n    chat_session_id: sessionId // <--- Lo portiamo avanti noi manualmente\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -224,
+          112
+        ],
+        "id": "6d62e106-1c00-46af-9d6d-951cebf08cf9",
+        "name": "Formatta la Chat per l'AI"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT role, content, chat_session_id\nFROM (\n    SELECT role, content, chat_session_id, created_at\n    FROM messages\n    WHERE chat_session_id = $1\n    ORDER BY created_at DESC\n    LIMIT 30\n) sub\nORDER BY created_at ASC",
+          "options": {
+            "queryReplacement": "={{ [ $json.chat_session_id ] }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -448,
+          112
+        ],
+        "id": "587dadd0-14a5-4a7a-9b6c-b88e06aa1ebc",
+        "name": "Recupera la Chat History",
+        "credentials": {
+          "postgres": {
+            "id": "y26w3cf5oDEAQXdB",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.transcript }}",
+          "options": {
+            "systemMessage": "# System Prompt: Lead Recovery Analyst\n\nYou are an expert Sales Analyst AI for \"NikiTuttoFare\".\nYour goal is to identify recoverablke sales leads from abandoned chats.\n\n## SCORING RULES (STRICT)\nYou must follow these rules strictly. Intent alone is NOT enough.\n\n- **SCORE 1-2 (Discard)**: Spam, just \"Hello\", nonsense, or user said \"No thanks\".\n- **SCORE 3-4 (Low - Browser)**: Specific intent (e.g., \"Need plumber\") BUT **NO contact info** (No phone, no full name). Just a location is NOT a contact.\n- **SCORE 5-7 (Medium - Lead)**: Specific intent + **User provided a Name** (e.g., \"I'm Marco\") but no phone.\n- **SCORE 8-10 (High - Hot Lead)**: Specific intent + **PHONE NUMBER** or Email provided.\n\n## OUTPUT JSON\nReturn PURE JSON only.\n\n```json\n{\n  \"detected_intent\": \"Summary...\",\n  \"extracted_contact\": {\n    \"name\": \"...\",\n    \"phone\": \"...\",\n    \"city\": \"...\"\n  },\n  \"lead_score\": 0,\n  \"reasoning\": \"...\",\n  \"status_recommendation\": \"new\" \n}\n\nIMPORTANT\nIf extracted_contact.phone is missing/null, lead_score MUST be 4 or lower. Do not hallucinate contact info.\n\n---",
+            "enableStreaming": true
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "e92c64a9-aec7-4a44-af77-98386141b3ad",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-flash-lite-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          80,
+          224
+        ],
+        "id": "ff1a48df-dc79-4eed-88c1-0e56eb775d74",
+        "name": "Google Gemini Chat Model",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "UlhMJWQVjXFDMzf8",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Recupera l'output dell'AI\nconst inputJson = $input.first().json;\nconst aiText = inputJson.output || inputJson.text || \"\";\n\nlet extractedData = {};\nlet leadScore = 0;\n\n// 1. RECUPERO ID SICURO (Il pezzo mancante)\n// Andiamo a prendere l'ID dal nodo precedente che abbiamo sistemato prima\n// Usa .first() perché siamo dentro un loop batch size 1, quindi c'è sempre un solo item attivo\nlet sessionId = null;\ntry {\n    sessionId = $('Formatta la Chat per l\\'AI').first().json.chat_session_id;\n} catch (err) {\n    // Fallback: prova a prenderlo dall'input se l'AI lo ha passato (raro)\n    sessionId = inputJson.chat_session_id;\n}\n\n// --- FUNZIONE SMART PARSER ---\nfunction extractJSON(str) {\n    let firstOpen = str.indexOf('{');\n    if (firstOpen === -1) return null;\n    let balance = 0;\n    let lastClose = -1;\n    for (let i = firstOpen; i < str.length; i++) {\n        if (str[i] === '{') balance++;\n        else if (str[i] === '}') {\n            balance--;\n            if (balance === 0) { lastClose = i; break; }\n        }\n    }\n    return (lastClose !== -1) ? str.substring(firstOpen, lastClose + 1) : null;\n}\n\ntry {\n    const jsonString = extractJSON(aiText);\n    if (jsonString) {\n        const cleanJson = jsonString.replace(/,(\\s*})/g, '$1'); \n        extractedData = JSON.parse(cleanJson);\n        leadScore = extractedData.lead_score || 0;\n    }\n} catch (e) {\n    // Errore parsing silenzioso\n}\n\n// OUTPUT FINALE\nreturn {\n  json: {\n    ...extractedData,\n    lead_score: leadScore,\n    chat_session_id: sessionId // <--- Ora lo includiamo esplicitamente!\n  }\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          352,
+          112
+        ],
+        "id": "8f80896a-e1bb-4259-a1e4-52f2213c117a",
+        "name": "Pulizia JSON"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "9c1b9879-1464-4372-a143-c9c9fd960458",
+                "leftValue": "={{ $json.lead_score }}",
+                "rightValue": 3,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          576,
+          112
+        ],
+        "id": "47b3cef2-5fa5-4d6a-8d60-2459dbc8717d",
+        "name": "Filtro Qualità"
+      },
+      {
+        "parameters": {
+          "tableId": "leads_recovery",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "chat_session_id",
+                "fieldValue": "={{ $json.chat_session_id }}"
+              },
+              {
+                "fieldId": "detected_intent",
+                "fieldValue": "={{ $json.detected_intent }}"
+              },
+              {
+                "fieldId": "extracted_contact",
+                "fieldValue": "={{ JSON.stringify($json.extracted_contact) }}"
+              },
+              {
+                "fieldId": "lead_score",
+                "fieldValue": "={{ $json.lead_score }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "new"
+              },
+              {
+                "fieldId": "abandoned_at",
+                "fieldValue": "={{ $now }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          800,
+          592
+        ],
+        "id": "47a554c6-aaae-427e-9a3b-1abef26d7182",
+        "name": "Inserimento Finale",
+        "credentials": {
+          "supabaseApi": {
+            "id": "JeLHXdm4YoHRP9wb",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "leads_recovery",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "chat_session_id",
+                "fieldValue": "={{ $json.chat_session_id }}"
+              },
+              {
+                "fieldId": "detected_intent",
+                "fieldValue": "={{ $json.detected_intent }}"
+              },
+              {
+                "fieldId": "extracted_contact",
+                "fieldValue": "={{ JSON.stringify($json.extracted_contact) }}"
+              },
+              {
+                "fieldId": "lead_score",
+                "fieldValue": "={{ $json.lead_score }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "discarded"
+              },
+              {
+                "fieldId": "abandoned_at",
+                "fieldValue": "={{ $now }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          800,
+          336
+        ],
+        "id": "fb6692e1-44d5-485d-9e6f-afcf2aa26158",
+        "name": "Salva Scartati",
+        "credentials": {
+          "supabaseApi": {
+            "id": "JeLHXdm4YoHRP9wb",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n  extracted_contact, \n  detected_intent, \n  lead_score, \n  chat_session_id\nFROM leads_recovery\nWHERE status = 'new'\n  AND lead_score >= 5 -- Solo quelli interessanti\n  AND created_at > (NOW() - INTERVAL '1 hour') -- Solo quelli appena trovati\nORDER BY lead_score DESC;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -448,
+          400
+        ],
+        "id": "8d7aee72-9927-4a89-9827-ca34ffab09c4",
+        "name": "Recupera i Lead Appena Salvati",
+        "credentials": {
+          "postgres": {
+            "id": "y26w3cf5oDEAQXdB",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c1728643-8d4c-4b92-8ba6-ee3e6e468645",
+                "leftValue": "={{ $input.all().length }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -224,
+          400
+        ],
+        "id": "1c59c936-64f1-494a-9c98-b6149d61893d",
+        "name": "Controllo Quantità"
+      },
+      {
+        "parameters": {
+          "jsCode": "const leads = $input.all().map(item => item.json);\n\nlet html = `\n<h3>🚀 Report Recupero Lead: ${leads.length} Nuovi Contatti</h3>\n<p>Ecco i clienti che hanno abbandonato la chat nell'ultima ora ma sembrano interessati:</p>\n<table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse; width: 100%;\">\n  <tr style=\"background-color: #f2f2f2;\">\n    <th>Score</th>\n    <th>Cliente (Nome/Tel)</th>\n    <th>Intento</th>\n    <th>Link Chat</th>\n  </tr>\n`;\n\nfor (const lead of leads) {\n  // --- CORREZIONE QUI SOTTO ---\n  let contact = lead.extracted_contact;\n\n  // Se Supabase restituisce il JSON come stringa, facciamo il parse manuale\n  if (typeof contact === 'string') {\n      try {\n          contact = JSON.parse(contact);\n      } catch (e) {\n          contact = {};\n      }\n  }\n  // Se è null o undefined, inizializza vuoto\n  if (!contact) { contact = {}; }\n  \n  const name = contact.name || \"N/D\";\n  const phone = contact.phone || \"N/D\";\n  // -----------------------------\n  \n  // Colore Score: Rosso se alto, Arancio se medio\n  const scoreColor = lead.lead_score >= 8 ? \"#ffcccc\" : \"#fff4cc\";\n\n  html += `\n  <tr>\n    <td style=\"background-color: ${scoreColor}; text-align: center;\"><strong>${lead.lead_score}/10</strong></td>\n    <td>\n      <b>${name}</b><br>\n      📞 <a href=\"tel:${phone}\">${phone}</a>\n    </td>\n    <td>${lead.detected_intent || \"N/D\"}</td>\n    <td><a href=\"https://tuo-crm.com/chats/${lead.chat_session_id}\">Apri Chat</a></td>\n  </tr>\n  `;\n}\n\nhtml += `</table>`;\n\nreturn { json: { email_body: html } };"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          64,
+          400
+        ],
+        "id": "3f107d5e-21d1-4620-b41e-bbbafc7f8d9d",
+        "name": "Formatta Email"
+      },
+      {
+        "parameters": {
+          "sendTo": "bronovito@gmail.com",
+          "subject": "=🔥 NikiTuttoFare: Trovati {{ $('Recupera i Lead Appena Salvati').all().length }} Lead da recuperare",
+          "message": "={{ $json.email_body }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          352,
+          400
+        ],
+        "id": "93dfdcda-56d8-4812-bc6a-a3484bb9533b",
+        "name": "Invia Email",
+        "webhookId": "b42fd07c-2df2-4d5e-8b72-c1d5d56fefd9",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "8qyqTd1YjYdRixtv",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Ogni 1 ora": {
+        "main": [
+          [
+            {
+              "node": "Recupera tutti gli ID delle chat abbandonate da più di 2 ore",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recupera tutti gli ID delle chat abbandonate da più di 2 ore": {
+        "main": [
+          [
+            {
+              "node": "Processiamo una chat alla volta per non confondere l'AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Processiamo una chat alla volta per non confondere l'AI": {
+        "main": [
+          [
+            {
+              "node": "Recupera i Lead Appena Salvati",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Recupera la Chat History",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recupera la Chat History": {
+        "main": [
+          [
+            {
+              "node": "Formatta la Chat per l'AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Formatta la Chat per l'AI": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Pulizia JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pulizia JSON": {
+        "main": [
+          [
+            {
+              "node": "Filtro Qualità",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filtro Qualità": {
+        "main": [
+          [
+            {
+              "node": "Inserimento Finale",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Salva Scartati",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Inserimento Finale": {
+        "main": [
+          [
+            {
+              "node": "Processiamo una chat alla volta per non confondere l'AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Salva Scartati": {
+        "main": [
+          [
+            {
+              "node": "Processiamo una chat alla volta per non confondere l'AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recupera i Lead Appena Salvati": {
+        "main": [
+          [
+            {
+              "node": "Controllo Quantità",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Controllo Quantità": {
+        "main": [
+          [
+            {
+              "node": "Formatta Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Formatta Email": {
+        "main": [
+          [
+            {
+              "node": "Invia Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 22739475",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}

@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-21T15:03:09.263Z",
+  "createdAt": "2026-03-03T00:04:57.702Z",
+  "id": "6ZLyZmg4iLuF4YGr",
   "name": "Zirèl - Registra_Prenotazione",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -40,6 +45,9 @@
             },
             {
               "name": "internal_email"
+            },
+            {
+              "name": "email"
             }
           ]
         }
@@ -89,6 +97,10 @@
             {
               "fieldId": "note_prenotazione",
               "fieldValue": "={{ $json.note_prenotazione || \"\" }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
             }
           ]
         }
@@ -110,7 +122,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst tenant_id = normalizeSpaces(input.tenant_id);\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\nconst business_type = normalizeSpaces(input.business_type).toLowerCase();\nconst nome_cliente = normalizeSpaces(input.nome_cliente)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst note_prenotazione = normalizeSpaces(input.note_prenotazione);\n\nfunction todayRome() {\n  const now = new Date();\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  return new Date(Date.UTC(\n    Number(parts.find((part) => part.type === 'year')?.value),\n    Number(parts.find((part) => part.type === 'month')?.value) - 1,\n    Number(parts.find((part) => part.type === 'day')?.value)\n  ));\n}\n\nfunction toIso(date) {\n  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;\n}\n\nfunction nextWeekday(index) {\n  const base = todayRome();\n  let diff = index - base.getUTCDay();\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeDate(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data prenotazione mancante.' };\n  if (raw === 'oggi') return { iso: toIso(todayRome()) };\n  if (raw === 'domani') {\n    const date = todayRome();\n    date.setUTCDate(date.getUTCDate() + 1);\n    return { iso: toIso(date) };\n  }\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n  if (weekdayMap[raw] !== undefined) return { iso: nextWeekday(weekdayMap[raw]) };\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n  return { iso: null, code: 'NEED_EXACT_SLOT', message: 'Data prenotazione non abbastanza precisa.' };\n}\n\nfunction normalizeTime(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction formatLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst ora = normalizeTime(input.ora);\nconst persone = Number(String(input.persone || '').trim());\n\nlet validation_code = '';\nlet validation_message = '';\nif (business_type !== 'restaurant') {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow funziona solo per tenant restaurant.';\n} else if (!tenant_id || !nome_cliente || !telefono || !parsedDate.iso || !ora || Number.isNaN(persone) || persone <= 0) {\n  validation_code = parsedDate.code || (!ora ? 'NEED_EXACT_SLOT' : 'MISSING_REQUIRED_FIELDS');\n  validation_message = parsedDate.message || (!ora ? 'Per registrare la prenotazione serve un orario preciso.' : 'Mancano uno o più campi obbligatori.');\n} else if (persone >= 10) {\n  validation_code = 'GROUP_REQUIRES_MANUAL_HANDLING';\n  validation_message = 'Gruppo numeroso da gestire manualmente.';\n}\n\nconst data_prenotazione = parsedDate.iso;\nconst data_prenotazione_label = formatLabel(data_prenotazione);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    source,\n    business_type,\n    nome_cliente,\n    telefono,\n    note_prenotazione,\n    data_prenotazione,\n    data_prenotazione_label,\n    ora,\n    persone: Number.isNaN(persone) ? null : persone,\n    requested_slot_iso: data_prenotazione && ora ? `${data_prenotazione}T${ora}:00+01:00` : null,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : (validation_code ? 'rejected' : 'pending_check'),\n    retryable: false,\n  },\n}];"
+        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst email = normalizeSpaces(input.email).toLowerCase();\nconst tenant_id = normalizeSpaces(input.tenant_id);\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\nconst business_type = normalizeSpaces(input.business_type).toLowerCase();\nconst nome_cliente = normalizeSpaces(input.nome_cliente)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst note_prenotazione = normalizeSpaces(input.note_prenotazione);\n\nfunction todayRome() {\n  const now = new Date();\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  return new Date(Date.UTC(\n    Number(parts.find((part) => part.type === 'year')?.value),\n    Number(parts.find((part) => part.type === 'month')?.value) - 1,\n    Number(parts.find((part) => part.type === 'day')?.value)\n  ));\n}\n\nfunction toIso(date) {\n  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;\n}\n\nfunction nextWeekday(index) {\n  const base = todayRome();\n  let diff = index - base.getUTCDay();\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeDate(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data prenotazione mancante.' };\n  if (raw === 'oggi') return { iso: toIso(todayRome()) };\n  if (raw === 'domani') {\n    const date = todayRome();\n    date.setUTCDate(date.getUTCDate() + 1);\n    return { iso: toIso(date) };\n  }\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n  if (weekdayMap[raw] !== undefined) return { iso: nextWeekday(weekdayMap[raw]) };\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n  return { iso: null, code: 'NEED_EXACT_SLOT', message: 'Data prenotazione non abbastanza precisa.' };\n}\n\nfunction normalizeTime(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction formatLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst ora = normalizeTime(input.ora);\nconst persone = Number(String(input.persone || '').trim());\n\nlet validation_code = '';\nlet validation_message = '';\nif (business_type !== 'restaurant') {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow funziona solo per tenant restaurant.';\n} else if (!tenant_id || !nome_cliente || !telefono || !parsedDate.iso || !ora || Number.isNaN(persone) || persone <= 0) {\n  validation_code = parsedDate.code || (!ora ? 'NEED_EXACT_SLOT' : 'MISSING_REQUIRED_FIELDS');\n  validation_message = parsedDate.message || (!ora ? 'Per registrare la prenotazione serve un orario preciso.' : 'Mancano uno o più campi obbligatori.');\n} else if (persone >= 10) {\n  validation_code = 'GROUP_REQUIRES_MANUAL_HANDLING';\n  validation_message = 'Gruppo numeroso da gestire manualmente.';\n}\n\nconst data_prenotazione = parsedDate.iso;\nconst data_prenotazione_label = formatLabel(data_prenotazione);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    source,\n    business_type,\n    nome_cliente,\n    telefono,\n    email,\n    note_prenotazione,\n    data_prenotazione,\n    data_prenotazione_label,\n    ora,\n    persone: Number.isNaN(persone) ? null : persone,\n    requested_slot_iso: data_prenotazione && ora ? `${data_prenotazione}T${ora}:00+01:00` : null,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : (validation_code ? 'rejected' : 'pending_check'),\n    retryable: false,\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -210,7 +222,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\nconst provider = String(\n  input.restaurant_booking_provider ||\n  input.booking_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.restaurant_booking_api_url ||\n  input.restaurant_calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome_cliente: input.nome_cliente,\n        telefono: input.telefono,\n      },\n      reservation: {\n        date: input.data_prenotazione,\n        time: input.ora,\n        iso: input.requested_slot_iso,\n        persone: input.persone,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
+        "jsCode": "const input = $json;\nconst provider = String(\n  input.restaurant_booking_provider ||\n  input.booking_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.restaurant_booking_api_url ||\n  input.restaurant_calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      email: input.email,\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome_cliente: input.nome_cliente,\n        telefono: input.telefono,\n      },\n      reservation: {\n        date: input.data_prenotazione,\n        time: input.ora,\n        iso: input.requested_slot_iso,\n        persone: input.persone,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -308,7 +320,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  business_type: input.business_type,\n  reservation_id: record.id || null,\n  nome_cliente: input.nome_cliente,\n  telefono: input.telefono,\n  data_prenotazione: input.data_prenotazione,\n  data_prenotazione_label: input.data_prenotazione_label,\n  ora: input.ora,\n  persone: input.persone,\n  note_prenotazione: input.note_prenotazione || '',\n  status: input.business_status,\n  reference: input.reference || null,\n  nome_attivita: input.nome_attivita || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst rows = [\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: 'restaurant_guest_confirmation',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n];\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_restaurant:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
+        "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  email: input.email,\n  business_type: input.business_type,\n  reservation_id: record.id || null,\n  nome_cliente: input.nome_cliente,\n  telefono: input.telefono,\n  data_prenotazione: input.data_prenotazione,\n  data_prenotazione_label: input.data_prenotazione_label,\n  ora: input.ora,\n  persone: input.persone,\n  note_prenotazione: input.note_prenotazione || '',\n  status: input.business_status,\n  reference: input.reference || null,\n  nome_attivita: input.nome_attivita || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst rows = [\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: 'restaurant_guest_confirmation',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n];\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_restaurant:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -412,7 +424,6 @@
       "name": "Build Final Response"
     }
   ],
-  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -533,17 +544,576 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "binaryMode": "separate"
   },
-  "versionId": "d9c97a9a-0aec-4245-9b3d-125a82b3b231",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+    "templateCredsSetupCompleted": true
   },
-  "id": "6ZLyZmg4iLuF4YGr",
+  "pinData": {},
+  "versionId": "f6c874c5-a294-4dab-bca9-7790c2e13d5d",
+  "activeVersionId": "f6c874c5-a294-4dab-bca9-7790c2e13d5d",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T00:04:57.702Z",
+      "createdAt": "2026-03-03T00:04:57.702Z",
+      "role": "workflow:owner",
+      "workflowId": "6ZLyZmg4iLuF4YGr",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T14:37:17.591Z",
+    "createdAt": "2026-03-21T14:37:04.419Z",
+    "versionId": "f6c874c5-a294-4dab-bca9-7790c2e13d5d",
+    "workflowId": "6ZLyZmg4iLuF4YGr",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "tenant_id"
+              },
+              {
+                "name": "nome_cliente"
+              },
+              {
+                "name": "telefono"
+              },
+              {
+                "name": "data_input"
+              },
+              {
+                "name": "ora"
+              },
+              {
+                "name": "persone"
+              },
+              {
+                "name": "note_prenotazione"
+              },
+              {
+                "name": "business_type"
+              },
+              {
+                "name": "notification_email"
+              },
+              {
+                "name": "billing_email"
+              },
+              {
+                "name": "telegram_chat_id"
+              },
+              {
+                "name": "internal_email"
+              },
+              {
+                "name": "email"
+              }
+            ]
+          }
+        },
+        "id": "c055762a-8fe7-4141-a639-df2372f30060",
+        "typeVersion": 1.1,
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          272,
+          928
+        ]
+      },
+      {
+        "parameters": {
+          "tableId": "prenotazioni",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "nome_cliente",
+                "fieldValue": "={{ $json.nome_cliente }}"
+              },
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "telefono",
+                "fieldValue": "={{ $json.telefono }}"
+              },
+              {
+                "fieldId": "data_prenotazione",
+                "fieldValue": "={{ $json.data_prenotazione }}"
+              },
+              {
+                "fieldId": "ora",
+                "fieldValue": "={{ $json.ora }}"
+              },
+              {
+                "fieldId": "persone",
+                "fieldValue": "={{ $json.persone }}"
+              },
+              {
+                "fieldId": "stato",
+                "fieldValue": "={{ $json.business_status || \"manual_review\" }}"
+              },
+              {
+                "fieldId": "note_prenotazione",
+                "fieldValue": "={{ $json.note_prenotazione || \"\" }}"
+              },
+              {
+                "fieldId": "email",
+                "fieldValue": "={{ $json.email }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1840,
+          1024
+        ],
+        "id": "33b7eb0e-efc0-4ebe-b727-733be12a00d8",
+        "name": "Create a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst email = normalizeSpaces(input.email).toLowerCase();\nconst tenant_id = normalizeSpaces(input.tenant_id);\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\nconst business_type = normalizeSpaces(input.business_type).toLowerCase();\nconst nome_cliente = normalizeSpaces(input.nome_cliente)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst note_prenotazione = normalizeSpaces(input.note_prenotazione);\n\nfunction todayRome() {\n  const now = new Date();\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  return new Date(Date.UTC(\n    Number(parts.find((part) => part.type === 'year')?.value),\n    Number(parts.find((part) => part.type === 'month')?.value) - 1,\n    Number(parts.find((part) => part.type === 'day')?.value)\n  ));\n}\n\nfunction toIso(date) {\n  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;\n}\n\nfunction nextWeekday(index) {\n  const base = todayRome();\n  let diff = index - base.getUTCDay();\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeDate(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data prenotazione mancante.' };\n  if (raw === 'oggi') return { iso: toIso(todayRome()) };\n  if (raw === 'domani') {\n    const date = todayRome();\n    date.setUTCDate(date.getUTCDate() + 1);\n    return { iso: toIso(date) };\n  }\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n  if (weekdayMap[raw] !== undefined) return { iso: nextWeekday(weekdayMap[raw]) };\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n  return { iso: null, code: 'NEED_EXACT_SLOT', message: 'Data prenotazione non abbastanza precisa.' };\n}\n\nfunction normalizeTime(rawValue) {\n  const raw = normalizeSpaces(rawValue).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction formatLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst ora = normalizeTime(input.ora);\nconst persone = Number(String(input.persone || '').trim());\n\nlet validation_code = '';\nlet validation_message = '';\nif (business_type !== 'restaurant') {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow funziona solo per tenant restaurant.';\n} else if (!tenant_id || !nome_cliente || !telefono || !parsedDate.iso || !ora || Number.isNaN(persone) || persone <= 0) {\n  validation_code = parsedDate.code || (!ora ? 'NEED_EXACT_SLOT' : 'MISSING_REQUIRED_FIELDS');\n  validation_message = parsedDate.message || (!ora ? 'Per registrare la prenotazione serve un orario preciso.' : 'Mancano uno o più campi obbligatori.');\n} else if (persone >= 10) {\n  validation_code = 'GROUP_REQUIRES_MANUAL_HANDLING';\n  validation_message = 'Gruppo numeroso da gestire manualmente.';\n}\n\nconst data_prenotazione = parsedDate.iso;\nconst data_prenotazione_label = formatLabel(data_prenotazione);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    source,\n    business_type,\n    nome_cliente,\n    telefono,\n    email,\n    note_prenotazione,\n    data_prenotazione,\n    data_prenotazione_label,\n    ora,\n    persone: Number.isNaN(persone) ? null : persone,\n    requested_slot_iso: data_prenotazione && ora ? `${data_prenotazione}T${ora}:00+01:00` : null,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : (validation_code ? 'rejected' : 'pending_check'),\n    retryable: false,\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          496,
+          928
+        ],
+        "id": "74364433-bbf6-41f2-b0d1-56a398e0488d",
+        "name": "Normalize Reservation Request"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "c428fd70-b3cc-4259-82bd-8098b00d6d89",
+                "leftValue": "={{ !!$json.validation_code && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          720,
+          928
+        ],
+        "id": "c6bc6219-f774-4792-8d39-145e405627b6",
+        "name": "Check Validation Error"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c22c3cb4-58b8-4ed0-aa55-652c299a5634",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "e2407940-677e-4f38-b957-d0bdf3c2dbac",
+                "name": "code",
+                "value": "={{ $json.validation_code }}",
+                "type": "string"
+              },
+              {
+                "id": "f96b263a-2617-4d3f-ad93-ed08d685b099",
+                "name": "message",
+                "value": "={{ $json.validation_message }}",
+                "type": "string"
+              },
+              {
+                "id": "708fdde5-dc49-4436-a999-fac12f63eccf",
+                "name": "final_reply",
+                "value": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" ? \"Al momento la prenotazione automatica non è disponibile per questo tipo di attività.\" : \"Per registrare davvero la prenotazione mi servono tutti i dati obbligatori, con una data e un orario precisi.\" }}",
+                "type": "string"
+              },
+              {
+                "id": "daf52074-1cb7-440a-a5d9-41e6831f9ec7",
+                "name": "tenant_id",
+                "value": "={{ $json.tenant_id }}",
+                "type": "string"
+              },
+              {
+                "id": "84079ee9-9ef3-4408-8fd9-cf7e0b62d369",
+                "name": "trace_id",
+                "value": "={{ $json.trace_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          944,
+          832
+        ],
+        "id": "6de23ba0-d3c6-46ed-a4fc-8185859f0c74",
+        "name": "Validation Error Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\nconst provider = String(\n  input.restaurant_booking_provider ||\n  input.booking_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.restaurant_booking_api_url ||\n  input.restaurant_calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      email: input.email,\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome_cliente: input.nome_cliente,\n        telefono: input.telefono,\n      },\n      reservation: {\n        date: input.data_prenotazione,\n        time: input.ora,\n        iso: input.requested_slot_iso,\n        persone: input.persone,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          1024
+        ],
+        "id": "85cf61a0-b964-4575-845d-b8203de8ae2d",
+        "name": "Build Availability Payload"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "b0beb7d1-ccf7-47a3-abbc-d8246fe5e65c",
+                "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode && $json.validation_code !== \"GROUP_REQUIRES_MANUAL_HANDLING\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1168,
+          1024
+        ],
+        "id": "372fe6a4-68a6-41ac-98f1-f39e63ad3633",
+        "name": "Use Live Availability Adapter"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ $json.provider_api_url }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "X-TENANT-ID",
+                "value": "={{ $json.tenant_id }}"
+              },
+              {
+                "name": "X-TRACE-ID",
+                "value": "={{ $json.trace_id }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.availability_payload }}",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1392,
+          960
+        ],
+        "id": "90a34a03-89cf-4bbd-8a3a-a4e79bd58db0",
+        "name": "Availability Adapter",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\nconst fromHttp = input.body || input.data || null;\nconst adapter = input.adapter_test_mode\n  ? {\n      success: false,\n      code: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'GROUP_REQUIRES_MANUAL_HANDLING' : 'AVAILABILITY_ADAPTER_NOT_CONFIGURED',\n      availability_status: input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review',\n      reference: null,\n      retryable: true,\n    }\n  : (fromHttp || input);\n\nlet availability_status = String(adapter.availability_status || '').toLowerCase();\nif (!availability_status) {\n  availability_status = adapter.success ? 'confirmed' : (input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING' ? 'manual_review' : 'manual_review');\n}\n\nconst business_status = availability_status === 'confirmed'\n  ? 'confirmed'\n  : availability_status === 'unavailable'\n    ? 'rejected'\n    : 'manual_review';\n\nlet code = String(adapter.code || '');\nif (!code) {\n  code = business_status === 'confirmed'\n    ? 'RESTAURANT_BOOKING_CONFIRMED'\n    : business_status === 'rejected'\n      ? 'RESTAURANT_SLOT_UNAVAILABLE'\n      : 'RESTAURANT_BOOKING_MANUAL_REVIEW';\n}\n\nlet message = '';\nlet final_reply = '';\nif (business_status === 'confirmed') {\n  message = 'Prenotazione registrata correttamente.';\n  final_reply = `Perfetto, ho registrato la prenotazione per ${input.nome_cliente} il ${input.data_prenotazione_label} alle ${input.ora} per ${input.persone} persone.`;\n} else if (business_status === 'rejected') {\n  message = 'Slot non disponibile.';\n  final_reply = `Ho raccolto la richiesta, ma ${input.data_prenotazione_label} alle ${input.ora} non risulta disponibile. Possiamo cercare un altro orario.`;\n} else {\n  message = 'Richiesta salvata per verifica manuale.';\n  final_reply = input.validation_code === 'GROUP_REQUIRES_MANUAL_HANDLING'\n    ? 'Ho raccolto la richiesta per il gruppo numeroso, ma serve una gestione manuale del locale. Ti ricontatteranno al più presto.'\n    : `Ho raccolto la richiesta, ma non posso confermare subito il tavolo per ${input.data_prenotazione_label} alle ${input.ora}. Il locale verificherà e ti ricontatterà a breve.`;\n}\n\nreturn [{\n  json: {\n    ...input,\n    success: business_status === 'confirmed',\n    code,\n    message,\n    final_reply,\n    reference: adapter.reference || adapter.booking_reference || null,\n    availability_status,\n    business_status,\n    retryable: Boolean(adapter.retryable ?? business_status !== 'confirmed'),\n    raw_provider_response: adapter,\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1616,
+          1024
+        ],
+        "id": "256793ca-289c-4c03-893b-9430c05f3b92",
+        "name": "Normalize Availability Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  email: input.email,\n  business_type: input.business_type,\n  reservation_id: record.id || null,\n  nome_cliente: input.nome_cliente,\n  telefono: input.telefono,\n  data_prenotazione: input.data_prenotazione,\n  data_prenotazione_label: input.data_prenotazione_label,\n  ora: input.ora,\n  persone: input.persone,\n  note_prenotazione: input.note_prenotazione || '',\n  status: input.business_status,\n  reference: input.reference || null,\n  nome_attivita: input.nome_attivita || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst rows = [\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'telegram_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n  {\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: 'restaurant_guest_confirmation',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_restaurant:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  },\n];\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_alert',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_restaurant:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2064,
+          928
+        ],
+        "id": "a290f406-0cc4-4450-b270-5d95cb40aa16",
+        "name": "Build Notification Outbox Rows"
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "channel",
+                "fieldValue": "={{ $json.channel }}"
+              },
+              {
+                "fieldId": "template_key",
+                "fieldValue": "={{ $json.template_key }}"
+              },
+              {
+                "fieldId": "related_entity_type",
+                "fieldValue": "={{ $json.related_entity_type }}"
+              },
+              {
+                "fieldId": "related_entity_id",
+                "fieldValue": "={{ $json.related_entity_id || null }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "retry_count",
+                "fieldValue": "={{ $json.retry_count }}"
+              },
+              {
+                "fieldId": "max_retries",
+                "fieldValue": "={{ $json.max_retries }}"
+              },
+              {
+                "fieldId": "next_retry_at",
+                "fieldValue": "={{ $json.next_retry_at }}"
+              },
+              {
+                "fieldId": "trace_id",
+                "fieldValue": "={{ $json.trace_id }}"
+              },
+              {
+                "fieldId": "booking_reference",
+                "fieldValue": "={{ $json.payload?.booking_reference || null }}"
+              },
+              {
+                "fieldId": "nome_attivita",
+                "fieldValue": "={{ $json.payload?.nome_struttura || null }}"
+              },
+              {
+                "fieldId": "dedupe_key",
+                "fieldValue": "={{ $json.dedupe_key }}"
+              },
+              {
+                "fieldId": "payload",
+                "fieldValue": "={{ $json.payload }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2288,
+          928
+        ],
+        "id": "2b2ed186-3b44-415c-94c5-6b27e5a953f6",
+        "name": "Insert Outbox Rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row').item.json;\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    code: input.code || 'RESTAURANT_BOOKING_RESULT_UNKNOWN',\n    message: input.message || 'Richiesta prenotazione processata.',\n    final_reply: input.final_reply || 'Ho raccolto la richiesta di prenotazione.',\n    tenant_id: input.tenant_id,\n    trace_id: input.trace_id,\n    session_id: input.session_id,\n    reservation_id: record.id || null,\n    nome_cliente: input.nome_cliente,\n    telefono: input.telefono,\n    data_prenotazione: input.data_prenotazione,\n    data_prenotazione_label: input.data_prenotazione_label,\n    ora: input.ora,\n    persone: input.persone,\n    note_prenotazione: input.note_prenotazione || '',\n    booking_summary: `Tavolo per ${input.persone} persone il ${input.data_prenotazione_label} alle ${input.ora} a nome ${input.nome_cliente}.`,\n    availability_status: input.availability_status,\n    business_status: input.business_status,\n    reference: input.reference || null,\n    retryable: Boolean(input.retryable),\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2064,
+          1120
+        ],
+        "id": "62a8f67e-2e77-46c9-84e2-93f0fc5fe93f",
+        "name": "Build Final Response"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Normalize Reservation Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a row": {
+        "main": [
+          [
+            {
+              "node": "Build Notification Outbox Rows",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Build Final Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Reservation Request": {
+        "main": [
+          [
+            {
+              "node": "Check Validation Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Validation Error": {
+        "main": [
+          [
+            {
+              "node": "Validation Error Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Availability Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Availability Payload": {
+        "main": [
+          [
+            {
+              "node": "Use Live Availability Adapter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Use Live Availability Adapter": {
+        "main": [
+          [
+            {
+              "node": "Availability Adapter",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Normalize Availability Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Availability Adapter": {
+        "main": [
+          [
+            {
+              "node": "Normalize Availability Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Availability Response": {
+        "main": [
+          [
+            {
+              "node": "Create a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Notification Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version f6c874c5",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

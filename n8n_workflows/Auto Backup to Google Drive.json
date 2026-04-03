@@ -1,0 +1,145 @@
+{
+  "updatedAt": "2026-02-01T14:45:26.523Z",
+  "createdAt": "2026-01-24T01:14:23.884Z",
+  "id": "GNx_lVqnVn29Mij4eOjXA",
+  "name": "Auto Backup to Google Drive",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "bc8ee90b-7c84-48d0-8a59-9d38eda54c84",
+      "name": "Scarica Tutti i Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "convertAllData": false,
+        "sourceKey": "name",
+        "options": {
+          "fileName": "={{ $json.name }}_{{ $now.format('yyyy-MM-dd') }}.json",
+          "mimeType": "application/json"
+        }
+      },
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        -96
+      ],
+      "id": "4c3a76a6-e76a-473f-b65c-9ed60fe75864",
+      "name": "Converti in File JSON"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1EbQbY8KT0kGxiKsnB8kzVqjKOYfREIBX",
+          "mode": "list",
+          "cachedResultName": "n8n backups",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1EbQbY8KT0kGxiKsnB8kzVqjKOYfREIBX"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        656,
+        -96
+      ],
+      "id": "5cd67996-2ed0-47d5-aee7-caa94a5cda70",
+      "name": "Carica su Drive"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        -96
+      ],
+      "id": "bb2f3c7a-10bf-4ad4-95b6-fc60122726cf",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "Scarica Tutti i Workflow": {
+      "main": [
+        [
+          {
+            "node": "Converti in File JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converti in File JSON": {
+      "main": [
+        [
+          {
+            "node": "Carica su Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Scarica Tutti i Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3fe3bbdf-d1b0-4eb3-983e-a75162e88eef",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-24T01:14:23.884Z",
+      "createdAt": "2026-01-24T01:14:23.884Z",
+      "role": "workflow:owner",
+      "workflowId": "GNx_lVqnVn29Mij4eOjXA",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}

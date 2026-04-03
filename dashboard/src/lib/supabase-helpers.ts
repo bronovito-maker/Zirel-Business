@@ -38,6 +38,29 @@ const ensureTenantId = (tenantId?: string) => {
     return tid.trim();
 };
 
+const buildServerAuthHeaders = (tenantId?: string) => {
+    const authToken = getAuthToken();
+
+    return {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { Authorization: `Bearer ${authToken}`, 'X-Zirel-Api-Token': authToken } : {}),
+            ...(tenantId ? { 'X-Zirel-Tenant-Id': tenantId } : {}),
+        },
+        authToken,
+    };
+};
+
+const buildServerAuthBody = (tenantId?: string, extra: Record<string, unknown> = {}) => {
+    const { authToken } = buildServerAuthHeaders(tenantId);
+
+    return {
+        ...(tenantId ? { tenant_id: tenantId } : {}),
+        ...(authToken ? { tenant_api_token: authToken } : {}),
+        ...extra,
+    };
+};
+
 const ALLOWED_RESERVATION_STATUSES = ['PENDING', 'CONFERMATA', 'RIFIUTATA', 'ANNULLATA'] as const;
 
 const getIngestionWebhookUrl = () => import.meta.env.VITE_N8N_INGESTION_WEBHOOK || '';
@@ -116,6 +139,20 @@ const safeSelect = async <T extends MinimalStatusRow>(table: string, columns: st
  * Uses token from storage automatically.
  */
 export const getTenantData = async (): Promise<TenantData> => {
+    try {
+        const response = await fetch('/api/auth/tenant', {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const body = await response.json().catch(() => null) as { ok?: boolean; tenant?: TenantData } | null;
+        if (response.ok && body?.ok && body.tenant) {
+            return body.tenant;
+        }
+    } catch {
+        // Fall back to legacy client-side token lookup for local compatibility.
+    }
+
     const token = getAuthToken();
     if (!token) throw new Error('NOT_AUTHENTICATED');
 
@@ -828,22 +865,13 @@ export const updateWhatsAppAutomationSettings = async (
     tenantId?: string
 ): Promise<UpdateWhatsAppAutomationSettingsResult> => {
     const tid = ensureTenantId(tenantId);
-    const authToken = getAuthToken();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tid);
 
     const response = await fetch('/api/whatsapp/automation-settings', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tid,
-        },
-        body: JSON.stringify({
-            tenant_id: tid,
-            tenant_api_token: authToken,
-            ai_enabled: aiEnabled,
-        }),
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tid, { ai_enabled: aiEnabled })),
     });
 
     let body: UpdateWhatsAppAutomationSettingsResult | null = null;
@@ -866,24 +894,17 @@ export const sendWhatsAppHumanMessage = async (
     tenantId?: string
 ): Promise<SendWhatsAppHumanMessageResult> => {
     const tid = ensureTenantId(tenantId);
-    const authToken = getAuthToken();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
     if (!conversationId || !contentText.trim()) throw new Error('INVALID_PARAMS');
+    const { headers } = buildServerAuthHeaders(tid);
 
     const response = await fetch('/api/whatsapp/human-send', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tid,
-        },
-        body: JSON.stringify({
-            tenant_id: tid,
-            tenant_api_token: authToken,
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tid, {
             conversation_id: conversationId,
             content_text: contentText.trim(),
-        }),
+        })),
     });
 
     let body: SendWhatsAppHumanMessageResult | null = null;
@@ -914,21 +935,13 @@ const normalizeWhatsAppConnectionStatus = (
 
 export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<WhatsAppChannelSummary> => {
     const tid = ensureTenantId(tenantId);
-    const authToken = getAuthToken();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tid);
 
     const response = await fetch('/api/whatsapp/channel-summary', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tid,
-        },
-        body: JSON.stringify({
-            tenant_id: tid,
-            tenant_api_token: authToken,
-        }),
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tid)),
     });
 
     let body: { ok?: boolean; summary?: Partial<WhatsAppChannelSummary>; error_message?: string; error_code?: string } | null = null;
@@ -953,21 +966,13 @@ export const getWhatsAppChannelSummary = async (tenantId?: string): Promise<What
 
 export const syncWhatsAppChannel = async (tenantId?: string): Promise<SyncWhatsAppChannelResult> => {
     const tid = ensureTenantId(tenantId);
-    const authToken = getAuthToken();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tid);
 
     const response = await fetch('/api/whatsapp/sync', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tid,
-        },
-        body: JSON.stringify({
-            tenant_id: tid,
-            tenant_api_token: authToken,
-        }),
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tid)),
     });
 
     let body: SyncWhatsAppChannelResult | null = null;
@@ -987,23 +992,16 @@ export const syncWhatsAppChannel = async (tenantId?: string): Promise<SyncWhatsA
 export const completeWhatsAppEmbeddedSignup = async (
     payload: CompleteWhatsAppEmbeddedSignupPayload
 ): Promise<CompleteWhatsAppEmbeddedSignupResult> => {
-    const authToken = getAuthToken();
     const tenantId = getTenantId();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tenantId || undefined);
 
     const response = await fetch('/api/whatsapp/embedded-signup/callback', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            ...(tenantId ? { 'X-Zirel-Tenant-Id': tenantId } : {}),
-        },
-        body: JSON.stringify({
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tenantId || undefined, {
             ...payload,
-            tenant_api_token: authToken,
-            tenant_id: tenantId || undefined,
-        }),
+        })),
     });
 
     let data: CompleteWhatsAppEmbeddedSignupResult | null = null;
@@ -1022,22 +1020,15 @@ export const completeWhatsAppEmbeddedSignup = async (
 };
 
 export const disconnectWhatsAppChannel = async (): Promise<DisconnectWhatsAppChannelResult> => {
-    const authToken = getAuthToken();
     const tenantId = getTenantId();
-    if (!authToken || !tenantId) throw new Error('NOT_AUTHENTICATED');
+    if (!tenantId) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tenantId);
 
     const response = await fetch('/api/whatsapp/disconnect', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tenantId,
-        },
-        body: JSON.stringify({
-            tenant_id: tenantId,
-            tenant_api_token: authToken,
-        }),
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tenantId)),
     });
 
     let data: DisconnectWhatsAppChannelResult | null = null;
@@ -1057,21 +1048,13 @@ export const disconnectWhatsAppChannel = async (): Promise<DisconnectWhatsAppCha
 
 export const getWhatsAppChannelOpsSummary = async (tenantId?: string): Promise<WhatsAppChannelOpsSummary> => {
     const tid = ensureTenantId(tenantId);
-    const authToken = getAuthToken();
-    if (!authToken) throw new Error('NOT_AUTHENTICATED');
+    const { headers } = buildServerAuthHeaders(tid);
 
     const response = await fetch('/api/whatsapp/channel-ops', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Zirel-Api-Token': authToken,
-            'X-Zirel-Tenant-Id': tid,
-        },
-        body: JSON.stringify({
-            tenant_id: tid,
-            tenant_api_token: authToken,
-        }),
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(buildServerAuthBody(tid)),
     });
 
     let body: { ok?: boolean; failed_outbound?: WhatsAppChannelOpsSummary['failed_outbound']; recent_webhook_events?: WhatsAppChannelOpsSummary['recent_webhook_events']; error_message?: string; error_code?: string } | null = null;
@@ -1095,6 +1078,23 @@ export const getWhatsAppChannelOpsSummary = async (tenantId?: string): Promise<W
 
 export const regenerateTenantToken = async (tenantId?: string): Promise<string> => {
     const tid = ensureTenantId(tenantId);
+    try {
+        const response = await fetch('/api/auth/token', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'regenerate', tenant_id: tid }),
+        });
+        const body = await response.json().catch(() => null) as { ok?: boolean; api_token?: string; error_message?: string; error_code?: string } | null;
+        if (response.ok && body?.ok && body.api_token) {
+            return body.api_token;
+        }
+    } catch {
+        // Fall back to RPC for local compatibility.
+    }
+
     const { data, error } = await supabase.rpc('regenerate_tenant_token', { p_tenant_id: tid });
 
     if (error || !data) throw error || new Error('INVALID_PARAMS');
@@ -1103,6 +1103,22 @@ export const regenerateTenantToken = async (tenantId?: string): Promise<string> 
 
 export const markApiTokenRevealed = async (tenantId?: string): Promise<void> => {
     const tid = ensureTenantId(tenantId);
+    try {
+        const response = await fetch('/api/auth/token', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'mark_revealed', tenant_id: tid }),
+        });
+        const body = await response.json().catch(() => null) as { ok?: boolean } | null;
+        if (response.ok && body?.ok) {
+            return;
+        }
+    } catch {
+        // Fall back to direct update for local compatibility.
+    }
 
     const { error } = await supabase
         .from('tenants')

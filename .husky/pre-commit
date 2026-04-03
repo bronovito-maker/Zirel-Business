@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Esegui il backup automatico dei workflow
+npm run backup:workflows
+
+# Aggiungi i workflow scaricati al commit (in modo che vengano salvati su Git)
+git add n8n_workflows/

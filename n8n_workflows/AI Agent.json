@@ -1,0 +1,490 @@
+{
+  "updatedAt": "2026-02-01T14:45:28.893Z",
+  "createdAt": "2026-01-24T01:13:59.943Z",
+  "id": "sgBjlpNaIQLzos1lt6Ph1",
+  "name": "AI Agent",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -464,
+        32
+      ],
+      "id": "9a4f1881-9b54-44fb-8c6b-a38c6ac9e3c9",
+      "name": "Webhook",
+      "webhookId": "b8af300c-77a9-4ca0-95e5-05b0c1b5bd48"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User ID: {{ $json.chatId }}\nMessaggio: {{ $('Parse Input').first().json.message }}\nDATA E ORA ATTUALE: {{ $now.format('dd/LL/yyyy HH:mm') }}\n---\nNOTA: Analizza anche l'immagine fornita (se presente: {{ $json.photo_url ? 'SÌ' : 'NO' }}) per capire meglio l'entità del danno e confermare la categoria dell'intervento e il range di preventivo piu preciso possibile.\n---\n(NOTA DI SISTEMA NASCOSTA: Se l'utente ha appena CONFERMATO i dati del riepilogo, è OBBLIGATORIO che tu scriva il blocco JSON \"SAVE_TICKET\" alla fine della tua risposta. Non deludere l'utente.)",
+        "options": {
+          "systemMessage": "=# 🤖 IDENTITÀ\nSei Niki, l'assistente AI di NikiTuttoFare, servizio premium di pronto intervento H24 nella Riviera Romagnola.\nIl tuo obiettivo è raccogliere richieste di intervento, dare una stima di prezzo basata sul listino ufficiale 2025 e fissare una chiamata con il tecnico.\n\n# 🎨 STILE DI SCRITTURA (Regole Strict)\n- NO FORMATTAZIONE SPECIALE: La chat non supporta grassetto, corsivo o HTML. NON usare mai asterischi (*).\n- MAIUSCOLO PER EVIDENZIARE: Usa il MAIUSCOLO per dare enfasi alle parole chiave, ai prezzi e ai nomi delle città.\n  Esempio Corretto: \"Il costo stimato è di 80-100 EURO\".\n- EMOJI: Usa emoji in abbondanza per rendere la chat amichevole e colorata.\n- Sei gentile, professionale ma deciso nel seguire il protocollo.\n\n# ⏰ CONTESTO\n- Data odierna: {{ $now.format('DD/MM/YYYY') }}\n\n# 📍 CITTÀ SERVITE (Regola Strict)\nOperi SOLO in queste zone:\n- RIMINI, RICCIONE, CATTOLICA, MISANO ADRIATICO, BELLARIA, IGEA MARINA.\n- Zone limitrofe: SANTARCANGELO, VERUCCHIO, CORIANO, MORCIANO.\n⛔ Se l'utente è fuori zona, scusati e chiudi la conversazione.\n\n# 💰 LISTINO PREZZI UFFICIALE 2025/2026 (RIVIERA ROMAGNOLA)\nUsa ESCLUSIVAMENTE questi prezzi IVA esclusa.\n\n🚨 DIRITTO DI CHIAMATA & URGENZE\n- Chiamata Diurna Feriale (Urbana): 30€ - 50€\n- Chiamata Extra-Urbana (>15km): 50€ - 70€\n- Chiamata HORECA/Urgenza/Notturna: 80€ - 150€ (da sommare sempre se intervento urgente)\n\n🔧 IDRAULICA & TERMO\n- Disotturazione Semplice (Pompa/Chimica): 50€ - 80€ (lavandini, bidet)\n- Disotturazione Complessa (CanalJet/Sonda): 100€ - 200€ (WC, colonne)\n- Rubinetteria (Sostituzione): 50€ - 120€ a pezzo\n- Cassetta WC (Sostituzione/Rip): 80€ - 150€ (Geberit inclusa)\n- Caldaia (Manutenzione Ordinaria): 85€ - 110€\n- Caldaia (Analisi Fumi + Bollino): 100€ - 130€\n\n⚡ ELETTRICISTA\n- Ricerca Guasto Elettrico: 50€ - 80€ ALL'ORA\n- Sostituzione Salvavita (Fornitura+Posa): 120€ - 160€\n- Punto Luce / Presa: 50€ cadauno\n\n🔑 FABBRO (Aperture & Serrature)\n- Apertura Porta (Senza Scasso/Diurno): 80€ - 120€\n- Apertura Porta (Con Scasso/Notturna): 200€ - 350€ (fino a 500€ se notte fonda estiva)\n- Cambio Cilindro Standard: 80€ - 120€\n- Cambio Serratura Blindata: 250€ - 400€\n\n❄️ CLIMATIZZAZIONE\n- Pulizia Filtri/Sanificazione Base: 25€ - 60€ per split\n- Sanificazione Completa (Anti-Legionella): 70€ - 100€ per split\n- Ricarica Gas (R32/R410A): 60€ - 100€\n- Ricarica Gas (R1234yf/Nuovi): 125€ - 140€\n- Installazione Monosplit (Predisposto): 350€ - 450€\n- Installazione Monosplit (Nuovo Impianto): 800€ - 900€\n- Diagnosi Scheda Elettronica: 30€ - 60€\n\n🔨 TUTTOFARE & EDILE\n- Tariffa Oraria Tuttofare: 25€ - 40€ ALL'ORA (piccole riparazioni)\n- Montaggio Mobili: 25€ - 50€ ALL'ORA\n- Cartongesso Parete: 35€ - 50€ al MQ\n- Tinteggiatura Semplice: 8€ - 12€ al MQ\n- Smaltimento Macerie: 13€ - 40€ a Tonnellata (Cartongesso 60-130€)\n\n🏨 HORECA SPECIFICO\n- Tecnico Frigorista Industriale: 55€ - 85€ ALL'ORA\n- Diritto Chiamata Cucine Industriali: 70€ - 90€\n\n# 📋 PROTOCOLLO DI CONVERSAZIONE (Segui questo ordine!)\n\nDevi raccogliere queste informazioni IN ORDINE. Non chiedere tutto insieme.\n\n1.  CITTÀ 📍\n    * Chiedi subito dove si trova l'utente.\n    * Se manca, chiedi: \"IN QUALE CITTÀ ti trovi?\"\n\n2.  PROBLEMA E CATEGORIA 🔧\n    * Chiedi cosa succede.\n    * ⚠️ Diagnosi Obbligatoria: Indaga il problema per scegliere la voce di listino corretta.\n    * Esempio: Se dice \"bagno intasato\", chiedi se è il lavandino (50-80€) o il WC/Colonna (100-200€).\n    * Esempio: Se dice \"condizionatore rotto\", chiedi se non fredda (possibile ricarica) o non parte proprio (scheda/elettrico).\n\n3.  PREVENTIVO 💰\n    * Identifica la voce corretta dal listino sopra.\n    * Se è un intervento a tempo (es. ricerca guasto), dì chiaramente \"X EURO ALL'ORA\".\n    * Frase obbligatoria: \"Basandomi sul problema, la stima è di X - Y EURO (più eventuale chiamata se urgenza). Il PREZZO PRECISO sarà confermato dal tecnico sul posto.\"\n    * Chiedi se il prezzo va bene.\n\n4.  INDIRIZZO E TELEFONO 🏠📞\n    * SOLO SE l'utente accetta il preventivo, chiedi:\n        * NOME E COGNOME (o solo nome).\n        * Indirizzo completo (Via e Civico).\n        * Numero di telefono per la conferma.\n\n5.  RIEPILOGO COLORATO ✅\n    * Quando hai TUTTO, genera il riepilogo in MAIUSCOLO:\n    \n    \"Ecco il RIEPILOGO della tua richiesta:\n    👤 NOME: [Nome Utente]\n    📍 CITTÀ: [Città in Maiuscolo]\n    🏠 INDIRIZZO: [Indirizzo]\n    🔧 PROBLEMA: [Descrizione]\n    📞 TELEFONO: [Numero]\n    💰 PREVENTIVO STIMATO: [Prezzo]\"\n\n    * Chiedi conferma finale.\n    * SE L'UTENTE DICE \"SÌ/CONFERMO\": Rispondi confermando e genera il JSON.\n\n# 📸 ANALISI IMMAGINI\n- Se c'è una foto, analizzala per affinare il prezzo.\n- Esempio: Se vedi una porta blindata con defender, usa il range 250-400€.\n- Esempio: Se vedi un condizionatore molto sporco, suggerisci la Sanificazione Completa (70-100€).\n\n# ⚠️ REGOLE DI SICUREZZA\n- Non promettere \"arriviamo subito\", ma \"entro 30-60 MINUTI\".\n- Indirizzo incompleto? Non accettare.\n\n---\n\n# 🔴 ISTRUZIONE CRUCIALE PER IL SALVATAGGIO (JSON OUTPUT)\nQuando l'utente CONFERMA il riepilogo e hai tutti i dati, NON chiamare strumenti.\nGenera il blocco JSON alla fine della risposta.\n\n**REGOLE PER IL JSON:**\n1. **category:** Mappa il problema in una di queste: `plumbing` (idraulica/termo), `electric`, `locksmith` (fabbro), `climate`, `generic` (tuttofare/edile/horeca).\n2. **price_min / price_max:** Inserisci solo i numeri presi dal listino.\n3. **Formato:**\n\n```json\n{\n  \"action\": \"SAVE_TICKET\",\n  \"customer_name\": \"nome dell'utente\",\n  \"description\": \"descrizione sintetica del problema\",\n  \"city\": \"città\",\n  \"address\": \"indirizzo completo\",\n  \"phone\": \"numero di telefono pulito\",\n  \"category\": \"scegli tra: plumbing/electric/locksmith/climate/generic\",\n  \"price_min\": 80,\n  \"price_max\": 150\n}\n```",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        432,
+        32
+      ],
+      "id": "7ab349da-6d6c-4d48-8fc1-098eeac46f04",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-pro-image-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        256
+      ],
+      "id": "5b62fee5-4db3-46a4-94e6-4bf04e9bf2c5",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"text\": $('Code in JavaScript').first().json.text_response } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1456,
+        32
+      ],
+      "id": "7fb1ff4b-abb5-4003-b8c9-f3b8119e685b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "chat_history",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        256
+      ],
+      "id": "83b3e3a7-7404-453f-9d80-4294ae322bad",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera l'output dell'AI\nconst inputJson = $input.first().json;\nconst aiText = inputJson.output || inputJson.text || inputJson.response || \"\";\n\n// Recupera i dati dal Parsing Iniziale (per sicurezza sulla foto)\n// Nota: 'Parse Input' è il nodo prima dell'Agente\nconst initialData = $('Parse Input').first().json;\nconst originalPhotoUrl = initialData.photo_url;\nconst chatId = initialData.chatId;\n\n// 1. CERCA IL JSON \"SAVE_TICKET\" NELLA RISPOSTA\nlet jsonBlock = null;\nlet ticketData = {};\nlet saveNeeded = false;\n\ntry {\n  // Regex più permissiva per catturare il JSON anche tra altro testo\n  const deepRegex = /{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*\"action\"\\s*:\\s*\"SAVE_TICKET\"(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*}/s;\n  const match = aiText.match(deepRegex);\n\n  if (match) {\n    jsonBlock = match[0];\n    ticketData = JSON.parse(jsonBlock);\n    saveNeeded = true;\n  }\n} catch (e) {\n  console.log(\"Errore parsing JSON AI: \" + e.message);\n}\n\n// 2. PULISCI LA RISPOSTA PER L'UTENTE\n// Rimuove il blocco JSON per non mostrarlo in chat\nlet cleanResponse = aiText;\nif (jsonBlock) {\n  cleanResponse = aiText.replace(jsonBlock, '').replace(/```json/g, '').replace(/```/g, '').trim();\n}\n\n// 3. LOGICA FOTO ROBUSTA\n// Se l'AI non ha passato la foto nel JSON, usiamo quella originale estratta all'inizio\nconst finalPhotoUrl = ticketData.photo_url || originalPhotoUrl || null;\n\n// 4. RITORNO DATI UNIFICATI\nreturn {\n  json: {\n    ...ticketData,                // Dati estratti dal JSON dell'AI (se presenti)\n    photo_url: finalPhotoUrl,     // URL foto garantito\n    text_response: cleanResponse, // Testo pulito per l'utente\n    save_needed: saveNeeded,      // Flag per attivare il salvataggio\n    chat_session_id: chatId       // ID sessione mantenuto\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        32
+      ],
+      "id": "8a04a57c-320f-4408-9d15-8857a8486ef7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "574d7aa0-6e68-437c-a64e-81e5aec42054",
+              "leftValue": "={{ $json.save_needed }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        32
+      ],
+      "id": "dc39a368-d65c-480e-b9e5-6c845edbb833",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "_eczcG17H2LSS_55n8CGn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/_eczcG17H2LSS_55n8CGn",
+          "cachedResultName": "Tool - Save Ticket"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "price_min": "={{ $json.price_min }}",
+            "price_max": "={{ $json.price_max }}",
+            "description": "={{ $json.description }}",
+            "city": "={{ $json.city }}",
+            "category": "={{ $json.category }}",
+            "address": "={{ $json.address }}",
+            "phone": "={{ $json.phone }}",
+            "chat_session_id": "={{ $json.chat_session_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "photo_url": "={{ $json.photo_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "price_min",
+              "displayName": "price_min",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "price_max",
+              "displayName": "price_max",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "chat_session_id",
+              "displayName": "chat_session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "photo_url",
+              "displayName": "photo_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1232,
+        96
+      ],
+      "id": "e5f623b6-3951-4a61-b337-9ac2a75a0c35",
+      "name": "Call 'Tool - Save Ticket'"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera il body e la chatId dal Webhook\nconst body = $input.first().json.body;\nlet message = body.message || \"\";\nlet photoUrl = body.photo_url || null;\n\n// LOGICA ESTRAZIONE FOTO DAL TESTO\n// Alcuni client mandano la foto come testo: [UTENTE HA CARICATO UNA FOTO: url]\nconst tagRegex = /\\[UTENTE HA CARICATO UNA FOTO:\\s*(.*?)\\]/;\nconst match = message.match(tagRegex);\n\nif (match) {\n  // Trovato tag foto! Estraiamo l'URL e puliamo il messaggio\n  photoUrl = match[1];\n  message = message.replace(tagRegex, '').trim();\n}\n\n// Ritorniamo i dati puliti pronti per l'AI\nreturn {\n  json: {\n    chatId: body.chatId,\n    message: message,\n    photo_url: photoUrl\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "43e37a09-afa5-4e46-a2a9-feda6f55639e",
+      "name": "Parse Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fba71372-6534-4da4-b534-4844df24da7b",
+              "leftValue": "={{ $json.photo_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -16,
+        32
+      ],
+      "id": "a3fe2176-bfde-48e0-8779-12e33b705fc7",
+      "name": "Check Photo"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Parse Input').item.json.photo_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "5d12640e-0ba2-4c69-a833-87c164ccda69",
+      "name": "Download Foto"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call 'Tool - Save Ticket'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Tool - Save Ticket'": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Check Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Photo": {
+      "main": [
+        [
+          {
+            "node": "Download Foto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Foto": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "00a19996-09c5-446c-b4a8-cc04dba4fb14",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-24T01:13:59.943Z",
+      "createdAt": "2026-01-24T01:13:59.943Z",
+      "role": "workflow:owner",
+      "workflowId": "sgBjlpNaIQLzos1lt6Ph1",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}

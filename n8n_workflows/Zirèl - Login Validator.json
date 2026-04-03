@@ -1,0 +1,105 @@
+{
+  "updatedAt": "2026-03-01T21:11:32.203Z",
+  "createdAt": "2026-03-01T20:45:51.976Z",
+  "id": "f3xcENXVK0PEOcXF",
+  "name": "Zirèl - Login Validator",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "get-tenant-data",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d51be3ef-412e-44b7-bf91-bc4e51e965f8",
+      "name": "Webhook",
+      "webhookId": "d1ac500b-240e-4044-b0a8-ec6a0c973c5b"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM",
+          "mode": "list",
+          "cachedResultName": "zirèl_master_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 292130034,
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DjFqfkYnq2flC3szITcceuKIBxOqf0pkqUFOt811YcM/edit#gid=292130034"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "tenant_id",
+              "lookupValue": "={{ $json.body.tenant_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "604bf696-6051-47aa-bf18-4442a71adf38",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7Tiy94cUnbja9wlY",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ea58c565-702b-4b82-8c00-05c39be4767f",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-01T20:45:51.976Z",
+      "createdAt": "2026-03-01T20:45:51.976Z",
+      "role": "workflow:owner",
+      "workflowId": "f3xcENXVK0PEOcXF",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}

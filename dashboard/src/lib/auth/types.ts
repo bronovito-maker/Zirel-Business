@@ -11,8 +11,9 @@ export interface LoginCredentials {
 
 export interface AuthSession {
     tenantId: string;
-    token: string;
+    token: string | null;
     isAuthenticated: boolean;
+    authMode?: 'cookie' | 'token';
 }
 
 export interface AuthResult {

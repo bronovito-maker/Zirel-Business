@@ -1,15 +1,9 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { repoRoot, zirelWorkflowFiles } from './workflow-manifest.mjs';
 
-const root = '/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl';
-
-const files = {
-  aiCore: `${root}/Zirèl - AI Core.json`,
-  appointment: `${root}/Zirèl - Registra_Appuntamento.json`,
-  restaurant: `${root}/Zirèl - Registra_Prenotazione.json`,
-  hotel: `${root}/Zirèl - Registra_Prenotazione_Hotel.json`,
-  notifications: `${root}/Zirèl - Notifiche Hotel.json`,
-};
+const root = repoRoot;
+const files = zirelWorkflowFiles;
 
 const credentials = {
   supabase: {
@@ -44,9 +38,15 @@ const credentials = {
   },
 };
 
-const readWorkflow = (path) => JSON.parse(fs.readFileSync(path, 'utf8'));
+const readWorkflow = (path) => {
+  if (!fs.existsSync(path)) {
+    return { nodes: [], connections: {}, pinData: {} };
+  }
+  return JSON.parse(fs.readFileSync(path, 'utf8'));
+};
 
 const writeWorkflow = (path, workflow) => {
+  fs.mkdirSync(root + '/n8n_workflows', { recursive: true });
   fs.writeFileSync(path, `${JSON.stringify(workflow, null, 2)}\n`);
 };
 

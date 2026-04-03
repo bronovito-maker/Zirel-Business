@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-19T20:42:18.184Z",
+  "createdAt": "2026-03-19T18:38:08.637Z",
+  "id": "JfF5koutvybQYnaV",
   "name": "WhatsApp 1 - Webhook Ingestion (V3.2 Hardened)",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -206,7 +211,6 @@
       "notes": "Per default il webhook deve arrivare gia pre-validato da proxy o edge handler."
     }
   ],
-  "pinData": {},
   "connections": {
     "Meta Challenge (GET)": {
       "main": [
@@ -289,15 +293,322 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
   "versionId": "755c9f6c-71df-4e98-93c4-bd4d4d6bf2f1",
-  "meta": {
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  "activeVersionId": "755c9f6c-71df-4e98-93c4-bd4d4d6bf2f1",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-03-19T18:38:08.637Z",
+      "createdAt": "2026-03-19T18:38:08.637Z",
+      "role": "workflow:owner",
+      "workflowId": "JfF5koutvybQYnaV",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-19T20:42:32.738Z",
+    "createdAt": "2026-03-19T20:42:18.190Z",
+    "versionId": "755c9f6c-71df-4e98-93c4-bd4d4d6bf2f1",
+    "workflowId": "JfF5koutvybQYnaV",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "whatsapp/webhook",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Meta Challenge (GET)",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          -592,
+          96
+        ],
+        "id": "d658af0f-47d0-4097-af15-008b18fbc61a",
+        "webhookId": "f646c180-cfcd-43a7-ba98-c793a0d7e070"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "string": [
+              {
+                "value1": "={{ $json.query['hub.verify_token'] }}",
+                "value2": "={{ $env.META_VERIFY_TOKEN }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "name": "If Verify Token Valid",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          -368,
+          96
+        ],
+        "id": "b9aee7a7-50d2-46c7-aa0e-29c7a5ee176f",
+        "notesInFlow": true,
+        "notes": "Verifica il challenge GET contro META_VERIFY_TOKEN."
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "={{ $json.query['hub.challenge'] }}",
+          "options": {}
+        },
+        "name": "Respond Challenge",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          -128,
+          16
+        ],
+        "id": "cfb32388-60b7-4c3f-9942-061ca577d3fb"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "Forbidden: Invalid Verify Token",
+          "options": {}
+        },
+        "name": "Respond 403",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          -128,
+          176
+        ],
+        "id": "8f09c118-12b6-48c8-b669-a5d83e78f8a4"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "whatsapp/webhook",
+          "responseMode": "lastNode",
+          "options": {
+            "rawBody": true
+          }
+        },
+        "name": "Inbound Webhook (POST)",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          -592,
+          416
+        ],
+        "id": "6e94a3c0-4e0d-4940-bfad-31ac9c7c97a5",
+        "notesInFlow": true,
+        "webhookId": "dc0220c7-135e-4246-9337-cff0fcab5b13",
+        "notes": "rawBody=true aiuta il troubleshooting, ma non garantisce da solo una validazione HMAC affidabile in n8n."
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json || {};\nconst headersSource = input.headers || {};\nconst headers = Object.fromEntries(\n  Object.entries(headersSource).map(([key, value]) => [String(key || '').toLowerCase(), value])\n);\nconst hmacMode = String($env.WHATSAPP_HMAC_MODE || 'proxy_required').trim().toLowerCase();\nconst requireProxyVerification = hmacMode === 'proxy_required';\nconst proxyVerified = String(headers['x-zirel-wa-verified'] || '').trim().toLowerCase() === 'true';\nconst rawBodyCandidate = input.rawBody || input.bodyRaw || input.raw_body || null;\nconst signatureHeader = headers['x-hub-signature-256'] || null;\n\nlet signatureVerificationStatus = 'not_verified_in_n8n';\nlet signatureVerificationReason = 'n8n non verifica in modo affidabile il raw body HMAC; usare preferibilmente un pre-handler esterno.';\n\nif (proxyVerified) {\n  signatureVerificationStatus = 'verified_by_proxy';\n  signatureVerificationReason = 'Header x-zirel-wa-verified=true ricevuto da pre-handler fidato.';\n} else if (requireProxyVerification) {\n  signatureVerificationStatus = 'missing_proxy_verification';\n  signatureVerificationReason = 'WHATSAPP_HMAC_MODE=proxy_required ma manca x-zirel-wa-verified=true.';\n}\n\nreturn [{\n  json: {\n    allow_persist: proxyVerified || !requireProxyVerification,\n    channel: 'whatsapp',\n    event_type: input.body?.object || 'webhook',\n    processed: false,\n    event_status: 'pending',\n    payload_json: {\n      body: input.body || null,\n      headers,\n      meta: {\n        received_at: new Date().toISOString(),\n        verification_mode: requireProxyVerification ? 'proxy_required' : 'warn_only',\n        signature_header: signatureHeader,\n        signature_verification_status: signatureVerificationStatus,\n        signature_verification_reason: signatureVerificationReason,\n        raw_body_present: Boolean(rawBodyCandidate),\n        raw_body_preview: typeof rawBodyCandidate === 'string' ? rawBodyCandidate.slice(0, 500) : null\n      }\n    }\n  }\n}];"
+        },
+        "name": "Build Persistable Event",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -352,
+          416
+        ],
+        "id": "029e6897-77f2-425d-a552-2eea555810e4",
+        "notesInFlow": true,
+        "notes": "Persistiamo il contesto di verifica. La modalita di default e proxy_required: senza pre-handler fidato il webhook non viene accettato."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "boolean": [
+              {
+                "value1": "={{ Boolean($json.allow_persist) }}",
+                "value2": true
+              }
+            ]
+          }
+        },
+        "name": "If Event Is Trusted Enough",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          -96,
+          416
+        ],
+        "id": "ecccb3a3-1f6f-4651-ba34-9f686a3a33df"
+      },
+      {
+        "parameters": {
+          "tableId": "channel_webhook_events",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "channel",
+                "fieldValue": "={{ $json.channel }}"
+              },
+              {
+                "fieldId": "payload_json",
+                "fieldValue": "={{ $json.payload_json }}"
+              },
+              {
+                "fieldId": "processed",
+                "fieldValue": "={{ $json.processed }}"
+              },
+              {
+                "fieldId": "event_status",
+                "fieldValue": "={{ $json.event_status }}"
+              },
+              {
+                "fieldId": "event_type",
+                "fieldValue": "={{ $json.event_type }}"
+              }
+            ]
+          }
+        },
+        "name": "Supabase: Persist Event",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          176,
+          336
+        ],
+        "id": "64d5cc42-6b44-4ef1-9b43-a2c6037dbd66",
+        "notesInFlow": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        },
+        "notes": "Persistenza sincrona del webhook. tenant_id resta volutamente NULL in questa fase."
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify({ status: 'ok', verification_mode: $json.payload_json?.meta?.verification_mode || null, signature_verification_status: $json.payload_json?.meta?.signature_verification_status || null }, null, 2) }}",
+          "options": {}
+        },
+        "name": "Respond 200 OK",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          432,
+          336
+        ],
+        "id": "9a8d0b04-4d7b-4af9-adfd-786f26079f18",
+        "notesInFlow": true,
+        "notes": "Meta riceve 200 solo dopo persistenza riuscita."
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify({ error: 'Proxy signature verification required', mode: $env.WHATSAPP_HMAC_MODE || 'proxy_required' }, null, 2) }}",
+          "options": {}
+        },
+        "name": "Respond 503 Unverified",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          176,
+          496
+        ],
+        "id": "fe11a24e-83e4-4a1a-8c25-12a4588d9d6e",
+        "notesInFlow": true,
+        "notes": "Per default il webhook deve arrivare gia pre-validato da proxy o edge handler."
+      }
+    ],
+    "connections": {
+      "Meta Challenge (GET)": {
+        "main": [
+          [
+            {
+              "node": "If Verify Token Valid",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Verify Token Valid": {
+        "main": [
+          [
+            {
+              "node": "Respond Challenge",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond 403",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Inbound Webhook (POST)": {
+        "main": [
+          [
+            {
+              "node": "Build Persistable Event",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Persistable Event": {
+        "main": [
+          [
+            {
+              "node": "If Event Is Trusted Enough",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Event Is Trusted Enough": {
+        "main": [
+          [
+            {
+              "node": "Supabase: Persist Event",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond 503 Unverified",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase: Persist Event": {
+        "main": [
+          [
+            {
+              "node": "Respond 200 OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 755c9f6c",
+    "description": "",
+    "autosaved": true
   },
-  "id": "JfF5koutvybQYnaV",
   "tags": []
 }

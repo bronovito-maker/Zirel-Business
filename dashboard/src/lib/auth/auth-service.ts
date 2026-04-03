@@ -21,6 +21,10 @@ import {
 class TokenAuthService {
     private readonly defaultPersistence: AuthPersistenceMode = 'session';
 
+    private isServerSessionSupported(): boolean {
+        return typeof window !== 'undefined' && typeof window.fetch === 'function';
+    }
+
     /**
      * Authenticates a tenant by their API token.
      * Validates format, queries Supabase, and stores session data.
@@ -30,6 +34,36 @@ class TokenAuthService {
 
         if (!validateTokenFormat(token)) {
             throw new Error('INVALID_FORMAT');
+        }
+
+        if (this.isServerSessionSupported()) {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: token.trim(),
+                        persistence: persistence || this.defaultPersistence,
+                    }),
+                });
+
+                const body = await response.json().catch(() => null) as { ok?: boolean; tenant_id?: string; error_code?: string } | null;
+                if (response.ok && body?.ok && body.tenant_id) {
+                    saveTenantId(body.tenant_id, persistence || this.defaultPersistence);
+                    return;
+                }
+
+                if (body?.error_code === 'INVALID_FORMAT' || body?.error_code === 'AUTH_FAILED') {
+                    throw new Error(body.error_code);
+                }
+            } catch (err: unknown) {
+                if (err instanceof Error && (err.message === 'INVALID_FORMAT' || err.message === 'AUTH_FAILED')) {
+                    throw err;
+                }
+            }
         }
 
         try {
@@ -61,6 +95,24 @@ class TokenAuthService {
      * Fetches tenant data for the current authenticated session.
      */
     async getTenantData(): Promise<TenantData> {
+        if (this.isServerSessionSupported()) {
+            try {
+                const response = await fetch('/api/auth/tenant', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const body = await response.json().catch(() => null) as { ok?: boolean; tenant?: TenantData; error_code?: string } | null;
+                if (response.ok && body?.ok && body.tenant) {
+                    if (body.tenant.tenant_id) {
+                        saveTenantId(body.tenant.tenant_id, this.defaultPersistence);
+                    }
+                    return body.tenant;
+                }
+            } catch {
+                // Fall through to client-side compatibility path.
+            }
+        }
+
         const token = getAuthToken();
         if (!token) {
             throw new Error('NOT_AUTHENTICATED');
@@ -80,7 +132,7 @@ class TokenAuthService {
      * Checks if the user is currently authenticated.
      */
     isAuthenticated(): boolean {
-        return getAuthToken() !== null;
+        return getTenantId() !== null || getAuthToken() !== null;
     }
 
     /**
@@ -105,7 +157,30 @@ class TokenAuthService {
             token,
             tenantId,
             isAuthenticated: true,
+            authMode: token ? 'token' : 'cookie',
         };
+    }
+
+    async restoreSession(): Promise<boolean> {
+        if (!this.isServerSessionSupported()) {
+            return this.isAuthenticated();
+        }
+
+        try {
+            const response = await fetch('/api/auth/session', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            const body = await response.json().catch(() => null) as { ok?: boolean; tenant_id?: string } | null;
+            if (response.ok && body?.ok && body.tenant_id) {
+                saveTenantId(body.tenant_id, this.defaultPersistence);
+                return true;
+            }
+        } catch {
+            // Fall back to local compatibility mode.
+        }
+
+        return this.isAuthenticated();
     }
 
     /**
@@ -119,7 +194,17 @@ class TokenAuthService {
     /**
      * Clears the authentication session.
      */
-    clearSession(): void {
+    async clearSession(): Promise<void> {
+        if (this.isServerSessionSupported()) {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+            } catch {
+                // Continue clearing local state even if the server logout call fails.
+            }
+        }
         clearAllAuthData();
     }
 }

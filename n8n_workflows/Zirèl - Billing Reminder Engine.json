@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-18T21:59:21.079Z",
+  "createdAt": "2026-03-18T21:11:35.372Z",
+  "id": "byffaAWcHnknefuq",
   "name": "Zirèl - Billing Reminder Engine",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -195,7 +200,6 @@
       }
     }
   ],
-  "pinData": {},
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -253,15 +257,290 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "7eb8a104-7a34-4811-ae84-89138a86950e",
-  "meta": {
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
   },
-  "id": "byffaAWcHnknefuq",
+  "meta": null,
+  "pinData": {},
+  "versionId": "7eb8a104-7a34-4811-ae84-89138a86950e",
+  "activeVersionId": "7eb8a104-7a34-4811-ae84-89138a86950e",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-18T21:11:35.372Z",
+      "createdAt": "2026-03-18T21:11:35.372Z",
+      "role": "workflow:owner",
+      "workflowId": "byffaAWcHnknefuq",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-18T21:11:39.080Z",
+    "createdAt": "2026-03-18T21:11:35.372Z",
+    "versionId": "7eb8a104-7a34-4811-ae84-89138a86950e",
+    "workflowId": "byffaAWcHnknefuq",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 1440
+              }
+            ]
+          }
+        },
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -144,
+          -32
+        ],
+        "id": "9944ce88-82a2-4d2a-a3fc-633fa03b232e"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "tenants"
+        },
+        "name": "Get Billing Tenants",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          112,
+          -32
+        ],
+        "id": "c7ef8966-0627-4f96-bf0d-07c55586d027",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const today = new Date();\nconst romeNow = new Date(today.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));\nromeNow.setHours(0, 0, 0, 0);\n\nconst parseDateOnly = (value) => {\n  if (!value) return null;\n  const date = new Date(value);\n  if (Number.isNaN(date.getTime())) return null;\n  const romeDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));\n  romeDate.setHours(0, 0, 0, 0);\n  return romeDate;\n};\n\nconst diffDays = (target) => Math.round((target.getTime() - romeNow.getTime()) / 86400000);\n\nconst rows = [];\n\nfor (const item of items) {\n  const tenant = item.json || {};\n  const tenantId = String(tenant.tenant_id || '').trim();\n  if (!tenantId) continue;\n\n  const status = String(tenant.subscription_status || 'trialing').trim().toLowerCase();\n  const billingEmail = String(tenant.billing_email || tenant.mail || '').trim().toLowerCase();\n  const trialEndsAt = parseDateOnly(tenant.trial_ends_at);\n  const businessName = tenant.hotel_name || tenant.nome_attivita || tenant.nome_ristorante || tenant.tenant_id || 'Zirèl';\n\n  if (!trialEndsAt || status !== 'trialing' || !billingEmail) continue;\n\n  const daysToTrialEnd = diffDays(trialEndsAt);\n  const basePayload = {\n    tenant_id: tenantId,\n    business_name: businessName,\n    billing_email: billingEmail,\n    trial_ends_at: tenant.trial_ends_at || null,\n    billing_plan_code: tenant.billing_plan_code || null,\n    billing_cycle: tenant.billing_cycle || null,\n    current_period_end: tenant.current_period_end || null,\n    subscription_status: status,\n    dashboard_url: 'https://dashboard.zirel.org?tab=abbonamento',\n  };\n\n  if (daysToTrialEnd === 3) {\n    rows.push({\n      json: {\n        tenant_id: tenantId,\n        channel: 'email_billing_customer',\n        template_key: 'billing_trial_ending',\n        related_entity_type: 'billing_subscription',\n        related_entity_id: tenant.stripe_subscription_id || tenantId,\n        status: 'pending',\n        retry_count: 0,\n        max_retries: 5,\n        next_retry_at: new Date().toISOString(),\n        trace_id: 'billing-schedule:' + tenantId + ':trial_ending:' + (tenant.trial_ends_at || ''),\n        recipient_email: billingEmail,\n        dedupe_key: tenantId + ':billing_trial_ending:' + (tenant.trial_ends_at || ''),\n        payload: basePayload,\n      },\n    });\n  }\n\n  if (daysToTrialEnd === 0) {\n    rows.push({\n      json: {\n        tenant_id: tenantId,\n        channel: 'email_billing_customer',\n        template_key: 'billing_trial_expired',\n        related_entity_type: 'billing_subscription',\n        related_entity_id: tenant.stripe_subscription_id || tenantId,\n        status: 'pending',\n        retry_count: 0,\n        max_retries: 5,\n        next_retry_at: new Date().toISOString(),\n        trace_id: 'billing-schedule:' + tenantId + ':trial_expired:' + (tenant.trial_ends_at || ''),\n        recipient_email: billingEmail,\n        dedupe_key: tenantId + ':billing_trial_expired:' + (tenant.trial_ends_at || ''),\n        payload: basePayload,\n      },\n    });\n  }\n}\n\nreturn rows;"
+        },
+        "name": "Build Scheduled Reminder Rows",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          -32
+        ],
+        "id": "6ee409a3-9c95-499e-82da-07715463340a"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "event_type"
+              },
+              {
+                "name": "event_id"
+              },
+              {
+                "name": "tenant_id"
+              },
+              {
+                "name": "billing_email"
+              },
+              {
+                "name": "internal_email"
+              },
+              {
+                "name": "business_name"
+              },
+              {
+                "name": "billing_plan_code"
+              },
+              {
+                "name": "billing_cycle"
+              },
+              {
+                "name": "current_period_end"
+              },
+              {
+                "name": "trial_ends_at"
+              },
+              {
+                "name": "subscription_status"
+              },
+              {
+                "name": "subscription_id"
+              }
+            ]
+          }
+        },
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -144,
+          400
+        ],
+        "id": "87f0268c-6c87-4fb2-a07d-ea3bef757298"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json || {};\nconst tenantId = String(input.tenant_id || '').trim();\nconst eventType = String(input.event_type || '').trim();\nconst billingEmail = String(input.billing_email || '').trim().toLowerCase();\nconst internalEmail = String(input.internal_email || $env.ZIREL_BILLING_ALERT_EMAIL || '').trim().toLowerCase();\nconst eventId = String(input.event_id || '').trim() || ('manual-' + Date.now());\nconst businessName = input.business_name || input.hotel_name || input.nome_attivita || input.nome_ristorante || tenantId || 'Zirèl';\n\nif (!tenantId || !eventType) {\n  return [];\n}\n\nconst basePayload = {\n  tenant_id: tenantId,\n  business_name: businessName,\n  billing_email: billingEmail || null,\n  billing_plan_code: input.billing_plan_code || null,\n  billing_cycle: input.billing_cycle || null,\n  current_period_end: input.current_period_end || null,\n  trial_ends_at: input.trial_ends_at || null,\n  subscription_status: input.subscription_status || null,\n  event_id: eventId,\n  dashboard_url: 'https://dashboard.zirel.org?tab=abbonamento',\n  portal_url: 'https://dashboard.zirel.org?tab=abbonamento',\n};\n\nconst makeRow = (channel, templateKey, recipient, suffix) => ({\n  json: {\n    tenant_id: tenantId,\n    channel,\n    template_key: templateKey,\n    related_entity_type: 'billing_subscription',\n    related_entity_id: input.subscription_id || tenantId,\n    status: 'pending',\n    retry_count: 0,\n    max_retries: 5,\n    next_retry_at: new Date().toISOString(),\n    trace_id: 'billing-event:' + eventType + ':' + eventId,\n    recipient_email: recipient,\n    dedupe_key: tenantId + ':' + eventType + ':' + suffix + ':' + eventId,\n    payload: basePayload,\n  },\n});\n\nconst rows = [];\n\nif (eventType === 'invoice.payment_failed') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_payment_failed', billingEmail, 'customer'));\n  if (internalEmail) rows.push(makeRow('email_billing_internal', 'billing_payment_failed_internal', internalEmail, 'internal'));\n} else if (eventType === 'invoice.paid') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_payment_succeeded', billingEmail, 'customer'));\n} else if (eventType === 'customer.subscription.deleted') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_subscription_canceled', billingEmail, 'customer'));\n  if (internalEmail) rows.push(makeRow('email_billing_internal', 'billing_subscription_canceled_internal', internalEmail, 'internal'));\n} else if (eventType === 'customer.subscription.trial_will_end') {\n  if (billingEmail) rows.push(makeRow('email_billing_customer', 'billing_trial_ending', billingEmail, 'customer'));\n}\n\nreturn rows;"
+        },
+        "name": "Build Event Reminder Rows",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          112,
+          400
+        ],
+        "id": "3c07d961-9168-414b-ab84-b102ea046c91"
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "channel",
+                "fieldValue": "={{ $json.channel }}"
+              },
+              {
+                "fieldId": "template_key",
+                "fieldValue": "={{ $json.template_key }}"
+              },
+              {
+                "fieldId": "related_entity_type",
+                "fieldValue": "={{ $json.related_entity_type }}"
+              },
+              {
+                "fieldId": "related_entity_id",
+                "fieldValue": "={{ $json.related_entity_id || null }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "retry_count",
+                "fieldValue": "={{ $json.retry_count }}"
+              },
+              {
+                "fieldId": "max_retries",
+                "fieldValue": "={{ $json.max_retries }}"
+              },
+              {
+                "fieldId": "next_retry_at",
+                "fieldValue": "={{ $json.next_retry_at }}"
+              },
+              {
+                "fieldId": "trace_id",
+                "fieldValue": "={{ $json.trace_id }}"
+              },
+              {
+                "fieldId": "recipient_email",
+                "fieldValue": "={{ $json.recipient_email || null }}"
+              },
+              {
+                "fieldId": "dedupe_key",
+                "fieldValue": "={{ $json.dedupe_key }}"
+              },
+              {
+                "fieldId": "payload",
+                "fieldValue": "={{ $json.payload }}"
+              }
+            ]
+          }
+        },
+        "name": "Insert Billing Outbox Rows",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          704,
+          176
+        ],
+        "id": "01de817f-5c4b-4a84-8078-ec8de9ff0b4a",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Billing Tenants",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Billing Tenants": {
+        "main": [
+          [
+            {
+              "node": "Build Scheduled Reminder Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Scheduled Reminder Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Billing Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Build Event Reminder Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Event Reminder Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Billing Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 7eb8a104",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

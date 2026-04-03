@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-04-03T18:47:59.264Z",
+  "createdAt": "2026-03-01T23:45:29.584Z",
+  "id": "vfYYOYyiEcSIzuze",
   "name": "Zirèl - AI Core",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -13,7 +18,7 @@
       "typeVersion": 1.4,
       "position": [
         6864,
-        -1424
+        -1328
       ],
       "id": "aa143c78-62e1-4f4a-bc63-61857780cdd1",
       "name": "When chat message received",
@@ -45,13 +50,37 @@
             {
               "id": "source",
               "name": "source",
-              "value": "={{ $json.metadata?.source || \"chat_widget\" }}",
+              "value": "={{ $json.source || $json.metadata?.source || \"chat_widget\" }}",
               "type": "string"
             },
             {
               "id": "chatInput",
               "name": "chatInput",
               "value": "={{ String($json.chatInput || \"\").trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "a4823881-b64d-4129-9dcb-2865f6a69757",
+              "name": "room",
+              "value": "={{ $json.room || $json.metadata?.room || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "1a979f5a-424c-43d7-a1b5-81cc957a3a86",
+              "name": "area",
+              "value": "={{ $json.area || $json.metadata?.area || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c5283c60-66ab-435a-b56f-68568aa18438",
+              "name": "entry_url",
+              "value": "={{ $json.entryUrl || $json.entry_url || $json.metadata?.entry_url || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "824cf66f-f53e-4279-8b77-2a5af2a41174",
+              "name": "client",
+              "value": "={{ $json.metadata?.client || \"chat_widget\" }}",
               "type": "string"
             }
           ]
@@ -63,7 +92,7 @@
       "typeVersion": 3.4,
       "position": [
         7088,
-        -1424
+        -1328
       ],
       "id": "e6ddf818-0079-479c-96bf-548b72f89ec7",
       "name": "Crystalize Context1"
@@ -107,7 +136,7 @@
       "typeVersion": 2.2,
       "position": [
         7312,
-        -1424
+        -1328
       ],
       "id": "39122497-6439-4b48-a5bd-268078b525c1",
       "name": "Security: Tenant Check1"
@@ -129,7 +158,7 @@
       "typeVersion": 1,
       "position": [
         7536,
-        -1424
+        -1328
       ],
       "id": "11816f70-10e1-4db6-b5e0-d3be6ced6e21",
       "name": "Get a row1",
@@ -142,12 +171,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi o stati di pagamento.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Dopo una conferma finale già inviata, non ripetere automaticamente i dettagli nei messaggi sociali successivi.',\n  '6. Se la richiesta è vaga su data/orario, chiedi una data precisa e un orario preciso.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n].filter(Boolean).join('\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
+        "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Dopo una conferma finale già inviata, non ripetere automaticamente i dettagli nei messaggi sociali successivi.',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7760,
+        7984,
         -1424
       ],
       "id": "3b27addc-2983-46b0-b521-d93c1516393b",
@@ -158,13 +187,14 @@
         "promptType": "define",
         "text": "={{ $('Crystalize Context1').item.json.chatInput }}",
         "options": {
-          "systemMessage": "={{ $json.final_system_prompt }}\n"
+          "systemMessage": "={{ $json.final_system_prompt }}\n",
+          "maxIterations": 4
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        8352,
+        8744,
         -1424
       ],
       "id": "b23db228-e747-470c-9461-ae92990ddb93",
@@ -180,7 +210,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        8112,
+        8336,
         -1200
       ],
       "id": "7676784c-4c8e-47f1-88c4-1d5eb638a611",
@@ -218,7 +248,7 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
       "typeVersion": 1,
       "position": [
-        8240,
+        8464,
         -1200
       ],
       "id": "7d63138e-d6da-46ee-acc5-a3e51a60f48d",
@@ -240,7 +270,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        7984,
+        8208,
         -1200
       ],
       "id": "763713da-bfd7-4c3b-9716-e4b9dc73a6ce",
@@ -259,7 +289,7 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "typeVersion": 1,
       "position": [
-        8320,
+        8544,
         -992
       ],
       "id": "2198ee46-b773-4df9-98b7-d1defc1a5323",
@@ -285,7 +315,7 @@
           "value": {
             "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
             "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-            "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', ``, 'string') }}",
+            "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', `Valori ammessi: standard_appointment, demo_request, intro_call, first_consultation, callback_request. Default consigliato per richieste normali: standard_appointment.`, 'string') }}",
             "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
             "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
             "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
@@ -448,7 +478,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8528,
+        8752,
         -1200
       ],
       "id": "a1c7c1cb-da46-4369-9564-f3ed6c660d56",
@@ -478,7 +508,8 @@
             "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
             "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
             "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -601,6 +632,16 @@
               "canBeUsedToMatch": true,
               "type": "string",
               "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -610,7 +651,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8656,
+        8880,
         -1200
       ],
       "id": "7094ec98-2b97-4af5-b4d4-b1c1a824dd17",
@@ -849,14 +890,452 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        8784,
+        9008,
         -1200
       ],
       "id": "a30a24b7-7871-4aa5-aad8-5b0f6218bd47",
       "name": "Registra_Prenotazione_Hotel"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "m5YeTgY77TtrNbyS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/m5YeTgY77TtrNbyS",
+          "cachedResultName": "Zirèl - Cerca_In_Zona"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
+            "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
+            "user_request": "={{ $('Crystalize Context1').item.json.chatInput }}",
+            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+            "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
+            "indirizzo": "={{ $('Get a row1').item.json.indirizzo || '' }}",
+            "orari_apertura": "={{ $('Get a row1').item.json.orari_apertura || '' }}",
+            "current_date": "={{ DateTime.now().setZone('Europe/Rome').toFormat('dd/MM/yyyy') }}",
+            "current_time": "={{ DateTime.now().setZone('Europe/Rome').toFormat('HH:mm') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_request",
+              "displayName": "user_request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "nome_attivita",
+              "displayName": "nome_attivita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "indirizzo",
+              "displayName": "indirizzo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "orari_apertura",
+              "displayName": "orari_apertura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "current_date",
+              "displayName": "current_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "current_time",
+              "displayName": "current_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        9136,
+        -1200
+      ],
+      "id": "11879113-a293-40d7-9b90-ba136b2fd140",
+      "name": "Cerca_In_Zona"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CAJ5T4pDS3OyebyY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CAJ5T4pDS3OyebyY",
+          "cachedResultName": "Zirèl - Inoltra_Richiesta_Reception"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+            "request_type": "={{ $fromAI('request_type', '', 'string') }}",
+            "request_text": "={{ $fromAI('request_text', '', 'string') }}",
+            "requested_time": "={{ $fromAI('requested_time', '', 'string') }}",
+            "room": "={{ $('Crystalize Context1').item.json.room || '' }}",
+            "area": "={{ $('Crystalize Context1').item.json.area || '' }}",
+            "guest_name": "={{ $fromAI('guest_name', '', 'string') }}",
+            "telefono": "={{ $fromAI('telefono', '', 'string') }}",
+            "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
+            "notification_email": "={{ $('Get a row1').item.json.notification_email || '' }}",
+            "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || '' }}",
+            "billing_email": "={{ $('Get a row1').item.json.billing_email || '' }}",
+            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || '' }}",
+            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
+            "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
+            "source": "={{ $('Crystalize Context1').item.json.source || 'chat_widget' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "business_type",
+              "displayName": "business_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "request_type",
+              "displayName": "request_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "request_text",
+              "displayName": "request_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "requested_time",
+              "displayName": "requested_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "room",
+              "displayName": "room",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "guest_name",
+              "displayName": "guest_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "nome_attivita",
+              "displayName": "nome_attivita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "notification_email",
+              "displayName": "notification_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "internal_email",
+              "displayName": "internal_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "billing_email",
+              "displayName": "billing_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        9264,
+        -1200
+      ],
+      "id": "8f401e54-3e51-46ba-b69e-ee4b1ca74751",
+      "name": "Inoltra_Richiesta_Reception"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "54ffb618-2eb5-448e-bf46-a969438ebc2d",
+              "leftValue": "={{ $json.service_status || 'active' }}",
+              "rightValue": "active",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7760,
+        -1328
+      ],
+      "id": "e6e8bcd1-25a3-4db8-ae03-5b2de373daf7",
+      "name": "Check Service Status"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73463ab5-726b-4575-b113-fd15d3befff5",
+              "name": "output",
+              "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "cda32655-64f1-4e2b-a78d-1179640cb35b",
+              "name": "final_reply",
+              "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "283e215b-f3fb-491d-b3f4-715ee31496cd",
+              "name": "reply",
+              "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "5866c5a2-4ada-4b75-9e7d-4fd84173537e",
+              "name": "message",
+              "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "d580d390-3d20-4c83-85bf-8d23072efa3a",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "e5449fc1-1e6f-46b7-a3d1-0286df05a188",
+              "name": "code",
+              "value": "TENANT_SERVICE_DISABLED",
+              "type": "string"
+            },
+            {
+              "id": "8f7542f4-6701-49f8-95a5-5a13e0f41764",
+              "name": "service_status",
+              "value": "={{ $json.service_status || 'suspended_manual' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7984,
+        -1232
+      ],
+      "id": "88331615-21a1-47da-a98b-e289da0560a4",
+      "name": "Service Disabled Response"
     }
   ],
-  "pinData": {},
   "connections": {
     "When chat message received": {
       "main": [
@@ -895,7 +1374,7 @@
       "main": [
         [
           {
-            "node": "Build Prompt1",
+            "node": "Check Service Status",
             "type": "main",
             "index": 0
           }
@@ -989,9 +1468,48 @@
           }
         ]
       ]
+    },
+    "Cerca_In_Zona": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inoltra_Richiesta_Reception": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Service Status": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Service Disabled Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
@@ -999,11 +1517,1537 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "c1bcc4ed-9e27-46ca-8b03-f4a68e9d49e3",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+    "templateCredsSetupCompleted": true
   },
-  "id": "vfYYOYyiEcSIzuze",
+  "pinData": {},
+  "versionId": "3dd78c50-455e-49e4-86dc-988b49637659",
+  "activeVersionId": "3dd78c50-455e-49e4-86dc-988b49637659",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-01T23:45:29.584Z",
+      "createdAt": "2026-03-01T23:45:29.584Z",
+      "role": "workflow:owner",
+      "workflowId": "vfYYOYyiEcSIzuze",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-03T18:48:34.639Z",
+    "createdAt": "2026-04-03T18:47:59.268Z",
+    "versionId": "3dd78c50-455e-49e4-86dc-988b49637659",
+    "workflowId": "vfYYOYyiEcSIzuze",
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "mode": "webhook",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          6864,
+          -1328
+        ],
+        "id": "aa143c78-62e1-4f4a-bc63-61857780cdd1",
+        "name": "When chat message received",
+        "webhookId": "d9e10e54-2d61-4643-98ed-7bbe6221699e",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "tenant_id",
+                "name": "tenant_id",
+                "value": "={{ $json.metadata?.tenant_id || $json.tenant_id || \"\" }}",
+                "type": "string"
+              },
+              {
+                "id": "sessionId",
+                "name": "sessionId",
+                "value": "={{ $json.sessionId || $json.metadata?.session_id || `session_${Date.now()}` }}",
+                "type": "string"
+              },
+              {
+                "id": "trace_id",
+                "name": "trace_id",
+                "value": "={{ $json.metadata?.trace_id || `trace_${Date.now()}` }}",
+                "type": "string"
+              },
+              {
+                "id": "source",
+                "name": "source",
+                "value": "={{ $json.source || $json.metadata?.source || \"chat_widget\" }}",
+                "type": "string"
+              },
+              {
+                "id": "chatInput",
+                "name": "chatInput",
+                "value": "={{ String($json.chatInput || \"\").trim() }}",
+                "type": "string"
+              },
+              {
+                "id": "a4823881-b64d-4129-9dcb-2865f6a69757",
+                "name": "room",
+                "value": "={{ $json.room || $json.metadata?.room || \"\" }}",
+                "type": "string"
+              },
+              {
+                "id": "1a979f5a-424c-43d7-a1b5-81cc957a3a86",
+                "name": "area",
+                "value": "={{ $json.area || $json.metadata?.area || \"\" }}",
+                "type": "string"
+              },
+              {
+                "id": "c5283c60-66ab-435a-b56f-68568aa18438",
+                "name": "entry_url",
+                "value": "={{ $json.entryUrl || $json.entry_url || $json.metadata?.entry_url || \"\" }}",
+                "type": "string"
+              },
+              {
+                "id": "824cf66f-f53e-4279-8b77-2a5af2a41174",
+                "name": "client",
+                "value": "={{ $json.metadata?.client || \"chat_widget\" }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          7088,
+          -1328
+        ],
+        "id": "e6ddf818-0079-479c-96bf-548b72f89ec7",
+        "name": "Crystalize Context1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "check_tenant",
+                "leftValue": "={{ $json.tenant_id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "check_chat",
+                "leftValue": "={{ $json.chatInput }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          7312,
+          -1328
+        ],
+        "id": "39122497-6439-4b48-a5bd-268078b525c1",
+        "name": "Security: Tenant Check1"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "tenants",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "tenant_id",
+                "keyValue": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          7536,
+          -1328
+        ],
+        "id": "11816f70-10e1-4db6-b5e0-d3be6ced6e21",
+        "name": "Get a row1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Dopo una conferma finale già inviata, non ripetere automaticamente i dettagli nei messaggi sociali successivi.',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7984,
+          -1424
+        ],
+        "id": "3b27addc-2983-46b0-b521-d93c1516393b",
+        "name": "Build Prompt1"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('Crystalize Context1').item.json.chatInput }}",
+          "options": {
+            "systemMessage": "={{ $json.final_system_prompt }}\n",
+            "maxIterations": 4
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          8744,
+          -1424
+        ],
+        "id": "b23db228-e747-470c-9461-ae92990ddb93",
+        "name": "AI Agent1",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('Crystalize Context1').item.json.sessionId }}",
+          "contextWindowLength": 8
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          8336,
+          -1200
+        ],
+        "id": "7676784c-4c8e-47f1-88c4-1d5eb638a611",
+        "name": "Postgres Chat Memory1",
+        "credentials": {
+          "postgres": {
+            "id": "y26w3cf5oDEAQXdB",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolName": "company_knowledge_base",
+          "toolDescription": "Strumento per cercare documenti lunghi, listini, menu e FAQ con precisione tenant-scoped.",
+          "tableName": {
+            "__rl": true,
+            "value": "zirel_vectors",
+            "mode": "list",
+            "cachedResultName": "zirel_vectors"
+          },
+          "options": {
+            "queryName": "match_documents",
+            "metadata": {
+              "metadataValues": [
+                {
+                  "name": "tenant_id",
+                  "value": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+                }
+              ]
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+        "typeVersion": 1,
+        "position": [
+          8464,
+          -1200
+        ],
+        "id": "7d63138e-d6da-46ee-acc5-a3e51a60f48d",
+        "name": "Supabase Vector Store1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-flash-latest",
+          "options": {
+            "temperature": 0.4
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          8208,
+          -1200
+        ],
+        "id": "763713da-bfd7-4c3b-9716-e4b9dc73a6ce",
+        "name": "Google Gemini Chat Model1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "UlhMJWQVjXFDMzf8",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-embedding-001"
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          8544,
+          -992
+        ],
+        "id": "2198ee46-b773-4df9-98b7-d1defc1a5323",
+        "name": "Embeddings Google Gemini1",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "UlhMJWQVjXFDMzf8",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "d1LLF4mnxHeKcDJC",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/d1LLF4mnxHeKcDJC",
+            "cachedResultName": "Zirèl - Registra_Appuntamento"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', `Valori ammessi: standard_appointment, demo_request, intro_call, first_consultation, callback_request. Default consigliato per richieste normali: standard_appointment.`, 'string') }}",
+              "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
+              "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
+              "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
+              "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+              "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+              "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
+              "motivo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('motivo', ``, 'string') }}",
+              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telefono",
+                "displayName": "telefono",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "data_input",
+                "displayName": "data_input",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "orario",
+                "displayName": "orario",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "note",
+                "displayName": "note",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "motivo",
+                "displayName": "motivo",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "nome",
+                "displayName": "nome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "business_type",
+                "displayName": "business_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "appointment_type",
+                "displayName": "appointment_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "notification_email",
+                "displayName": "notification_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "internal_email",
+                "displayName": "internal_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "billing_email",
+                "displayName": "billing_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telegram_chat_id",
+                "displayName": "telegram_chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          8752,
+          -1200
+        ],
+        "id": "a1c7c1cb-da46-4369-9564-f3ed6c660d56",
+        "name": "Registra_Appuntamento"
+      },
+      {
+        "parameters": {
+          "description": "Salva una prenotazione ristorante reale solo dopo conferma esplicita del cliente e controllo disponibilità.",
+          "workflowId": {
+            "__rl": true,
+            "value": "6ZLyZmg4iLuF4YGr",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/6ZLyZmg4iLuF4YGr",
+            "cachedResultName": "Zirèl - Registra_Prenotazione"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "nome_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome_cliente', ``, 'string') }}",
+              "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+              "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
+              "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
+              "persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('persone', ``, 'string') }}",
+              "ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ora', ``, 'string') }}",
+              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
+              "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "nome_cliente",
+                "displayName": "nome_cliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telefono",
+                "displayName": "telefono",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "data_input",
+                "displayName": "data_input",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "ora",
+                "displayName": "ora",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "persone",
+                "displayName": "persone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "note_prenotazione",
+                "displayName": "note_prenotazione",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "business_type",
+                "displayName": "business_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "notification_email",
+                "displayName": "notification_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "billing_email",
+                "displayName": "billing_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telegram_chat_id",
+                "displayName": "telegram_chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "internal_email",
+                "displayName": "internal_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          8880,
+          -1200
+        ],
+        "id": "7094ec98-2b97-4af5-b4d4-b1c1a824dd17",
+        "name": "Registra_Prenotazione"
+      },
+      {
+        "parameters": {
+          "description": "Registra una prenotazione camera reale solo dopo conferma esplicita e controllo disponibilità.",
+          "workflowId": {
+            "__rl": true,
+            "value": "6NEYaCEnrm6h8jRG",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/6NEYaCEnrm6h8jRG",
+            "cachedResultName": "Zirèl - Registra_Prenotazione_Hotel"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "booking_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('booking_type', `standard_room_booking`, 'string') }}",
+              "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
+              "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
+              "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+              "checkin_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('checkin_input', ``, 'string') }}",
+              "checkout_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('checkout_input', ``, 'string') }}",
+              "ospiti_adulti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ospiti_adulti', ``, 'string') }}",
+              "ospiti_bambini": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ospiti_bambini', `0`, 'string') }}",
+              "room_type_requested": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('room_type_requested', ``, 'string') }}",
+              "servizi_richiesti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servizi_richiesti', ``, 'string') }}",
+              "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
+              "lingua_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('lingua_cliente', `it`, 'string') }}",
+              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita }}",
+              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "business_type",
+                "displayName": "business_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "booking_type",
+                "displayName": "booking_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "nome",
+                "displayName": "nome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telefono",
+                "displayName": "telefono",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "checkin_input",
+                "displayName": "checkin_input",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "checkout_input",
+                "displayName": "checkout_input",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "ospiti_adulti",
+                "displayName": "ospiti_adulti",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "ospiti_bambini",
+                "displayName": "ospiti_bambini",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "room_type_requested",
+                "displayName": "room_type_requested",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "servizi_richiesti",
+                "displayName": "servizi_richiesti",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "note_prenotazione",
+                "displayName": "note_prenotazione",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "lingua_cliente",
+                "displayName": "lingua_cliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "nome_attivita",
+                "displayName": "nome_attivita",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "notification_email",
+                "displayName": "notification_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "billing_email",
+                "displayName": "billing_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telegram_chat_id",
+                "displayName": "telegram_chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "internal_email",
+                "displayName": "internal_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          9008,
+          -1200
+        ],
+        "id": "a30a24b7-7871-4aa5-aad8-5b0f6218bd47",
+        "name": "Registra_Prenotazione_Hotel"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "m5YeTgY77TtrNbyS",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/m5YeTgY77TtrNbyS",
+            "cachedResultName": "Zirèl - Cerca_In_Zona"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
+              "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
+              "user_request": "={{ $('Crystalize Context1').item.json.chatInput }}",
+              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
+              "indirizzo": "={{ $('Get a row1').item.json.indirizzo || '' }}",
+              "orari_apertura": "={{ $('Get a row1').item.json.orari_apertura || '' }}",
+              "current_date": "={{ DateTime.now().setZone('Europe/Rome').toFormat('dd/MM/yyyy') }}",
+              "current_time": "={{ DateTime.now().setZone('Europe/Rome').toFormat('HH:mm') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "trace_id",
+                "displayName": "trace_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "session_id",
+                "displayName": "session_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "user_request",
+                "displayName": "user_request",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "business_type",
+                "displayName": "business_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "nome_attivita",
+                "displayName": "nome_attivita",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "indirizzo",
+                "displayName": "indirizzo",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "orari_apertura",
+                "displayName": "orari_apertura",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "current_date",
+                "displayName": "current_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "current_time",
+                "displayName": "current_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          9136,
+          -1200
+        ],
+        "id": "11879113-a293-40d7-9b90-ba136b2fd140",
+        "name": "Cerca_In_Zona"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "CAJ5T4pDS3OyebyY",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/CAJ5T4pDS3OyebyY",
+            "cachedResultName": "Zirèl - Inoltra_Richiesta_Reception"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "request_type": "={{ $fromAI('request_type', '', 'string') }}",
+              "request_text": "={{ $fromAI('request_text', '', 'string') }}",
+              "requested_time": "={{ $fromAI('requested_time', '', 'string') }}",
+              "room": "={{ $('Crystalize Context1').item.json.room || '' }}",
+              "area": "={{ $('Crystalize Context1').item.json.area || '' }}",
+              "guest_name": "={{ $fromAI('guest_name', '', 'string') }}",
+              "telefono": "={{ $fromAI('telefono', '', 'string') }}",
+              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
+              "notification_email": "={{ $('Get a row1').item.json.notification_email || '' }}",
+              "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || '' }}",
+              "billing_email": "={{ $('Get a row1').item.json.billing_email || '' }}",
+              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || '' }}",
+              "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
+              "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
+              "source": "={{ $('Crystalize Context1').item.json.source || 'chat_widget' }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "business_type",
+                "displayName": "business_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "request_type",
+                "displayName": "request_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "request_text",
+                "displayName": "request_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "requested_time",
+                "displayName": "requested_time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "room",
+                "displayName": "room",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "area",
+                "displayName": "area",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "guest_name",
+                "displayName": "guest_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telefono",
+                "displayName": "telefono",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "nome_attivita",
+                "displayName": "nome_attivita",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "notification_email",
+                "displayName": "notification_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "internal_email",
+                "displayName": "internal_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "billing_email",
+                "displayName": "billing_email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "telegram_chat_id",
+                "displayName": "telegram_chat_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "trace_id",
+                "displayName": "trace_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "session_id",
+                "displayName": "session_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "source",
+                "displayName": "source",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          9264,
+          -1200
+        ],
+        "id": "8f401e54-3e51-46ba-b69e-ee4b1ca74751",
+        "name": "Inoltra_Richiesta_Reception"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "54ffb618-2eb5-448e-bf46-a969438ebc2d",
+                "leftValue": "={{ $json.service_status || 'active' }}",
+                "rightValue": "active",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          7760,
+          -1328
+        ],
+        "id": "e6e8bcd1-25a3-4db8-ae03-5b2de373daf7",
+        "name": "Check Service Status"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "73463ab5-726b-4575-b113-fd15d3befff5",
+                "name": "output",
+                "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+                "type": "string"
+              },
+              {
+                "id": "cda32655-64f1-4e2b-a78d-1179640cb35b",
+                "name": "final_reply",
+                "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+                "type": "string"
+              },
+              {
+                "id": "283e215b-f3fb-491d-b3f4-715ee31496cd",
+                "name": "reply",
+                "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+                "type": "string"
+              },
+              {
+                "id": "5866c5a2-4ada-4b75-9e7d-4fd84173537e",
+                "name": "message",
+                "value": "={{ $json.service_public_message || 'Il servizio chat di questa struttura è temporaneamente non disponibile. Per assistenza contatta direttamente la struttura.' }}",
+                "type": "string"
+              },
+              {
+                "id": "d580d390-3d20-4c83-85bf-8d23072efa3a",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "e5449fc1-1e6f-46b7-a3d1-0286df05a188",
+                "name": "code",
+                "value": "TENANT_SERVICE_DISABLED",
+                "type": "string"
+              },
+              {
+                "id": "8f7542f4-6701-49f8-95a5-5a13e0f41764",
+                "name": "service_status",
+                "value": "={{ $json.service_status || 'suspended_manual' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          7984,
+          -1232
+        ],
+        "id": "88331615-21a1-47da-a98b-e289da0560a4",
+        "name": "Service Disabled Response"
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "Crystalize Context1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Crystalize Context1": {
+        "main": [
+          [
+            {
+              "node": "Security: Tenant Check1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Security: Tenant Check1": {
+        "main": [
+          [
+            {
+              "node": "Get a row1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row1": {
+        "main": [
+          [
+            {
+              "node": "Check Service Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Prompt1": {
+        "main": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Chat Memory1": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase Vector Store1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Google Gemini1": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Supabase Vector Store1",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registra_Appuntamento": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registra_Prenotazione": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registra_Prenotazione_Hotel": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cerca_In_Zona": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Inoltra_Richiesta_Reception": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Service Status": {
+        "main": [
+          [
+            {
+              "node": "Build Prompt1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Service Disabled Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 3dd78c50",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

@@ -1,26 +1,11 @@
 {
+  "updatedAt": "2026-03-21T20:29:33.441Z",
+  "createdAt": "2026-03-19T22:00:48.662Z",
+  "id": "W5wfUfAnRipqfQ6r",
   "name": "WhatsApp 4 - AI Orchestrator (V3.2 Hardened)",
+  "active": true,
+  "isArchived": false,
   "nodes": [
-    {
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "minutes",
-              "minutesInterval": 1
-            }
-          ]
-        }
-      },
-      "name": "Cron (1 min)",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        3536,
-        1072
-      ],
-      "id": "a79435b0-5c1e-4184-9e98-a40956d1fd67"
-    },
     {
       "parameters": {
         "jsCode": "const claimedRows = [];\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\nconst aiCoreUrl = String($env.ZIREL_AI_CORE_WEBHOOK_URL || $env.AI_CORE_WEBHOOK_URL || '').trim();\nconst aiCoreBearerToken = String($env.ZIREL_AI_CORE_BEARER_TOKEN || $env.AI_CORE_BEARER_TOKEN || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      id: 'missing-env',\n      processing_status: 'error',\n      conversation_ai_processing_status: 'error',\n      error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'\n    }\n  }];\n}\n\nif (!aiCoreUrl) {\n  return [{\n    json: {\n      id: 'missing-ai-core-url',\n      processing_status: 'error',\n      conversation_ai_processing_status: 'error',\n      error_message: 'RETRY: missing ZIREL_AI_CORE_WEBHOOK_URL or AI_CORE_WEBHOOK_URL'\n    }\n  }];\n}\n\nconst defaultHeaders = {\n  apikey: serviceKey,\n  Authorization: 'Bearer ' + serviceKey,\n  'Content-Type': 'application/json',\n  Prefer: 'return=representation',\n};\n\nconst encode = (value) => encodeURIComponent(String(value ?? ''));\nconst truncate = (value, max = 1000) => String(value || '').slice(0, max);\n\nconst rest = async (method, path, body) => {\n  try {\n    return await this.helpers.httpRequest({\n      method,\n      url: supabaseUrl + '/rest/v1/' + path,\n      headers: defaultHeaders,\n      body: body === undefined ? undefined : body,\n      json: true,\n    });\n  } catch (error) {\n    const responseBody =\n      error?.response?.body === undefined\n        ? ''\n        : typeof error.response.body === 'string'\n          ? error.response.body\n          : JSON.stringify(error.response.body);\n    const details = truncate(responseBody || error?.message || error);\n    throw new Error('Supabase ' + method + ' ' + path + ' failed: ' + details);\n  }\n};\n\nconst callAiCore = async (body) => {\n  try {\n    const headers = aiCoreBearerToken\n      ? {\n          Authorization: 'Bearer ' + aiCoreBearerToken,\n          'Content-Type': 'application/json',\n        }\n      : {\n          'Content-Type': 'application/json',\n        };\n\n    return await this.helpers.httpRequest({\n      method: 'POST',\n      url: aiCoreUrl,\n      headers,\n      body,\n      json: true,\n    });\n  } catch (error) {\n    const responseBody =\n      error?.response?.body === undefined\n        ? ''\n        : typeof error.response.body === 'string'\n          ? error.response.body\n          : JSON.stringify(error.response.body);\n    const details = truncate(responseBody || error?.message || error);\n    throw new Error('AI Core call failed: ' + details);\n  }\n};\n\nconst selectCandidates = async () => {\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,conversation_id,tenant_id,channel,direction,sender_role,external_message_id,processing_status,content_text,provider_payload_json,created_at&direction=eq.inbound&channel=eq.whatsapp&processing_status=eq.pending_ai&order=created_at.asc&limit=25'\n  );\n  return Array.isArray(rows) ? rows : [];\n};\n\nconst claimRow = async (rowId) => {\n  const rows = await rest(\n    'PATCH',\n    'conversation_messages?id=eq.' + encode(rowId) + '&processing_status=eq.pending_ai',\n    {\n      processing_status: 'processing',\n    }\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getTenantAccount = async (tenantId) => {\n  if (!tenantId) return null;\n  const rows = await rest(\n    'GET',\n    'tenant_whatsapp_accounts?select=id,tenant_id,ai_enabled,human_handoff_enabled&tenant_id=eq.' +\n      encode(tenantId) +\n      '&order=updated_at.desc.nullslast&limit=1'\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getConversation = async (conversationId) => {\n  if (!conversationId) return null;\n  const rows = await rest(\n    'GET',\n    'tenant_conversations?select=id,tenant_id,status,ai_processing_status,customer_name,customer_phone_normalized,external_contact_id,last_inbound_message_id,last_outbound_message_id&' +\n      'id=eq.' +\n      encode(conversationId) +\n      '&limit=1'\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getRecentMessages = async (conversationId) => {\n  if (!conversationId) return [];\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,direction,sender_role,content_text,created_at,provider_payload_json,message_type&conversation_id=eq.' +\n      encode(conversationId) +\n      '&order=created_at.desc&limit=12'\n  );\n  return Array.isArray(rows) ? rows.reverse() : [];\n};\n\nconst getExistingOutboundForInbound = async (conversationId, inboundMessageId) => {\n  if (!conversationId || !inboundMessageId) return null;\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,external_message_id,processing_status,delivery_status,provider_payload_json,created_at&conversation_id=eq.' +\n      encode(conversationId) +\n      '&direction=eq.outbound&sender_role=eq.ai&order=created_at.desc&limit=20'\n  );\n\n  const matches = Array.isArray(rows) ? rows : [];\n  return (\n    matches.find(\n      (item) => String(item?.provider_payload_json?.source_inbound_message_id || '') === String(inboundMessageId)\n    ) || null\n  );\n};\n\nconst extractInboundText = (row) => {\n  const provider = row?.provider_payload_json || {};\n  return (\n    row?.content_text ||\n    provider?.text_content ||\n    provider?.message_payload?.text?.body ||\n    null\n  );\n};\n\nconst normalizeContextMessages = (rows) =>\n  rows.map((item) => ({\n    id: item.id,\n    direction: item.direction,\n    sender_role: item.sender_role,\n    message_type: item.message_type || null,\n    content_text:\n      item.content_text ||\n      item?.provider_payload_json?.text_content ||\n      item?.provider_payload_json?.message_payload?.text?.body ||\n      null,\n    created_at: item.created_at,\n  }));\n\nconst resolveAiReply = (response) => {\n  const candidates = [\n    response?.final_reply,\n    response?.reply,\n    response?.message,\n    response?.text,\n    response?.output,\n    response?.data?.final_reply,\n    response?.data?.reply,\n    response?.data?.message,\n    response?.result?.final_reply,\n    response?.result?.reply,\n  ];\n\n  for (const candidate of candidates) {\n    if (typeof candidate === 'string' && candidate.trim()) {\n      return candidate.trim();\n    }\n  }\n\n  return null;\n};\n\nconst patchMessage = async (messageId, body) => {\n  if (!messageId) return [];\n  return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);\n};\n\nconst patchConversation = async (conversationId, body) => {\n  if (!conversationId) return [];\n  return rest('PATCH', 'tenant_conversations?id=eq.' + encode(conversationId), body);\n};\n\nconst insertOutboundMessage = async (conversation, inboundRow, replyText, aiResponse) => {\n  const body = {\n    conversation_id: conversation.id,\n    tenant_id: conversation.tenant_id,\n    channel: 'whatsapp',\n    direction: 'outbound',\n    sender_role: 'ai',\n    message_type: 'text',\n    content_text: replyText,\n    processing_status: 'done',\n    provider_payload_json: {\n      text_content: replyText,\n      recipient_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,\n      source_inbound_message_id: inboundRow.id,\n      ai_response: aiResponse,\n    },\n  };\n\n  const rows = await rest('POST', 'conversation_messages', body);\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst outcomes = [];\n\nfor (const candidate of await selectCandidates()) {\n  const claimed = await claimRow(candidate.id);\n  if (claimed?.id) {\n    claimedRows.push({ ...candidate, ...claimed });\n  }\n}\n\nif (!claimedRows.length) {\n  return [];\n}\n\nfor (const row of claimedRows) {\n  try {\n    const conversation = await getConversation(row.conversation_id);\n    if (!conversation?.id) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: conversation not found',\n        },\n      });\n      continue;\n    }\n\n    const tenantAccount = await getTenantAccount(conversation.tenant_id);\n    if (tenantAccount && tenantAccount.ai_enabled === false) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'skipped_hho',\n          conversation_ai_processing_status: 'skipped',\n          error_message: 'SKIPPED:ai_disabled',\n        },\n      });\n      continue;\n    }\n\n    if (conversation.status === 'human_handoff' || conversation.status === 'closed') {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'skipped_hho',\n          conversation_ai_processing_status: 'skipped',\n          error_message: 'SKIPPED:' + conversation.status,\n        },\n      });\n      continue;\n    }\n\n    await patchConversation(conversation.id, {\n      ai_processing_status: 'processing',\n    });\n\n    const recentMessages = await getRecentMessages(conversation.id);\n    const inboundText = extractInboundText(row);\n\n    if (!inboundText) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: missing inbound text content',\n        },\n      });\n      continue;\n    }\n\n    const aiPayload = {\n      chatInput: inboundText,\n      metadata: {\n        tenant_id: conversation.tenant_id,\n        session_id: conversation.id,\n        trace_id: row.id,\n        source: 'whatsapp',\n        channel: 'whatsapp',\n        conversation_id: conversation.id,\n        inbound_message_id: row.id,\n        external_message_id: row.external_message_id || null,\n        customer_name: conversation.customer_name || null,\n        customer_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,\n        recent_messages: normalizeContextMessages(recentMessages),\n      },\n    };\n\n    const aiResponse = await callAiCore(aiPayload);\n    const replyText = resolveAiReply(aiResponse);\n\n    if (!replyText) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: AI Core returned no usable reply text',\n        },\n      });\n      continue;\n    }\n\n    const existingOutbound = await getExistingOutboundForInbound(conversation.id, row.id);\n    if (existingOutbound?.id) {\n      await patchConversation(conversation.id, {\n        ai_processing_status: 'done',\n      });\n\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'done',\n          conversation_ai_processing_status: 'done',\n          error_message: 'DEDUP: existing outbound ' + existingOutbound.id,\n        },\n      });\n      continue;\n    }\n\n    const outboundMessage = await insertOutboundMessage(conversation, row, replyText, aiResponse);\n    if (!outboundMessage?.id) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: failed to create outbound message row',\n        },\n      });\n      continue;\n    }\n\n    await patchConversation(conversation.id, {\n      ai_processing_status: 'done',\n    });\n\n    outcomes.push({\n      json: {\n        id: row.id,\n        processing_status: 'done',\n        conversation_ai_processing_status: 'done',\n        error_message: null,\n      },\n    });\n  } catch (error) {\n    outcomes.push({\n      json: {\n        id: row.id,\n        processing_status: 'error',\n        conversation_ai_processing_status: 'error',\n        error_message: 'RETRY: ' + truncate(error.message || error),\n      },\n    });\n  }\n}\n\nreturn outcomes;"
@@ -29,10 +14,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3760,
-        1072
+        4240,
+        1328
       ],
-      "id": "addc3fd7-da10-43f9-9277-39149ae80125",
+      "id": "377336ec-1c70-4ae9-8bf7-1187f20f218a",
       "notesInFlow": true,
       "notes": "Legge inbound pending_ai, rispetta ai_enabled globale, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender."
     },
@@ -66,10 +51,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3984,
-        1072
+        4464,
+        1328
       ],
-      "id": "2fb80f28-97c7-47b8-a214-ea703be0ce81",
+      "id": "c3e1421b-15a3-45ff-8270-5283c67d22c5",
       "notesInFlow": true,
       "credentials": {
         "supabaseApi": {
@@ -105,10 +90,10 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        4208,
-        1072
+        4688,
+        1328
       ],
-      "id": "95889ee1-e500-4527-a601-a76fd1026e8f",
+      "id": "89f43253-62c9-434a-9c75-7457940e9d7a",
       "notesInFlow": true,
       "credentials": {
         "supabaseApi": {
@@ -117,21 +102,28 @@
         }
       },
       "notes": "Persistenza finale sullo stato AI della conversation."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "name": "Cron (30 sec)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        4016,
+        1328
+      ],
+      "id": "b6a8bd21-5970-4b06-875d-860a1d933fa4"
     }
   ],
-  "pinData": {},
   "connections": {
-    "Cron (1 min)": {
-      "main": [
-        [
-          {
-            "node": "Code: Claim + Orchestrate AI",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code: Claim + Orchestrate AI": {
       "main": [
         [
@@ -153,17 +145,207 @@
           }
         ]
       ]
+    },
+    "Cron (30 sec)": {
+      "main": [
+        [
+          {
+            "node": "Code: Claim + Orchestrate AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "0b365480-48d7-4c9a-99de-4f03f606b6f0",
-  "meta": {
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+  "staticData": {
+    "node:Cron (1 min)": {
+      "recurrenceRules": []
+    },
+    "node:Cron (30 sec)": {
+      "recurrenceRules": []
+    }
   },
-  "id": "W5wfUfAnRipqfQ6r",
+  "meta": null,
+  "pinData": {},
+  "versionId": "5b22f907-6900-4530-bfa8-e4038e269a46",
+  "activeVersionId": "5b22f907-6900-4530-bfa8-e4038e269a46",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-19T22:00:48.662Z",
+      "createdAt": "2026-03-19T22:00:48.662Z",
+      "role": "workflow:owner",
+      "workflowId": "W5wfUfAnRipqfQ6r",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T20:29:34.853Z",
+    "createdAt": "2026-03-21T20:29:33.438Z",
+    "versionId": "5b22f907-6900-4530-bfa8-e4038e269a46",
+    "workflowId": "W5wfUfAnRipqfQ6r",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "const claimedRows = [];\nconst supabaseUrl = String($env.SUPABASE_URL || '').trim();\nconst serviceKey = String($env.SUPABASE_SERVICE_ROLE_KEY || '').trim();\nconst aiCoreUrl = String($env.ZIREL_AI_CORE_WEBHOOK_URL || $env.AI_CORE_WEBHOOK_URL || '').trim();\nconst aiCoreBearerToken = String($env.ZIREL_AI_CORE_BEARER_TOKEN || $env.AI_CORE_BEARER_TOKEN || '').trim();\n\nif (!supabaseUrl || !serviceKey) {\n  return [{\n    json: {\n      id: 'missing-env',\n      processing_status: 'error',\n      conversation_ai_processing_status: 'error',\n      error_message: 'RETRY: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'\n    }\n  }];\n}\n\nif (!aiCoreUrl) {\n  return [{\n    json: {\n      id: 'missing-ai-core-url',\n      processing_status: 'error',\n      conversation_ai_processing_status: 'error',\n      error_message: 'RETRY: missing ZIREL_AI_CORE_WEBHOOK_URL or AI_CORE_WEBHOOK_URL'\n    }\n  }];\n}\n\nconst defaultHeaders = {\n  apikey: serviceKey,\n  Authorization: 'Bearer ' + serviceKey,\n  'Content-Type': 'application/json',\n  Prefer: 'return=representation',\n};\n\nconst encode = (value) => encodeURIComponent(String(value ?? ''));\nconst truncate = (value, max = 1000) => String(value || '').slice(0, max);\n\nconst rest = async (method, path, body) => {\n  try {\n    return await this.helpers.httpRequest({\n      method,\n      url: supabaseUrl + '/rest/v1/' + path,\n      headers: defaultHeaders,\n      body: body === undefined ? undefined : body,\n      json: true,\n    });\n  } catch (error) {\n    const responseBody =\n      error?.response?.body === undefined\n        ? ''\n        : typeof error.response.body === 'string'\n          ? error.response.body\n          : JSON.stringify(error.response.body);\n    const details = truncate(responseBody || error?.message || error);\n    throw new Error('Supabase ' + method + ' ' + path + ' failed: ' + details);\n  }\n};\n\nconst callAiCore = async (body) => {\n  try {\n    const headers = aiCoreBearerToken\n      ? {\n          Authorization: 'Bearer ' + aiCoreBearerToken,\n          'Content-Type': 'application/json',\n        }\n      : {\n          'Content-Type': 'application/json',\n        };\n\n    return await this.helpers.httpRequest({\n      method: 'POST',\n      url: aiCoreUrl,\n      headers,\n      body,\n      json: true,\n    });\n  } catch (error) {\n    const responseBody =\n      error?.response?.body === undefined\n        ? ''\n        : typeof error.response.body === 'string'\n          ? error.response.body\n          : JSON.stringify(error.response.body);\n    const details = truncate(responseBody || error?.message || error);\n    throw new Error('AI Core call failed: ' + details);\n  }\n};\n\nconst selectCandidates = async () => {\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,conversation_id,tenant_id,channel,direction,sender_role,external_message_id,processing_status,content_text,provider_payload_json,created_at&direction=eq.inbound&channel=eq.whatsapp&processing_status=eq.pending_ai&order=created_at.asc&limit=25'\n  );\n  return Array.isArray(rows) ? rows : [];\n};\n\nconst claimRow = async (rowId) => {\n  const rows = await rest(\n    'PATCH',\n    'conversation_messages?id=eq.' + encode(rowId) + '&processing_status=eq.pending_ai',\n    {\n      processing_status: 'processing',\n    }\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getTenantAccount = async (tenantId) => {\n  if (!tenantId) return null;\n  const rows = await rest(\n    'GET',\n    'tenant_whatsapp_accounts?select=id,tenant_id,ai_enabled,human_handoff_enabled&tenant_id=eq.' +\n      encode(tenantId) +\n      '&order=updated_at.desc.nullslast&limit=1'\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getConversation = async (conversationId) => {\n  if (!conversationId) return null;\n  const rows = await rest(\n    'GET',\n    'tenant_conversations?select=id,tenant_id,status,ai_processing_status,customer_name,customer_phone_normalized,external_contact_id,last_inbound_message_id,last_outbound_message_id&' +\n      'id=eq.' +\n      encode(conversationId) +\n      '&limit=1'\n  );\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst getRecentMessages = async (conversationId) => {\n  if (!conversationId) return [];\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,direction,sender_role,content_text,created_at,provider_payload_json,message_type&conversation_id=eq.' +\n      encode(conversationId) +\n      '&order=created_at.desc&limit=12'\n  );\n  return Array.isArray(rows) ? rows.reverse() : [];\n};\n\nconst getExistingOutboundForInbound = async (conversationId, inboundMessageId) => {\n  if (!conversationId || !inboundMessageId) return null;\n  const rows = await rest(\n    'GET',\n    'conversation_messages?select=id,external_message_id,processing_status,delivery_status,provider_payload_json,created_at&conversation_id=eq.' +\n      encode(conversationId) +\n      '&direction=eq.outbound&sender_role=eq.ai&order=created_at.desc&limit=20'\n  );\n\n  const matches = Array.isArray(rows) ? rows : [];\n  return (\n    matches.find(\n      (item) => String(item?.provider_payload_json?.source_inbound_message_id || '') === String(inboundMessageId)\n    ) || null\n  );\n};\n\nconst extractInboundText = (row) => {\n  const provider = row?.provider_payload_json || {};\n  return (\n    row?.content_text ||\n    provider?.text_content ||\n    provider?.message_payload?.text?.body ||\n    null\n  );\n};\n\nconst normalizeContextMessages = (rows) =>\n  rows.map((item) => ({\n    id: item.id,\n    direction: item.direction,\n    sender_role: item.sender_role,\n    message_type: item.message_type || null,\n    content_text:\n      item.content_text ||\n      item?.provider_payload_json?.text_content ||\n      item?.provider_payload_json?.message_payload?.text?.body ||\n      null,\n    created_at: item.created_at,\n  }));\n\nconst resolveAiReply = (response) => {\n  const candidates = [\n    response?.final_reply,\n    response?.reply,\n    response?.message,\n    response?.text,\n    response?.output,\n    response?.data?.final_reply,\n    response?.data?.reply,\n    response?.data?.message,\n    response?.result?.final_reply,\n    response?.result?.reply,\n  ];\n\n  for (const candidate of candidates) {\n    if (typeof candidate === 'string' && candidate.trim()) {\n      return candidate.trim();\n    }\n  }\n\n  return null;\n};\n\nconst patchMessage = async (messageId, body) => {\n  if (!messageId) return [];\n  return rest('PATCH', 'conversation_messages?id=eq.' + encode(messageId), body);\n};\n\nconst patchConversation = async (conversationId, body) => {\n  if (!conversationId) return [];\n  return rest('PATCH', 'tenant_conversations?id=eq.' + encode(conversationId), body);\n};\n\nconst insertOutboundMessage = async (conversation, inboundRow, replyText, aiResponse) => {\n  const body = {\n    conversation_id: conversation.id,\n    tenant_id: conversation.tenant_id,\n    channel: 'whatsapp',\n    direction: 'outbound',\n    sender_role: 'ai',\n    message_type: 'text',\n    content_text: replyText,\n    processing_status: 'done',\n    provider_payload_json: {\n      text_content: replyText,\n      recipient_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,\n      source_inbound_message_id: inboundRow.id,\n      ai_response: aiResponse,\n    },\n  };\n\n  const rows = await rest('POST', 'conversation_messages', body);\n  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;\n};\n\nconst outcomes = [];\n\nfor (const candidate of await selectCandidates()) {\n  const claimed = await claimRow(candidate.id);\n  if (claimed?.id) {\n    claimedRows.push({ ...candidate, ...claimed });\n  }\n}\n\nif (!claimedRows.length) {\n  return [];\n}\n\nfor (const row of claimedRows) {\n  try {\n    const conversation = await getConversation(row.conversation_id);\n    if (!conversation?.id) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: conversation not found',\n        },\n      });\n      continue;\n    }\n\n    const tenantAccount = await getTenantAccount(conversation.tenant_id);\n    if (tenantAccount && tenantAccount.ai_enabled === false) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'skipped_hho',\n          conversation_ai_processing_status: 'skipped',\n          error_message: 'SKIPPED:ai_disabled',\n        },\n      });\n      continue;\n    }\n\n    if (conversation.status === 'human_handoff' || conversation.status === 'closed') {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'skipped_hho',\n          conversation_ai_processing_status: 'skipped',\n          error_message: 'SKIPPED:' + conversation.status,\n        },\n      });\n      continue;\n    }\n\n    await patchConversation(conversation.id, {\n      ai_processing_status: 'processing',\n    });\n\n    const recentMessages = await getRecentMessages(conversation.id);\n    const inboundText = extractInboundText(row);\n\n    if (!inboundText) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: missing inbound text content',\n        },\n      });\n      continue;\n    }\n\n    const aiPayload = {\n      chatInput: inboundText,\n      metadata: {\n        tenant_id: conversation.tenant_id,\n        session_id: conversation.id,\n        trace_id: row.id,\n        source: 'whatsapp',\n        channel: 'whatsapp',\n        conversation_id: conversation.id,\n        inbound_message_id: row.id,\n        external_message_id: row.external_message_id || null,\n        customer_name: conversation.customer_name || null,\n        customer_phone: conversation.customer_phone_normalized || conversation.external_contact_id || null,\n        recent_messages: normalizeContextMessages(recentMessages),\n      },\n    };\n\n    const aiResponse = await callAiCore(aiPayload);\n    const replyText = resolveAiReply(aiResponse);\n\n    if (!replyText) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: AI Core returned no usable reply text',\n        },\n      });\n      continue;\n    }\n\n    const existingOutbound = await getExistingOutboundForInbound(conversation.id, row.id);\n    if (existingOutbound?.id) {\n      await patchConversation(conversation.id, {\n        ai_processing_status: 'done',\n      });\n\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'done',\n          conversation_ai_processing_status: 'done',\n          error_message: 'DEDUP: existing outbound ' + existingOutbound.id,\n        },\n      });\n      continue;\n    }\n\n    const outboundMessage = await insertOutboundMessage(conversation, row, replyText, aiResponse);\n    if (!outboundMessage?.id) {\n      outcomes.push({\n        json: {\n          id: row.id,\n          processing_status: 'error',\n          conversation_ai_processing_status: 'error',\n          error_message: 'RETRY: failed to create outbound message row',\n        },\n      });\n      continue;\n    }\n\n    await patchConversation(conversation.id, {\n      ai_processing_status: 'done',\n    });\n\n    outcomes.push({\n      json: {\n        id: row.id,\n        processing_status: 'done',\n        conversation_ai_processing_status: 'done',\n        error_message: null,\n      },\n    });\n  } catch (error) {\n    outcomes.push({\n      json: {\n        id: row.id,\n        processing_status: 'error',\n        conversation_ai_processing_status: 'error',\n        error_message: 'RETRY: ' + truncate(error.message || error),\n      },\n    });\n  }\n}\n\nreturn outcomes;"
+        },
+        "name": "Code: Claim + Orchestrate AI",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4240,
+          1328
+        ],
+        "id": "377336ec-1c70-4ae9-8bf7-1187f20f218a",
+        "notesInFlow": true,
+        "notes": "Legge inbound pending_ai, rispetta ai_enabled globale, salta human_handoff/closed, chiama AI Core e crea outbound pronti per il sender."
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "conversation_messages",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "processing_status",
+                "fieldValue": "={{ $json.processing_status }}"
+              },
+              {
+                "fieldId": "error_message",
+                "fieldValue": "={{ $json.error_message || null }}"
+              }
+            ]
+          }
+        },
+        "name": "Supabase: Persist AI Outcome",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4464,
+          1328
+        ],
+        "id": "c3e1421b-15a3-45ff-8270-5283c67d22c5",
+        "notesInFlow": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        },
+        "notes": "Aggiorna lo stato del messaggio inbound processato dall’orchestrator."
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "tenant_conversations",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "last_inbound_message_id",
+                "condition": "eq",
+                "keyValue": "={{ $json.id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "ai_processing_status",
+                "fieldValue": "={{ $json.conversation_ai_processing_status || \"done\" }}"
+              }
+            ]
+          }
+        },
+        "name": "Supabase: Persist Conversation AI Status",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4688,
+          1328
+        ],
+        "id": "89f43253-62c9-434a-9c75-7457940e9d7a",
+        "notesInFlow": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        },
+        "notes": "Persistenza finale sullo stato AI della conversation."
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "seconds"
+              }
+            ]
+          }
+        },
+        "name": "Cron (30 sec)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          4016,
+          1328
+        ],
+        "id": "b6a8bd21-5970-4b06-875d-860a1d933fa4"
+      }
+    ],
+    "connections": {
+      "Code: Claim + Orchestrate AI": {
+        "main": [
+          [
+            {
+              "node": "Supabase: Persist AI Outcome",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase: Persist AI Outcome": {
+        "main": [
+          [
+            {
+              "node": "Supabase: Persist Conversation AI Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cron (30 sec)": {
+        "main": [
+          [
+            {
+              "node": "Code: Claim + Orchestrate AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 5b22f907",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

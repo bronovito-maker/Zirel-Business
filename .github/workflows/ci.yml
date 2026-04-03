@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'codex/**'
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            dashboard/package-lock.json
+            demo/package-lock.json
+
+      - name: Install dashboard dependencies
+        run: npm install
+        working-directory: dashboard
+
+      - name: Install demo dependencies
+        run: npm install
+        working-directory: demo
+
+      - name: Workspace checks
+        run: npm run check:setup
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build

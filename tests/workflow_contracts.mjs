@@ -1,10 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { repoRoot, zirelWorkflowFiles } from '../scripts/workflow-manifest.mjs';
 
-const root = '/Users/bronovito/Documents/Sviluppo-AI/Progetti-Web/Zirèl';
-
-const readJson = (relativePath) =>
-  JSON.parse(fs.readFileSync(`${root}/${relativePath}`, 'utf8'));
+const readJson = (absolutePath) =>
+  JSON.parse(fs.readFileSync(absolutePath, 'utf8'));
 
 const getNode = (workflow, name) => {
   const node = workflow.nodes.find((item) => item.name === name);
@@ -18,11 +17,11 @@ const runCodeNode = (workflow, name, json, getter = () => ({ item: { json: {} } 
   return fn(json, getter, [{ json }]);
 };
 
-const aiCore = readJson('Zirèl - AI Core.json');
-const appointment = readJson('Zirèl - Registra_Appuntamento.json');
-const restaurant = readJson('Zirèl - Registra_Prenotazione.json');
-const hotel = readJson('Zirèl - Registra_Prenotazione_Hotel.json');
-const notifications = readJson('Zirèl - Notifiche Hotel.json');
+const aiCore = readJson(zirelWorkflowFiles.aiCore);
+const appointment = readJson(zirelWorkflowFiles.appointment);
+const restaurant = readJson(zirelWorkflowFiles.restaurant);
+const hotel = readJson(zirelWorkflowFiles.hotel);
+const notifications = readJson(zirelWorkflowFiles.notifications);
 
 for (const [label, workflow] of Object.entries({ aiCore, appointment, restaurant, hotel, notifications })) {
   assert.doesNotThrow(() => JSON.stringify(workflow), `Workflow ${label} non serializzabile`);
@@ -231,13 +230,17 @@ const notificationChannels = notifications.nodes
 assert.ok(notificationChannels.some((value) => value.includes('startsWith(\\"email_\\")')));
 assert.ok(notificationChannels.some((value) => value.includes('startsWith(\\"telegram_\\")')));
 
-const dashboardTypes = fs.readFileSync(`${root}/dashboard/src/types/index.ts`, 'utf8');
+const dashboardTypes = fs.readFileSync(`${repoRoot}/dashboard/src/types/index.ts`, 'utf8');
 assert.ok(dashboardTypes.includes('stripe_customer_id?: string;'));
 assert.ok(dashboardTypes.includes('stripe_customer_portal_url?: string;'));
 
-const dashboardComponent = fs.readFileSync(`${root}/dashboard/src/components/Dashboard.tsx`, 'utf8');
-assert.ok(dashboardComponent.includes('Billing SaaS'));
-assert.ok(dashboardComponent.includes('stripe_checkout_url'));
-assert.ok(dashboardComponent.includes('stripe_customer_portal_url'));
+const dashboardComponent = fs.readFileSync(`${repoRoot}/dashboard/src/components/Dashboard.tsx`, 'utf8');
+assert.ok(dashboardComponent.includes("lazy(() => import('./BillingSection'))"));
+assert.ok(dashboardComponent.includes("activeTab === 'abbonamento'"));
+
+const billingSection = fs.readFileSync(`${repoRoot}/dashboard/src/components/BillingSection.tsx`, 'utf8');
+assert.ok(billingSection.includes('onCheckout'));
+assert.ok(billingSection.includes('onPortal'));
+assert.ok(billingSection.includes('VITE_STRIPE_PRICE_PREMIUM_ID'));
 
 console.log('Workflow contract checks passed.');

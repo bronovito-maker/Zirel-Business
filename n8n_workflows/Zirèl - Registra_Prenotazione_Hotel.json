@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-21T08:14:33.326Z",
+  "createdAt": "2026-03-04T23:05:57.607Z",
+  "id": "6NEYaCEnrm6h8jRG",
   "name": "Zirèl - Registra_Prenotazione_Hotel",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -572,7 +577,6 @@
       "name": "Build Final Response"
     }
   ],
-  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -711,17 +715,747 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "4a4930b2-d0bb-4cd2-838a-56d0fb5fd935",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+    "templateCredsSetupCompleted": true
   },
-  "id": "6NEYaCEnrm6h8jRG",
+  "pinData": {},
+  "versionId": "4a4930b2-d0bb-4cd2-838a-56d0fb5fd935",
+  "activeVersionId": "4a4930b2-d0bb-4cd2-838a-56d0fb5fd935",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-04T23:05:57.607Z",
+      "createdAt": "2026-03-04T23:05:57.607Z",
+      "role": "workflow:owner",
+      "workflowId": "6NEYaCEnrm6h8jRG",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T08:10:37.184Z",
+    "createdAt": "2026-03-21T08:10:34.598Z",
+    "versionId": "4a4930b2-d0bb-4cd2-838a-56d0fb5fd935",
+    "workflowId": "6NEYaCEnrm6h8jRG",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "tenant_id"
+              },
+              {
+                "name": "business_type"
+              },
+              {
+                "name": "booking_type"
+              },
+              {
+                "name": "nome"
+              },
+              {
+                "name": "telefono"
+              },
+              {
+                "name": "email"
+              },
+              {
+                "name": "checkin_input"
+              },
+              {
+                "name": "checkout_input"
+              },
+              {
+                "name": "ospiti_adulti"
+              },
+              {
+                "name": "ospiti_bambini"
+              },
+              {
+                "name": "room_type_requested"
+              },
+              {
+                "name": "servizi_richiesti"
+              },
+              {
+                "name": "note_prenotazione"
+              },
+              {
+                "name": "lingua_cliente"
+              },
+              {
+                "name": "nome_attivita"
+              },
+              {
+                "name": "notification_email"
+              },
+              {
+                "name": "billing_email"
+              },
+              {
+                "name": "telegram_chat_id"
+              },
+              {
+                "name": "internal_email"
+              }
+            ]
+          }
+        },
+        "id": "39d9baeb-b7f4-40e4-a1af-c24968b18ca6",
+        "typeVersion": 1.1,
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -6816,
+          -464
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "18194833-0e65-485c-a586-794df8ac1818",
+                "leftValue": "={{ String($json.business_type || \"\").trim().toLowerCase() === \"hotel\" || !String($json.business_type || \"\").trim() }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -6592,
+          -464
+        ],
+        "id": "eea1e750-a61b-4ba5-9358-49627395adbb",
+        "name": "Check Hotel Sector"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "463dfb85-6a5a-4164-8bd3-e8bff507876a",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "01c868df-7f08-485d-bac0-6116bc7ee904",
+                "name": "code",
+                "value": "UNSUPPORTED_SECTOR",
+                "type": "string"
+              },
+              {
+                "id": "4c32ffe5-35d2-4a8f-9400-0ffa3a9316bc",
+                "name": "message",
+                "value": "Questo workflow gestisce solo richieste hotel.",
+                "type": "string"
+              },
+              {
+                "id": "8721a942-9e23-41c3-a9f8-71b7eb1d73ee",
+                "name": "final_reply",
+                "value": "Posso raccogliere i dati, ma questa richiesta non può essere registrata da questo flusso hotel.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -6368,
+          -368
+        ],
+        "id": "3ac11efa-7f09-4bb5-887a-e327dde2217b",
+        "name": "Unsupported Sector Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const value = $json;\n\nconst normalize = (v) => String(v || '').replace(/\\s+/g, ' ').trim();\nconst normalizeDate = (input) => {\n  const raw = normalize(input).toLowerCase();\n  if (!raw) return null;\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return raw;\n  const it = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (it) return `${it[3]}-${String(it[2]).padStart(2, '0')}-${String(it[1]).padStart(2, '0')}`;\n  return null;\n};\n\nconst trace_id = normalize(value.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalize(value.session_id || value.conversation_id) || `session_${Date.now()}`;\nconst source = normalize(value.source || 'chat_widget') || 'chat_widget';\nconst tenant_id = normalize(value.tenant_id) || 'hotel_rivamare_demo_001';\nconst business_type = 'hotel';\nconst booking_type = normalize(value.booking_type || 'standard_room_booking').toLowerCase();\nconst nome = normalize(value.nome);\nconst telefono = normalize(value.telefono).replace(/[^\\d+\\s]/g, '');\nconst email = normalize(value.email).toLowerCase();\nconst checkin_date = normalizeDate(value.checkin_input);\nconst checkout_date = normalizeDate(value.checkout_input);\nconst ospiti_adulti = Number(String(value.ospiti_adulti || '').trim());\nconst ospiti_bambini = Number(String(value.ospiti_bambini || '0').trim() || '0');\nconst room_type_requested = normalize(value.room_type_requested);\nconst servizi_richiesti = normalize(value.servizi_richiesti);\nconst note_prenotazione = normalize(value.note_prenotazione);\nconst lingua_cliente = normalize(value.lingua_cliente || 'it').toLowerCase();\n\nlet validation_code = '';\nlet validation_message = '';\n\nif (!nome || !telefono || !email || !checkin_date || !checkout_date || Number.isNaN(ospiti_adulti) || ospiti_adulti <= 0) {\n  validation_code = 'MISSING_REQUIRED_FIELDS';\n  validation_message = 'Dati obbligatori mancanti o non validi.';\n}\n\nif (!validation_code) {\n  const ci = new Date(`${checkin_date}T00:00:00Z`);\n  const co = new Date(`${checkout_date}T00:00:00Z`);\n  if (!(co > ci)) {\n    validation_code = 'INVALID_STAY_RANGE';\n    validation_message = 'Check-out deve essere successivo al check-in.';\n  }\n}\n\nreturn [{\n  json: {\n    ...value,\n    tenant_id,\n    source,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    business_type,\n    booking_type,\n    nome,\n    telefono,\n    email,\n    checkin_date,\n    checkout_date,\n    ospiti_adulti,\n    ospiti_bambini,\n    room_type_requested,\n    servizi_richiesti,\n    note_prenotazione,\n    lingua_cliente,\n    validation_code,\n    validation_message,\n    is_valid_payload: !validation_code,\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -6368,
+          -560
+        ],
+        "id": "e798ae72-b566-497e-bf87-dba975010c69",
+        "name": "Normalize & Validate Booking Data"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "9968d2eb-21ef-4050-b1f7-1a625fe9599b",
+                "leftValue": "={{ !!$json.validation_code }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -6144,
+          -560
+        ],
+        "id": "561ed550-2d54-4dd0-bbc6-e2db985113fc",
+        "name": "Check Valid Payload"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e9eafdd7-1f34-4acd-832c-116add3cacdc",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "31f5bee4-0804-46b0-8aab-1d3bf901339e",
+                "name": "code",
+                "value": "={{ $json.validation_code }}",
+                "type": "string"
+              },
+              {
+                "id": "c5a44a91-be96-4435-92fa-dc31aca5a608",
+                "name": "message",
+                "value": "={{ $json.validation_message }}",
+                "type": "string"
+              },
+              {
+                "id": "8e6be7c3-5448-4b4a-9d2e-1abd624624c7",
+                "name": "final_reply",
+                "value": "Per registrare davvero il soggiorno mi servono tutti i dati obbligatori, con date di check-in e check-out valide.",
+                "type": "string"
+              },
+              {
+                "id": "d79fb5d7-c9f3-42a9-b94e-ca43764ca601",
+                "name": "tenant_id",
+                "value": "={{ $json.tenant_id }}",
+                "type": "string"
+              },
+              {
+                "id": "02583366-8320-4261-b5ba-a50e5483bf70",
+                "name": "trace_id",
+                "value": "={{ $json.trace_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -5920,
+          -464
+        ],
+        "id": "5719e048-5635-4b14-b55d-d1537b2c6df6",
+        "name": "Invalid Payload Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\n\nconst providerRaw = String(input.booking_manager_provider || input.pms_provider || '').trim().toLowerCase();\nconst hasExternalBookingLink = !!String(input.link_booking_esterno || '').trim();\nconst adapter_test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nconst endpointByProvider = {\n  mews: String(input.hotel_middleware_mews_url || '').trim(),\n  cloudbeds: String(input.hotel_middleware_cloudbeds_url || '').trim(),\n  siteminder: String(input.hotel_middleware_siteminder_url || '').trim(),\n  cinque_stelle: String(input.hotel_middleware_5stelle_url || '').trim(),\n};\n\nconst provider = endpointByProvider[providerRaw] ? providerRaw : 'manual';\nconst provider_api_url = endpointByProvider[provider] || String(input.hotel_middleware_fallback_url || input.availability_api_url || '').trim();\n\nconst integration_mode = provider === 'manual'\n  ? (hasExternalBookingLink ? 'manual_with_external_link' : 'manual_no_link')\n  : 'booking_manager_live';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    integration_mode,\n    provider_api_url,\n    adapter_test_mode: adapter_test_mode || !provider_api_url,\n    booking_payload: {\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_booking',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      provider,\n      booking_type: input.booking_type,\n      guest: {\n        nome: input.nome,\n        telefono: input.telefono,\n        email: input.email,\n        lingua_cliente: input.lingua_cliente || 'it',\n      },\n      stay: {\n        checkin_date: input.checkin_date,\n        checkout_date: input.checkout_date,\n        ospiti_adulti: Number(input.ospiti_adulti || 0),\n        ospiti_bambini: Number(input.ospiti_bambini || 0),\n        room_type_requested: input.room_type_requested || null,\n        servizi_richiesti: input.servizi_richiesti || null,\n        note_prenotazione: input.note_prenotazione || null,\n      },\n    },\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -5920,
+          -656
+        ],
+        "id": "0e95059d-83c8-449e-8093-f0098d590050",
+        "name": "Build Booking Manager Payload"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "43c92e1f-b6bf-414c-ab9c-c5e58bd0e6bb",
+                "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -5696,
+          -656
+        ],
+        "id": "26b6d604-6dc0-47ba-8a8f-2a4b167fda8d",
+        "name": "Use Live Booking Adapter?"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ $json.provider_api_url || \"\" }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "X-TENANT-ID",
+                "value": "={{ $json.tenant_id }}"
+              },
+              {
+                "name": "X-TRACE-ID",
+                "value": "={{ $json.trace_id }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.booking_payload }}",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -5472,
+          -736
+        ],
+        "id": "296b74ca-d874-47c4-a0b7-f4bd543de0e6",
+        "name": "Booking Manager Adapter",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\n\nconst fromHttp = input.body || input.data || null;\nconst adapter = input.adapter_test_mode\n  ? {\n      success: false,\n      code: 'AVAILABILITY_ADAPTER_NOT_CONFIGURED',\n      availability_status: 'manual_review',\n      booking_status: 'manual_review',\n      payment_required: false,\n      payment_url: null,\n      booking_reference: null,\n      room_type: input.room_type_requested || 'camera standard',\n      total_amount: null,\n      currency: 'EUR',\n      retryable: true,\n      mode: 'fallback_test_mode',\n    }\n  : (fromHttp || input);\n\nconst success = Boolean(adapter.success);\nconst availability_status = String(adapter.availability_status || adapter.booking_status || (success ? 'confirmed' : 'manual_review')).toLowerCase();\nconst booking_status = String(adapter.booking_status || availability_status || (success ? 'confirmed' : 'manual_review')).toLowerCase();\nconst payment_required = Boolean(adapter.payment_required);\nconst booking_reference = adapter.booking_reference || null;\nconst payment_url = adapter.payment_url || null;\nconst total_amount = adapter.total_amount ?? null;\nconst currency = adapter.currency || 'EUR';\nconst room_type_assigned = adapter.room_type || input.room_type_requested || 'camera standard';\nconst business_status = booking_status === 'confirmed'\n  ? 'confirmed'\n  : booking_status === 'unavailable'\n    ? 'rejected'\n    : 'manual_review';\n\nlet code = String(adapter.code || '');\nif (!code) {\n  code = business_status === 'confirmed'\n    ? 'HOTEL_BOOKING_CONFIRMED'\n    : business_status === 'rejected'\n      ? 'HOTEL_STAY_UNAVAILABLE'\n      : 'HOTEL_BOOKING_MANUAL_REVIEW';\n}\n\nlet final_reply = '';\nlet message = '';\nif (business_status === 'confirmed' && payment_required && payment_url) {\n  message = 'Disponibilità trovata: pagamento richiesto.';\n  final_reply = `Ho trovato disponibilità per ${room_type_assigned}. Per completare la prenotazione devi finalizzare il pagamento qui: ${payment_url}`;\n} else if (business_status === 'confirmed') {\n  message = 'Richiesta soggiorno registrata correttamente.';\n  final_reply = `Prenotazione confermata con riferimento ${booking_reference || 'in elaborazione'}.`;\n} else if (business_status === 'rejected') {\n  message = 'Soggiorno non disponibile per le date richieste.';\n  final_reply = 'Ho raccolto la richiesta, ma al momento non risulta disponibilità per le date indicate. Possiamo verificare un’alternativa.';\n} else {\n  message = 'Richiesta soggiorno salvata per verifica manuale.';\n  final_reply = 'Ho raccolto tutti i dati, ma non posso confermare subito la disponibilità. La struttura verificherà e ti ricontatterà a breve.';\n}\n\nreturn [{\n  json: {\n    ...input,\n    success: business_status === 'confirmed',\n    code,\n    message,\n    final_reply,\n    retryable: Boolean(adapter.retryable ?? business_status !== 'confirmed'),\n    adapter_success: success,\n    availability_status,\n    booking_status,\n    business_status,\n    payment_required,\n    payment_url,\n    booking_reference,\n    total_amount,\n    currency,\n    room_type_assigned,\n    adapter_raw: adapter,\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -5248,
+          -656
+        ],
+        "id": "474da32c-28cd-43ad-9eed-80f5f1295536",
+        "name": "Normalize Adapter Response"
+      },
+      {
+        "parameters": {
+          "tableId": "hotel_bookings",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "business_type",
+                "fieldValue": "hotel"
+              },
+              {
+                "fieldId": "booking_type",
+                "fieldValue": "={{ $json.booking_type }}"
+              },
+              {
+                "fieldId": "nome_cliente",
+                "fieldValue": "={{ $json.nome }}"
+              },
+              {
+                "fieldId": "telefono",
+                "fieldValue": "={{ $json.telefono }}"
+              },
+              {
+                "fieldId": "email",
+                "fieldValue": "={{ $json.email }}"
+              },
+              {
+                "fieldId": "checkin_date",
+                "fieldValue": "={{ $json.checkin_date }}"
+              },
+              {
+                "fieldId": "checkout_date",
+                "fieldValue": "={{ $json.checkout_date }}"
+              },
+              {
+                "fieldId": "ospiti_adulti",
+                "fieldValue": "={{ $json.ospiti_adulti }}"
+              },
+              {
+                "fieldId": "ospiti_bambini",
+                "fieldValue": "={{ $json.ospiti_bambini }}"
+              },
+              {
+                "fieldId": "room_type_requested",
+                "fieldValue": "={{ $json.room_type_requested || null }}"
+              },
+              {
+                "fieldId": "room_type_assigned",
+                "fieldValue": "={{ $json.room_type_assigned || null }}"
+              },
+              {
+                "fieldId": "servizi_richiesti",
+                "fieldValue": "={{ $json.servizi_richiesti || null }}"
+              },
+              {
+                "fieldId": "note_prenotazione",
+                "fieldValue": "={{ $json.note_prenotazione || null }}"
+              },
+              {
+                "fieldId": "booking_manager_provider",
+                "fieldValue": "={{ $json.provider || \"manual\" }}"
+              },
+              {
+                "fieldId": "integration_mode",
+                "fieldValue": "={{ $json.integration_mode }}"
+              },
+              {
+                "fieldId": "booking_reference",
+                "fieldValue": "={{ $json.booking_reference || null }}"
+              },
+              {
+                "fieldId": "booking_status",
+                "fieldValue": "={{ $json.booking_status }}"
+              },
+              {
+                "fieldId": "payment_required",
+                "fieldValue": "={{ $json.payment_required }}"
+              },
+              {
+                "fieldId": "payment_url",
+                "fieldValue": "={{ $json.payment_url || null }}"
+              },
+              {
+                "fieldId": "total_amount",
+                "fieldValue": "={{ $json.total_amount || null }}"
+              },
+              {
+                "fieldId": "currency",
+                "fieldValue": "={{ $json.currency || \"EUR\" }}"
+              },
+              {
+                "fieldId": "source",
+                "fieldValue": "={{ $json.source || \"chat_widget\" }}"
+              },
+              {
+                "fieldId": "raw_adapter_response",
+                "fieldValue": "={{ JSON.stringify($json.adapter_raw || {}) }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -5024,
+          -656
+        ],
+        "id": "4a1f9f5f-65d0-432e-9626-c7b9519b17b4",
+        "name": "Create Hotel Booking Row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Normalize Adapter Response').item.json;\nconst record = $('Create Hotel Booking Row').item.json;\nconst payload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  nome_struttura: input.nome_attivita || 'Hotel',\n  hotel_booking_id: record.id || null,\n  booking_status: input.booking_status,\n  availability_status: input.availability_status,\n  booking_reference: input.booking_reference || null,\n  payment_required: Boolean(input.payment_required),\n  payment_url: input.payment_url || null,\n  nome: input.nome,\n  telefono: input.telefono,\n  email: input.email,\n  checkin_date: input.checkin_date,\n  checkout_date: input.checkout_date,\n  ospiti_adulti: input.ospiti_adulti,\n  ospiti_bambini: input.ospiti_bambini,\n  ospiti_totali: Number(input.ospiti_adulti || 0) + Number(input.ospiti_bambini || 0),\n  room_type_requested: input.room_type_requested || null,\n  room_type_assigned: input.room_type_assigned || null,\n  servizi_richiesti: input.servizi_richiesti || null,\n  note_prenotazione: input.note_prenotazione || null,\n  internal_email: input.notification_email || input.internal_notification_email || input.internal_email || input.billing_email || null,\n  telegram_chat_id: input.telegram_chat_id || input.internal_telegram_chat_id || null,\n};\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.internal_notification_email ||\n  input.internal_email ||\n  input.billing_email ||\n  ''\n).trim().toLowerCase();\n\nconst rows = [{\n  json: {\n    tenant_id: input.tenant_id,\n    channel: 'telegram_internal_hotel',\n      template_key: 'hotel_internal_alert',\n      related_entity_type: 'hotel_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_hotel:' + (record.id || input.trace_id),\n      payload,\n    },\n  }];\n\nif (input.email) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_hotel',\n      template_key: 'hotel_guest_confirmation',\n      related_entity_type: 'hotel_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_hotel:' + (record.id || input.trace_id),\n      payload,\n    },\n  });\n}\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_hotel',\n      template_key: 'hotel_internal_alert',\n      related_entity_type: 'hotel_booking',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_hotel:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -4800,
+          -752
+        ],
+        "id": "2aed6e2f-308d-40e4-9c36-07c147bb974f",
+        "name": "Build Notification Outbox Rows"
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "channel",
+                "fieldValue": "={{ $json.channel }}"
+              },
+              {
+                "fieldId": "template_key",
+                "fieldValue": "={{ $json.template_key }}"
+              },
+              {
+                "fieldId": "related_entity_type",
+                "fieldValue": "={{ $json.related_entity_type }}"
+              },
+              {
+                "fieldId": "related_entity_id",
+                "fieldValue": "={{ $json.related_entity_id || null }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "retry_count",
+                "fieldValue": "={{ $json.retry_count }}"
+              },
+              {
+                "fieldId": "max_retries",
+                "fieldValue": "={{ $json.max_retries }}"
+              },
+              {
+                "fieldId": "next_retry_at",
+                "fieldValue": "={{ $json.next_retry_at }}"
+              },
+              {
+                "fieldId": "trace_id",
+                "fieldValue": "={{ $json.trace_id }}"
+              },
+              {
+                "fieldId": "booking_reference",
+                "fieldValue": "={{ $json.payload?.booking_reference || null }}"
+              },
+              {
+                "fieldId": "nome_attivita",
+                "fieldValue": "={{ $json.payload?.nome_struttura || null }}"
+              },
+              {
+                "fieldId": "dedupe_key",
+                "fieldValue": "={{ $json.dedupe_key }}"
+              },
+              {
+                "fieldId": "payload",
+                "fieldValue": "={{ $json.payload }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -4576,
+          -752
+        ],
+        "id": "1bb87517-9f33-4841-b3fe-a96719fd634d",
+        "name": "Insert Outbox Rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const i = $('Normalize Adapter Response').item.json;\nconst record = $('Create Hotel Booking Row').item.json;\n\nreturn [{\n  json: {\n    success: Boolean(i.success),\n    code: i.code || 'HOTEL_BOOKING_RESULT_UNKNOWN',\n    message: i.message || 'Richiesta prenotazione hotel processata.',\n    tenant_id: i.tenant_id,\n    trace_id: i.trace_id,\n    session_id: i.session_id,\n    booking_id: record.id || null,\n    booking_type: i.booking_type,\n    booking_status: i.booking_status,\n    availability_status: i.availability_status,\n    business_status: i.business_status,\n    booking_reference: i.booking_reference || null,\n    nome_attivita: i.nome_attivita || null,\n    checkin_date: i.checkin_date,\n    checkout_date: i.checkout_date,\n    room_type_assigned: i.room_type_assigned || null,\n    payment_required: Boolean(i.payment_required),\n    payment_url: i.payment_url || null,\n    total_amount: i.total_amount || null,\n    currency: i.currency || 'EUR',\n    integration_mode: i.integration_mode,\n    provider: i.provider,\n    final_reply: i.final_reply || 'Richiesta soggiorno registrata.',\n    retryable: Boolean(i.retryable),\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -4800,
+          -560
+        ],
+        "id": "ff722ddf-786c-47af-bcd4-6a603ad6fdfa",
+        "name": "Build Final Response"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Check Hotel Sector",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Hotel Sector": {
+        "main": [
+          [
+            {
+              "node": "Normalize & Validate Booking Data",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Unsupported Sector Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize & Validate Booking Data": {
+        "main": [
+          [
+            {
+              "node": "Check Valid Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Valid Payload": {
+        "main": [
+          [
+            {
+              "node": "Invalid Payload Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Booking Manager Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Booking Manager Payload": {
+        "main": [
+          [
+            {
+              "node": "Use Live Booking Adapter?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Use Live Booking Adapter?": {
+        "main": [
+          [
+            {
+              "node": "Booking Manager Adapter",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Normalize Adapter Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Booking Manager Adapter": {
+        "main": [
+          [
+            {
+              "node": "Normalize Adapter Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Adapter Response": {
+        "main": [
+          [
+            {
+              "node": "Create Hotel Booking Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Hotel Booking Row": {
+        "main": [
+          [
+            {
+              "node": "Build Notification Outbox Rows",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Build Final Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Notification Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 4a4930b2",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

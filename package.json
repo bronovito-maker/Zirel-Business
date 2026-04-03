@@ -1,16 +1,27 @@
 {
-    "name": "zirel-monorepo",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "dev:dashboard": "cd dashboard && npm run dev",
-        "dev:landing": "cd demo && npm run dev",
-        "dev": "npm run dev:landing & npm run dev:dashboard",
-        "build:workflows": "node scripts/build_zirel_workflows.mjs",
-        "build:whatsapp-workflows": "node scripts/build_whatsapp_workflows.mjs",
-        "test:billing": "node tests/billing_reminders_e2e.mjs",
-        "test:whatsapp-workflows": "node tests/whatsapp_workflows_contracts.mjs",
-        "test:workflows": "node tests/workflow_contracts.mjs",
-        "test:chat": "node tests/chat_webhook_e2e.mjs"
-    }
+  "name": "zirel-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:dashboard": "cd dashboard && npm run dev",
+    "dev:landing": "cd demo && npm run dev",
+    "dev": "npm run dev:landing & npm run dev:dashboard",
+    "check:setup": "node scripts/check_setup.mjs",
+    "backup:workflows": "node scripts/backup-n8n.js",
+    "build:workflows": "node scripts/build_zirel_workflows.mjs",
+    "build:whatsapp-workflows": "node scripts/build_whatsapp_workflows.mjs",
+    "build:all-workflows": "npm run build:workflows && npm run build:whatsapp-workflows",
+    "lint": "npm run lint --prefix dashboard",
+    "test:dashboard": "npm test --prefix dashboard",
+    "test:billing": "node tests/billing_reminders_e2e.mjs",
+    "test:whatsapp-workflows": "npm run build:whatsapp-workflows && node tests/whatsapp_workflows_contracts.mjs",
+    "test:workflows": "npm run build:workflows && node tests/workflow_contracts.mjs",
+    "test:chat": "node tests/chat_webhook_e2e.mjs",
+    "test": "npm run test:dashboard && npm run test:workflows && npm run test:whatsapp-workflows",
+    "build": "npm run build --prefix demo && npm run build --prefix dashboard",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
 }

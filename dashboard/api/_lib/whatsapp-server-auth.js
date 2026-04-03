@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { extractBearerToken } from './whatsapp-embedded-signup.js';
+import { readSession } from './auth-session.js';
 
 export function json(res, status, body) {
     res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -31,6 +32,14 @@ export async function resolveTenantId(supabase, req, errorPrefix = 'WHATSAPP_UNA
         extractBearerToken(req.headers['x-zirel-api-token']);
     const expectedTenantId =
         String(requestBody.tenant_id || req.headers['x-zirel-tenant-id'] || req.query?.tenant_id || '').trim() || null;
+
+    const session = readSession(req);
+    if (!apiToken && session?.tenant_id && session?.api_token) {
+        if (expectedTenantId && expectedTenantId !== session.tenant_id) {
+            return { ok: false, status: 401, error_code: errorPrefix, error_message: 'Tenant mismatch for active session' };
+        }
+        return { ok: true, tenant_id: String(session.tenant_id) };
+    }
 
     if (!apiToken) {
         return { ok: false, status: 401, error_code: errorPrefix, error_message: 'Missing tenant API token' };

@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-21T14:01:56.216Z",
+  "createdAt": "2026-02-27T14:11:38.870Z",
+  "id": "AsPNECKuT5ZiFFYq",
   "name": "Zirèl - Telegram Callback Handler",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -13,7 +18,7 @@
       "typeVersion": 1.2,
       "position": [
         1872,
-        -792
+        -800
       ],
       "id": "fa75ff28-199a-4058-8b47-67c2077783da",
       "webhookId": "fd1d2c92-80ee-4fc2-a423-78fb68f5fb45",
@@ -33,7 +38,7 @@
       "typeVersion": 2,
       "position": [
         2096,
-        -792
+        -800
       ],
       "id": "bb2a2e62-c946-40ac-89a9-fffe4d17d51f"
     },
@@ -67,7 +72,7 @@
       "typeVersion": 2.2,
       "position": [
         2320,
-        -792
+        -800
       ],
       "id": "86f927b1-7dad-4dda-9705-3a610d758394"
     },
@@ -346,7 +351,7 @@
       "typeVersion": 2,
       "position": [
         3216,
-        -504
+        -512
       ],
       "id": "16e5a3a7-0e9d-46c0-8309-b74229b3a072"
     },
@@ -363,7 +368,7 @@
       "typeVersion": 1.2,
       "position": [
         4784,
-        -696
+        -704
       ],
       "id": "c535bd41-b32a-4bc1-8237-c509983b6142",
       "webhookId": "abd248d7-be13-48d5-8e2a-a5ffb8a4bc7b",
@@ -391,7 +396,7 @@
       "typeVersion": 1.2,
       "position": [
         5008,
-        -696
+        -704
       ],
       "id": "e37815fb-be5a-43cf-97f5-103d9b3bd390",
       "webhookId": "68b12c2c-1683-4bce-9924-5c9aab2d129a",
@@ -404,53 +409,13 @@
     },
     {
       "parameters": {
-        "tableId": "request_events",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "request_type",
-              "fieldValue": "={{ $json.request_event_type }}"
-            },
-            {
-              "fieldId": "request_id",
-              "fieldValue": "={{ String($json.related_entity_id || \"\") }}"
-            },
-            {
-              "fieldId": "event_type",
-              "fieldValue": "={{ $json.callback_action === \"reject\" ? \"rejected\" : \"confirmed\" }}"
-            },
-            {
-              "fieldId": "actor",
-              "fieldValue": "={{ \"telegram:\" + ($json.operator_name || \"Team\") }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        4560,
-        -912
-      ],
-      "id": "f737f8f5-ff23-4903-af34-7aa087a95ee9",
-      "name": "Insert Request Event",
-      "credentials": {
-        "supabaseApi": {
-          "id": "bEyN805IWleebXdC",
-          "name": "Supabase account - Zirèl"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
         "operation": "get",
         "tableId": "appointments",
         "filters": {
           "conditions": [
             {
               "keyName": "id",
-              "keyValue": "={{$json.related_entity_id}}"
+              "keyValue": "={{ $('Parse Callback Data1').item.json.related_entity_id }}"
             }
           ]
         }
@@ -473,7 +438,7 @@
     {
       "parameters": {
         "operation": "get",
-        "tableId": "appointments",
+        "tableId": "tenants",
         "filters": {
           "conditions": [
             {
@@ -500,7 +465,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Appointment Row1').item.json || {};\nconst tenant = $('Get Appointment Tenant Row1').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.nome || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'appointment_rejected' : 'appointment_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  appointment_id: row.id,\n  nome: row.nome || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  motivo: row.motivo || row.note || 'N/D',\n  note: row.note || '',\n  data_appuntamento: row.data_appuntamento || null,\n  data_appuntamento_label: row.data_appuntamento || null,\n  orario: row.orario || null,\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_appointment',\n      template_key: customerTemplate,\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_appointment:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_appointment',\n      template_key: 'appointment_internal_status_update',\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_appointment:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+        "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Appointment Row').item.json || {};\nconst tenant = $('Get Appointment Tenant Row').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.nome || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'appointment_rejected' : 'appointment_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  appointment_id: row.id,\n  nome: row.nome || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  motivo: row.motivo || row.note || 'N/D',\n  note: row.note || '',\n  data_appuntamento: row.data_appuntamento || null,\n  data_appuntamento_label: row.data_appuntamento || null,\n  orario: row.orario || null,\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_appointment',\n      template_key: customerTemplate,\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_appointment:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_appointment',\n      template_key: 'appointment_internal_status_update',\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_appointment:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -519,7 +484,7 @@
           "conditions": [
             {
               "keyName": "id",
-              "keyValue": "={{$json.related_entity_id}}"
+              "keyValue": "={{ $('Parse Callback Data1').item.json.related_entity_id }}"
             }
           ]
         }
@@ -542,7 +507,7 @@
     {
       "parameters": {
         "operation": "get",
-        "tableId": "prenotazioni",
+        "tableId": "tenants",
         "filters": {
           "conditions": [
             {
@@ -569,7 +534,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Restaurant Row1').item.json || {};\nconst tenant = $('Get Restaurant Tenant Row1').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'restaurant_rejected' : 'restaurant_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  reservation_id: row.id,\n  nome_cliente: row.nome_cliente || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  data_prenotazione: row.data_prenotazione || null,\n  data_prenotazione_label: row.data_prenotazione || null,\n  ora: row.ora || null,\n  persone: row.persone || null,\n  note_prenotazione: row.note_prenotazione || '',\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: customerTemplate,\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_restaurant:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_status_update',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_restaurant:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+        "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Restaurant Row').item.json || {};\nconst tenant = $('Get Restaurant Tenant Row').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'restaurant_rejected' : 'restaurant_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  reservation_id: row.id,\n  nome_cliente: row.nome_cliente || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  data_prenotazione: row.data_prenotazione || null,\n  data_prenotazione_label: row.data_prenotazione || null,\n  ora: row.ora || null,\n  persone: row.persone || null,\n  note_prenotazione: row.note_prenotazione || '',\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: customerTemplate,\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_restaurant:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_status_update',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_restaurant:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -621,7 +586,6 @@
       }
     }
   ],
-  "pinData": {},
   "connections": {
     "Telegram Trigger": {
       "main": [
@@ -754,7 +718,7 @@
       "main": [
         [
           {
-            "node": "Insert Request Event",
+            "node": "Answer Callback1",
             "type": "main",
             "index": 0
           }
@@ -777,17 +741,6 @@
         [
           {
             "node": "Edit Telegram Message1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Insert Request Event": {
-      "main": [
-        [
-          {
-            "node": "Answer Callback1",
             "type": "main",
             "index": 0
           }
@@ -883,17 +836,868 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "8e4fae9a-b5e1-4a8d-9867-20d6a3ffe51e",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+    "templateCredsSetupCompleted": true
   },
-  "id": "AsPNECKuT5ZiFFYq",
+  "pinData": {},
+  "versionId": "69643c4b-384a-4b29-97af-7e56b555cd45",
+  "activeVersionId": "69643c4b-384a-4b29-97af-7e56b555cd45",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-27T14:11:38.870Z",
+      "createdAt": "2026-02-27T14:11:38.870Z",
+      "role": "workflow:owner",
+      "workflowId": "AsPNECKuT5ZiFFYq",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T14:23:57.312Z",
+    "createdAt": "2026-03-21T14:01:56.217Z",
+    "versionId": "69643c4b-384a-4b29-97af-7e56b555cd45",
+    "workflowId": "AsPNECKuT5ZiFFYq",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": [
+            "callback_query"
+          ],
+          "additionalFields": {}
+        },
+        "name": "Telegram Trigger",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          1872,
+          -800
+        ],
+        "id": "fa75ff28-199a-4058-8b47-67c2077783da",
+        "webhookId": "fd1d2c92-80ee-4fc2-a423-78fb68f5fb45",
+        "credentials": {
+          "telegramApi": {
+            "id": "MHrNkPgbqU0Q6vyM",
+            "name": "TG_Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const callback = $json.callback_query || {};\nconst data = String(callback.data || '').trim();\nconst [action, related_entity_type, related_entity_id] = data.split('|');\n\nconst mapping = {\n  restaurant_booking: {\n    table_name: 'prenotazioni',\n    field_name: 'stato',\n    accept_status: 'CONFERMATA',\n    reject_status: 'RIFIUTATA',\n    accept_label: 'Prenotazione ristorante confermata',\n    reject_label: 'Prenotazione ristorante rifiutata',\n  },\n  hotel_booking: {\n    table_name: 'hotel_bookings',\n    field_name: 'booking_status',\n    accept_status: 'confirmed',\n    reject_status: 'rejected',\n    accept_label: 'Richiesta soggiorno confermata',\n    reject_label: 'Richiesta soggiorno rifiutata',\n  },\n  appointment: {\n    table_name: 'appointments',\n    field_name: 'stato',\n    accept_status: 'confirmed',\n    reject_status: 'rejected',\n    accept_label: 'Appuntamento confermato',\n    reject_label: 'Appuntamento rifiutato',\n  },\n};\n\nconst target = mapping[related_entity_type] || null;\nconst operatorName = callback.from?.first_name || 'Team';\nconst originalText = callback.message?.text || 'Messaggio non disponibile';\nconst normalizedAction = String(action || '').trim().toLowerCase();\nconst actionTimestamp = new Date().toISOString();\nconst isAccept = normalizedAction === 'accept';\nconst isReject = normalizedAction === 'reject';\n\nreturn [{\n  json: {\n    ...$json,\n    callback_action: normalizedAction,\n    related_entity_type: related_entity_type || '',\n    related_entity_id: related_entity_id || '',\n    operator_name: operatorName,\n    original_text: originalText,\n    action_timestamp: actionTimestamp,\n    rejection_reason: isReject ? `Rifiutata da Telegram da ${operatorName}` : null,\n    new_status: target ? (isReject ? target.reject_status : target.accept_status) : '',\n    status_label: target ? (isReject ? target.reject_label : target.accept_label) : '',\n    ...target,\n    is_supported: Boolean(target && (isAccept || isReject) && related_entity_id),\n  },\n}];"
+        },
+        "name": "Parse Callback Data1",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2096,
+          -800
+        ],
+        "id": "bb2a2e62-c946-40ac-89a9-fffe4d17d51f"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "5fa6aff0-4d01-4842-92e7-71426653fc4f",
+                "leftValue": "={{ $json.is_supported }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Check Supported Callback1",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2320,
+          -800
+        ],
+        "id": "86f927b1-7dad-4dda-9705-3a610d758394"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "2fd20831-7e4e-43d4-b41e-49baa6af775c",
+                "leftValue": "={{ $json.related_entity_type === \"restaurant_booking\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "If Restaurant Booking1",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2544,
+          -864
+        ],
+        "id": "f021d2be-dc80-45d1-8699-40dea012f195"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "prenotazioni",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.related_entity_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "stato",
+                "fieldValue": "={{ $json.new_status }}"
+              },
+              {
+                "fieldId": "confirmed_at",
+                "fieldValue": "={{ $json.callback_action === \"accept\" ? $json.action_timestamp : null }}"
+              },
+              {
+                "fieldId": "confirmed_by",
+                "fieldValue": "={{ $json.callback_action === \"accept\" ? $json.operator_name : null }}"
+              },
+              {
+                "fieldId": "rejected_at",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.action_timestamp : null }}"
+              },
+              {
+                "fieldId": "rejected_by",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.operator_name : null }}"
+              },
+              {
+                "fieldId": "rejection_reason",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.rejection_reason : null }}"
+              }
+            ]
+          }
+        },
+        "name": "Confirm Restaurant Booking1",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3216,
+          -1104
+        ],
+        "id": "7e28d7a0-4e8b-4d49-8c9a-5d6ca5a0583d",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "fd977537-782d-4a1c-b051-d35215dfe3a4",
+                "leftValue": "={{ $json.related_entity_type === \"hotel_booking\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "If Hotel Booking1",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2768,
+          -768
+        ],
+        "id": "fa79e31e-a39b-47c7-9518-7c554da26601"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "hotel_bookings",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.related_entity_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "booking_status",
+                "fieldValue": "={{ $json.new_status }}"
+              }
+            ]
+          }
+        },
+        "name": "Confirm Hotel Booking1",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4112,
+          -912
+        ],
+        "id": "3a329cac-2429-4896-b5c2-3b996e0a99ba",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "93b87681-4a8a-4d59-a43e-a50e73f203ee",
+                "leftValue": "={{ $json.related_entity_type === \"appointment\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "If Appointment1",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2992,
+          -672
+        ],
+        "id": "93f5aacc-2393-4ce8-92e8-2f0e347df28f"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "appointments",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.related_entity_id }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "stato",
+                "fieldValue": "={{ $json.new_status }}"
+              },
+              {
+                "fieldId": "confirmed_at",
+                "fieldValue": "={{ $json.callback_action === \"accept\" ? $json.action_timestamp : null }}"
+              },
+              {
+                "fieldId": "confirmed_by",
+                "fieldValue": "={{ $json.callback_action === \"accept\" ? $json.operator_name : null }}"
+              },
+              {
+                "fieldId": "rejected_at",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.action_timestamp : null }}"
+              },
+              {
+                "fieldId": "rejected_by",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.operator_name : null }}"
+              },
+              {
+                "fieldId": "rejection_reason",
+                "fieldValue": "={{ $json.callback_action === \"reject\" ? $json.rejection_reason : null }}"
+              }
+            ]
+          }
+        },
+        "name": "Confirm Appointment1",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3216,
+          -720
+        ],
+        "id": "fd5de77c-c59c-4240-9468-4fab51d97d5d",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Parse Callback Data1').item.json;\nconst isReject = input.callback_action === 'reject';\n\nreturn [{\n  json: {\n    ...input,\n    callback_answer_text: input.status_label + ' da ' + input.operator_name,\n    edited_message_text: [\n      input.original_text,\n      '',\n      'Aggiornamento: ' + (isReject ? 'rifiutata' : 'accettata'),\n      (isReject ? 'Rifiutata da: ' : 'Accettata da: ') + input.operator_name,\n    ].join('\\n'),\n  },\n}];"
+        },
+        "name": "Build Accepted Response1",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4336,
+          -912
+        ],
+        "id": "a7634085-f53e-4c00-8d44-7dd170353ef1"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\nreturn [{\n  json: {\n    ...input,\n    callback_answer_text: 'Azione non supportata o dati callback non validi.',\n    edited_message_text: input.original_text || 'Azione non supportata.',\n  },\n}];"
+        },
+        "name": "Build Unsupported Response1",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3216,
+          -512
+        ],
+        "id": "16e5a3a7-0e9d-46c0-8309-b74229b3a072"
+      },
+      {
+        "parameters": {
+          "resource": "callback",
+          "queryId": "={{ $(\"Telegram Trigger\").item.json.callback_query.id }}",
+          "additionalFields": {
+            "text": "={{ $json.callback_answer_text }}"
+          }
+        },
+        "name": "Answer Callback1",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          4784,
+          -704
+        ],
+        "id": "c535bd41-b32a-4bc1-8237-c509983b6142",
+        "webhookId": "abd248d7-be13-48d5-8e2a-a5ffb8a4bc7b",
+        "credentials": {
+          "telegramApi": {
+            "id": "MHrNkPgbqU0Q6vyM",
+            "name": "TG_Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "editMessageText",
+          "chatId": "={{ $(\"Telegram Trigger\").item.json.callback_query.message.chat.id }}",
+          "messageId": "={{ $(\"Telegram Trigger\").item.json.callback_query.message.message_id }}",
+          "replyMarkup": "inlineKeyboard",
+          "text": "={{ $('Build Accepted Response1').item.json.edited_message_text || $('Build Unsupported Response1').item.json.edited_message_text || 'Aggiornamento non disponibile.' }}",
+          "inlineKeyboard": {
+            "rows": []
+          },
+          "additionalFields": {}
+        },
+        "name": "Edit Telegram Message1",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          5008,
+          -704
+        ],
+        "id": "e37815fb-be5a-43cf-97f5-103d9b3bd390",
+        "webhookId": "68b12c2c-1683-4bce-9924-5c9aab2d129a",
+        "credentials": {
+          "telegramApi": {
+            "id": "MHrNkPgbqU0Q6vyM",
+            "name": "TG_Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "appointments",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Parse Callback Data1').item.json.related_entity_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3440,
+          -720
+        ],
+        "id": "65e47371-de7d-4d66-83b6-9d7adc04fa93",
+        "name": "Get Appointment Row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "tenants",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "tenant_id",
+                "keyValue": "={{$('Get Appointment Row').item.json.tenant_id}}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3664,
+          -720
+        ],
+        "id": "860ea04d-6437-48e0-adb2-f1c1f640ecc1",
+        "name": "Get Appointment Tenant Row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Appointment Row').item.json || {};\nconst tenant = $('Get Appointment Tenant Row').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.nome || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'appointment_rejected' : 'appointment_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  appointment_id: row.id,\n  nome: row.nome || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  motivo: row.motivo || row.note || 'N/D',\n  note: row.note || '',\n  data_appuntamento: row.data_appuntamento || null,\n  data_appuntamento_label: row.data_appuntamento || null,\n  orario: row.orario || null,\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_appointment',\n      template_key: customerTemplate,\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_appointment:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_appointment',\n      template_key: 'appointment_internal_status_update',\n      related_entity_type: 'appointment',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_appointment:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3888,
+          -720
+        ],
+        "id": "e020dd99-582f-425e-b791-2fe7d4255e63",
+        "name": "Build Appointment Outbox Rows"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "prenotazioni",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Parse Callback Data1').item.json.related_entity_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3440,
+          -1104
+        ],
+        "id": "bfe1031f-1bb3-4fdd-9325-2cace61747d8",
+        "name": "Get Restaurant Row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "tenants",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "tenant_id",
+                "keyValue": "={{$('Get Restaurant Row').item.json.tenant_id}}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          3664,
+          -1104
+        ],
+        "id": "3fa441e9-0e2e-42c7-8cad-fb70e665c502",
+        "name": "Get Restaurant Tenant Row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const action = $('Parse Callback Data1').item.json;\nconst row = $('Get Restaurant Row').item.json || {};\nconst tenant = $('Get Restaurant Tenant Row').item.json || {};\n\nconst normalizeEmail = (value) => String(value || '').trim().toLowerCase();\nconst customerRecipient = normalizeEmail(row.email);\nconst internalRecipient = normalizeEmail(\n  tenant.notification_email || tenant.billing_email || tenant.mail || ''\n);\n\nconst activity = tenant.nome_attivita || tenant.nome_ristorante || tenant.hotel_name || row.tenant_id || 'Zirèl';\nconst now = action.action_timestamp;\nconst eventType = action.callback_action === 'reject' ? 'rejected' : 'confirmed';\nconst customerTemplate = action.callback_action === 'reject' ? 'restaurant_rejected' : 'restaurant_confirmed';\n\nconst payload = {\n  tenant_id: row.tenant_id,\n  nome_attivita: activity,\n  dashboard_url: 'https://dashboard.zirel.org?tab=prenotazioni',\n  reservation_id: row.id,\n  nome_cliente: row.nome_cliente || 'Cliente',\n  telefono: row.telefono || null,\n  email: row.email || null,\n  data_prenotazione: row.data_prenotazione || null,\n  data_prenotazione_label: row.data_prenotazione || null,\n  ora: row.ora || null,\n  persone: row.persone || null,\n  note_prenotazione: row.note_prenotazione || '',\n  rejection_reason: action.rejection_reason || null,\n  status: action.new_status,\n  actor: `telegram:${action.operator_name}`,\n};\n\nconst rows = [];\nconst dedupeBase = `telegram:${row.tenant_id}:${row.id}:${eventType}:${now}`;\n\nif (customerRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_guest_restaurant',\n      template_key: customerTemplate,\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: dedupeBase,\n      dedupe_key: `email_guest_restaurant:${dedupeBase}`,\n      recipient_email: customerRecipient,\n      payload,\n    },\n  });\n}\n\nif (internalRecipient) {\n  rows.push({\n    json: {\n      tenant_id: row.tenant_id,\n      channel: 'email_internal_restaurant',\n      template_key: 'restaurant_internal_status_update',\n      related_entity_type: 'restaurant_booking',\n      related_entity_id: row.id,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: now,\n      trace_id: `${dedupeBase}:internal`,\n      dedupe_key: `email_internal_restaurant:${dedupeBase}`,\n      recipient_email: internalRecipient,\n      payload,\n    },\n  });\n}\n\nreturn rows;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3888,
+          -1104
+        ],
+        "id": "ce3f3060-8349-4a8d-83a5-a3244b6ff258",
+        "name": "Build Restaurant Outbox Rows"
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "dataToSend": "autoMapInputData"
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4112,
+          -1104
+        ],
+        "id": "18a3907b-d0ad-463c-9bab-a015af26952d",
+        "name": "Insert Restaurant Outbox Rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "dataToSend": "autoMapInputData"
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          4112,
+          -720
+        ],
+        "id": "ee0e476f-6194-4ce6-9ef0-3483e7e482b5",
+        "name": "Insert Appointment Outbox Rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Parse Callback Data1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Callback Data1": {
+        "main": [
+          [
+            {
+              "node": "Check Supported Callback1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Supported Callback1": {
+        "main": [
+          [
+            {
+              "node": "If Restaurant Booking1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Unsupported Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Restaurant Booking1": {
+        "main": [
+          [
+            {
+              "node": "Confirm Restaurant Booking1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "If Hotel Booking1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirm Restaurant Booking1": {
+        "main": [
+          [
+            {
+              "node": "Get Restaurant Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Hotel Booking1": {
+        "main": [
+          [
+            {
+              "node": "Confirm Hotel Booking1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "If Appointment1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirm Hotel Booking1": {
+        "main": [
+          [
+            {
+              "node": "Build Accepted Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If Appointment1": {
+        "main": [
+          [
+            {
+              "node": "Confirm Appointment1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Unsupported Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirm Appointment1": {
+        "main": [
+          [
+            {
+              "node": "Get Appointment Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Accepted Response1": {
+        "main": [
+          [
+            {
+              "node": "Answer Callback1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Unsupported Response1": {
+        "main": [
+          [
+            {
+              "node": "Answer Callback1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Answer Callback1": {
+        "main": [
+          [
+            {
+              "node": "Edit Telegram Message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Appointment Row": {
+        "main": [
+          [
+            {
+              "node": "Get Appointment Tenant Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Appointment Tenant Row": {
+        "main": [
+          [
+            {
+              "node": "Build Appointment Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Appointment Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Appointment Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Restaurant Row": {
+        "main": [
+          [
+            {
+              "node": "Get Restaurant Tenant Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Restaurant Tenant Row": {
+        "main": [
+          [
+            {
+              "node": "Build Restaurant Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Restaurant Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Restaurant Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Restaurant Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Build Accepted Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Appointment Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Build Accepted Response1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 69643c4b",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

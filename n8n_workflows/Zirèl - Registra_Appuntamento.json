@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2026-03-21T18:37:01.622Z",
+  "createdAt": "2026-03-03T21:56:32.771Z",
+  "id": "d1LLF4mnxHeKcDJC",
   "name": "Zirèl - Registra_Appuntamento",
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -173,7 +178,7 @@
             },
             {
               "fieldId": "note",
-              "fieldValue": "={{ ($json.note || \"\") + (($json.motivo || \"\").trim() ? (($json.note || \"\").trim() ? \" | Motivo: \" : \"Motivo: \") + $json.motivo : \"\") || null }}"
+              "fieldValue": "={{ $json.note || null }}"
             },
             {
               "fieldId": "stato",
@@ -182,6 +187,10 @@
             {
               "fieldId": "source",
               "fieldValue": "={{ $json.source || \"chat_widget\" }}"
+            },
+            {
+              "fieldId": "motivo",
+              "fieldValue": "={{ $('Normalize Availability Response').item.json.motivo || null }}"
             }
           ]
         }
@@ -203,7 +212,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst now = new Date();\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\n\nconst normalizedBusinessType = normalizeSpaces(input.business_type).toLowerCase();\nconst normalizedAppointmentType = normalizeSpaces(input.appointment_type || 'demo_request').toLowerCase();\nconst nome = normalizeSpaces(input.nome)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst email = normalizeSpaces(input.email).toLowerCase();\nconst motivo = normalizeSpaces(input.motivo);\nconst note = normalizeSpaces(input.note);\nconst tenant_id = normalizeSpaces(input.tenant_id);\n\nconst SUPPORTED_SECTORS = ['professional', 'medical', 'legal', 'hotel'];\nconst SUPPORTED_TYPES = ['demo_request', 'intro_call', 'first_consultation', 'callback_request'];\n\nfunction getRomeDay(offsetDays = 0) {\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  const year = Number(parts.find((part) => part.type === 'year')?.value);\n  const month = Number(parts.find((part) => part.type === 'month')?.value);\n  const day = Number(parts.find((part) => part.type === 'day')?.value);\n  const date = new Date(Date.UTC(year, month - 1, day));\n  date.setUTCDate(date.getUTCDate() + offsetDays);\n  return date;\n}\n\nfunction toIso(date) {\n  const y = date.getUTCFullYear();\n  const m = String(date.getUTCMonth() + 1).padStart(2, '0');\n  const d = String(date.getUTCDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}\n\nfunction formatItalianLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nfunction getNextWeekday(weekday) {\n  const base = getRomeDay(0);\n  const current = base.getUTCDay();\n  let diff = weekday - current;\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeTime(inputTime) {\n  const raw = normalizeSpaces(inputTime).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction normalizeDate(dataInput) {\n  const raw = normalizeSpaces(dataInput).toLowerCase();\n  if (!raw) {\n    return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data appuntamento mancante.' };\n  }\n  if (['oggi'].includes(raw)) return { iso: toIso(getRomeDay(0)) };\n  if (['domani'].includes(raw)) return { iso: toIso(getRomeDay(1)) };\n\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n\n  if (weekdayMap[raw] !== undefined) {\n    return { iso: getNextWeekday(weekdayMap[raw]) };\n  }\n\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n\n  return {\n    iso: null,\n    code: 'NEED_EXACT_SLOT',\n    message: 'Data o orario non abbastanza precisi.',\n  };\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst normalizedTime = normalizeTime(input.orario);\nconst requiredEmail = normalizedAppointmentType === 'demo_request';\nconst hasRequiredFields = Boolean(\n  tenant_id &&\n  nome &&\n  telefono &&\n  motivo &&\n  parsedDate.iso &&\n  normalizedTime &&\n  (!requiredEmail || email)\n);\n\nlet validation_code = '';\nlet validation_message = '';\n\nif (!SUPPORTED_SECTORS.includes(normalizedBusinessType)) {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow gestisce solo appuntamenti per settori supportati diversi da restaurant.';\n} else if (!SUPPORTED_TYPES.includes(normalizedAppointmentType)) {\n  validation_code = 'UNSUPPORTED_APPOINTMENT_TYPE';\n  validation_message = 'Tipo appuntamento non supportato.';\n} else if (parsedDate.code) {\n  validation_code = parsedDate.code;\n  validation_message = parsedDate.message;\n} else if (!normalizedTime) {\n  validation_code = 'NEED_EXACT_SLOT';\n  validation_message = 'Per registrare l’appuntamento serve un orario preciso.';\n} else if (!hasRequiredFields) {\n  validation_code = 'MISSING_REQUIRED_FIELDS';\n  validation_message = 'Mancano uno o più campi obbligatori per registrare l’appuntamento.';\n}\n\nconst data_appuntamento = parsedDate.iso;\nconst data_appuntamento_label = formatItalianLabel(data_appuntamento);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    source,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    business_type: normalizedBusinessType,\n    appointment_type: normalizedAppointmentType,\n    nome,\n    telefono,\n    email,\n    motivo,\n    note,\n    orario: normalizedTime,\n    data_appuntamento,\n    data_appuntamento_label,\n    requested_slot_iso: data_appuntamento && normalizedTime ? `${data_appuntamento}T${normalizedTime}:00+01:00` : null,\n    is_supported_sector: SUPPORTED_SECTORS.includes(normalizedBusinessType),\n    is_supported_type: SUPPORTED_TYPES.includes(normalizedAppointmentType),\n    has_required_fields: hasRequiredFields,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code ? 'rejected' : 'pending_check',\n    retryable: false,\n    final_reply: '',\n    message: '',\n    code: validation_code || '',\n  },\n}];"
+        "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst now = new Date();\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\n\nconst normalizedBusinessType = normalizeSpaces(input.business_type).toLowerCase();\nconst normalizedAppointmentType = normalizeSpaces(input.appointment_type || 'standard_appointment').toLowerCase();\nconst nome = normalizeSpaces(input.nome)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst email = normalizeSpaces(input.email).toLowerCase();\nconst motivo = normalizeSpaces(input.motivo);\nconst note = normalizeSpaces(input.note);\nconst tenant_id = normalizeSpaces(input.tenant_id);\n\nconst SUPPORTED_SECTORS = ['professional', 'medical', 'legal', 'hotel'];\nconst SUPPORTED_TYPES = ['standard_appointment', 'demo_request', 'intro_call', 'first_consultation', 'callback_request'];\n\nfunction getRomeDay(offsetDays = 0) {\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  const year = Number(parts.find((part) => part.type === 'year')?.value);\n  const month = Number(parts.find((part) => part.type === 'month')?.value);\n  const day = Number(parts.find((part) => part.type === 'day')?.value);\n  const date = new Date(Date.UTC(year, month - 1, day));\n  date.setUTCDate(date.getUTCDate() + offsetDays);\n  return date;\n}\n\nfunction toIso(date) {\n  const y = date.getUTCFullYear();\n  const m = String(date.getUTCMonth() + 1).padStart(2, '0');\n  const d = String(date.getUTCDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}\n\nfunction formatItalianLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nfunction getNextWeekday(weekday) {\n  const base = getRomeDay(0);\n  const current = base.getUTCDay();\n  let diff = weekday - current;\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeTime(inputTime) {\n  const raw = normalizeSpaces(inputTime).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction normalizeDate(dataInput) {\n  const raw = normalizeSpaces(dataInput).toLowerCase();\n  if (!raw) {\n    return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data appuntamento mancante.' };\n  }\n  if (['oggi'].includes(raw)) return { iso: toIso(getRomeDay(0)) };\n  if (['domani'].includes(raw)) return { iso: toIso(getRomeDay(1)) };\n\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n\n  if (weekdayMap[raw] !== undefined) {\n    return { iso: getNextWeekday(weekdayMap[raw]) };\n  }\n\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n\n  return {\n    iso: null,\n    code: 'NEED_EXACT_SLOT',\n    message: 'Data o orario non abbastanza precisi.',\n  };\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst normalizedTime = normalizeTime(input.orario);\nconst requiredEmail = normalizedAppointmentType === 'demo_request';\nconst hasRequiredFields = Boolean(\n  tenant_id &&\n  nome &&\n  telefono &&\n  motivo &&\n  parsedDate.iso &&\n  normalizedTime &&\n  (!requiredEmail || email)\n);\n\nlet validation_code = '';\nlet validation_message = '';\n\nif (!SUPPORTED_SECTORS.includes(normalizedBusinessType)) {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow gestisce solo appuntamenti per settori supportati diversi da restaurant.';\n} else if (!SUPPORTED_TYPES.includes(normalizedAppointmentType)) {\n  validation_code = 'UNSUPPORTED_APPOINTMENT_TYPE';\n  validation_message = 'Tipo appuntamento non supportato.';\n} else if (parsedDate.code) {\n  validation_code = parsedDate.code;\n  validation_message = parsedDate.message;\n} else if (!normalizedTime) {\n  validation_code = 'NEED_EXACT_SLOT';\n  validation_message = 'Per registrare l’appuntamento serve un orario preciso.';\n} else if (!hasRequiredFields) {\n  validation_code = 'MISSING_REQUIRED_FIELDS';\n  validation_message = 'Mancano uno o più campi obbligatori per registrare l’appuntamento.';\n}\n\nconst data_appuntamento = parsedDate.iso;\nconst data_appuntamento_label = formatItalianLabel(data_appuntamento);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    source,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    business_type: normalizedBusinessType,\n    appointment_type: normalizedAppointmentType,\n    nome,\n    telefono,\n    email,\n    motivo,\n    note,\n    orario: normalizedTime,\n    data_appuntamento,\n    data_appuntamento_label,\n    requested_slot_iso: data_appuntamento && normalizedTime ? `${data_appuntamento}T${normalizedTime}:00+01:00` : null,\n    is_supported_sector: SUPPORTED_SECTORS.includes(normalizedBusinessType),\n    is_supported_type: SUPPORTED_TYPES.includes(normalizedAppointmentType),\n    has_required_fields: hasRequiredFields,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code ? 'rejected' : 'pending_check',\n    retryable: false,\n    final_reply: '',\n    message: '',\n    code: validation_code || '',\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -505,7 +514,6 @@
       "name": "Build Final Response"
     }
   ],
-  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -644,17 +652,684 @@
       ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "596a1450-627b-4179-a666-72c9069fbb62",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e5e4156406eb2781358eadbaabf7ac25423788a2a1b74d65514ae4da6dc2f496"
+    "templateCredsSetupCompleted": true
   },
-  "id": "d1LLF4mnxHeKcDJC",
+  "pinData": {},
+  "versionId": "914603ae-4f11-42db-8442-720a2e01fe19",
+  "activeVersionId": "914603ae-4f11-42db-8442-720a2e01fe19",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T21:56:32.771Z",
+      "createdAt": "2026-03-03T21:56:32.771Z",
+      "role": "workflow:owner",
+      "workflowId": "d1LLF4mnxHeKcDJC",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-03-21T18:37:03.890Z",
+    "createdAt": "2026-03-21T18:37:01.623Z",
+    "versionId": "914603ae-4f11-42db-8442-720a2e01fe19",
+    "workflowId": "d1LLF4mnxHeKcDJC",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "tenant_id"
+              },
+              {
+                "name": "telefono"
+              },
+              {
+                "name": "email"
+              },
+              {
+                "name": "data_input"
+              },
+              {
+                "name": "orario"
+              },
+              {
+                "name": "note"
+              },
+              {
+                "name": "motivo"
+              },
+              {
+                "name": "nome"
+              },
+              {
+                "name": "business_type"
+              },
+              {
+                "name": "appointment_type"
+              },
+              {
+                "name": "notification_email"
+              },
+              {
+                "name": "internal_email"
+              },
+              {
+                "name": "billing_email"
+              },
+              {
+                "name": "telegram_chat_id"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -4368,
+          -2848
+        ],
+        "id": "6d7dbf26-cd8d-4372-a0dc-68cbc8b7112d",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9cb9f4f9-c5b5-4f8e-ac9e-00bc85d1cb97",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "61b10517-d8b3-41f8-a248-f08029e8be0d",
+                "name": "code",
+                "value": "UNSUPPORTED_SECTOR",
+                "type": "string"
+              },
+              {
+                "id": "023ff387-7074-4a75-9dc6-40736eabacd1",
+                "name": "message",
+                "value": "Questo workflow gestisce solo appuntamenti per settori supportati diversi da restaurant.",
+                "type": "string"
+              },
+              {
+                "id": "ae650fca-1069-45b2-b322-4220dca03ef5",
+                "name": "final_reply",
+                "value": "Posso raccogliere i dati, ma questa richiesta non può essere registrata da questo flusso.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -3696,
+          -2944
+        ],
+        "id": "db7cd698-0673-4092-a769-cf24f8c0403d",
+        "name": "Unsupported Sector Response1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "2700a558-be41-4d62-baa9-eda6ee7f16b1",
+                "leftValue": "={{ !!$json.validation_code }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -3696,
+          -2752
+        ],
+        "id": "0e543fb7-2d1c-42af-87a1-ce29168b2472",
+        "name": "Check Required Fields1"
+      },
+      {
+        "parameters": {
+          "tableId": "appointments",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "business_type",
+                "fieldValue": "={{ $json.business_type }}"
+              },
+              {
+                "fieldId": "appointment_type",
+                "fieldValue": "={{ $json.appointment_type }}"
+              },
+              {
+                "fieldId": "nome",
+                "fieldValue": "={{ $json.nome }}"
+              },
+              {
+                "fieldId": "telefono",
+                "fieldValue": "={{ $json.telefono }}"
+              },
+              {
+                "fieldId": "email",
+                "fieldValue": "={{ $json.email || null }}"
+              },
+              {
+                "fieldId": "data_appuntamento",
+                "fieldValue": "={{ $json.data_appuntamento }}"
+              },
+              {
+                "fieldId": "orario",
+                "fieldValue": "={{ $json.orario }}"
+              },
+              {
+                "fieldId": "note",
+                "fieldValue": "={{ $json.note || null }}"
+              },
+              {
+                "fieldId": "stato",
+                "fieldValue": "={{ $json.business_status || \"manual_review\" }}"
+              },
+              {
+                "fieldId": "source",
+                "fieldValue": "={{ $json.source || \"chat_widget\" }}"
+              },
+              {
+                "fieldId": "motivo",
+                "fieldValue": "={{ $('Normalize Availability Response').item.json.motivo || null }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2576,
+          -2848
+        ],
+        "id": "ec30424c-2821-4568-9052-083a3eded8e5",
+        "name": "Create a row1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\n\nconst normalizeSpaces = (value) => String(value || '').replace(/\\s+/g, ' ').trim();\nconst now = new Date();\nconst trace_id = normalizeSpaces(input.trace_id) || (globalThis.crypto?.randomUUID?.() || `trace_${Date.now()}`);\nconst session_id = normalizeSpaces(input.session_id || input.conversation_id) || `session_${Date.now()}`;\nconst source = normalizeSpaces(input.source || 'chat_widget') || 'chat_widget';\n\nconst normalizedBusinessType = normalizeSpaces(input.business_type).toLowerCase();\nconst normalizedAppointmentType = normalizeSpaces(input.appointment_type || 'standard_appointment').toLowerCase();\nconst nome = normalizeSpaces(input.nome)\n  .split(' ')\n  .filter(Boolean)\n  .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())\n  .join(' ');\nconst telefono = normalizeSpaces(input.telefono).replace(/[^\\d+\\s]/g, '');\nconst email = normalizeSpaces(input.email).toLowerCase();\nconst motivo = normalizeSpaces(input.motivo);\nconst note = normalizeSpaces(input.note);\nconst tenant_id = normalizeSpaces(input.tenant_id);\n\nconst SUPPORTED_SECTORS = ['professional', 'medical', 'legal', 'hotel'];\nconst SUPPORTED_TYPES = ['standard_appointment', 'demo_request', 'intro_call', 'first_consultation', 'callback_request'];\n\nfunction getRomeDay(offsetDays = 0) {\n  const formatter = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Europe/Rome',\n    year: 'numeric',\n    month: '2-digit',\n    day: '2-digit',\n  });\n  const parts = formatter.formatToParts(now);\n  const year = Number(parts.find((part) => part.type === 'year')?.value);\n  const month = Number(parts.find((part) => part.type === 'month')?.value);\n  const day = Number(parts.find((part) => part.type === 'day')?.value);\n  const date = new Date(Date.UTC(year, month - 1, day));\n  date.setUTCDate(date.getUTCDate() + offsetDays);\n  return date;\n}\n\nfunction toIso(date) {\n  const y = date.getUTCFullYear();\n  const m = String(date.getUTCMonth() + 1).padStart(2, '0');\n  const d = String(date.getUTCDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}\n\nfunction formatItalianLabel(isoDate) {\n  if (!isoDate) return '';\n  const [year, month, day] = isoDate.split('-').map(Number);\n  return new Intl.DateTimeFormat('it-IT', {\n    timeZone: 'Europe/Rome',\n    weekday: 'long',\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n  }).format(new Date(Date.UTC(year, month - 1, day)));\n}\n\nfunction getNextWeekday(weekday) {\n  const base = getRomeDay(0);\n  const current = base.getUTCDay();\n  let diff = weekday - current;\n  if (diff <= 0) diff += 7;\n  base.setUTCDate(base.getUTCDate() + diff);\n  return toIso(base);\n}\n\nfunction normalizeTime(inputTime) {\n  const raw = normalizeSpaces(inputTime).toLowerCase();\n  if (!raw) return null;\n  const match = raw.match(/^(\\d{1,2})(?::|\\.|,)?(\\d{2})?$/);\n  if (!match) return null;\n  const hour = Number(match[1]);\n  const minute = Number(match[2] || '00');\n  if (hour > 23 || minute > 59) return null;\n  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;\n}\n\nfunction normalizeDate(dataInput) {\n  const raw = normalizeSpaces(dataInput).toLowerCase();\n  if (!raw) {\n    return { iso: null, code: 'MISSING_REQUIRED_FIELDS', message: 'Data appuntamento mancante.' };\n  }\n  if (['oggi'].includes(raw)) return { iso: toIso(getRomeDay(0)) };\n  if (['domani'].includes(raw)) return { iso: toIso(getRomeDay(1)) };\n\n  const weekdayMap = {\n    domenica: 0,\n    lunedi: 1,\n    'lunedì': 1,\n    martedi: 2,\n    'martedì': 2,\n    mercoledi: 3,\n    'mercoledì': 3,\n    giovedi: 4,\n    'giovedì': 4,\n    venerdi: 5,\n    'venerdì': 5,\n    sabato: 6,\n  };\n\n  if (weekdayMap[raw] !== undefined) {\n    return { iso: getNextWeekday(weekdayMap[raw]) };\n  }\n\n  const ddmmyyyy = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (ddmmyyyy) {\n    return {\n      iso: `${ddmmyyyy[3]}-${String(ddmmyyyy[2]).padStart(2, '0')}-${String(ddmmyyyy[1]).padStart(2, '0')}`,\n    };\n  }\n\n  const iso = raw.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);\n  if (iso) return { iso: raw };\n\n  return {\n    iso: null,\n    code: 'NEED_EXACT_SLOT',\n    message: 'Data o orario non abbastanza precisi.',\n  };\n}\n\nconst parsedDate = normalizeDate(input.data_input);\nconst normalizedTime = normalizeTime(input.orario);\nconst requiredEmail = normalizedAppointmentType === 'demo_request';\nconst hasRequiredFields = Boolean(\n  tenant_id &&\n  nome &&\n  telefono &&\n  motivo &&\n  parsedDate.iso &&\n  normalizedTime &&\n  (!requiredEmail || email)\n);\n\nlet validation_code = '';\nlet validation_message = '';\n\nif (!SUPPORTED_SECTORS.includes(normalizedBusinessType)) {\n  validation_code = 'UNSUPPORTED_SECTOR';\n  validation_message = 'Questo workflow gestisce solo appuntamenti per settori supportati diversi da restaurant.';\n} else if (!SUPPORTED_TYPES.includes(normalizedAppointmentType)) {\n  validation_code = 'UNSUPPORTED_APPOINTMENT_TYPE';\n  validation_message = 'Tipo appuntamento non supportato.';\n} else if (parsedDate.code) {\n  validation_code = parsedDate.code;\n  validation_message = parsedDate.message;\n} else if (!normalizedTime) {\n  validation_code = 'NEED_EXACT_SLOT';\n  validation_message = 'Per registrare l’appuntamento serve un orario preciso.';\n} else if (!hasRequiredFields) {\n  validation_code = 'MISSING_REQUIRED_FIELDS';\n  validation_message = 'Mancano uno o più campi obbligatori per registrare l’appuntamento.';\n}\n\nconst data_appuntamento = parsedDate.iso;\nconst data_appuntamento_label = formatItalianLabel(data_appuntamento);\n\nreturn [{\n  json: {\n    ...input,\n    tenant_id,\n    source,\n    trace_id,\n    session_id,\n    conversation_id: session_id,\n    business_type: normalizedBusinessType,\n    appointment_type: normalizedAppointmentType,\n    nome,\n    telefono,\n    email,\n    motivo,\n    note,\n    orario: normalizedTime,\n    data_appuntamento,\n    data_appuntamento_label,\n    requested_slot_iso: data_appuntamento && normalizedTime ? `${data_appuntamento}T${normalizedTime}:00+01:00` : null,\n    is_supported_sector: SUPPORTED_SECTORS.includes(normalizedBusinessType),\n    is_supported_type: SUPPORTED_TYPES.includes(normalizedAppointmentType),\n    has_required_fields: hasRequiredFields,\n    validation_code,\n    validation_message,\n    availability_status: validation_code ? 'validation_failed' : 'pending_check',\n    business_status: validation_code ? 'rejected' : 'pending_check',\n    retryable: false,\n    final_reply: '',\n    message: '',\n    code: validation_code || '',\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -4144,
+          -2848
+        ],
+        "id": "379feec9-d53f-4859-be06-f70e3865f9dd",
+        "name": "Normalize Appointment Request"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "fafb3231-05c1-42c8-a298-ddc2b9235f31",
+                "leftValue": "={{ $json.validation_code === \"UNSUPPORTED_SECTOR\" }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -3920,
+          -2848
+        ],
+        "id": "738b73ac-8031-4241-ad13-ab712eeb5354",
+        "name": "Check Supported Sector"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "80e63f9d-32d3-4e44-96d4-ca596580605d",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "81db2f2c-9a1c-4b19-bddd-3ddffc357233",
+                "name": "code",
+                "value": "={{ $json.validation_code }}",
+                "type": "string"
+              },
+              {
+                "id": "cc4e7704-3152-49ba-b1b4-28ff3ef32194",
+                "name": "message",
+                "value": "={{ $json.validation_message }}",
+                "type": "string"
+              },
+              {
+                "id": "938e014a-4526-48dc-9677-309558621acf",
+                "name": "final_reply",
+                "value": "={{ $json.validation_code === \"NEED_EXACT_SLOT\" ? \"Per registrare davvero l’appuntamento mi serve una data precisa e un orario preciso.\" : \"Per registrare l’appuntamento mi servono tutti i dati obbligatori, compreso il motivo della richiesta.\" }}",
+                "type": "string"
+              },
+              {
+                "id": "17ab4ecc-2e4d-4756-a5a1-4aa6c78c9d09",
+                "name": "tenant_id",
+                "value": "={{ $json.tenant_id }}",
+                "type": "string"
+              },
+              {
+                "id": "1efdb70e-199a-4ede-a20e-b6e36662958b",
+                "name": "trace_id",
+                "value": "={{ $json.trace_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -3472,
+          -2656
+        ],
+        "id": "cbd5a7ed-5c30-4c1f-8ba5-df0351f7d440",
+        "name": "Validation Error Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\nconst provider = String(\n  input.appointment_calendar_provider ||\n  input.calendar_provider ||\n  ''\n).trim().toLowerCase() || 'manual';\nconst provider_api_url = String(\n  input.appointment_calendar_api_url ||\n  input.calendar_api_url ||\n  input.availability_api_url ||\n  ''\n).trim();\nconst test_mode = String(input.adapter_test_mode ?? '').trim().toLowerCase() === 'true';\n\nreturn [{\n  json: {\n    ...input,\n    provider,\n    provider_api_url,\n    adapter_test_mode: test_mode || !provider_api_url,\n    availability_payload: {\n      tenant_id: input.tenant_id,\n      business_type: input.business_type,\n      action: 'confirm_appointment',\n      trace_id: input.trace_id,\n      session_id: input.session_id,\n      customer: {\n        nome: input.nome,\n        telefono: input.telefono,\n        email: input.email || null,\n      },\n      slot: {\n        date: input.data_appuntamento,\n        time: input.orario,\n        iso: input.requested_slot_iso,\n        appointment_type: input.appointment_type,\n        motivo: input.motivo,\n        note: input.note || null,\n      },\n    },\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -3472,
+          -2848
+        ],
+        "id": "be1b9aea-35c8-451d-bedf-e743ff69afbe",
+        "name": "Build Availability Payload"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "9d3be415-42b3-4e86-afcd-312f4db4de92",
+                "leftValue": "={{ !!String($json.provider_api_url || \"\").trim() && !$json.adapter_test_mode }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -3248,
+          -2848
+        ],
+        "id": "b4ba9bd0-472a-4116-88a7-879e26f79b56",
+        "name": "Use Live Availability Adapter"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{ $json.provider_api_url }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "X-TENANT-ID",
+                "value": "={{ $json.tenant_id }}"
+              },
+              {
+                "name": "X-TRACE-ID",
+                "value": "={{ $json.trace_id }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.availability_payload }}",
+          "options": {
+            "timeout": 15000
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -3024,
+          -2928
+        ],
+        "id": "ee9be4c3-1b9b-45d9-a5e7-1c33f0cdc4fe",
+        "name": "Availability Adapter",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $json;\nconst fromHttp = input.body || input.data || null;\nconst adapter = input.adapter_test_mode\n  ? {\n      success: false,\n      code: 'AVAILABILITY_ADAPTER_NOT_CONFIGURED',\n      availability_status: 'manual_review',\n      reference: null,\n      retryable: true,\n      provider: input.provider || 'manual',\n    }\n  : (fromHttp || input);\n\nconst success = Boolean(adapter.success);\nconst availability_status = String(adapter.availability_status || (success ? 'confirmed' : 'manual_review')).toLowerCase();\nconst business_status = success && ['available', 'reserved', 'confirmed'].includes(availability_status)\n  ? 'confirmed'\n  : (availability_status === 'unavailable' ? 'rejected' : 'manual_review');\nconst code = String(adapter.code || (success ? 'APPOINTMENT_SLOT_CONFIRMED' : 'APPOINTMENT_MANUAL_REVIEW'));\nconst retryable = Boolean(adapter.retryable ?? !success);\nconst reference = adapter.reference || adapter.booking_reference || adapter.slot_reference || null;\n\nlet final_reply = '';\nlet message = '';\n\nif (business_status === 'confirmed') {\n  message = 'Appuntamento registrato correttamente.';\n  final_reply = `Perfetto, ho registrato la tua richiesta per ${input.data_appuntamento_label} alle ${input.orario}. Il team ti contatterà a breve.`;\n} else if (business_status === 'rejected') {\n  message = 'Slot non disponibile.';\n  final_reply = `Ho raccolto la richiesta, ma ${input.data_appuntamento_label} alle ${input.orario} non risulta disponibile. Possiamo cercare un altro orario.`;\n} else {\n  message = 'Richiesta salvata per verifica manuale.';\n  final_reply = `Ho raccolto tutti i dati, ma non posso confermare subito la disponibilità per ${input.data_appuntamento_label} alle ${input.orario}. Il team verificherà e ti ricontatterà a breve.`;\n}\n\nreturn [{\n  json: {\n    ...input,\n    success: business_status === 'confirmed',\n    code,\n    message,\n    final_reply,\n    retryable,\n    reference,\n    availability_status,\n    business_status,\n    raw_provider_response: adapter,\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2800,
+          -2848
+        ],
+        "id": "7769504b-e602-4612-88ce-34e0f22b2eac",
+        "name": "Normalize Availability Response"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row1').item.json;\nconst basePayload = {\n  trace_id: input.trace_id,\n  session_id: input.session_id,\n  tenant_id: input.tenant_id,\n  business_type: input.business_type,\n  appointment_type: input.appointment_type,\n  appointment_id: record.id || null,\n  nome: input.nome,\n  telefono: input.telefono,\n  email: input.email || null,\n  motivo: input.motivo,\n  note: input.note || '',\n  data_appuntamento: input.data_appuntamento,\n  data_appuntamento_label: input.data_appuntamento_label,\n  orario: input.orario,\n  status: input.business_status,\n  provider_reference: input.reference || null,\n  internal_email: input.notification_email || input.billing_email || input.internal_email || null,\n  telegram_chat_id: input.telegram_chat_id || null,\n\n};\n\nconst internalEmail = String(\n  input.notification_email ||\n  input.billing_email ||\n  input.internal_email ||\n  ''\n).trim().toLowerCase();\n\n\nconst rows = [{\n  json: {\n    tenant_id: input.tenant_id,\n    channel: 'telegram_internal_appointment',\n      template_key: 'appointment_internal_alert',\n      related_entity_type: 'appointment',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':telegram_internal_appointment:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  }];\n\nif (input.email) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_guest_appointment',\n      template_key: 'appointment_guest_confirmation',\n      related_entity_type: 'appointment',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_guest_appointment:' + (record.id || input.trace_id),\n      payload: basePayload,\n    },\n  });\n}\n\nif (internalEmail) {\n  rows.push({\n    json: {\n      tenant_id: input.tenant_id,\n      channel: 'email_internal_appointment',\n      template_key: 'appointment_internal_alert',\n      related_entity_type: 'appointment',\n      related_entity_id: record.id || null,\n      status: 'pending',\n      retry_count: 0,\n      max_retries: 5,\n      next_retry_at: new Date().toISOString(),\n      trace_id: input.trace_id,\n      dedupe_key: input.tenant_id + ':email_internal_appointment:' + (record.id || input.trace_id),\n      recipient_email: internalEmail,\n      payload: basePayload,\n    },\n  });\n}\n\nreturn rows;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2352,
+          -2944
+        ],
+        "id": "ccf8e587-e450-4f3e-8b94-a56e38111cf5",
+        "name": "Build Notification Outbox Rows"
+      },
+      {
+        "parameters": {
+          "tableId": "notification_outbox",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "tenant_id",
+                "fieldValue": "={{ $json.tenant_id }}"
+              },
+              {
+                "fieldId": "channel",
+                "fieldValue": "={{ $json.channel }}"
+              },
+              {
+                "fieldId": "template_key",
+                "fieldValue": "={{ $json.template_key }}"
+              },
+              {
+                "fieldId": "related_entity_type",
+                "fieldValue": "={{ $json.related_entity_type }}"
+              },
+              {
+                "fieldId": "related_entity_id",
+                "fieldValue": "={{ $json.related_entity_id || null }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "={{ $json.status }}"
+              },
+              {
+                "fieldId": "retry_count",
+                "fieldValue": "={{ $json.retry_count }}"
+              },
+              {
+                "fieldId": "max_retries",
+                "fieldValue": "={{ $json.max_retries }}"
+              },
+              {
+                "fieldId": "next_retry_at",
+                "fieldValue": "={{ $json.next_retry_at }}"
+              },
+              {
+                "fieldId": "trace_id",
+                "fieldValue": "={{ $json.trace_id }}"
+              },
+              {
+                "fieldId": "booking_reference",
+                "fieldValue": "={{ $json.payload?.booking_reference || null }}"
+              },
+              {
+                "fieldId": "nome_attivita",
+                "fieldValue": "={{ $json.payload?.nome_struttura || null }}"
+              },
+              {
+                "fieldId": "dedupe_key",
+                "fieldValue": "={{ $json.dedupe_key }}"
+              },
+              {
+                "fieldId": "payload",
+                "fieldValue": "={{ $json.payload }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2128,
+          -2944
+        ],
+        "id": "4328375a-9473-4a6c-8b03-e75be2e35ced",
+        "name": "Insert Outbox Rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "bEyN805IWleebXdC",
+            "name": "Supabase account - Zirèl"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $('Normalize Availability Response').item.json;\nconst record = $('Create a row1').item.json;\nreturn [{\n  json: {\n    success: Boolean(input.success),\n    code: input.code || 'APPOINTMENT_RESULT_UNKNOWN',\n    message: input.message || 'Richiesta appuntamento processata.',\n    final_reply: input.final_reply || 'Ho raccolto la tua richiesta.',\n    tenant_id: input.tenant_id,\n    trace_id: input.trace_id,\n    session_id: input.session_id,\n    lead_id: record.id || null,\n    appointment_id: record.id || null,\n    appointment_type: input.appointment_type,\n    business_type: input.business_type,\n    data_appuntamento: input.data_appuntamento,\n    data_appuntamento_label: input.data_appuntamento_label,\n    orario: input.orario,\n    nome: input.nome,\n    telefono: input.telefono,\n    email: input.email || '',\n    note: input.note || '',\n    motivo: input.motivo || '',\n    booking_summary: `${input.appointment_type || 'appointment'} da ${input.nome} per ${input.data_appuntamento_label} alle ${input.orario}.`,\n    availability_status: input.availability_status,\n    business_status: input.business_status,\n    reference: input.reference || null,\n    retryable: Boolean(input.retryable),\n  },\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2352,
+          -2752
+        ],
+        "id": "72f1711e-1d63-4396-ac80-c80fd71246ce",
+        "name": "Build Final Response"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Normalize Appointment Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Required Fields1": {
+        "main": [
+          [
+            {
+              "node": "Validation Error Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Availability Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a row1": {
+        "main": [
+          [
+            {
+              "node": "Build Notification Outbox Rows",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Build Final Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Appointment Request": {
+        "main": [
+          [
+            {
+              "node": "Check Supported Sector",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Supported Sector": {
+        "main": [
+          [
+            {
+              "node": "Unsupported Sector Response1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Check Required Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Availability Payload": {
+        "main": [
+          [
+            {
+              "node": "Use Live Availability Adapter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Use Live Availability Adapter": {
+        "main": [
+          [
+            {
+              "node": "Availability Adapter",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Normalize Availability Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Availability Adapter": {
+        "main": [
+          [
+            {
+              "node": "Normalize Availability Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Availability Response": {
+        "main": [
+          [
+            {
+              "node": "Create a row1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Notification Outbox Rows": {
+        "main": [
+          [
+            {
+              "node": "Insert Outbox Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 914603ae",
+    "description": "",
+    "autosaved": true
+  },
   "tags": []
 }

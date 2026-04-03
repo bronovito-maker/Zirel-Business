@@ -30,7 +30,7 @@ export async function login(credentials: LoginCredentials): Promise<void> {
  * Logs out the current user and clears all session data.
  */
 export async function logout(): Promise<void> {
-    authService.clearSession();
+    await authService.clearSession();
 }
 
 /**
@@ -63,6 +63,10 @@ export function getCurrentSession(): AuthSession | null {
  */
 export async function fetchTenantData(): Promise<TenantData> {
     return authService.getTenantData();
+}
+
+export async function restoreSession(): Promise<boolean> {
+    return authService.restoreSession();
 }
 
 // ===== Backward Compatibility =====
