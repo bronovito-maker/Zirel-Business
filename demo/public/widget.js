@@ -246,11 +246,13 @@
         tooltip.id = 'chat-tooltip';
         tooltip.className = 'chat-tooltip';
         tooltip.textContent = (window.zirelTooltipMessages[0] || 'Hai una domanda? Ti aiuto subito. 💬');
+        tooltip.style.display = 'none';
         document.body.appendChild(tooltip);
 
         const widget = document.createElement('div');
         widget.id = 'n8n-widget-mock';
         widget.className = 'scale-0';
+        widget.style.display = 'none';
         widget.innerHTML = `
             <div class="brand-gradient">
                 <div id="zirel-widget-icon" class="chat-icon flex-shrink-0 text-2xl bg-white/20 rounded-full">💬</div>
@@ -282,6 +284,7 @@
         toggle.id = 'chat-toggle-btn';
         toggle.setAttribute('onclick', 'toggleDemo()');
         toggle.innerHTML = '<span id="toggle-icon-open">💬</span>';
+        toggle.style.display = 'none';
         document.body.appendChild(toggle);
     }
 
