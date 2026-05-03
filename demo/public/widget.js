@@ -44,13 +44,14 @@
         style.id = 'zirel-widget-style';
         style.textContent = `
             #chat-tooltip {
+                --zirel-tooltip-color: #FF8C42;
                 position: fixed;
                 right: 24px;
                 bottom: 88px;
                 max-width: 280px;
                 padding: 10px 14px;
                 border-radius: 14px;
-                background: #FF8C42;
+                background: var(--zirel-tooltip-color);
                 color: #fff;
                 font: 600 14px/1.35 Outfit, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
                 box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
@@ -59,6 +60,9 @@
                 pointer-events: none;
                 transition: opacity .25s ease, transform .25s ease;
                 z-index: 2147483645;
+            }
+            #chat-tooltip::after {
+                content: none;
             }
             #chat-tooltip.visible {
                 opacity: 1;
@@ -127,10 +131,11 @@
                 height: calc(100% - 148px);
                 overflow: auto;
                 background: #FFFAF1;
+                --chat-surface: #FFFAF1;
                 padding: 16px;
                 font-family: Outfit, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
             }
-            #chat-messages > div {
+            #chat-messages > div:not(.zirel-chat-message) {
                 margin-bottom: 12px;
                 background: #fff;
                 border: 1px solid #F2E5C8;
@@ -142,6 +147,95 @@
             }
             #chat-messages > div:last-child {
                 margin-bottom: 0;
+            }
+            .zirel-chat-message {
+                max-width: 90%;
+                margin-top: 12px;
+                padding: 14px 16px;
+                border-radius: 18px;
+                border: 1px solid rgba(0, 48, 73, 0.14);
+                box-shadow: 0 8px 18px rgba(0, 48, 73, 0.06);
+                font-size: 14px;
+                line-height: 1.45;
+                position: relative;
+                word-break: break-word;
+            }
+            .zirel-chat-message-user {
+                --bubble-fill: rgba(255, 140, 66, 0.14);
+                --bubble-stroke: rgba(255, 140, 66, 0.36);
+                margin-left: auto;
+                background: var(--bubble-fill);
+                border-color: var(--bubble-stroke);
+                border-radius: 18px;
+                border-top-right-radius: 9px;
+                color: #003049;
+            }
+            .zirel-chat-message-bot {
+                --bubble-fill: #fff;
+                --bubble-stroke: rgba(125, 211, 252, 0.72);
+                margin-right: auto;
+                background: var(--bubble-fill);
+                border-color: var(--bubble-stroke);
+                border-radius: 18px;
+                border-top-left-radius: 9px;
+                color: #003049;
+            }
+            .zirel-chat-message-loading .zirel-chat-content {
+                color: #64748b;
+            }
+            .zirel-typing-indicator {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                min-height: 1rem;
+            }
+            .zirel-typing-dot {
+                width: 0.44rem;
+                height: 0.44rem;
+                border-radius: 9999px;
+                background: #8aa0ba;
+                opacity: 0.35;
+                animation: zirelTypingPulse 1.1s ease-in-out infinite;
+            }
+            .zirel-typing-dot:nth-child(2) { animation-delay: 0.15s; }
+            .zirel-typing-dot:nth-child(3) { animation-delay: 0.3s; }
+            .zirel-typing-fallback {
+                font-style: italic;
+                color: #64748b;
+            }
+            @keyframes zirelTypingPulse {
+                0%, 80%, 100% { transform: translateY(0); opacity: 0.28; }
+                40% { transform: translateY(-2px); opacity: 0.9; }
+            }
+            .zirel-chat-message-error {
+                border-color: rgba(239, 68, 68, 0.45);
+                background: #fff5f5;
+            }
+            .zirel-chat-message-error .zirel-chat-content {
+                color: #b91c1c;
+            }
+            .zirel-chat-link-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 6px;
+                padding: 6px 12px;
+                border-radius: 9999px;
+                border: 1px solid rgba(255, 140, 66, 0.45);
+                background: rgba(255, 140, 66, 0.12);
+                color: #c76420;
+                font-weight: 700;
+                text-decoration: none;
+                transition: all .2s ease;
+            }
+            .zirel-chat-link-btn:hover {
+                background: rgba(255, 140, 66, 0.2);
+                border-color: rgba(255, 140, 66, 0.65);
+                transform: translateY(-1px);
+            }
+            .zirel-chat-link-btn::after {
+                content: '↗';
+                font-size: .8em;
             }
             #quick-replies-container {
                 display: grid;
@@ -263,7 +357,7 @@
                 <button class="chat-close" onclick="toggleDemo()">Chiudi</button>
             </div>
             <div id="chat-messages">
-                <div id="zirel-welcome-message">
+                <div id="zirel-welcome-message" class="zirel-chat-message zirel-chat-message-bot">
                     <p><strong style="color:#FF8C42">Ciao!</strong> Sono Zirèl.</p>
                     <p>Ti aiuto a rispondere subito ai tuoi clienti.</p>
                 </div>

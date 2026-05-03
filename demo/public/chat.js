@@ -92,6 +92,29 @@
             .join('');
     }
 
+    function decorateWelcomeBubble() {
+        const container = document.getElementById('chat-messages');
+        if (!container) return;
+
+        let welcomeEl = document.getElementById('zirel-welcome-message');
+        if (!welcomeEl) {
+            // Fallback per pagine legacy: prima bolla statica nel container chat.
+            const firstCandidate = Array.from(container.children).find((el) => {
+                if (!(el instanceof HTMLElement)) return false;
+                if (el.id === 'quick-replies-container') return false;
+                if (el.classList.contains('quick-replies')) return false;
+                return true;
+            });
+            if (firstCandidate) {
+                welcomeEl = firstCandidate;
+                welcomeEl.id = 'zirel-welcome-message';
+            }
+        }
+
+        if (!welcomeEl) return;
+        welcomeEl.className = 'zirel-chat-message zirel-chat-message-bot';
+    }
+
     function renderQuickReplies(items) {
         const quickReplies = document.getElementById('quick-replies-container');
         if (!quickReplies) return;
@@ -196,12 +219,14 @@
                 const tooltipEl = document.getElementById('chat-tooltip');
                 if (tooltipEl) {
                     tooltipEl.style.background = safeColor;
+                    tooltipEl.style.setProperty('--zirel-tooltip-color', safeColor);
                 }
             }
             if (welcome_message) {
                 const welcomeEl = document.getElementById('zirel-welcome-message');
                 if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(tenantServiceDisabled ? tenantServicePublicMessage : welcome_message);
             }
+            decorateWelcomeBubble();
             if (quick_replies) {
                 renderQuickReplies(tenantServiceDisabled ? [] : quick_replies);
             }
@@ -252,12 +277,14 @@
                 const tooltipEl = document.getElementById('chat-tooltip');
                 if (tooltipEl) {
                     tooltipEl.style.background = safeColor;
+                    tooltipEl.style.setProperty('--zirel-tooltip-color', safeColor);
                 }
             }
             if (welcome_message) {
                 const welcomeEl = document.getElementById('zirel-welcome-message');
                 if (welcomeEl) welcomeEl.innerHTML = renderWelcomeMessage(welcome_message);
             }
+            decorateWelcomeBubble();
             if (quick_replies) {
                 renderQuickReplies(quick_replies);
             }
@@ -285,14 +312,42 @@
         return s.replace(/[&<>'"]/g, tag => map[tag] || tag);
     }
 
+    function prettyLinkLabel(href, fallback = 'Apri link') {
+        try {
+            const url = new URL(href);
+            return `Apri ${url.hostname.replace(/^www\./i, '')}`;
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     function renderRichBotText(text) {
-        const safeText = escapeHTML(String(text == null ? '' : text));
-        const withLinks = safeText.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, (match) => {
-            const href = match.startsWith('www.') ? `https://${match}` : match;
-            return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-brand-orange underline break-all">${match}</a>`;
+        const rawText = String(text == null ? '' : text);
+        const linkTokens = [];
+
+        // [Testo link](https://url) -> CTA leggibile
+        const maskedMarkdown = rawText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi, (_, label, url) => {
+            const safeLabel = escapeHTML(String(label || '').trim() || prettyLinkLabel(url));
+            const safeUrl = escapeHTML(String(url || '').trim());
+            const token = `__ZIREL_LINK_TOKEN_${linkTokens.length}__`;
+            linkTokens.push(`<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="zirel-chat-link-btn" aria-label="${safeLabel}">${safeLabel}</a>`);
+            return token;
         });
 
-        return withLinks
+        const safeText = escapeHTML(maskedMarkdown);
+        const withLinks = safeText.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, (match) => {
+            const href = match.startsWith('www.') ? `https://${match}` : match;
+            const safeHref = escapeHTML(href);
+            const label = escapeHTML(prettyLinkLabel(href));
+            return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="zirel-chat-link-btn" aria-label="${label}">${label}</a>`;
+        });
+
+        const withRestoredMarkdownLinks = withLinks.replace(/__ZIREL_LINK_TOKEN_(\d+)__/g, (_, index) => {
+            const tokenIndex = Number(index);
+            return Number.isFinite(tokenIndex) && linkTokens[tokenIndex] ? linkTokens[tokenIndex] : '';
+        });
+
+        return withRestoredMarkdownLinks
             .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-brand-orange">$1</strong>')
             .replace(/\n/g, '<br>');
     }
@@ -490,20 +545,27 @@
 
         // Messaggio utente
         const userMsg = document.createElement('div');
-        userMsg.className = 'bg-brand-orange/10 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto max-w-[85%] text-sm text-brand-blue border border-brand-orange/20';
-        userMsg.innerText = text;
+        userMsg.className = 'zirel-chat-message zirel-chat-message-user';
+        userMsg.innerHTML = `<div class="zirel-chat-content">${escapeHTML(text).replace(/\n/g, '<br>')}</div>`;
         container.appendChild(userMsg);
         container.scrollTop = container.scrollHeight;
 
         // Loading
         const loadingMsg = document.createElement('div');
-        loadingMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[50%] text-sm border border-brand-sand/50 mt-4 italic text-slate-400';
-        loadingMsg.innerText = 'Scrivendo...';
+        loadingMsg.className = 'zirel-chat-message zirel-chat-message-bot zirel-chat-message-loading';
+        loadingMsg.innerHTML = `
+            <div class="zirel-chat-content zirel-typing-indicator" aria-label="Zirèl sta scrivendo" role="status">
+                <span class="zirel-typing-dot"></span>
+                <span class="zirel-typing-dot"></span>
+                <span class="zirel-typing-dot"></span>
+            </div>
+        `;
         container.appendChild(loadingMsg);
         container.scrollTop = container.scrollHeight;
 
         const slowResponseTimer = setTimeout(() => {
-            loadingMsg.innerText = 'Sto ancora recuperando la risposta...';
+            const content = loadingMsg.querySelector('.zirel-chat-content');
+            if (content) content.innerHTML = '<span class="zirel-typing-fallback">Sto ancora recuperando la risposta...</span>';
         }, 8000);
 
         console.log(`[Zirèl Chat] Sending message for tenant: ${tenantId}`);
@@ -557,18 +619,18 @@
             }
 
             const botMsg = document.createElement('div');
-            botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50 mt-4 whitespace-pre-line';
-            botMsg.innerHTML = renderRichBotText(botText);
+            botMsg.className = 'zirel-chat-message zirel-chat-message-bot';
+            botMsg.innerHTML = `<div class="zirel-chat-content">${renderRichBotText(botText)}</div>`;
             container.appendChild(botMsg);
             container.scrollTop = container.scrollHeight;
 
         } catch (e) {
             loadingMsg.remove();
             const botMsg = document.createElement('div');
-            botMsg.className = 'bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-red-200 mt-4 text-red-500';
-            botMsg.innerText = e?.name === 'AbortError'
+            botMsg.className = 'zirel-chat-message zirel-chat-message-bot zirel-chat-message-error';
+            botMsg.innerHTML = `<div class="zirel-chat-content">${escapeHTML(e?.name === 'AbortError'
                 ? 'La risposta sta impiegando troppo tempo. Riprova tra poco.'
-                : 'Non sono riuscito a contattare il server. Riprova tra poco.';
+                : 'Non sono riuscito a contattare il server. Riprova tra poco.')}</div>`;
             container.appendChild(botMsg);
             container.scrollTop = container.scrollHeight;
             console.error('Chat error:', e);
