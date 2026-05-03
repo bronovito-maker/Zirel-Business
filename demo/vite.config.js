@@ -35,6 +35,7 @@ export default defineConfig({
         pricingProfessional: resolve(__dirname, 'pricing-professional.html'),
         privacy: resolve(__dirname, 'privacy.html'),
         cookie: resolve(__dirname, 'cookie.html'),
+        chiSiamo: resolve(__dirname, 'chi-siamo.html'),
       },
       // Suppress Rollup warnings for static scripts intentionally served
       // from public/ without type="module". These scripts (config.js,

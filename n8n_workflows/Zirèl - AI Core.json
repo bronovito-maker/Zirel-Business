@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-03T13:51:58.668Z",
+  "updatedAt": "2026-05-03T17:29:24.392Z",
   "createdAt": "2026-03-01T23:45:29.584Z",
   "id": "vfYYOYyiEcSIzuze",
   "name": "Zirèl - AI Core",
@@ -18,7 +18,7 @@
       "typeVersion": 1.4,
       "position": [
         6864,
-        -1328
+        -1232
       ],
       "id": "aa143c78-62e1-4f4a-bc63-61857780cdd1",
       "name": "When chat message received",
@@ -92,10 +92,10 @@
       "typeVersion": 3.4,
       "position": [
         7088,
-        -1328
+        -1232
       ],
-      "id": "e6ddf818-0079-479c-96bf-548b72f89ec7",
-      "name": "Crystalize Context1"
+      "id": "b4064113-a694-478d-8400-5682a08bc020",
+      "name": "Crystalize Context"
     },
     {
       "parameters": {
@@ -136,10 +136,10 @@
       "typeVersion": 2.2,
       "position": [
         7312,
-        -1328
+        -1232
       ],
-      "id": "39122497-6439-4b48-a5bd-268078b525c1",
-      "name": "Security: Tenant Check1"
+      "id": "d923f3f4-dcc8-48af-a7ab-850a82b50366",
+      "name": "Security: Tenant Check"
     },
     {
       "parameters": {
@@ -149,7 +149,7 @@
           "conditions": [
             {
               "keyName": "tenant_id",
-              "keyValue": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+              "keyValue": "={{ $('Crystalize Context').item.json.tenant_id }}"
             }
           ]
         }
@@ -158,10 +158,10 @@
       "typeVersion": 1,
       "position": [
         7536,
-        -1328
+        -1232
       ],
-      "id": "11816f70-10e1-4db6-b5e0-d3be6ced6e21",
-      "name": "Get a row1",
+      "id": "54d7fcc5-aa1d-4160-b766-ad695b2bdc0f",
+      "name": "Get a row",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -171,21 +171,21 @@
     },
     {
       "parameters": {
-        "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || tenant.prompt_di_sistema || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Dopo una conferma finale già inviata, non ripetere automaticamente i dettagli nei messaggi sociali successivi.',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '13. Se usi il tool company_knowledge_base e non trovi la risposta esatta alla domanda dell’utente, rispondi subito dicendo che non hai l’informazione, senza riprovare il tool o altri tool.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Se l’utente chiede una consegna a domicilio (delivery) o asporto (takeaway), informa che l’ordine non può essere completato direttamente in chat e indirizzalo al link del sito web o al numero di telefono dell’attività.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
+        "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || tenant.prompt_di_sistema || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Se l’utente risponde con saluti, ringraziamenti (es. ’Grazie’, ’Grazie mille’) o messaggi puramente sociali/di chiusura, non ripetere le informazioni già date nei messaggi precedenti. Rispondi solo in modo breve e cortese (es. ’Prego! Se hai bisogno di altro sono qui.’).',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '13. Non usare mai il tool company_knowledge_base se l’utente sta solo salutando, ringraziando o dicendo parole di cortesia (es. ’ok’, ’grazie’, ’perfetto’).',\n  '14. Se usi il tool company_knowledge_base e non trovi la risposta esatta alla domanda dell’utente, rispondi subito dicendo che non hai l’informazione, senza riprovare il tool o altri tool.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Se l’utente chiede una consegna a domicilio (delivery) o asporto (takeaway), informa che l’ordine non può essere completato direttamente in chat e indirizzalo al link del sito web o al numero di telefono dell’attività.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         7984,
-        -1424
+        -1328
       ],
-      "id": "3b27addc-2983-46b0-b521-d93c1516393b",
-      "name": "Build Prompt1"
+      "id": "c2005ce8-ed5e-465f-bb86-950a6e290309",
+      "name": "Build Prompt"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $('Crystalize Context1').item.json.chatInput }}",
+        "text": "={{ $('Crystalize Context').item.json.chatInput }}",
         "options": {
           "systemMessage": "={{ $json.final_system_prompt }}\n",
           "maxIterations": 6
@@ -194,27 +194,27 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        8752,
-        -1424
+        8744,
+        -1328
       ],
-      "id": "b23db228-e747-470c-9461-ae92990ddb93",
-      "name": "AI Agent1",
+      "id": "cc8a52f5-0c45-49db-966d-35aa78810f13",
+      "name": "AI Agent",
       "onError": "continueRegularOutput"
     },
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Crystalize Context1').item.json.sessionId }}",
+        "sessionKey": "={{ $('Crystalize Context').item.json.sessionId }}",
         "contextWindowLength": 8
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
         8336,
-        -1200
+        -1104
       ],
-      "id": "7676784c-4c8e-47f1-88c4-1d5eb638a611",
-      "name": "Postgres Chat Memory1",
+      "id": "e4fe36ec-bc5c-4fbd-959c-3284cd2323ec",
+      "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
           "id": "y26w3cf5oDEAQXdB",
@@ -239,7 +239,7 @@
             "metadataValues": [
               {
                 "name": "tenant_id",
-                "value": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+                "value": "={{ $('Crystalize Context').item.json.tenant_id }}"
               }
             ]
           }
@@ -249,10 +249,10 @@
       "typeVersion": 1,
       "position": [
         8464,
-        -1200
+        -1104
       ],
-      "id": "7d63138e-d6da-46ee-acc5-a3e51a60f48d",
-      "name": "Supabase Vector Store1",
+      "id": "da560214-084a-4257-8044-f550a75ccd19",
+      "name": "Supabase Vector Store",
       "credentials": {
         "supabaseApi": {
           "id": "bEyN805IWleebXdC",
@@ -271,10 +271,10 @@
       "typeVersion": 1,
       "position": [
         8208,
-        -1200
+        -1104
       ],
-      "id": "763713da-bfd7-4c3b-9716-e4b9dc73a6ce",
-      "name": "Google Gemini Chat Model1",
+      "id": "3ed651cd-b5b3-4d46-9bda-63d29b831b6a",
+      "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
           "id": "UlhMJWQVjXFDMzf8",
@@ -290,10 +290,10 @@
       "typeVersion": 1,
       "position": [
         8544,
-        -992
+        -896
       ],
-      "id": "2198ee46-b773-4df9-98b7-d1defc1a5323",
-      "name": "Embeddings Google Gemini1",
+      "id": "c84e2578-9220-48b7-9c2a-30968b9dcc9e",
+      "name": "Embeddings Google Gemini",
       "credentials": {
         "googlePalmApi": {
           "id": "UlhMJWQVjXFDMzf8",
@@ -313,8 +313,8 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
             "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', `Valori ammessi: standard_appointment, demo_request, intro_call, first_consultation, callback_request. Default consigliato per richieste normali: standard_appointment.`, 'string') }}",
             "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
             "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
@@ -323,10 +323,10 @@
             "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
             "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
             "motivo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('motivo', ``, 'string') }}",
-            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-            "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || \"\" }}",
-            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+            "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row').item.json.internal_email || $('Get a row').item.json.mail || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+            "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -479,10 +479,10 @@
       "typeVersion": 2.2,
       "position": [
         8752,
-        -1200
+        -1104
       ],
-      "id": "a1c7c1cb-da46-4369-9564-f3ed6c660d56",
-      "name": "Registra_Appuntamento"
+      "id": "7d1d2446-b9b3-46fe-b0c4-b32712161351",
+      "name": "Registra_Appuntamento1"
     },
     {
       "parameters": {
@@ -497,18 +497,18 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
             "nome_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome_cliente', ``, 'string') }}",
             "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
             "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
             "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
             "persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('persone', ``, 'string') }}",
             "ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ora', ``, 'string') }}",
-            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-            "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
-            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+            "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row').item.json.mail || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+            "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}",
             "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
           },
           "matchingColumns": [],
@@ -652,10 +652,10 @@
       "typeVersion": 2.2,
       "position": [
         8880,
-        -1200
+        -1104
       ],
-      "id": "7094ec98-2b97-4af5-b4d4-b1c1a824dd17",
-      "name": "Registra_Prenotazione"
+      "id": "40300857-52d2-41c8-b4f9-794f64d748ca",
+      "name": "Registra_Prenotazione1"
     },
     {
       "parameters": {
@@ -670,8 +670,8 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
             "booking_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('booking_type', `standard_room_booking`, 'string') }}",
             "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
             "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
@@ -684,11 +684,11 @@
             "servizi_richiesti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servizi_richiesti', ``, 'string') }}",
             "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
             "lingua_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('lingua_cliente', `it`, 'string') }}",
-            "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita }}",
-            "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-            "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
-            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+            "nome_attivita": "={{ $('Get a row').item.json.nome_attivita }}",
+            "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+            "internal_email": "={{ $('Get a row').item.json.mail || \"\" }}",
+            "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+            "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -891,10 +891,10 @@
       "typeVersion": 2.2,
       "position": [
         9008,
-        -1200
+        -1104
       ],
-      "id": "a30a24b7-7871-4aa5-aad8-5b0f6218bd47",
-      "name": "Registra_Prenotazione_Hotel"
+      "id": "0f1e7e69-a545-4382-9e60-5195e7b923c2",
+      "name": "Registra_Prenotazione_Hotel1"
     },
     {
       "parameters": {
@@ -908,14 +908,14 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
-            "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
-            "user_request": "={{ $('Crystalize Context1').item.json.chatInput }}",
-            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-            "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
-            "indirizzo": "={{ $('Get a row1').item.json.indirizzo || '' }}",
-            "orari_apertura": "={{ $('Get a row1').item.json.orari_apertura || '' }}",
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "trace_id": "={{ $('Crystalize Context').item.json.trace_id || '' }}",
+            "session_id": "={{ $('Crystalize Context').item.json.sessionId || '' }}",
+            "user_request": "={{ $('Crystalize Context').item.json.chatInput }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+            "nome_attivita": "={{ $('Get a row').item.json.nome_attivita || '' }}",
+            "indirizzo": "={{ $('Get a row').item.json.indirizzo || '' }}",
+            "orari_apertura": "={{ $('Get a row').item.json.orari_apertura || '' }}",
             "current_date": "={{ DateTime.now().setZone('Europe/Rome').toFormat('dd/MM/yyyy') }}",
             "current_time": "={{ DateTime.now().setZone('Europe/Rome').toFormat('HH:mm') }}"
           },
@@ -1020,10 +1020,10 @@
       "typeVersion": 2.2,
       "position": [
         9136,
-        -1200
+        -1104
       ],
-      "id": "11879113-a293-40d7-9b90-ba136b2fd140",
-      "name": "Cerca_In_Zona"
+      "id": "418eb31b-03b9-4c5b-90d5-c47fa34e2a12",
+      "name": "Cerca_In_Zona1"
     },
     {
       "parameters": {
@@ -1037,23 +1037,23 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-            "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+            "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+            "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
             "request_type": "={{ $fromAI('request_type', '', 'string') }}",
             "request_text": "={{ $fromAI('request_text', '', 'string') }}",
             "requested_time": "={{ $fromAI('requested_time', '', 'string') }}",
-            "room": "={{ $('Crystalize Context1').item.json.room || '' }}",
-            "area": "={{ $('Crystalize Context1').item.json.area || '' }}",
+            "room": "={{ $('Crystalize Context').item.json.room || '' }}",
+            "area": "={{ $('Crystalize Context').item.json.area || '' }}",
             "guest_name": "={{ $fromAI('guest_name', '', 'string') }}",
             "telefono": "={{ $fromAI('telefono', '', 'string') }}",
-            "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
-            "notification_email": "={{ $('Get a row1').item.json.notification_email || '' }}",
-            "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || '' }}",
-            "billing_email": "={{ $('Get a row1').item.json.billing_email || '' }}",
-            "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || '' }}",
-            "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
-            "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
-            "source": "={{ $('Crystalize Context1').item.json.source || 'chat_widget' }}"
+            "nome_attivita": "={{ $('Get a row').item.json.nome_attivita || '' }}",
+            "notification_email": "={{ $('Get a row').item.json.notification_email || '' }}",
+            "internal_email": "={{ $('Get a row').item.json.internal_email || $('Get a row').item.json.mail || '' }}",
+            "billing_email": "={{ $('Get a row').item.json.billing_email || '' }}",
+            "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || '' }}",
+            "trace_id": "={{ $('Crystalize Context').item.json.trace_id || '' }}",
+            "session_id": "={{ $('Crystalize Context').item.json.sessionId || '' }}",
+            "source": "={{ $('Crystalize Context').item.json.source || 'chat_widget' }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -1236,10 +1236,10 @@
       "typeVersion": 2.2,
       "position": [
         9264,
-        -1200
+        -1104
       ],
-      "id": "8f401e54-3e51-46ba-b69e-ee4b1ca74751",
-      "name": "Inoltra_Richiesta_Reception"
+      "id": "5a59b1a0-7bf7-449c-ab74-e686d57b6b37",
+      "name": "Inoltra_Richiesta_Reception1"
     },
     {
       "parameters": {
@@ -1270,10 +1270,10 @@
       "typeVersion": 2.3,
       "position": [
         7760,
-        -1328
+        -1232
       ],
-      "id": "e6e8bcd1-25a3-4db8-ae03-5b2de373daf7",
-      "name": "Check Service Status"
+      "id": "e97caca3-8b1d-4247-bb2a-d2aedfa511fd",
+      "name": "Check Service Status1"
     },
     {
       "parameters": {
@@ -1330,10 +1330,10 @@
       "typeVersion": 3.4,
       "position": [
         7984,
-        -1232
+        -1136
       ],
-      "id": "88331615-21a1-47da-a98b-e289da0560a4",
-      "name": "Service Disabled Response"
+      "id": "f2899745-5f4a-4215-8bb5-8564c3b5b2d7",
+      "name": "Service Disabled Response1"
     }
   ],
   "connections": {
@@ -1341,168 +1341,168 @@
       "main": [
         [
           {
-            "node": "Crystalize Context1",
+            "node": "Crystalize Context",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Crystalize Context1": {
+    "Crystalize Context": {
       "main": [
         [
           {
-            "node": "Security: Tenant Check1",
+            "node": "Security: Tenant Check",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Security: Tenant Check1": {
+    "Security: Tenant Check": {
       "main": [
         [
           {
-            "node": "Get a row1",
+            "node": "Get a row",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get a row1": {
+    "Get a row": {
       "main": [
         [
           {
-            "node": "Check Service Status",
+            "node": "Check Service Status1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Build Prompt1": {
+    "Build Prompt": {
       "main": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Postgres Chat Memory1": {
+    "Postgres Chat Memory": {
       "ai_memory": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_memory",
             "index": 0
           }
         ]
       ]
     },
-    "Supabase Vector Store1": {
+    "Supabase Vector Store": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Google Gemini Chat Model1": {
+    "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     },
-    "Embeddings Google Gemini1": {
+    "Embeddings Google Gemini": {
       "ai_embedding": [
         [
           {
-            "node": "Supabase Vector Store1",
+            "node": "Supabase Vector Store",
             "type": "ai_embedding",
             "index": 0
           }
         ]
       ]
     },
-    "Registra_Appuntamento": {
+    "Registra_Appuntamento1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Registra_Prenotazione": {
+    "Registra_Prenotazione1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Registra_Prenotazione_Hotel": {
+    "Registra_Prenotazione_Hotel1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Cerca_In_Zona": {
+    "Cerca_In_Zona1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Inoltra_Richiesta_Reception": {
+    "Inoltra_Richiesta_Reception1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent1",
+            "node": "AI Agent",
             "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Check Service Status": {
+    "Check Service Status1": {
       "main": [
         [
           {
-            "node": "Build Prompt1",
+            "node": "Build Prompt",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Service Disabled Response",
+            "node": "Service Disabled Response1",
             "type": "main",
             "index": 0
           }
@@ -1513,7 +1513,7 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false,
+    "availableInMCP": true,
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
@@ -1522,8 +1522,8 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "530bfbb5-ccd4-462d-994f-564224580c7a",
-  "activeVersionId": "530bfbb5-ccd4-462d-994f-564224580c7a",
+  "versionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
+  "activeVersionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
   "triggerCount": 1,
   "shared": [
     {
@@ -1535,9 +1535,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-05-03T13:51:58.672Z",
-    "createdAt": "2026-05-03T13:51:58.672Z",
-    "versionId": "530bfbb5-ccd4-462d-994f-564224580c7a",
+    "updatedAt": "2026-05-03T17:29:36.313Z",
+    "createdAt": "2026-05-03T17:29:24.394Z",
+    "versionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
     "workflowId": "vfYYOYyiEcSIzuze",
     "nodes": [
       {
@@ -1552,7 +1552,7 @@
         "typeVersion": 1.4,
         "position": [
           6864,
-          -1328
+          -1232
         ],
         "id": "aa143c78-62e1-4f4a-bc63-61857780cdd1",
         "name": "When chat message received",
@@ -1626,10 +1626,10 @@
         "typeVersion": 3.4,
         "position": [
           7088,
-          -1328
+          -1232
         ],
-        "id": "e6ddf818-0079-479c-96bf-548b72f89ec7",
-        "name": "Crystalize Context1"
+        "id": "b4064113-a694-478d-8400-5682a08bc020",
+        "name": "Crystalize Context"
       },
       {
         "parameters": {
@@ -1670,10 +1670,10 @@
         "typeVersion": 2.2,
         "position": [
           7312,
-          -1328
+          -1232
         ],
-        "id": "39122497-6439-4b48-a5bd-268078b525c1",
-        "name": "Security: Tenant Check1"
+        "id": "d923f3f4-dcc8-48af-a7ab-850a82b50366",
+        "name": "Security: Tenant Check"
       },
       {
         "parameters": {
@@ -1683,7 +1683,7 @@
             "conditions": [
               {
                 "keyName": "tenant_id",
-                "keyValue": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+                "keyValue": "={{ $('Crystalize Context').item.json.tenant_id }}"
               }
             ]
           }
@@ -1692,10 +1692,10 @@
         "typeVersion": 1,
         "position": [
           7536,
-          -1328
+          -1232
         ],
-        "id": "11816f70-10e1-4db6-b5e0-d3be6ced6e21",
-        "name": "Get a row1",
+        "id": "54d7fcc5-aa1d-4160-b766-ad695b2bdc0f",
+        "name": "Get a row",
         "credentials": {
           "supabaseApi": {
             "id": "bEyN805IWleebXdC",
@@ -1705,21 +1705,21 @@
       },
       {
         "parameters": {
-          "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || tenant.prompt_di_sistema || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Dopo una conferma finale già inviata, non ripetere automaticamente i dettagli nei messaggi sociali successivi.',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '13. Se usi il tool company_knowledge_base e non trovi la risposta esatta alla domanda dell’utente, rispondi subito dicendo che non hai l’informazione, senza riprovare il tool o altri tool.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Se l’utente chiede una consegna a domicilio (delivery) o asporto (takeaway), informa che l’ordine non può essere completato direttamente in chat e indirizzalo al link del sito web o al numero di telefono dell’attività.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
+          "jsCode": "const tenant = $json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome' });\nconst timeStr = now.toLocaleTimeString('it-IT', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Europe/Rome'\n});\n\nconst rawType = String(tenant.business_type || 'professional').toLowerCase().trim();\nlet businessType = 'professional';\nif (['restaurant', 'ristorante', 'locale', 'chiringuito', 'pizzeria'].includes(rawType)) businessType = 'restaurant';\nelse if (['hotel', 'albergo', 'b&b', 'bnb', 'struttura'].includes(rawType)) businessType = 'hotel';\nelse if (['medical', 'medico', 'studio_medico', 'clinica'].includes(rawType)) businessType = 'medical';\nelse if (['legal', 'legale', 'avvocato', 'studio_legale'].includes(rawType)) businessType = 'legal';\n\nconst addField = (fields, label, value) => {\n  if (value && String(value).trim() !== '') fields.push(`- ${label}: ${value}`);\n};\n\nconst fields = [];\naddField(fields, 'Nome Attività', tenant.nome_attivita);\naddField(fields, 'Telefono', tenant.telefono);\naddField(fields, 'Email', tenant.mail);\naddField(fields, 'Indirizzo', tenant.indirizzo);\naddField(fields, 'Orari Apertura', tenant.orari_apertura);\naddField(fields, 'Check-in/out', tenant.orari_checkin_checkout);\naddField(fields, 'Servizi Inclusi', tenant.servizi_inclusi);\naddField(fields, 'Prezzi', tenant.prezzo_medio);\naddField(fields, 'Link Booking', tenant.link_booking_esterno);\naddField(fields, 'Link Prenotazione Tavoli', tenant.link_prenotazione_tavoli);\naddField(fields, 'Info Utili', tenant.dati_testuali_brevi);\n\nconst sessionFields = [];\naddField(sessionFields, 'Sorgente Conversazione', tenant.source);\naddField(sessionFields, 'Client', tenant.client);\naddField(sessionFields, 'Camera', tenant.room);\naddField(sessionFields, 'Area', tenant.area);\naddField(sessionFields, 'Entry URL', tenant.entry_url);\n\nconst final_system_prompt = [\n  'Oggi è il giorno: ' + dateStr,\n  'Ora attuale: ' + timeStr,\n  'Fuso orario: Europe/Rome',\n  '',\n  '[IDENTITÀ]',\n  tenant.prompt_base || tenant.prompt_di_sistema || 'Sei un assistente AI professionale, cordiale e affidabile.',\n  '',\n  '[REGOLE BULLETPROOF]',\n  '1. Non inventare mai disponibilità, conferme, prezzi, stati di pagamento, eventi, luoghi, indirizzi o orari se non risultano chiaramente dal contesto o dai tool.',\n  '2. Nessuna prenotazione o appuntamento è confermata prima del successo del tool corretto.',\n  '3. Se un tool restituisce success:false o un codice di errore, usa il final_reply del tool oppure spiega che la richiesta è stata raccolta ma non confermata.',\n  '4. Se l’utente corregge un dato, il valore più recente sostituisce sempre il precedente.',\n  '5. Se l’utente risponde con saluti, ringraziamenti (es. ’Grazie’, ’Grazie mille’) o messaggi puramente sociali/di chiusura, non ripetere le informazioni già date nei messaggi precedenti. Rispondi solo in modo breve e cortese (es. ’Prego! Se hai bisogno di altro sono qui.’).',\n  '6. Se la richiesta è vaga su data, orario o luogo, chiedi una sola precisazione breve e utile.',\n  '7. Non menzionare mai tenant_id, trace_id, session_id o dettagli tecnici all’utente.',\n  '8. Rispondi in modo breve, naturale e focalizzato sul prossimo passo utile.',\n  '9. Se la richiesta è semplice, informativa o conversazionale e puoi rispondere con il prompt e il contesto attività, rispondi subito senza usare tool.',\n  '10. Per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche o altri punti di interesse vicini, usa Cerca_In_Zona una sola volta.',\n  '11. Se nel contesto sessione è presente una camera o un’area, trattala come informazione operativa valida della conversazione e usala quando la richiesta riguarda la struttura.',\n  '12. Camera o area sono contesto operativo interno della struttura, non cambiano la località geografica della ricerca locale.',\n  '13. Non usare mai il tool company_knowledge_base se l’utente sta solo salutando, ringraziando o dicendo parole di cortesia (es. ’ok’, ’grazie’, ’perfetto’).',\n  '14. Se usi il tool company_knowledge_base e non trovi la risposta esatta alla domanda dell’utente, rispondi subito dicendo che non hai l’informazione, senza riprovare il tool o altri tool.',\n  '',\n  '[MACCHINA A STATI CONVERSAZIONALE]',\n  '- Raccolta dati: chiedi solo il prossimo dato mancante.',\n  '- Riepilogo: quando hai tutti i dati obbligatori, fai un solo riepilogo chiaro.',\n  '- Conferma esplicita: prima di chiamare il tool devi ottenere un “sì / confermo / ok” esplicito.',\n  '- Chiamata tool: usa il tool una sola volta con i dati più recenti.',\n  '- Post-tool: se successo, usa la risposta del tool; se fallisce, non improvvisare.',\n  '',\n  '[SETTORE]',\n  'Business type normalizzato: ' + businessType,\n  '',\n  '[REGOLE SETTORIALI]',\n  businessType === 'restaurant' ? '- Per prenotazioni tavolo raccogli: nome_cliente, telefono, email, data_input, ora, persone, note_prenotazione opzionali.' : '',\n  businessType === 'restaurant' ? '- Se l’utente chiede una consegna a domicilio (delivery) o asporto (takeaway), informa che l’ordine non può essere completato direttamente in chat e indirizzalo al link del sito web o al numero di telefono dell’attività.' : '',\n  businessType === 'restaurant' ? '- Non confermare disponibilità tavoli senza il tool Registra_Prenotazione.' : '',\n  businessType === 'restaurant' ? '- Gruppi numerosi devono andare in manual review o contatto diretto.' : '',\n  businessType === 'hotel' ? '- Per soggiorni raccogli: nome, telefono, email, check-in, check-out, ospiti.' : '',\n  businessType === 'hotel' ? '- Non confermare disponibilità camere senza il tool Registra_Prenotazione_Hotel.' : '',\n  businessType === 'hotel' ? '- Se il contesto sessione contiene una camera, usala come riferimento operativo per richieste alla struttura come asciugamani, reception, manutenzione o assistenza ospite.' : '',\n  businessType === 'hotel' ? '- Per richieste operative hotel come asciugamani, cuscini, amenities, manutenzione, sveglia o taxi organizzato dalla struttura usa Inoltra_Richiesta_Reception.' : '',\n  businessType === 'hotel' ? '- Se nel contesto sessione è presente una camera, usala come riferimento operativo per richieste alla struttura.' : '',\n  businessType === 'hotel' ? '- Se il tool restituisce payment_url, condividilo senza dire che la prenotazione è conclusa finché lo stato non è confirmed.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Per appuntamenti e demo raccogli: nome, telefono, email quando richiesta, data precisa, orario preciso, motivo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = standard_appointment per richieste operative, sopralluoghi, interventi, consulenze standard o appuntamenti generici.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Usa appointment_type = demo_request solo per demo commerciali, presentazioni prodotto o richieste esplicite di demo.' : '',\n  ['professional', 'medical', 'legal', 'hotel'].includes(businessType) ? '- Non confermare slot reali senza il tool Registra_Appuntamento.' : '',\n  '',\n  '[CONTESTO ATTIVITÀ]',\n  fields.join('\\\\n'),\n  '',\n  '[CONTESTO SESSIONE]',\n  sessionFields.join('\\\\n'),\n  '',\n  '[UTILIZZO TOOLS]',\n  '- company_knowledge_base:',\n  '  - Usalo per documenti lunghi, FAQ dettagliate, menu o listini.',\n  '  - Non usarlo per luoghi, negozi, eventi o attività esterne al business.',\n  '- Cerca_In_Zona:',\n  '  - Usalo per richieste su eventi, cose da fare, negozi, farmacie, tabaccai, parcheggi, taxi, bar, discoteche e punti di interesse vicini.',\n  '  - Se l’utente usa espressioni come \"qui vicino\", \"in zona\", \"vicino all’hotel\", il tool deve usare la località della struttura o chiedere una sola precisazione se il contesto non basta.',\n  '  - Se esiste una camera o un’area nel contesto sessione, mantienila come informazione utile ma non usarla per cambiare città o zona geografica della ricerca.',\n  '  - Usa il tool una sola volta per messaggio.',\n  '  - Se il tool restituisce final_reply, usalo come base della risposta finale senza rilanciare altre ricerche.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool.',\n  '  - Se trovi risultati chiari, puoi riassumere massimo 3 opzioni utili.',\n  '- Registra_Prenotazione:',\n  '  - Solo per business_type restaurant.',\n  '  - Richiede tenant_id, trace_id, session_id, nome_cliente, telefono, data_input, ora, persone.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool non conferma, non dichiarare mai prenotazione registrata.',\n  '- Registra_Appuntamento:',\n  '  - Solo per settori supportati diversi da restaurant.',\n  '  - appointment_type supportati: standard_appointment, demo_request, intro_call, first_consultation, callback_request.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, data_input, orario, motivo.',\n  '  - Per standard_appointment email non è obbligatoria.',\n  '  - Per demo_request email è obbligatoria.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review o errore, usa il final_reply del tool.',\n  '- Registra_Prenotazione_Hotel:',\n  '  - Solo per business_type hotel.',\n  '  - Richiede tenant_id, trace_id, session_id, nome, telefono, email, checkin_input, checkout_input, ospiti_adulti.',\n  '  - Prima del tool: riepilogo + conferma esplicita.',\n  '  - Se il tool ritorna manual_review, non dichiarare disponibilità o conferma.',\n  '- Inoltra_Richiesta_Reception:',\n  '  - Solo per business_type hotel.',\n  '  - Usalo per richieste operative interne come asciugamani, cuscini, amenities, manutenzione, sveglia, richiamo reception o taxi organizzato dalla struttura.',\n  '  - Richiede request_text chiaro.',\n  '  - Se disponibili, passa anche request_type, requested_time, room e area.',\n  '  - Se il tool restituisce success:true, puoi dire che la richiesta è stata inoltrata alla reception.',\n  '  - Se il tool restituisce success:false, usa il final_reply del tool e non promettere presa in carico.',\n].filter(Boolean).join('\\\\n');\n\nreturn {\n  normalized_business_type: businessType,\n  final_system_prompt,\n};"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
           7984,
-          -1424
+          -1328
         ],
-        "id": "3b27addc-2983-46b0-b521-d93c1516393b",
-        "name": "Build Prompt1"
+        "id": "c2005ce8-ed5e-465f-bb86-950a6e290309",
+        "name": "Build Prompt"
       },
       {
         "parameters": {
           "promptType": "define",
-          "text": "={{ $('Crystalize Context1').item.json.chatInput }}",
+          "text": "={{ $('Crystalize Context').item.json.chatInput }}",
           "options": {
             "systemMessage": "={{ $json.final_system_prompt }}\n",
             "maxIterations": 6
@@ -1728,27 +1728,27 @@
         "type": "@n8n/n8n-nodes-langchain.agent",
         "typeVersion": 3.1,
         "position": [
-          8752,
-          -1424
+          8744,
+          -1328
         ],
-        "id": "b23db228-e747-470c-9461-ae92990ddb93",
-        "name": "AI Agent1",
+        "id": "cc8a52f5-0c45-49db-966d-35aa78810f13",
+        "name": "AI Agent",
         "onError": "continueRegularOutput"
       },
       {
         "parameters": {
           "sessionIdType": "customKey",
-          "sessionKey": "={{ $('Crystalize Context1').item.json.sessionId }}",
+          "sessionKey": "={{ $('Crystalize Context').item.json.sessionId }}",
           "contextWindowLength": 8
         },
         "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
         "typeVersion": 1.3,
         "position": [
           8336,
-          -1200
+          -1104
         ],
-        "id": "7676784c-4c8e-47f1-88c4-1d5eb638a611",
-        "name": "Postgres Chat Memory1",
+        "id": "e4fe36ec-bc5c-4fbd-959c-3284cd2323ec",
+        "name": "Postgres Chat Memory",
         "credentials": {
           "postgres": {
             "id": "y26w3cf5oDEAQXdB",
@@ -1773,7 +1773,7 @@
               "metadataValues": [
                 {
                   "name": "tenant_id",
-                  "value": "={{ $('Crystalize Context1').item.json.tenant_id }}"
+                  "value": "={{ $('Crystalize Context').item.json.tenant_id }}"
                 }
               ]
             }
@@ -1783,10 +1783,10 @@
         "typeVersion": 1,
         "position": [
           8464,
-          -1200
+          -1104
         ],
-        "id": "7d63138e-d6da-46ee-acc5-a3e51a60f48d",
-        "name": "Supabase Vector Store1",
+        "id": "da560214-084a-4257-8044-f550a75ccd19",
+        "name": "Supabase Vector Store",
         "credentials": {
           "supabaseApi": {
             "id": "bEyN805IWleebXdC",
@@ -1805,10 +1805,10 @@
         "typeVersion": 1,
         "position": [
           8208,
-          -1200
+          -1104
         ],
-        "id": "763713da-bfd7-4c3b-9716-e4b9dc73a6ce",
-        "name": "Google Gemini Chat Model1",
+        "id": "3ed651cd-b5b3-4d46-9bda-63d29b831b6a",
+        "name": "Google Gemini Chat Model",
         "credentials": {
           "googlePalmApi": {
             "id": "UlhMJWQVjXFDMzf8",
@@ -1824,10 +1824,10 @@
         "typeVersion": 1,
         "position": [
           8544,
-          -992
+          -896
         ],
-        "id": "2198ee46-b773-4df9-98b7-d1defc1a5323",
-        "name": "Embeddings Google Gemini1",
+        "id": "c84e2578-9220-48b7-9c2a-30968b9dcc9e",
+        "name": "Embeddings Google Gemini",
         "credentials": {
           "googlePalmApi": {
             "id": "UlhMJWQVjXFDMzf8",
@@ -1847,8 +1847,8 @@
           "workflowInputs": {
             "mappingMode": "defineBelow",
             "value": {
-              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
               "appointment_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_type', `Valori ammessi: standard_appointment, demo_request, intro_call, first_consultation, callback_request. Default consigliato per richieste normali: standard_appointment.`, 'string') }}",
               "note": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note', ``, 'string') }}",
               "orario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('orario', ``, 'string') }}",
@@ -1857,10 +1857,10 @@
               "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
               "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
               "motivo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('motivo', ``, 'string') }}",
-              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-              "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || \"\" }}",
-              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+              "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row').item.json.internal_email || $('Get a row').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}"
             },
             "matchingColumns": [],
             "schema": [
@@ -2013,10 +2013,10 @@
         "typeVersion": 2.2,
         "position": [
           8752,
-          -1200
+          -1104
         ],
-        "id": "a1c7c1cb-da46-4369-9564-f3ed6c660d56",
-        "name": "Registra_Appuntamento"
+        "id": "7d1d2446-b9b3-46fe-b0c4-b32712161351",
+        "name": "Registra_Appuntamento1"
       },
       {
         "parameters": {
@@ -2031,18 +2031,18 @@
           "workflowInputs": {
             "mappingMode": "defineBelow",
             "value": {
-              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
+              "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
               "nome_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome_cliente', ``, 'string') }}",
               "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
               "data_input": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data_input', ``, 'string') }}",
               "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
               "persone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('persone', ``, 'string') }}",
               "ora": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ora', ``, 'string') }}",
-              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-              "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
-              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}",
+              "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+              "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}",
               "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
             },
             "matchingColumns": [],
@@ -2186,10 +2186,10 @@
         "typeVersion": 2.2,
         "position": [
           8880,
-          -1200
+          -1104
         ],
-        "id": "7094ec98-2b97-4af5-b4d4-b1c1a824dd17",
-        "name": "Registra_Prenotazione"
+        "id": "40300857-52d2-41c8-b4f9-794f64d748ca",
+        "name": "Registra_Prenotazione1"
       },
       {
         "parameters": {
@@ -2204,8 +2204,8 @@
           "workflowInputs": {
             "mappingMode": "defineBelow",
             "value": {
-              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
               "booking_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('booking_type', `standard_room_booking`, 'string') }}",
               "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
               "telefono": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefono', ``, 'string') }}",
@@ -2218,11 +2218,11 @@
               "servizi_richiesti": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servizi_richiesti', ``, 'string') }}",
               "note_prenotazione": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('note_prenotazione', ``, 'string') }}",
               "lingua_cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('lingua_cliente', `it`, 'string') }}",
-              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita }}",
-              "notification_email": "={{ $('Get a row1').item.json.notification_email || \"\" }}",
-              "internal_email": "={{ $('Get a row1').item.json.mail || \"\" }}",
-              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || \"\" }}",
-              "billing_email": "={{ $('Get a row1').item.json.billing_email || \"\" }}"
+              "nome_attivita": "={{ $('Get a row').item.json.nome_attivita }}",
+              "notification_email": "={{ $('Get a row').item.json.notification_email || \"\" }}",
+              "internal_email": "={{ $('Get a row').item.json.mail || \"\" }}",
+              "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || \"\" }}",
+              "billing_email": "={{ $('Get a row').item.json.billing_email || \"\" }}"
             },
             "matchingColumns": [],
             "schema": [
@@ -2425,10 +2425,10 @@
         "typeVersion": 2.2,
         "position": [
           9008,
-          -1200
+          -1104
         ],
-        "id": "a30a24b7-7871-4aa5-aad8-5b0f6218bd47",
-        "name": "Registra_Prenotazione_Hotel"
+        "id": "0f1e7e69-a545-4382-9e60-5195e7b923c2",
+        "name": "Registra_Prenotazione_Hotel1"
       },
       {
         "parameters": {
@@ -2442,14 +2442,14 @@
           "workflowInputs": {
             "mappingMode": "defineBelow",
             "value": {
-              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-              "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
-              "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
-              "user_request": "={{ $('Crystalize Context1').item.json.chatInput }}",
-              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
-              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
-              "indirizzo": "={{ $('Get a row1').item.json.indirizzo || '' }}",
-              "orari_apertura": "={{ $('Get a row1').item.json.orari_apertura || '' }}",
+              "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+              "trace_id": "={{ $('Crystalize Context').item.json.trace_id || '' }}",
+              "session_id": "={{ $('Crystalize Context').item.json.sessionId || '' }}",
+              "user_request": "={{ $('Crystalize Context').item.json.chatInput }}",
+              "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
+              "nome_attivita": "={{ $('Get a row').item.json.nome_attivita || '' }}",
+              "indirizzo": "={{ $('Get a row').item.json.indirizzo || '' }}",
+              "orari_apertura": "={{ $('Get a row').item.json.orari_apertura || '' }}",
               "current_date": "={{ DateTime.now().setZone('Europe/Rome').toFormat('dd/MM/yyyy') }}",
               "current_time": "={{ DateTime.now().setZone('Europe/Rome').toFormat('HH:mm') }}"
             },
@@ -2554,10 +2554,10 @@
         "typeVersion": 2.2,
         "position": [
           9136,
-          -1200
+          -1104
         ],
-        "id": "11879113-a293-40d7-9b90-ba136b2fd140",
-        "name": "Cerca_In_Zona"
+        "id": "418eb31b-03b9-4c5b-90d5-c47fa34e2a12",
+        "name": "Cerca_In_Zona1"
       },
       {
         "parameters": {
@@ -2571,23 +2571,23 @@
           "workflowInputs": {
             "mappingMode": "defineBelow",
             "value": {
-              "tenant_id": "={{ $('Crystalize Context1').item.json.tenant_id }}",
-              "business_type": "={{ $('Build Prompt1').item.json.normalized_business_type }}",
+              "tenant_id": "={{ $('Crystalize Context').item.json.tenant_id }}",
+              "business_type": "={{ $('Build Prompt').item.json.normalized_business_type }}",
               "request_type": "={{ $fromAI('request_type', '', 'string') }}",
               "request_text": "={{ $fromAI('request_text', '', 'string') }}",
               "requested_time": "={{ $fromAI('requested_time', '', 'string') }}",
-              "room": "={{ $('Crystalize Context1').item.json.room || '' }}",
-              "area": "={{ $('Crystalize Context1').item.json.area || '' }}",
+              "room": "={{ $('Crystalize Context').item.json.room || '' }}",
+              "area": "={{ $('Crystalize Context').item.json.area || '' }}",
               "guest_name": "={{ $fromAI('guest_name', '', 'string') }}",
               "telefono": "={{ $fromAI('telefono', '', 'string') }}",
-              "nome_attivita": "={{ $('Get a row1').item.json.nome_attivita || '' }}",
-              "notification_email": "={{ $('Get a row1').item.json.notification_email || '' }}",
-              "internal_email": "={{ $('Get a row1').item.json.internal_email || $('Get a row1').item.json.mail || '' }}",
-              "billing_email": "={{ $('Get a row1').item.json.billing_email || '' }}",
-              "telegram_chat_id": "={{ $('Get a row1').item.json.telegram_chat_id || '' }}",
-              "trace_id": "={{ $('Crystalize Context1').item.json.trace_id || '' }}",
-              "session_id": "={{ $('Crystalize Context1').item.json.sessionId || '' }}",
-              "source": "={{ $('Crystalize Context1').item.json.source || 'chat_widget' }}"
+              "nome_attivita": "={{ $('Get a row').item.json.nome_attivita || '' }}",
+              "notification_email": "={{ $('Get a row').item.json.notification_email || '' }}",
+              "internal_email": "={{ $('Get a row').item.json.internal_email || $('Get a row').item.json.mail || '' }}",
+              "billing_email": "={{ $('Get a row').item.json.billing_email || '' }}",
+              "telegram_chat_id": "={{ $('Get a row').item.json.telegram_chat_id || '' }}",
+              "trace_id": "={{ $('Crystalize Context').item.json.trace_id || '' }}",
+              "session_id": "={{ $('Crystalize Context').item.json.sessionId || '' }}",
+              "source": "={{ $('Crystalize Context').item.json.source || 'chat_widget' }}"
             },
             "matchingColumns": [],
             "schema": [
@@ -2770,10 +2770,10 @@
         "typeVersion": 2.2,
         "position": [
           9264,
-          -1200
+          -1104
         ],
-        "id": "8f401e54-3e51-46ba-b69e-ee4b1ca74751",
-        "name": "Inoltra_Richiesta_Reception"
+        "id": "5a59b1a0-7bf7-449c-ab74-e686d57b6b37",
+        "name": "Inoltra_Richiesta_Reception1"
       },
       {
         "parameters": {
@@ -2804,10 +2804,10 @@
         "typeVersion": 2.3,
         "position": [
           7760,
-          -1328
+          -1232
         ],
-        "id": "e6e8bcd1-25a3-4db8-ae03-5b2de373daf7",
-        "name": "Check Service Status"
+        "id": "e97caca3-8b1d-4247-bb2a-d2aedfa511fd",
+        "name": "Check Service Status1"
       },
       {
         "parameters": {
@@ -2864,10 +2864,10 @@
         "typeVersion": 3.4,
         "position": [
           7984,
-          -1232
+          -1136
         ],
-        "id": "88331615-21a1-47da-a98b-e289da0560a4",
-        "name": "Service Disabled Response"
+        "id": "f2899745-5f4a-4215-8bb5-8564c3b5b2d7",
+        "name": "Service Disabled Response1"
       }
     ],
     "connections": {
@@ -2875,168 +2875,168 @@
         "main": [
           [
             {
-              "node": "Crystalize Context1",
+              "node": "Crystalize Context",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Crystalize Context1": {
+      "Crystalize Context": {
         "main": [
           [
             {
-              "node": "Security: Tenant Check1",
+              "node": "Security: Tenant Check",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Security: Tenant Check1": {
+      "Security: Tenant Check": {
         "main": [
           [
             {
-              "node": "Get a row1",
+              "node": "Get a row",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Get a row1": {
+      "Get a row": {
         "main": [
           [
             {
-              "node": "Check Service Status",
+              "node": "Check Service Status1",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Build Prompt1": {
+      "Build Prompt": {
         "main": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Postgres Chat Memory1": {
+      "Postgres Chat Memory": {
         "ai_memory": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_memory",
               "index": 0
             }
           ]
         ]
       },
-      "Supabase Vector Store1": {
+      "Supabase Vector Store": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Google Gemini Chat Model1": {
+      "Google Gemini Chat Model": {
         "ai_languageModel": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_languageModel",
               "index": 0
             }
           ]
         ]
       },
-      "Embeddings Google Gemini1": {
+      "Embeddings Google Gemini": {
         "ai_embedding": [
           [
             {
-              "node": "Supabase Vector Store1",
+              "node": "Supabase Vector Store",
               "type": "ai_embedding",
               "index": 0
             }
           ]
         ]
       },
-      "Registra_Appuntamento": {
+      "Registra_Appuntamento1": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Registra_Prenotazione": {
+      "Registra_Prenotazione1": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Registra_Prenotazione_Hotel": {
+      "Registra_Prenotazione_Hotel1": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Cerca_In_Zona": {
+      "Cerca_In_Zona1": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Inoltra_Richiesta_Reception": {
+      "Inoltra_Richiesta_Reception1": {
         "ai_tool": [
           [
             {
-              "node": "AI Agent1",
+              "node": "AI Agent",
               "type": "ai_tool",
               "index": 0
             }
           ]
         ]
       },
-      "Check Service Status": {
+      "Check Service Status1": {
         "main": [
           [
             {
-              "node": "Build Prompt1",
+              "node": "Build Prompt",
               "type": "main",
               "index": 0
             }
           ],
           [
             {
-              "node": "Service Disabled Response",
+              "node": "Service Disabled Response1",
               "type": "main",
               "index": 0
             }
@@ -3045,9 +3045,9 @@
       }
     },
     "authors": "nikita bronovs",
-    "name": null,
-    "description": null,
-    "autosaved": false
+    "name": "Version e2da85a2",
+    "description": "",
+    "autosaved": true
   },
   "tags": []
 }

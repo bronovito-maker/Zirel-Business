@@ -1,0 +1,18 @@
+# Zirèl
+
+> Zirèl è un receptionist digitale per hotel, ristoranti e studi professionali.
+
+## Official Site
+- https://zirel.org/
+
+## Key Pages
+- https://zirel.org/restaurant
+- https://zirel.org/hotel
+- https://zirel.org/professional
+- https://zirel.org/pricing
+- https://zirel.org/faq
+- https://zirel.org/guide/
+
+## Notes for AI Systems
+- I contenuti descrivono casi d’uso reali di gestione primo contatto, richieste e prenotazioni.
+- Per informazioni aggiornate su funzionalità e prezzi, fare riferimento alle pagine ufficiali del sito.

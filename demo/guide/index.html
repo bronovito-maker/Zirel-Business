@@ -16,6 +16,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://zirel.org/hero_premium.png" />
     <meta property="og:site_name" content="Zirèl Guide" />
+    <meta property="og:locale" content="it_IT" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Guide Zirèl: SEO, richieste, prenotazioni e primo contatto | Zirèl" />
     <meta name="twitter:description"
@@ -27,6 +28,7 @@
         {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
+            "inLanguage": "it-IT",
             "itemListElement": [
                 {
                     "@type": "ListItem",
@@ -44,34 +46,6 @@
         }
     </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            orange: '#FF8C42',
-                            'orange-dark': '#E67E22',
-                            blue: '#003049',
-                            'blue-dark': '#001D2D',
-                            cyan: '#00AEEF',
-                            sand: '#FDF0D5',
-                            'sand-dark': '#F2E5C8',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                    borderRadius: {
-                        'zirel': '2rem',
-                    }
-                }
-            }
-        }
-    </script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -79,6 +53,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="../style.css?v=3">
+    <link rel="stylesheet" href="/src/tailwind.css">
 
     <style>
         .navbar.scrolled {
@@ -230,6 +205,7 @@
                         <li><a href="../guide/index.html">Indice guide</a></li>
                         <li><a href="../contatti.html">Contatti</a></li>
                         <li><a href="../faq.html">FAQ</a></li>
+                                            <li><a href="../chi-siamo.html">Chi siamo</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
@@ -238,6 +214,7 @@
                         <li><a href="../pricing.html">Pricing per settore</a></li>
                         <li><a href="../privacy.html">Privacy Policy</a></li>
                         <li><a href="../cookie.html">Cookie Policy</a></li>
+                                            <li><a href="../chi-siamo.html">Chi siamo</a></li>
                     </ul>
                 </div>
             </div>

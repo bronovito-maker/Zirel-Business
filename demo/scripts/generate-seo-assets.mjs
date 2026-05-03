@@ -102,28 +102,56 @@ async function generateRobots() {
   await writeFile(path.join(publicDir, 'robots.txt'), robots, 'utf8');
 }
 
+async function generateLlmsTxt() {
+  const lines = [
+    '# Zirèl',
+    '',
+    '> Zirèl è un receptionist digitale per hotel, ristoranti e studi professionali.',
+    '',
+    '## Official Site',
+    `- ${siteUrl}/`,
+    '',
+    '## Key Pages',
+    `- ${siteUrl}/restaurant`,
+    `- ${siteUrl}/hotel`,
+    `- ${siteUrl}/professional`,
+    `- ${siteUrl}/pricing`,
+    `- ${siteUrl}/faq`,
+    `- ${siteUrl}/guide/`,
+    '',
+    '## Notes for AI Systems',
+    '- I contenuti descrivono casi d’uso reali di gestione primo contatto, richieste e prenotazioni.',
+    '- Per informazioni aggiornate su funzionalità e prezzi, fare riferimento alle pagine ufficiali del sito.',
+    '',
+  ].join('\n');
+
+  await writeFile(path.join(publicDir, 'llms.txt'), lines, 'utf8');
+}
+
 async function validateCanonicalTargets() {
-  const files = [
-    'index.html',
-    'restaurant.html',
-    'hotel.html',
-    'professional.html',
-    'faq.html',
-    'guide/index.html',
-    'guide/ai-per-ristoranti.html',
-    'guide/come-aumentare-prenotazioni-ristorante.html',
-    'guide/automazione-richieste-hotel.html',
-    'guide/whatsapp-hotel-prenotazioni.html',
-    'guide/gestione-primo-contatto-studi-professionali.html',
-    'guide/come-filtrare-richieste-clienti-prima-appuntamento.html',
-  ];
+  const htmlFiles = await collectHtmlFiles(demoRoot);
+  const files = htmlFiles.filter((relativeFile) => {
+    const urlPath = pathToUrlPath(relativeFile);
+    return !excludedPaths.has(urlPath);
+  });
 
   for (const relativeFile of files) {
     const absoluteFile = path.join(demoRoot, relativeFile);
     const html = await readFile(absoluteFile, 'utf8');
+    const urlPath = pathToUrlPath(relativeFile);
+    const expectedCanonical = `${siteUrl}${urlPath}`;
 
-    if (!html.includes('rel="canonical"')) {
+    const canonicalMatch = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"\s*\/?>/i);
+    if (!canonicalMatch) {
       throw new Error(`Canonical mancante in ${relativeFile}`);
+    }
+
+    const canonicalHref = canonicalMatch[1].replace(/\/+$/, '');
+    const normalizedExpected = expectedCanonical.replace(/\/+$/, '');
+    if (canonicalHref !== normalizedExpected) {
+      throw new Error(
+        `Canonical non allineato in ${relativeFile}: trovato "${canonicalMatch[1]}", atteso "${expectedCanonical}"`
+      );
     }
   }
 }
@@ -132,3 +160,4 @@ await mkdir(publicDir, { recursive: true });
 await validateCanonicalTargets();
 await generateSitemap();
 await generateRobots();
+await generateLlmsTxt();

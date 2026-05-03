@@ -18,6 +18,7 @@
     <meta property="og:type" content="article" />
     <meta property="og:image" content="https://zirel.org/hero_premium.png" />
     <meta property="og:site_name" content="Zirèl Hotel" />
+    <meta property="og:locale" content="it_IT" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title"
@@ -38,29 +39,34 @@
         }
     </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            orange: '#FF8C42',
-                            'orange-dark': '#E67E22',
-                            blue: '#003049',
-                            'blue-dark': '#001D2D',
-                            cyan: '#00AEEF',
-                            sand: '#FDF0D5',
-                            'sand-dark': '#F2E5C8',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                    borderRadius: {
-                        'zirel': '2rem',
-                    }
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "WhatsApp per hotel e prenotazioni: quando aiuta davvero e come usarlo bene | Zirèl",
+            "description": "WhatsApp può aiutare gli hotel a gestire più richieste e rispondere più in fretta, ma solo se il percorso resta ordinato. Ecco come usarlo bene.",
+            "inLanguage": "it-IT",
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://zirel.org/guide/whatsapp-hotel-prenotazioni"
+            },
+            "image": ["https://zirel.org/hero_premium.png"],
+            "datePublished": "2026-04-03",
+            "dateModified": "2026-05-03",
+            "author": {
+                "@type": "Organization",
+                "name": "Redazione Zirèl"
+            },
+            "editor": {
+                "@type": "Organization",
+                "name": "Team Prodotto Zirèl"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "Zirèl",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://zirel.org/favicon.svg"
                 }
             }
         }
@@ -73,6 +79,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="../style.css?v=3">
+    <link rel="stylesheet" href="/src/tailwind.css">
 
     <style>
         .navbar.scrolled {
@@ -168,6 +175,11 @@
                     Molti ospiti preferiscono scrivere un messaggio piuttosto che chiamare. Il punto, però, non è solo essere presenti su WhatsApp:
                     e capire come usarlo senza trasformarlo in un altro canale caotico per la reception.
                 </p>
+                <div data-e-eat="meta" class="mt-8 inline-flex flex-col gap-1 rounded-2xl bg-white/80 border border-slate-200 px-5 py-3 text-sm text-brand-blue/70">
+                    <span><strong>Autore:</strong> Redazione Zirèl</span>
+                    <span><strong>Editor:</strong> Team Prodotto Zirèl</span>
+                    <span><strong>Aggiornato:</strong> 3 maggio 2026</span>
+                </div>
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="../hotel.html"
                         class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-xl shadow-brand-orange/30 border border-white/20">
@@ -441,6 +453,7 @@
                         <li><a href="../guide/index.html">Indice guide</a></li>
                         <li><a href="../contatti.html">Contatti</a></li>
                         <li><a href="../faq.html">FAQ</a></li>
+                                            <li><a href="../chi-siamo.html">Chi siamo</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
@@ -449,6 +462,7 @@
                         <li><a href="../pricing.html">Pricing per settore</a></li>
                         <li><a href="../privacy.html">Privacy Policy</a></li>
                         <li><a href="../cookie.html">Cookie Policy</a></li>
+                                            <li><a href="../chi-siamo.html">Chi siamo</a></li>
                     </ul>
                 </div>
             </div>
