@@ -68,6 +68,24 @@ const TextareaField = ({ label, value, onChange, placeholder = '', rows = 3 }: T
     </div>
 );
 
+const pickReadableTextColor = (hexColor?: string): '#FFFFFF' | '#0B2239' => {
+    const raw = String(hexColor || '').trim();
+    const match = raw.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (!match) return '#FFFFFF';
+
+    const normalized = match[1].length === 3
+        ? match[1].split('').map((c) => c + c).join('')
+        : match[1];
+
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+
+    // YIQ perceived brightness
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return yiq >= 155 ? '#0B2239' : '#FFFFFF';
+};
+
 const formatBillingDate = (value?: string | null) => {
     if (!value) return 'data non disponibile';
     const date = new Date(value);
@@ -201,6 +219,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         showPracticalSection,
         showMarketingSection,
     ].some(Boolean);
+    const widgetAccentColor = formData?.widget_color || '#FF8C42';
+    const widgetAccentTextColor = pickReadableTextColor(widgetAccentColor);
     const workspaceSearchItems: WorkspaceSearchItem[] = [
         ...DASHBOARD_TABS.map((tab) => ({
             id: `tab-${tab.id}`,
@@ -1130,7 +1150,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                     <div className="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-6">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Anteprima Rapida</p>
                                         <div className="max-w-sm mx-auto mb-4">
-                                            <div className="rounded-2xl bg-[#003049] px-4 py-3 text-sm font-semibold text-white shadow-sm">
+                                            <div
+                                                className="rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-sm"
+                                                style={{
+                                                    backgroundColor: widgetAccentColor,
+                                                    color: widgetAccentTextColor,
+                                                }}
+                                            >
                                                 {(
                                                     String(formData.widget_teaser_messages || '')
                                                         .split('\n')
@@ -1143,14 +1169,22 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                                         <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 max-w-sm mx-auto overflow-hidden">
                                             <div
                                                 className="px-5 py-4 text-white flex items-center gap-3"
-                                                style={{ background: `linear-gradient(135deg, ${formData.widget_color || '#FF8C42'} 0%, ${formData.widget_color || '#FF8C42'}CC 100%)` }}
+                                                style={{
+                                                    background: `linear-gradient(135deg, ${widgetAccentColor} 0%, ${widgetAccentColor}CC 100%)`,
+                                                    color: widgetAccentTextColor,
+                                                }}
                                             >
                                                 <div className="w-11 h-11 rounded-full flex items-center justify-center text-2xl bg-white/20 shrink-0">
                                                     {formData.widget_icon || '💬'}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <h4 className="font-bold break-words">{formData.widget_title || 'Zirèl Assistant'}</h4>
-                                                    <p className="text-sm text-white/85 break-words">{formData.widget_subtitle || 'Concierge h24'}</p>
+                                                    <p
+                                                        className="text-sm break-words"
+                                                        style={{ color: widgetAccentTextColor === '#FFFFFF' ? 'rgba(255,255,255,0.9)' : 'rgba(11,34,57,0.82)' }}
+                                                    >
+                                                        {formData.widget_subtitle || 'Concierge h24'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="p-4 space-y-4">
