@@ -192,8 +192,11 @@
                     toggleBtn.style.boxShadow = `0 10px 25px -5px ${safeColor}66`;
                 }
 
-                // Apply theme color to user messages (optional enhancement)
-                // We'll skip for now to maintain consistency with the CSS variables approach if possible
+                // Apply theme color to closed widget tooltip
+                const tooltipEl = document.getElementById('chat-tooltip');
+                if (tooltipEl) {
+                    tooltipEl.style.background = safeColor;
+                }
             }
             if (welcome_message) {
                 const welcomeEl = document.getElementById('zirel-welcome-message');
@@ -245,6 +248,10 @@
                 if (toggleBtn) {
                     toggleBtn.style.background = safeColor;
                     toggleBtn.style.boxShadow = `0 10px 25px -5px ${safeColor}66`;
+                }
+                const tooltipEl = document.getElementById('chat-tooltip');
+                if (tooltipEl) {
+                    tooltipEl.style.background = safeColor;
                 }
             }
             if (welcome_message) {

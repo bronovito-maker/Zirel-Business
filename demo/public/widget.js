@@ -50,7 +50,7 @@
                 max-width: 280px;
                 padding: 10px 14px;
                 border-radius: 14px;
-                background: #003049;
+                background: #FF8C42;
                 color: #fff;
                 font: 600 14px/1.35 Outfit, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
                 box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
