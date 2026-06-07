@@ -34,18 +34,18 @@
 
 <body class="font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="contacts">
 
-    <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+            <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
-            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
-            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
-            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
+            <li><a href="index.html#cosa-riceve-team" class="nav-link">SERVIZI</a></li>
+            <li><a href="index.html#portfolio" class="nav-link">PORTFOLIO</a></li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="demo.html" class="nav-link">DEMO IA</a></li>
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO</a></li>
         </ul>
-        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <a href="contatti.html" class="cta-nav cta-nav-desktop">PREVENTIVO</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -68,128 +68,82 @@
             </div>
 
             <div class="grid lg:grid-cols-3 gap-8 mb-16">
-                <div class="contact-card rounded-[2.5rem] p-8">
+                <div class="contact-card flex flex-col rounded-[2.5rem] p-8">
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Contatto diretto</p>
                     <h2 class="text-2xl font-black mb-4">WhatsApp</h2>
                     <p class="text-brand-blue/70 leading-relaxed mb-6">Per risposte rapide su demo, attivazione e piano più adatto.</p>
-                    <a href="https://wa.me/393461027447"
-                        class="inline-flex items-center justify-center bg-zirel-gradient text-white px-6 py-3 rounded-full text-base font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95"
-                        data-track="cta" data-track-location="contacts_direct" data-track-label="contacts whatsapp">
-                        Scrivi su WhatsApp
-                    </a>
+                    <div class="mt-auto pt-4">
+                        <a href="https://wa.me/393793394421"
+                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-6 py-3 rounded-full text-base font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95"
+                            data-track="cta" data-track-location="contacts_direct" data-track-label="contacts whatsapp">
+                            Scrivi su WhatsApp
+                        </a>
+                    </div>
                 </div>
 
-                <div class="contact-card rounded-[2.5rem] p-8">
+                <div class="contact-card flex flex-col rounded-[2.5rem] p-8">
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Email</p>
                     <h2 class="text-2xl font-black mb-4">Supporto e info</h2>
                     <p class="text-brand-blue/70 leading-relaxed mb-6">Per richieste commerciali, partnership e follow-up strutturati.</p>
-                    <div class="space-y-3 text-sm">
-                        <a href="mailto:info@zirel.org" class="block text-brand-orange font-bold hover:underline">info@zirel.org</a>
-                        <a href="mailto:bronovito@gmail.com" class="block text-brand-blue/70 hover:text-brand-orange transition-colors">bronovito@gmail.com</a>
+                    <div class="space-y-3 text-sm mt-auto pt-4">
+                        <a href="mailto:zirel.business@gmail.com" class="block text-brand-orange font-bold hover:underline text-base">zirel.business@gmail.com</a>
                     </div>
                 </div>
 
-                <div class="contact-card rounded-[2.5rem] p-8">
+                <div class="contact-card flex flex-col rounded-[2.5rem] p-8">
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Telefono</p>
                     <h2 class="text-2xl font-black mb-4">Parliamoci</h2>
-                    <p class="text-brand-blue/70 leading-relaxed mb-6">Per un confronto rapido su settore, prova e attivazione.</p>
-                    <a href="tel:+3934368335677"
-                        class="inline-flex items-center justify-center bg-zirel-gradient text-white px-6 py-3 rounded-full text-base font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95"
-                        data-track="cta" data-track-location="contacts_direct" data-track-label="contacts phone">
-                        Chiama ora
-                    </a>
+                    <p class="text-brand-blue/70 leading-relaxed mb-6">Siamo disponibili a questi numeri per un confronto rapido.</p>
+                    <div class="space-y-3 text-sm mt-auto pt-4">
+                        <a href="tel:+393461027447" class="block font-bold hover:text-brand-orange transition-colors text-base">+39 346 102 7447</a>
+                        <a href="tel:+393793394421" class="block font-bold hover:text-brand-orange transition-colors text-base">+39 379 339 4421</a>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="contact-card rounded-[2.5rem] p-8 md:p-10">
-                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Prenotare una demo
-                    </p>
-                    <h2 class="text-3xl font-black mb-4">Vedi Zirèl in azione</h2>
-                    <p class="text-brand-blue/70 leading-relaxed mb-8">
-                        Ti mostriamo il flusso più adatto al tuo settore e come trasforma una richiesta in un contatto già chiaro da gestire. In pochi minuti capisci se è il momento giusto per partire.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="https://wa.me/393461027447?text=Ciao%2C%20vorrei%20prenotare%20una%20demo%20guidata%20di%20Zir%C3%A8l"
-                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95"
-                            data-track="cta" data-track-location="contacts_demo" data-track-label="contacts guided demo whatsapp">
-                            Prenota una demo guidata
-                        </a>
-                        <a href="demo.html"
-                            class="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 text-brand-blue shadow-sm transition-all"
-                            data-track="cta" data-track-location="contacts_demo" data-track-label="contacts live demo restaurant">
-                            Apri una demo live
-                        </a>
-                    </div>
-                </div>
 
-                <div class="contact-card rounded-[2.5rem] p-8 md:p-10">
-                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue/45 mb-4">Accesso e setup</p>
-                    <h2 class="text-3xl font-black mb-4">Vuoi attivarlo sul tuo sito?</h2>
-                    <p class="text-brand-blue/70 leading-relaxed mb-8">
-                        Ti aiutiamo a scegliere il piano giusto e a partire senza attrito. Se sei già deciso, qui trovi il percorso più rapido.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="login.html"
-                            class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all active:scale-95"
-                            data-track="cta" data-track-location="contacts_setup" data-track-label="contacts login">
-                            Vai al login
-                        </a>
-                        <a href="register.html"
-                            class="inline-flex items-center justify-center px-8 py-4 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 text-brand-blue shadow-sm transition-all"
-                            data-track="cta" data-track-location="contacts_setup" data-track-label="contacts register">
-                            Registrati
-                        </a>
-                    </div>
-                    <p class="text-sm text-brand-blue/55 mt-6 leading-relaxed">
-                        Se vuoi chiarirti prima il piano giusto, apri il
-                        <a href="pricing.html" class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">pricing per settore</a>.
-                    </p>
-                </div>
-            </div>
         </div>
     </main>
 
-    <footer class="footer">
+            <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
-                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e attivare flussi utili per hotel, ristoranti e attività di servizio.</p>
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
+                    <p>Studio di Sviluppo Web specializzato in Siti Web Intelligenti ad alta conversione, dotati di IA proprietaria.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Soluzioni</h4>
+                    <h4>Servizi</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="restaurant.html">Restaurant</a></li>
-                        <li><a href="hotel.html">Hotel</a></li>
-                        <li><a href="professional.html">Professional</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Sviluppo Web</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Intelligenza Artificiale</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Digital Marketing</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Accesso</h4>
+                    <h4>Portfolio & Demo</h4>
                     <ul>
-                        <li><a href="demo.html">Demo Restaurant</a></li>
-                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
-                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="index.html#portfolio">I Nostri Lavori</a></li>
+                        <li><a href="demo.html">Testa una Demo Interattiva</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Lo Studio</h4>
+                    <ul>
+                        <li><a href="chi-siamo.html">Chi siamo</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="login.html">Login</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Risorse</h4>
-                    <ul>
-                        <li><a href="guide/index.html">Guide</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="pricing.html">Pricing per settore</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="cookie.html">Cookie Policy</a></li>
-                                            <li><a href="chi-siamo.html">Chi siamo</a></li>
+                        <li><a href="index.html#faq">FAQ</a></li>
                     </ul>
                 </div>
             </div>
-            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
-                riservati.</p>
+                                    <div class="mt-16 pt-8 border-t border-white/10 text-center text-[11px] text-white/30 flex flex-wrap justify-center items-baseline gap-x-3 gap-y-2 leading-none">
+                <span class="m-0 p-0 inline-block">&copy; 2026 Zirèl Studio. Tutti i diritti riservati.</span>
+                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
+                <a href="privacy.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Privacy Policy</a>
+                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
+                <a href="cookie.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Cookie Policy</a>
+            </div>
         </div>
     </footer>
 

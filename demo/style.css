@@ -25,6 +25,7 @@
 
     --shadow-soft: 0 10px 30px rgba(0, 48, 73, 0.08);
     --shadow-hover: 0 20px 50px rgba(0, 48, 73, 0.12);
+    --shadow: var(--shadow-soft);
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     --space-card: 3.5rem;
     --space-section: 12rem;
@@ -32,9 +33,20 @@
     --space-page: 2rem;
     --space-title: 4rem;
     --space-header-gap: 3rem;
+    --font-heading: var(--font-main);
+    --sea-cyan: var(--accent);
 
     /* Gradients */
     --zirel-gradient: linear-gradient(135deg, #FF8C42 0%, #E67E22 100%);
+}
+
+body[data-page-type="restaurant-demo"] {
+    --space-card: clamp(1.5rem, 2.6vw, 2.8rem);
+    --space-section: clamp(4.5rem, 7vw, 8rem);
+    --space-grid: clamp(1.25rem, 3vw, 2.5rem);
+    --space-page: clamp(1.1rem, 2vw, 2rem);
+    --space-title: clamp(2rem, 4vw, 3.5rem);
+    --space-header-gap: clamp(1rem, 2.5vw, 2rem);
 }
 
 * {
@@ -288,6 +300,11 @@ section {
     /* Space for navbar */
 }
 
+body[data-page-type="restaurant-demo"] .hero {
+    min-height: min(100dvh, 920px);
+    margin-bottom: clamp(1.75rem, 4vw, 3.5rem);
+}
+
 .hero-overlay {
     position: absolute;
     top: 0;
@@ -304,11 +321,28 @@ section {
     padding: 0 1.5rem;
 }
 
+body[data-page-type="restaurant-demo"] .hero-content {
+    max-width: 860px;
+    padding-inline: clamp(1rem, 3vw, 2rem);
+    padding-top: clamp(1.5rem, 4vw, 3.5rem);
+}
+
 .hero h1 {
     font-size: clamp(3.5rem, 10vw, 7.5rem);
     margin-bottom: 2rem;
     text-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
     animation: fadeInUp 1s ease-out;
+}
+
+body[data-page-type="restaurant-demo"] .hero h1 {
+    font-size: clamp(2.55rem, 5.6vw, 4.9rem);
+    line-height: 0.92;
+    max-width: 18ch;
+    margin-inline: auto;
+    text-wrap: balance;
+    text-shadow: 0 6px 28px rgba(0, 0, 0, 0.58);
+    margin-top: clamp(0.5rem, 1vw, 0.9rem);
+    margin-bottom: clamp(0.8rem, 1.6vw, 1.25rem);
 }
 
 .hero h1 span {
@@ -327,6 +361,13 @@ section {
     line-height: 1.6;
 }
 
+body[data-page-type="restaurant-demo"] .hero p {
+    max-width: 42rem;
+    font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+    line-height: 1.65;
+    margin-bottom: clamp(1.5rem, 2.8vw, 2.2rem);
+}
+
 .hero-actions {
     display: flex;
     flex-direction: column;
@@ -334,6 +375,40 @@ section {
     gap: 1.5rem;
     justify-content: center;
     animation: fadeInUp 1s ease-out 0.4s backwards;
+}
+
+body[data-page-type="restaurant-demo"] .hero-actions {
+    gap: 1rem;
+}
+
+body[data-page-type="restaurant-demo"] section.container.py-10 {
+    padding-top: clamp(3rem, 5vw, 4.5rem) !important;
+    padding-bottom: clamp(3.5rem, 6vw, 5.5rem) !important;
+}
+
+body[data-page-type="restaurant-demo"] section.container.pb-16 {
+    padding-top: clamp(3.5rem, 6vw, 5rem);
+}
+
+body[data-page-type="restaurant-demo"] #menu {
+    padding-top: clamp(1rem, 2vw, 1.75rem);
+}
+
+body[data-page-type="restaurant-demo"] .parallax-quote {
+    margin-block: clamp(2.5rem, 4vw, 4rem);
+}
+
+body[data-page-type="restaurant-demo"] section.container.pb-16 .btn-secondary {
+    background: rgba(0, 48, 73, 0.06);
+    border: 1px solid rgba(0, 48, 73, 0.16);
+    color: var(--secondary);
+    box-shadow: none;
+}
+
+body[data-page-type="restaurant-demo"] section.container.pb-16 .btn-secondary:hover {
+    background: rgba(0, 48, 73, 0.12);
+    color: var(--secondary);
+    box-shadow: none;
 }
 
 @media (min-width: 640px) {
@@ -395,7 +470,7 @@ section {
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--space-grid);
+    gap: clamp(1.5rem, 3vw, 2.75rem);
     margin-bottom: var(--space-grid);
 }
 
@@ -404,7 +479,7 @@ section {
     border-radius: 30px;
     overflow: hidden;
     transition: var(--transition);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-soft);
 }
 
 .menu-card:hover {
@@ -414,7 +489,7 @@ section {
 
 .menu-img-wrapper {
     overflow: hidden;
-    height: 300px;
+    height: clamp(220px, 24vw, 280px);
 }
 
 .menu-img {
@@ -429,19 +504,20 @@ section {
 }
 
 .menu-info {
-    padding: var(--space-card);
+    padding: clamp(1.4rem, 2.5vw, 2.5rem);
 }
 
 .menu-info h3 {
-    font-size: 2rem;
+    font-size: clamp(1.45rem, 2.5vw, 1.95rem);
     margin-bottom: 0.8rem;
     color: var(--secondary);
 }
 
 .menu-info p {
-    font-size: 1rem;
+    font-size: 0.98rem;
     color: #555;
     margin-bottom: 1.5rem;
+    line-height: 1.65;
 }
 
 .menu-price {
@@ -466,13 +542,13 @@ section {
 .experiences-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-grid);
+    gap: clamp(1.25rem, 3vw, 2.25rem);
     margin-bottom: var(--space-grid);
 }
 
 .exp-card {
     text-align: center;
-    padding: 5rem 3.5rem;
+    padding: clamp(2.5rem, 4vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 40px;
@@ -487,44 +563,180 @@ section {
 }
 
 .exp-icon {
-    font-size: 4rem;
-    margin-bottom: 2rem;
+    font-size: clamp(2.75rem, 5vw, 4rem);
+    margin-bottom: 1.35rem;
     display: block;
 }
 
 .exp-card h3 {
-    font-size: 1.8rem;
+    font-size: clamp(1.35rem, 2.5vw, 1.8rem);
     margin-bottom: 1rem;
+}
+
+.exp-card p {
+    font-size: 1rem;
+    line-height: 1.65;
+    opacity: 0.92;
 }
 
 /* Testimonial Special */
 .parallax-quote {
-    background: linear-gradient(rgba(0, 48, 73, 0.8), rgba(0, 48, 73, 0.8)), url('food_premium.webp') no-repeat center center/cover;
+    background:
+        linear-gradient(180deg, rgba(0, 48, 73, 0.78) 0%, rgba(0, 48, 73, 0.84) 100%),
+        url('food_premium.webp') no-repeat center center/cover;
     background-attachment: fixed;
-    padding: 120px 0;
+    padding: clamp(4.5rem, 7vw, 7rem) 0;
     color: var(--white);
     text-align: center;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.parallax-quote::before,
+.parallax-quote::after {
+    content: '';
+    position: absolute;
+    inset: auto;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.parallax-quote::before {
+    width: 22rem;
+    height: 22rem;
+    top: -8rem;
+    left: -6rem;
+    background: radial-gradient(circle, rgba(255, 140, 66, 0.12) 0%, rgba(255, 140, 66, 0) 70%);
+}
+
+.parallax-quote::after {
+    width: 24rem;
+    height: 24rem;
+    right: -7rem;
+    bottom: -9rem;
+    background: radial-gradient(circle, rgba(0, 174, 239, 0.12) 0%, rgba(0, 174, 239, 0) 72%);
 }
 
 .testimonial-card {
-    max-width: 1000px;
+    width: min(1180px, calc(100% - 2rem));
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: clamp(2.25rem, 4vw, 3.5rem) clamp(1.4rem, 3vw, 2.75rem);
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: clamp(28px, 4vw, 42px);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.04) 100%);
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.testimonial-card::before {
+    content: '“';
+    position: absolute;
+    top: -0.55rem;
+    left: 1.25rem;
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 9vw, 6.5rem);
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.18);
+    pointer-events: none;
+}
+
+.testimonial-card::after {
+    content: '”';
+    position: absolute;
+    right: 1.25rem;
+    bottom: -0.9rem;
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 9vw, 6.5rem);
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.16);
+    pointer-events: none;
 }
 
 .testimonial-card p {
     font-family: var(--font-heading);
-    font-size: 2.8rem;
+    font-size: clamp(1.7rem, 3.7vw, 2.85rem);
     font-style: italic;
-    margin-bottom: 3rem;
+    margin: 0 auto 1.4rem;
+    line-height: 1.18;
+    max-width: 18.5ch;
+    text-wrap: balance;
+    color: rgba(255, 255, 255, 0.98);
 }
 
 .testimonial-card .author {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 4px;
-    font-size: 1rem;
+    letter-spacing: 0.26em;
+    font-size: 0.92rem;
     color: var(--primary);
+    padding-top: 0.2rem;
+}
+
+.testimonial-card .author::before {
+    content: '';
+    width: 2.5rem;
+    height: 1px;
+    background: rgba(255, 140, 66, 0.45);
+}
+
+.testimonial-card .author::after {
+    content: '';
+    width: 2.5rem;
+    height: 1px;
+    background: rgba(255, 140, 66, 0.45);
+}
+
+@media (max-width: 768px) {
+    .parallax-quote {
+        padding: 3.5rem 0;
+        background-attachment: scroll;
+    }
+
+    .testimonial-card {
+        width: min(100% - 1rem, 720px);
+        padding: 1.8rem 1.1rem 1.6rem;
+        border-radius: 26px;
+    }
+
+    .testimonial-card::before {
+        left: 0.9rem;
+        top: -0.35rem;
+        font-size: 4rem;
+    }
+
+    .testimonial-card::after {
+        right: 0.9rem;
+        bottom: -0.55rem;
+        font-size: 4rem;
+    }
+
+    .testimonial-card p {
+        max-width: 100%;
+        font-size: 1.45rem;
+        line-height: 1.22;
+        margin-bottom: 1rem;
+    }
+
+    .testimonial-card .author {
+        font-size: 0.82rem;
+        letter-spacing: 0.2em;
+    }
+
+    .testimonial-card .author::before,
+    .testimonial-card .author::after {
+        width: 1.6rem;
+    }
 }
 
 /* Footer Premium */
@@ -599,73 +811,111 @@ section {
 
 /* Info Section Refinement */
 #info {
-    background-color: #F8F5F0;
-    /* Warm sand-white for contrast */
+    background:
+        radial-gradient(circle at top left, rgba(255, 140, 66, 0.09), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(0, 174, 239, 0.07), transparent 30%),
+        linear-gradient(180deg, #f8f5f0 0%, #fffdf8 100%);
 }
 
 .info-container {
     display: flex;
     flex-direction: column;
-    max-width: 1000px;
+    width: min(1140px, calc(100% - 2rem));
+    max-width: 1140px;
     margin: 0 auto;
-    background: var(--white);
-    padding: 6rem 4rem;
-    border-radius: 60px;
-    box-shadow: var(--shadow-soft);
+    padding: clamp(0.4rem, 1.4vw, 1.1rem) 0 0;
+    position: relative;
 }
 
 .info-text {
     width: 100%;
     text-align: center;
+    padding-inline: 0;
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin-inline: auto;
 }
 
 .info-text h2 {
     text-align: center;
-    margin-bottom: 2rem;
-    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    font-size: clamp(2.2rem, 3.8vw, 3.35rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
 }
 
 .info-text p {
-    font-size: 1.1rem;
-    color: #444;
-    line-height: 1.8;
+    font-size: clamp(0.98rem, 1.4vw, 1.12rem);
+    color: rgba(0, 48, 73, 0.72);
+    line-height: 1.75;
+    max-width: 60ch;
+    margin-inline: auto;
 }
 
 .info-details {
-    margin-top: 3rem;
+    margin-top: 2rem;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-    max-width: 500px;
+    gap: 0.9rem;
+    max-width: 860px;
     margin-inline: auto;
     text-align: left;
 }
 
 .info-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0.95rem;
     align-items: center;
-    gap: 1.2rem;
+    padding: 0.95rem 1.05rem;
+    min-height: 88px;
+    background: rgba(255, 255, 255, 0.52);
+    border: 1px solid rgba(0, 48, 73, 0.06);
+    border-radius: 22px;
+    box-shadow: 0 8px 20px rgba(0, 48, 73, 0.025);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(0, 48, 73, 0.045);
+    border-color: rgba(255, 140, 66, 0.1);
+    background: rgba(255, 255, 255, 0.62);
 }
 
 .info-item span {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--primary);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 140, 66, 0.1), rgba(255, 140, 66, 0.045));
+    border: 1px solid rgba(255, 140, 66, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .info-item div h5 {
     font-family: var(--font-main);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
     color: var(--accent);
-    margin-bottom: 2px;
+    margin-bottom: 0.35rem;
 }
 
 .info-item div p {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--secondary);
     margin-bottom: 0;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 1.4vw, 1.1rem);
+    line-height: 1.45;
 }
 
 .map-placeholder {
@@ -697,11 +947,37 @@ section {
     .navbar.scrolled {
         padding: 0.8rem 2rem;
     }
+
+    body[data-page-type="restaurant-demo"] .hero h1 {
+        font-size: clamp(2.6rem, 8vw, 4.2rem);
+        max-width: 11ch;
+    }
+
+    body[data-page-type="restaurant-demo"] .hero p {
+        max-width: 34rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .menu-img-wrapper {
+        height: 250px;
+    }
+
+    .exp-card {
+        padding: 2.75rem 2rem;
+    }
+
+    .info-container {
+        width: min(1180px, calc(100% - 1.5rem));
+        padding: 2.5rem 1rem 0;
+    }
 }
 
 @media (max-width: 768px) {
     section {
-        padding-block: 5.5rem;
+        padding-block: 4.75rem;
     }
 
     .zirel-card {
@@ -710,29 +986,34 @@ section {
     }
 
     .hero {
-        padding-top: 120px;
+        padding-top: 104px;
         min-height: auto;
-        padding-bottom: 4rem;
+        padding-bottom: 3.5rem;
+    }
+
+    body[data-page-type="restaurant-demo"] .hero-content {
+        padding-top: 2rem;
     }
 
     .hero h1.demo-font {
-        font-size: 3.2rem;
-        line-height: 1.1;
+        font-size: 2.75rem;
+        line-height: 0.98;
+        max-width: 11ch;
     }
 
     .hero p {
-        font-size: 1.2rem;
-        margin-bottom: 2.5rem;
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
         text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
         font-weight: 400;
-        line-height: 1.5;
-        max-width: 90% !important;
+        line-height: 1.6;
+        max-width: 92% !important;
         margin-inline: auto;
     }
 
     .hero-actions {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.85rem;
     }
 
     .btn {
@@ -759,61 +1040,127 @@ section {
     }
 
     .parallax-quote p {
-        font-size: 1.8rem;
+        font-size: 1.55rem;
     }
 
     .info-container {
         grid-template-columns: 1fr;
-        padding: 4rem 2.5rem;
-        border-radius: 40px;
-        gap: 3rem;
-        margin: 0 1.5rem;
-        /* Add lateral breathing room */
-        width: auto;
-        /* Ensure margin works with full-width section */
+        width: min(100% - 1rem, 720px);
+        padding: 0.35rem 0 0;
+        gap: 0.95rem;
+        margin: 0 auto;
     }
 
     .info-text h2 {
-        font-size: 2.5rem;
+        font-size: 1.95rem;
         text-align: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .info-text p {
         text-align: center;
+        font-size: 0.98rem;
     }
 
     .info-details {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem;
-        margin-top: 2rem;
+        gap: 0.7rem;
+        margin-top: 1.2rem;
         text-align: left;
         width: 100%;
     }
 
     .info-item {
-        display: flex;
-        flex-direction: row;
+        grid-template-columns: 46px 1fr;
         text-align: left;
-        gap: 1.5rem;
+        gap: 0.75rem;
         align-items: center;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid rgba(0, 48, 73, 0.05);
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+        padding: 0.85rem 0.9rem;
+        min-height: 76px;
+        border-radius: 18px;
     }
 
     .info-item span {
-        font-size: 2rem;
+        width: 46px;
+        height: 46px;
+        font-size: 1.15rem;
     }
 
     .map-placeholder {
         height: 300px;
         border-radius: 20px;
+    }
+
+    .testimonial-card {
+        width: min(100% - 1rem, 720px);
+        padding: 1.8rem 1.1rem 1.55rem;
+        border-radius: 26px;
+    }
+
+    .testimonial-card::before {
+        left: 0.85rem;
+        top: -0.3rem;
+        font-size: 3.75rem;
+    }
+
+    .testimonial-card p {
+        max-width: 100%;
+        font-size: 1.34rem;
+        line-height: 1.24;
+        margin-bottom: 0.95rem;
+    }
+
+    .testimonial-card .author {
+        font-size: 0.76rem;
+        letter-spacing: 0.18em;
+        gap: 0.45rem;
+    }
+
+    .testimonial-card .author::after {
+        width: 1.6rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .menu-card {
+        border-radius: 24px;
+    }
+
+    .menu-img-wrapper {
+        height: 210px;
+    }
+
+    .menu-info {
+        padding: 1.25rem 1.15rem 1.4rem;
+    }
+
+    .menu-info h3 {
+        font-size: 1.35rem;
+    }
+
+    .experiences-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exp-card {
+        padding: 2rem 1.35rem;
+        border-radius: 28px;
+    }
+
+    .exp-card h3 {
+        font-size: 1.3rem;
+    }
+
+    .exp-card p {
+        font-size: 0.95rem;
+    }
+
+    .parallax-quote {
+        background-attachment: scroll;
     }
 }
 

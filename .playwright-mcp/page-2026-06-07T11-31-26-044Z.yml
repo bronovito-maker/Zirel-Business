@@ -1,0 +1,194 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "Zirèl Studio" [ref=e3] [cursor=pointer]:
+      - /url: index.html
+    - list [ref=e4]:
+      - listitem [ref=e5]:
+        - link "SERVIZI" [ref=e6] [cursor=pointer]:
+          - /url: index.html#cosa-riceve-team
+      - listitem [ref=e7]:
+        - link "PORTFOLIO" [ref=e8] [cursor=pointer]:
+          - /url: index.html#portfolio
+      - listitem [ref=e9]:
+        - link "FAQ" [ref=e10] [cursor=pointer]:
+          - /url: index.html#faq
+      - listitem [ref=e11]:
+        - link "DEMO IA" [ref=e12] [cursor=pointer]:
+          - /url: demo.html
+      - listitem [ref=e13]:
+        - link "PRICING" [ref=e14] [cursor=pointer]:
+          - /url: pricing.html
+      - listitem [ref=e15]:
+        - link "CONTATTI" [ref=e16] [cursor=pointer]:
+          - /url: contatti.html
+    - link "PREVENTIVO" [ref=e17] [cursor=pointer]:
+      - /url: contatti.html
+  - banner [ref=e18]:
+    - generic [ref=e20]:
+      - generic [ref=e21]: Prova Pratica Ecosistema IA
+      - heading "Tocca con mano il nostro ecosistema" [level=1] [ref=e22]:
+        - text: Tocca con mano
+        - generic [ref=e23]: il nostro ecosistema
+      - paragraph [ref=e24]: "Questo è il \"Chiringuito da Gino\", un locale fittizio. Metti alla prova la nostra IA: chiedi il menù, gli orari o prenota un tavolo. Immagina questa stessa potenza applicata al tuo settore, programmata esclusivamente sulle tue regole."
+      - generic [ref=e25]:
+        - link "Avvia l'IA e fai una prova" [ref=e26] [cursor=pointer]:
+          - /url: "#n8n-widget-mock"
+        - link "Prenota una Consulenza" [ref=e27] [cursor=pointer]:
+          - /url: contatti.html
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - paragraph [ref=e31]: Acquisizione 24/7
+      - paragraph [ref=e32]: Raccoglie contatti sempre
+      - paragraph [ref=e33]: Trasforma i visitatori in lead o appuntamenti concreti a qualsiasi ora, senza passaggi inutili e frizioni.
+    - generic [ref=e34]:
+      - paragraph [ref=e35]: Filtro Obiezioni
+      - paragraph [ref=e36]: Il telefono smette di squillare
+      - paragraph [ref=e37]: L'IA risponde alle FAQ, gestisce gli orari e la logistica. Tu e il tuo team interverrete solo quando conta davvero.
+    - generic [ref=e38]:
+      - paragraph [ref=e39]: Totalmente Su Misura
+      - paragraph [ref=e40]: Non è un template pre-fatto
+      - paragraph [ref=e41]: Questo ristorante è solo un esempio. Addestreremo l'IA esclusivamente sui dati e sulle regole della TUA attività.
+  - generic [ref=e42]:
+    - heading "Esperienze di Gusto" [level=2] [ref=e43]
+    - paragraph [ref=e44]: Dalla barca alla tavola
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - img "Spaghetti allo Scoglio" [ref=e48]
+        - generic [ref=e49]:
+          - heading "Lo Scoglio Reale" [level=3] [ref=e50]
+          - paragraph [ref=e51]: Spaghetto trafilato al bronzo con vongole veraci, cozze di Cattolica e scampi freschi.
+          - text: €22.00
+      - generic [ref=e52]:
+        - img "Signature Cocktail" [ref=e54]
+        - generic [ref=e55]:
+          - heading "Sunset Mojito" [level=3] [ref=e56]
+          - paragraph [ref=e57]: Zucchero di canna, lime fresco, menta del giardino e rum invecchiato al sole della Riviera.
+          - text: €12.00
+  - generic [ref=e59]:
+    - heading "Vivi il Chiringuito" [level=2] [ref=e60]
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]: 🌅
+        - heading "Aperitivi al Tramonto" [level=3] [ref=e64]
+        - paragraph [ref=e65]: Musica lounge e il miglior tramonto di Riccione, con i piedi sulla sabbia.
+      - generic [ref=e66]:
+        - generic [ref=e67]: 🍤
+        - heading "Cena Sotto le Stelle" [level=3] [ref=e68]
+        - paragraph [ref=e69]: La brezza marina accompagna i nostri piatti di pesce freschissimo.
+      - generic [ref=e70]:
+        - generic [ref=e71]: 🎸
+        - heading "Eventi & Live Music" [level=3] [ref=e72]
+        - paragraph [ref=e73]: Serate a tema e musica dal vivo per un'atmosfera indimenticabile.
+  - generic [ref=e75]:
+    - text: “
+    - paragraph [ref=e76]: Non è solo un ristorante, è un pezzo di cuore rimasto sulla spiaggia di Riccione.
+    - generic [ref=e77]: Guida Gourmet 2026
+    - text: ”
+  - generic [ref=e80]:
+    - heading "Dove Trovarci" [level=2] [ref=e81]
+    - paragraph [ref=e82]: La brezza del mare, il profumo della griglia e l'accoglienza di casa. Ti aspettiamo nel cuore pulsante di Riccione.
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - generic [ref=e85]: 📍
+        - generic [ref=e86]:
+          - heading "Indirizzo" [level=5] [ref=e87]
+          - paragraph [ref=e88]: Lungomare della Repubblica, Zona 71, Riccione
+      - generic [ref=e89]:
+        - generic [ref=e90]: ✉️
+        - generic [ref=e91]:
+          - heading "Email" [level=5] [ref=e92]
+          - paragraph [ref=e93]: bronovito@gmail.com
+      - generic [ref=e94]:
+        - generic [ref=e95]: 🕒
+        - generic [ref=e96]:
+          - heading "Orari" [level=5] [ref=e97]
+          - paragraph [ref=e98]: "Tutti i giorni: 12:00 — 02:00"
+  - generic: Prova la chat live del ristorante 🍹
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - heading "Chiringuito da Gino" [level=6]
+            - paragraph: Sapore di mare e piadine h24
+        - button "Chiudi"
+      - generic:
+        - generic:
+          - paragraph:
+            - text: Ben arrivato! 🍹 Sono l'Oste del
+            - strong: Chiringuito da Gino
+            - text: .
+          - paragraph: Come posso aiutarti oggi?
+        - generic:
+          - button "🍽️ Mostrami il Menù"
+          - button "🕒 Quali sono gli orari?"
+          - button "📍 Dove siete?"
+          - button "📞 Parla con lo staff"
+      - generic:
+        - textbox "Scrivi all'Oste..."
+        - button:
+          - img
+  - button "💬" [ref=e99] [cursor=pointer]:
+    - generic [ref=e100]: 💬
+  - generic [ref=e102]:
+    - paragraph [ref=e103]: Passo successivo
+    - heading "Pronto a delegare il primo contatto all'IA?" [level=2] [ref=e104]
+    - paragraph [ref=e105]: Contattaci per scoprire come Zirèl Studio può costruire un ecosistema identico per la tua attività, programmato sul tuo tono di voce e sui tuoi obiettivi di vendita.
+    - generic [ref=e106]:
+      - link "Richiedi un Preventivo" [ref=e107] [cursor=pointer]:
+        - /url: contatti.html
+      - link "Scopri i Pacchetti" [ref=e108] [cursor=pointer]:
+        - /url: pricing.html
+  - contentinfo [ref=e109]:
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - generic [ref=e112]:
+          - link "Zirèl Studio" [ref=e113] [cursor=pointer]:
+            - /url: index.html
+          - paragraph [ref=e114]: Studio di Sviluppo Web specializzato in Siti Web Intelligenti ad alta conversione, dotati di IA proprietaria.
+        - generic [ref=e115]:
+          - heading "Servizi" [level=4] [ref=e116]
+          - list [ref=e117]:
+            - listitem [ref=e118]:
+              - link "Sviluppo Web" [ref=e119] [cursor=pointer]:
+                - /url: index.html#cosa-riceve-team
+            - listitem [ref=e120]:
+              - link "Intelligenza Artificiale" [ref=e121] [cursor=pointer]:
+                - /url: index.html#cosa-riceve-team
+            - listitem [ref=e122]:
+              - link "Digital Marketing" [ref=e123] [cursor=pointer]:
+                - /url: index.html#cosa-riceve-team
+        - generic [ref=e124]:
+          - heading "Portfolio & Demo" [level=4] [ref=e125]
+          - list [ref=e126]:
+            - listitem [ref=e127]:
+              - link "I Nostri Lavori" [ref=e128] [cursor=pointer]:
+                - /url: index.html#portfolio
+            - listitem [ref=e129]:
+              - link "Testa una Demo Interattiva" [ref=e130] [cursor=pointer]:
+                - /url: demo.html
+        - generic [ref=e131]:
+          - heading "Lo Studio" [level=4] [ref=e132]
+          - list [ref=e133]:
+            - listitem [ref=e134]:
+              - link "Chi siamo" [ref=e135] [cursor=pointer]:
+                - /url: chi-siamo.html
+            - listitem [ref=e136]:
+              - link "Pricing" [ref=e137] [cursor=pointer]:
+                - /url: pricing.html
+            - listitem [ref=e138]:
+              - link "Contatti" [ref=e139] [cursor=pointer]:
+                - /url: contatti.html
+            - listitem [ref=e140]:
+              - link "FAQ" [ref=e141] [cursor=pointer]:
+                - /url: index.html#faq
+      - generic [ref=e142]:
+        - generic [ref=e143]: © 2026 Zirèl Studio. Tutti i diritti riservati.
+        - generic [ref=e144]: "|"
+        - link "Privacy Policy" [ref=e145] [cursor=pointer]:
+          - /url: privacy.html
+        - generic [ref=e146]: "|"
+        - link "Cookie Policy" [ref=e147] [cursor=pointer]:
+          - /url: cookie.html

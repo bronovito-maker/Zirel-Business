@@ -56,18 +56,18 @@
 </head>
 
 <body class="pricing-core" data-page-type="pricing">
-    <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
+            <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="restaurant.html" class="nav-link">RESTAURANT</a></li>
-            <li><a href="hotel.html" class="nav-link">HOTEL</a></li>
-            <li><a href="professional.html" class="nav-link">PROFESSIONAL</a></li>
-            <li><a href="guide/index.html" class="nav-link">GUIDE</a></li>
+            <li><a href="index.html#cosa-riceve-team" class="nav-link">SERVIZI</a></li>
+            <li><a href="index.html#portfolio" class="nav-link">PORTFOLIO</a></li>
+            <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+            <li><a href="demo.html" class="nav-link">DEMO IA</a></li>
             <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="login.html" class="cta-nav">LOGIN</a></li>
+            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO</a></li>
         </ul>
-        <a href="login.html" class="cta-nav cta-nav-desktop">LOGIN</a>
+        <a href="contatti.html" class="cta-nav cta-nav-desktop">PREVENTIVO</a>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -75,112 +75,131 @@
         </div>
     </nav>
 
-    <header class="pricing-hero">
-        <div class="container">
-            <h1>Prezzi Zirèl. <span class="zirel-brand">Tre settori.</span></h1>
-            <p>Confronta i piani Hotel, Restaurant e Professional: configurazione iniziale, canone mensile e funzioni incluse per ogni settore.</p>
+        <header class="pricing-hero">
+        <div class="container text-center pt-32 pb-20">
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-6">Prezzi in chiaro. <span class="text-brand-orange">Come piace a te.</span></h1>
+            <p class="text-xl text-white/80 max-w-2xl mx-auto">Tre livelli. Un costo di attivazione una tantum. Un canone mensile trasparente. Scegli pagamento annuale e risparmi il 50% sul setup.</p>
             <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="contatti.html" class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all text-center"
-                    data-track="cta" data-track-location="pricing_hero" data-track-label="pricing hero guided demo">
-                    Fatti consigliare il piano giusto
+                <a href="contatti.html" class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all text-center">
+                    Voglio un Preventivo Gratuito
                 </a>
-                <a href="#faq" class="px-8 py-4 rounded-full text-lg font-bold border-2 border-white/30 bg-white/10 text-white hover:bg-white/20 transition-all text-center"
-                    data-track="cta" data-track-location="pricing_hero" data-track-label="pricing hero faq">
-                    Chiarisci prima i dubbi
+                <a href="#faq" class="px-8 py-4 rounded-full text-lg font-bold border-2 border-white/30 bg-white/10 text-white hover:bg-white/20 transition-all text-center">
+                    Leggi le FAQ
                 </a>
             </div>
         </div>
     </header>
 
-    <section class="pricing-section">
-        <div class="container">
+        <section class="pricing-section py-20">
+        <div class="container mx-auto px-4">
             <div class="text-center max-w-3xl mx-auto mb-14">
-                <span
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-brand-blue text-sm font-bold border border-white/70 shadow-sm">
-                    Scegli il tuo settore
-                </span>
-                <p class="mt-6 text-lg text-brand-blue/70 leading-relaxed">Tre piani per settore. Un'unica logica di prezzo. Con annuale: -50% sulla configurazione iniziale. Il piano base parte dal sito; WhatsApp ufficiale entra dai piani superiori. Costi Meta esclusi.</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Scegli quanto vuoi <span class="text-brand-orange">delegare</span></h2>
+                <p class="mt-6 text-lg text-brand-blue/70 leading-relaxed">Un canone mensile. Un setup una tantum. Fine. Con pagamento annuale il setup costa la metà.</p>
+                
+                <div class="mt-10 flex items-center justify-center gap-4">
+                    <span id="label-monthly" class="font-bold text-brand-blue transition-colors">Mensile</span>
+                    <button id="billing-toggle" onclick="toggleBilling()" class="relative inline-flex h-8 w-16 cursor-pointer items-center rounded-full bg-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 border border-slate-300 shadow-inner" role="switch" aria-checked="false">
+                        <span id="billing-toggle-thumb" class="inline-block h-6 w-6 translate-x-1 rounded-full bg-brand-orange transition-transform shadow-md"></span>
+                    </button>
+                    <span id="label-annual" class="font-medium text-brand-blue/50 transition-colors flex items-center gap-2">
+                        Annuale <span class="bg-brand-orange text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-sm">-50% Setup</span>
+                    </span>
+                </div>
             </div>
 
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <div class="card-icon">🍽️</div>
-                    <h3>Restaurant</h3>
-                    <p>Per locali che vogliono più tavoli confermati e meno caos durante il servizio, dal sito e da WhatsApp.</p>
-                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €69/mese + configurazione iniziale</p>
-                    <ul class="pricing-features">
-                        <li>Piani: Servizio, Azdora, Maestro</li>
-                        <li>Focus su tavoli, FAQ e richieste</li>
-                        <li>CTA orientate al locale</li>
+            <div class="pricing-grid grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Piano Sito Vetrina Veloce -->
+                <div class="pricing-card bg-white rounded-3xl p-8 flex flex-col text-center">
+                    <div class="card-icon text-5xl mb-4">💻</div>
+                    <h3 class="text-2xl font-bold text-brand-blue mb-2">Sito Vetrina Veloce</h3>
+                    <p class="text-brand-blue/70 mb-6 flex-grow">Il sito che ti fa trovare su Google. Design pulito, veloce, mobile-first. Per pizzerie, autolavaggi e attività locali.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-6">Da €69/mese + <span class="setup-price" data-monthly="€349" data-annual="<span class='line-through opacity-50'>€349</span> €175">€349</span> setup</p>
+                    <ul class="pricing-features text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Sito che carica in 2 secondi (Google ti premia)</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Design su misura, non template</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Posizionamento Google nella tua zona</li>
                     </ul>
-                    <a href="pricing-restaurant.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
-                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing restaurant">
-                        Apri Restaurant
+                    <a href="contatti.html"
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center w-full">
+                        Voglio un Preventivo Gratuito
                     </a>
                 </div>
 
-                <div class="pricing-card recommended">
-                    <span class="badge-recommended">3 piani dedicati</span>
-                    <div class="card-icon">🏨</div>
-                    <h3>Hotel</h3>
-                    <p>Per strutture che vogliono più richieste dirette e meno prenotazioni perse dal sito e da WhatsApp.</p>
-                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €69/mese + configurazione iniziale</p>
-                    <ul class="pricing-features">
-                        <li>Piani: Direct, Azdora, Gran Turismo</li>
-                        <li>Focus su follow-up e richieste soggiorno</li>
-                        <li>CTA orientate alla struttura</li>
+                <!-- Piano Sito Che Risponde Da Solo -->
+                <div class="pricing-card recommended relative bg-white rounded-3xl p-8 flex flex-col text-center shadow-2xl transform md:-translate-y-4">
+                    <span class="badge-recommended absolute -top-4 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider">70% dei clienti</span>
+                    <div class="card-icon text-5xl mb-4">🚀</div>
+                    <h3 class="text-2xl font-bold text-brand-blue mb-2">Sito Che Risponde Da Solo</h3>
+                    <p class="text-brand-blue/70 mb-6 flex-grow">Il sito che filtra i clienti su WhatsApp mentre dormi. L'IA Zirèl impara i tuoi servizi e ti lascia solo le richieste pronte.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-6">Da €129/mese + <span class="setup-price" data-monthly="€549" data-annual="<span class='line-through opacity-50'>€549</span> €275">€549</span> setup</p>
+                    <ul class="pricing-features text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Tutto il piano Sito Vetrina Veloce</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> IA Zirèl sul sito (risponde 24/7)</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Addestramento IA sui tuoi servizi</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Clienti filtrati su WhatsApp ogni mattina</li>
                     </ul>
-                    <a href="pricing-hotel.html"
-                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-lg shadow-brand-orange/20"
-                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing hotel">
-                        Apri Hotel
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:-translate-y-1 transition-all text-center shadow-lg shadow-brand-orange/20 w-full">
+                        Voglio un Preventivo Gratuito
                     </a>
                 </div>
 
-                <div class="pricing-card">
-                    <div class="card-icon">🧭</div>
-                    <h3>Professional</h3>
-                    <p>Per studi e professionisti che vogliono richieste più chiare e meno rumore in agenda, dal sito e da WhatsApp.</p>
-                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-4">Da €69/mese + configurazione iniziale</p>
-                    <ul class="pricing-features">
-                        <li>Piani: Studio, Equipe, Partner</li>
-                        <li>Focus su primi contatti e appuntamenti</li>
-                        <li>CTA orientate al processo di studio</li>
+                <!-- Piano Agenda Automatica -->
+                <div class="pricing-card bg-white rounded-3xl p-8 flex flex-col text-center">
+                    <div class="card-icon text-5xl mb-4">⚙️</div>
+                    <h3 class="text-2xl font-bold text-brand-blue mb-2">Agenda Automatica</h3>
+                    <p class="text-brand-blue/70 mb-6 flex-grow">Il cliente prenota da solo dal sito. Tu arrivi e trovi l'agenda già piena. WhatsApp, sito, calendario: tutto collegato.</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand-orange mb-6">Da €199/mese + <span class="setup-price" data-monthly="da €645" data-annual="<span class='line-through opacity-50'>da €645</span> da €323">da €645</span> setup</p>
+                    <ul class="pricing-features text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Tutto il piano Sito Che Risponde</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Zirèl su WhatsApp Business</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Calendario appuntamenti automatico</li>
+                        <li class="flex items-center gap-2"><span class="text-green-500">✓</span> Landing page premium per Ads</li>
                     </ul>
-                    <a href="pricing-professional.html"
-                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center"
-                        data-track="cta" data-track-location="pricing_sector_cards" data-track-label="pricing professional">
-                        Apri Professional
+                    <a href="contatti.html"
+                        class="border-2 border-brand-blue text-brand-blue px-8 py-4 rounded-full text-lg font-bold hover:bg-brand-blue hover:text-white transition-all text-center w-full">
+                        Voglio un Preventivo Gratuito
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-12 max-w-6xl mx-auto zirel-card bg-brand-orange/5 rounded-3xl p-8 border border-brand-orange/20 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+                <div class="flex-shrink-0 text-5xl">🎯</div>
+                <div class="flex-grow text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-2">Digital Marketing Add-on</p>
+                    <h3 class="text-2xl font-bold text-brand-blue mb-2">Campagne Ads & Traffico Mirato</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Abbiniamo campagne Google e Meta Ads a qualsiasi piano. Portiamo traffico profilato sul tuo sito. L'IA lo accoglie e lo converte. Tu raccogli i risultati.</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <a href="contatti.html" class="border-2 border-brand-orange text-brand-orange px-6 py-3 rounded-full font-bold hover:bg-brand-orange hover:text-white transition-all text-center whitespace-nowrap">
+                        Parla delle tue Ads
                     </a>
                 </div>
             </div>
 
             <div class="mt-20 max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
-                <div class="zirel-card text-left">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Listino</p>
-                    <h3 class="text-2xl font-black text-brand-blue mb-3">Prezzo coerente</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Entry, intermedio e custom. Stessa struttura in ogni settore, con copy, esempi e flussi adattati al contesto.</p>
+                <div class="zirel-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Trasparenza</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Prezzi Chiari</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Nessuna sorpresa in fattura. Sai esattamente quanto paghi ogni mese. Setup + canone: tutto qui.</p>
                 </div>
-                <div class="zirel-card text-left">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Leva
-                        commerciale</p>
-                    <h3 class="text-2xl font-black text-brand-blue mb-3">Partenza più leggera</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Il canone mensile resta uguale. Con annuale: -50% sulla configurazione iniziale. Sito e WhatsApp sono inclusi nei piani.</p>
+                <div class="zirel-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Flessibilità</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Nessun Vincolo</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Annulli quando vuoi. Zero penali. Zero costi nascosti. Mese per mese, senza sorprese.</p>
                 </div>
-                <div class="zirel-card text-left">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Scelta</p>
-                    <h3 class="text-2xl font-black text-brand-blue mb-3">Scelta rapida</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Scegli il settore e apri il listino dedicato. Se hai un caso ibrido, ti guidiamo noi.</p>
+                <div class="zirel-card bg-white rounded-3xl p-6 shadow-sm border border-slate-100 text-left">
+                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-3">Supporto</p>
+                    <h3 class="text-2xl font-black text-brand-blue mb-3">Assistenza Dedicata</h3>
+                    <p class="text-brand-blue/70 leading-relaxed">Il team Zirèl è con te. Modifiche, aggiornamenti, domande — siamo a un messaggio di distanza. Incluso nel canone.</p>
                 </div>
             </div>
+            
             <div class="mt-12 max-w-4xl mx-auto rounded-[2rem] bg-white border border-sky-100 p-8 text-center shadow-sm">
-                <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Scelta rapida</p>
-                <h3 class="text-2xl md:text-3xl font-black text-brand-blue mb-4">Non sei sicuro del settore o del piano?</h3>
-                <p class="text-brand-blue/70 mb-6">Ti diciamo noi quale demo vedere, quale listino aprire e se ha senso partire dal sito, da WhatsApp o da entrambi.</p>
-                <a href="contatti.html" class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all"
-                    data-track="cta" data-track-location="pricing_mid_cta" data-track-label="pricing contact help">
-                    Parliamone prima di scegliere
+                <h3 class="text-2xl md:text-3xl font-black text-brand-blue mb-4">Non sei sicuro del piano giusto?</h3>
+                <p class="text-brand-blue/70 mb-6">Raccontaci la tua attività. Ti consigliamo il piano migliore senza venderti nulla che non ti serve.</p>
+                <a href="contatti.html" class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all">
+                    Voglio un Preventivo Gratuito
                 </a>
             </div>
         </div>
@@ -196,14 +215,12 @@
             <div class="faq-accordion" id="faq-accordion">
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>I prezzi cambiano tra Restaurant, Hotel e Professional?</h4>
+                        <h4>Ci sono vincoli? Posso disdire quando voglio?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>No.</strong> La fascia di prezzo resta la stessa: entry a partire da 69 euro al
-                                mese, intermedio da 129 euro al mese e piano custom su progetto. Cambiano naming,
-                                esempi e CTA per settore.</p>
+                            <p><strong>Zero vincoli.</strong> Annulli quando vuoi. Nessuna penale. L'attivazione iniziale una tantum non è rimborsabile: copre il lavoro già fatto prima della consegna.</p>
                         </div>
                     </div>
                 </div>
@@ -214,8 +231,7 @@
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Non e' un costo tecnico vuoto.</strong> Include configurazione iniziale,
-                                caricamento delle informazioni della tua attività, personalizzazione del widget e creazione del prima richiesta guidata.</p>
+                            <p><strong>Non è una tassa vuota.</strong> Include: analisi della tua attività, design su misura, sviluppo del sito, configurazione IA, addestramento sui tuoi dati reali e test finale. È il lavoro vero che facciamo prima di andare online.</p>
                         </div>
                     </div>
                 </div>
@@ -226,46 +242,40 @@
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Il canone mensile resta invariato</strong>, ma l'attivazione iniziale viene
-                                scontata del 50%. E' la leva piu' semplice per partire con meno attrito senza
-                                svalutare il servizio.</p>
+                            <p><strong>Il canone mensile resta invariato.</strong> L'attivazione iniziale (setup) viene scontata del 50%. Paghi meno all'inizio, stesso servizio ogni mese. Nessun trucco.</p>
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>WhatsApp e incluso? Ci sono costi extra?</h4>
+                        <h4>WhatsApp è incluso? Ci sono costi extra?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Si.</strong> Le risposte automatiche e la gestione WhatsApp sono incluse nei piani compatibili. Restano invece esclusi eventuali costi di messaggistica Meta/WhatsApp, che dipendono dall'utilizzo e da campagne o template fuori fair use.</p>
+                            <p><strong>Sì.</strong> Le risposte automatiche e la gestione WhatsApp sono incluse nei piani Sito Che Risponde e Agenda Automatica. Restano esclusi solo eventuali costi Meta/WhatsApp per campagne ad alto volume fuori dal fair use standard.</p>
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>Se non sono sicuro del settore giusto?</h4>
+                        <h4>E se la mia attività cresce? Posso cambiare piano?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Parliamone.</strong> Vai su <a href="contatti.html"
-                                    class="font-bold text-brand-orange hover:text-brand-orange-dark transition-colors">Contatti</a>
-                                e ti indirizziamo verso la soluzione, la demo e il listino piu' adatti al tuo caso.</p>
+                            <p><strong>Sì, fai upgrade quando vuoi.</strong> Paghi solo la differenza di canone. Zero penali per il cambio. Il setup già pagato viene scalato dal nuovo piano.</p>
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <h4>Posso annullare senza vincoli? E l'attivazione viene rimborsata?</h4>
+                        <h4>Il sito è mio? Cosa succede se smetto di pagare?</h4>
                         <div class="faq-icon"></div>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Sì, l'annullamento e' gratuito e senza vincoli.</strong> Puoi interrompere
-                                l'abbonamento senza penali. L'attivazione iniziale una tantum, invece, non e'
-                                rimborsabile in alcun caso.</p>
+                            <p><strong>Il dominio è tuo. Sempre.</strong> Il sito resta online finché il canone è attivo. Se smetti, il sito va offline ma i tuoi dati, contatti e dominio restano tuoi. Puoi esportare tutto quando vuoi.</p>
                         </div>
                     </div>
                 </div>
@@ -278,56 +288,54 @@
             <div class="zirel-card max-w-5xl mx-auto">
                 <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/45 font-bold mb-4">Chiaro dall'inizio</p>
                 <div class="grid md:grid-cols-2 gap-6 text-left">
-                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">La configurazione iniziale e' sempre prevista.</strong> Il costo una tantum si applica in partenza ed e' scontato del 50% con abbonamento annuale.</p>
-                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Il canone mensile resta sempre attivo.</strong> L'abbonamento mensile resta parte del servizio in ogni settore.</p>
-                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Widget e implementazione standard sono gratuiti.</strong> L'integrazione tecnica standard sul sito non ha costi aggiuntivi.</p>
-                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">WhatsApp e incluso nei piani.</strong> Eventuali costi di messaggistica Meta/WhatsApp restano esclusi e dipendono dall'utilizzo.</p>
-                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Annullamento gratuito e senza vincoli.</strong> Puoi interrompere quando vuoi. La configurazione iniziale una tantum non e' rimborsabile.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Setup una tantum.</strong> Lo paghi una volta all'inizio. Con l'annuale lo paghi la metà. Copre design, sviluppo, configurazione IA e test.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Canone mensile trasparente.</strong> Copre hosting, manutenzione, IA sempre attiva e assistenza continua. Mese per mese, niente sorprese.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">WhatsApp incluso.</strong> Le risposte automatiche su WhatsApp sono comprese nei piani Sito Che Risponde e Agenda Automatica.</p>
+                    <p class="text-brand-blue/70 leading-relaxed"><strong class="text-brand-blue">Nessun vincolo.</strong> Disdici quando vuoi. Il dominio resta tuo. I dati e i contatti dei clienti pure.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="footer">
+            <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Core</span></a>
-                    <p>Soluzioni operative per rispondere ai clienti, raccogliere richieste e attivare flussi utili per hotel, ristoranti e attività di servizio.</p>
+                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
+                    <p>Studio di Sviluppo Web specializzato in Siti Web Intelligenti ad alta conversione, dotati di IA proprietaria.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Soluzioni</h4>
+                    <h4>Servizi</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="restaurant.html">Restaurant</a></li>
-                        <li><a href="hotel.html">Hotel</a></li>
-                        <li><a href="professional.html">Professional</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Sviluppo Web</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Intelligenza Artificiale</a></li>
+                        <li><a href="index.html#cosa-riceve-team">Digital Marketing</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Accesso</h4>
+                    <h4>Portfolio & Demo</h4>
                     <ul>
-                        <li><a href="demo.html">Demo Restaurant</a></li>
-                        <li><a href="hotel-demo.html">Demo Hotel</a></li>
-                        <li><a href="professional-demo.html">Demo Professional</a></li>
+                        <li><a href="index.html#portfolio">I Nostri Lavori</a></li>
+                        <li><a href="demo.html">Testa una Demo Interattiva</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Lo Studio</h4>
+                    <ul>
+                        <li><a href="chi-siamo.html">Chi siamo</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
                         <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="login.html">Login</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Risorse</h4>
-                    <ul>
-                        <li><a href="guide/index.html">Guide</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="pricing.html">Pricing per settore</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="cookie.html">Cookie Policy</a></li>
-                                            <li><a href="chi-siamo.html">Chi siamo</a></li>
+                        <li><a href="index.html#faq">FAQ</a></li>
                     </ul>
                 </div>
             </div>
-            <p class="copyright">&copy; 2026 Operative AI by <span class="zirel-brand">Zirèl</span>. Tutti i diritti
-                riservati.</p>
+                                    <div class="mt-16 pt-8 border-t border-white/10 text-center text-[11px] text-white/30 flex flex-wrap justify-center items-baseline gap-x-3 gap-y-2 leading-none">
+                <span class="m-0 p-0 inline-block">&copy; 2026 Zirèl Studio. Tutti i diritti riservati.</span>
+                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
+                <a href="privacy.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Privacy Policy</a>
+                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
+                <a href="cookie.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Cookie Policy</a>
+            </div>
         </div>
     </footer>
 
@@ -369,10 +377,10 @@
                     <button class="quick-reply-btn" onclick="sendChatMessage('📅 Come funziona lo sconto annuale?')">
                         📅 Sconto annuale
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('🏨 Voglio vedere il pricing Hotel')">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Differenze tra i tre piani')">
                         🏨 Pricing Hotel
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Voglio capire il piano giusto per me')">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('💻 Che tecnologie usate?')">
                         🚀 Trova il piano giusto
                     </button>
                 </div>
@@ -404,6 +412,50 @@
     </button>
 
     <script type="module" src="/config.js"></script>
+    <script>
+        // Toggle Billing Logic
+        function toggleBilling() {
+            const toggleBtn = document.getElementById('billing-toggle');
+            const toggleThumb = document.getElementById('billing-toggle-thumb');
+            const labelMonthly = document.getElementById('label-monthly');
+            const labelAnnual = document.getElementById('label-annual');
+            const setupPrices = document.querySelectorAll('.setup-price');
+            
+            const isAnnual = toggleBtn.getAttribute('aria-checked') === 'true';
+            
+            if (!isAnnual) {
+                // Switch to Annual
+                toggleBtn.setAttribute('aria-checked', 'true');
+                toggleBtn.classList.replace('bg-slate-200', 'bg-brand-blue/20');
+                toggleThumb.classList.replace('translate-x-1', 'translate-x-7');
+                
+                labelMonthly.classList.replace('font-bold', 'font-medium');
+                labelMonthly.classList.replace('text-brand-blue', 'text-brand-blue/50');
+                
+                labelAnnual.classList.replace('font-medium', 'font-bold');
+                labelAnnual.classList.replace('text-brand-blue/50', 'text-brand-blue');
+                
+                setupPrices.forEach(el => {
+                    el.innerHTML = el.getAttribute('data-annual');
+                });
+            } else {
+                // Switch to Monthly
+                toggleBtn.setAttribute('aria-checked', 'false');
+                toggleBtn.classList.replace('bg-brand-blue/20', 'bg-slate-200');
+                toggleThumb.classList.replace('translate-x-7', 'translate-x-1');
+                
+                labelMonthly.classList.replace('font-medium', 'font-bold');
+                labelMonthly.classList.replace('text-brand-blue/50', 'text-brand-blue');
+                
+                labelAnnual.classList.replace('font-bold', 'font-medium');
+                labelAnnual.classList.replace('text-brand-blue', 'text-brand-blue/50');
+                
+                setupPrices.forEach(el => {
+                    el.innerHTML = el.getAttribute('data-monthly');
+                });
+            }
+        }
+    </script>
     <script>
         window.zirelTooltipMessages = [
             'Scegli il piano giusto per il tuo settore 💶',
