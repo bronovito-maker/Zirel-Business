@@ -1,0 +1,1372 @@
+{
+  "updatedAt": "2026-06-07T10:55:06.530Z",
+  "createdAt": "2026-05-14T20:14:56.087Z",
+  "id": "bbIMngH6a6UgPbE6",
+  "name": "gotbun",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "coupon_leads",
+          "mode": "list",
+          "cachedResultName": "coupon_leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "coupon_code": "={{ $json.couponCode }}",
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "coupon_type": "={{ $json.couponType }}",
+            "brand": "={{ $json.brand }}",
+            "source": "={{ $json.source }}",
+            "campaign": "={{ $json.campaign }}",
+            "privacy_consent": "={{ $json.privacyConsent }}",
+            "marketing_consent": "={{ $json.marketingConsent }}",
+            "created_at": "={{ $json.createdAt }}",
+            "expires_at": "={{ $json.expiresAt }}",
+            "status": "={{ $json.status }}",
+            "notes": "={{ $json.notes || '' }}",
+            "qr_url": "={{ $json.redeemUrl }}",
+            "qr_content": "={{ $json.qrContent }}",
+            "usage_limit": "={{ $json.usageLimit }}",
+            "redeem_attempts": 0,
+            "redeem_token": "={{ $json.redeemToken }}",
+            "redeem_url": "={{ $json.redeemUrl }}",
+            "qr_image_url": "={{ $json.qrImageUrl }}",
+            "redemption_mode": "={{ $json.redemptionMode }}",
+            "promo_days": "={{ $json.promoDays }}",
+            "promo_hours": "={{ $json.promoHours }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "coupon_code",
+              "displayName": "coupon_code",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "coupon_type",
+              "displayName": "coupon_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "campaign",
+              "displayName": "campaign",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "privacy_consent",
+              "displayName": "privacy_consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "marketing_consent",
+              "displayName": "marketing_consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qr_url",
+              "displayName": "qr_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qr_content",
+              "displayName": "qr_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "usage_limit",
+              "displayName": "usage_limit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "redeemed_at_text",
+              "displayName": "redeemed_at_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "redeemed_by",
+              "displayName": "redeemed_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "redeem_attempts",
+              "displayName": "redeem_attempts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_redeem_attempt_at",
+              "displayName": "last_redeem_attempt_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "promo_days",
+              "displayName": "promo_days",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "promo_hours",
+              "displayName": "promo_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "redeem_token",
+              "displayName": "redeem_token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "redeem_url",
+              "displayName": "redeem_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "qr_image_url",
+              "displayName": "qr_image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "redemption_mode",
+              "displayName": "redemption_mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "inserted_at",
+              "displayName": "inserted_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.2,
+      "position": [
+        2688,
+        2368
+      ],
+      "id": "ad3b4c57-826e-4c37-a37d-42045da90573",
+      "name": "Create Supabase Lead",
+      "credentials": {
+        "postgres": {
+          "id": "ln0nWKzBrIQmC9rX",
+          "name": "postgres supabase gotbun"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "event",
+              "name": "event",
+              "value": "={{ $json.body?.event || $json.event || 'coupon_claimed' }}",
+              "type": "string"
+            },
+            {
+              "id": "brand",
+              "name": "brand",
+              "value": "={{ $json.body?.brand || $json.brand || 'GotBun Riccione' }}",
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ ($json.body?.name || $json.name || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ ($json.body?.email || $json.email || '').trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "phone",
+              "name": "phone",
+              "value": "={{ (() => {\n  const raw = ($json.body?.phone || $json.phone || '').trim().replace(/\\s+/g, '');\n  if (raw.startsWith('+')) return raw;\n  if (raw.startsWith('00')) return '+' + raw.slice(2);\n  return '+39' + raw.replace(/^0+/, '');\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "privacyConsent",
+              "name": "privacyConsent",
+              "value": "={{ Boolean($json.body?.privacyConsent ?? $json.privacyConsent) }}",
+              "type": "boolean"
+            },
+            {
+              "id": "marketingConsent",
+              "name": "marketingConsent",
+              "value": "={{ Boolean($json.body?.marketingConsent ?? $json.marketingConsent) }}",
+              "type": "boolean"
+            },
+            {
+              "id": "couponCode",
+              "name": "couponCode",
+              "value": "={{ $json.body?.couponCode || $json.couponCode }}",
+              "type": "string"
+            },
+            {
+              "id": "couponType",
+              "name": "couponType",
+              "value": "={{ $json.body?.couponType || $json.couponType || '2x1' }}",
+              "type": "string"
+            },
+            {
+              "id": "createdAt",
+              "name": "createdAt",
+              "value": "={{ $json.body?.createdAt || $json.createdAt || $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "expiresAt",
+              "name": "expiresAt",
+              "value": "={{ $json.body?.expiresAt || $json.expiresAt }}",
+              "type": "string"
+            },
+            {
+              "id": "source",
+              "name": "source",
+              "value": "={{ $json.body?.source || $json.source || 'landing' }}",
+              "type": "string"
+            },
+            {
+              "id": "campaign",
+              "name": "campaign",
+              "value": "={{ $json.body?.campaign || $json.campaign || 'gotbun_tavoli_2x1' }}",
+              "type": "string"
+            },
+            {
+              "id": "redeemToken",
+              "name": "redeemToken",
+              "value": "={{ $json.body?.redeemToken || $json.redeemToken }}",
+              "type": "string"
+            },
+            {
+              "id": "redeemUrl",
+              "name": "redeemUrl",
+              "value": "={{ $json.body?.redeemUrl || $json.redeemUrl || $json.body?.qrContent || $json.qrContent }}",
+              "type": "string"
+            },
+            {
+              "id": "qrContent",
+              "name": "qrContent",
+              "value": "={{ $json.body?.qrContent || $json.qrContent || $json.body?.redeemUrl || $json.redeemUrl || $json.body?.couponCode || $json.couponCode }}",
+              "type": "string"
+            },
+            {
+              "id": "qrImageUrl",
+              "name": "qrImageUrl",
+              "value": "={{ $json.body?.qrImageUrl || $json.qrImageUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "status",
+              "name": "status",
+              "value": "={{ $json.body?.status || $json.status || \"Active\" }}",
+              "type": "string"
+            },
+            {
+              "id": "redemptionMode",
+              "name": "redemptionMode",
+              "value": "={{ $json.body?.redemptionMode || $json.redemptionMode || \"in_store\" }}",
+              "type": "string"
+            },
+            {
+              "id": "usageLimit",
+              "name": "usageLimit",
+              "value": "={{ Number($json.body?.usageLimit || $json.usageLimit || 1) }}",
+              "type": "number"
+            },
+            {
+              "id": "promoDays",
+              "name": "promoDays",
+              "value": "={{ $json.body?.promoDays || $json.promoDays || \"lunedi-giovedi\" }}",
+              "type": "string"
+            },
+            {
+              "id": "promoHours",
+              "name": "promoHours",
+              "value": "={{ $json.body?.promoHours || $json.promoHours || \"18:30-22:30\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        2368
+      ],
+      "id": "10b65ca8-0713-43d8-84ab-0be4f5cc8f14",
+      "name": "Normalize Coupon Lead1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gotbun-coupon",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        2240,
+        2368
+      ],
+      "id": "a66bf907-902b-4e3c-9e63-274095ab32d8",
+      "name": "Webhook",
+      "webhookId": "gotbun-coupon"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: true,\n  received: true,\n  couponCode: $('Normalize Coupon Lead1').item.json.couponCode,\n  qrContent: $('Normalize Coupon Lead1').item.json.qrContent,\n  qrImageUrl: $('Normalize Coupon Lead1').item.json.qrImageUrl,\n  redeemUrl: $('Normalize Coupon Lead1').item.json.redeemUrl,\n  status: $('Normalize Coupon Lead1').item.json.status,\n  email: $('Normalize Coupon Lead1').item.json.email,\n  airtableRecordId: $('Create Supabase Lead').item.json.id || '',\n  supabaseRecordId: $('Create Supabase Lead').item.json.id || '',\n  brevoMessageId: $json.messageId || ''\n} }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3360,
+        2368
+      ],
+      "id": "b65badaa-942e-4509-acfc-a08c043f3d00",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "email": "={{ $('Normalize Coupon Lead1').item.json.email }}",
+        "createContactAttributes": {
+          "attributesValues": [
+            {
+              "fieldName": "FIRSTNAME",
+              "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.name }}"
+            },
+            {
+              "fieldName": "COUPON",
+              "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.couponCode }}"
+            },
+            {
+              "fieldName": "CAMPAIGN",
+              "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.campaign }}"
+            },
+            {
+              "fieldName": "PHONE_RAW",
+              "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.phone }}"
+            },
+            {
+              "fieldName": "SMS",
+              "fieldValue": "={{$('Normalize Coupon Lead1').item.json.phone}}"
+            }
+          ]
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        2368
+      ],
+      "id": "528e2a62-3b36-46a5-8b6b-e1ab3e4cd07f",
+      "name": "Create a contact1",
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "E4xgdQJTCBSM526C",
+          "name": "Brevo account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  to: [\n    {\n      email: $('Normalize Coupon Lead1').item.json.email,\n      name: $('Normalize Coupon Lead1').item.json.name\n    }\n  ],\n  templateId: 1,\n  params: {\n    name: $('Normalize Coupon Lead1').item.json.name,\n    couponCode: $('Normalize Coupon Lead1').item.json.couponCode,\n    qrImageUrl: $('Normalize Coupon Lead1').item.json.qrImageUrl,\n    redeemUrl: $('Normalize Coupon Lead1').item.json.redeemUrl,\n    expiresAt: (() => {\n      const raw = $('Normalize Coupon Lead1').item.json.expiresAt;\n      const date = new Date(raw);\n      return Number.isNaN(date.getTime())\n        ? raw\n        : new Intl.DateTimeFormat('it-IT', {\n            day: '2-digit',\n            month: 'long',\n            year: 'numeric',\n            timeZone: 'Europe/Rome'\n          }).format(date);\n    })()\n  }\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3136,
+        2368
+      ],
+      "id": "c3cfc3ea-f700-4259-9ff0-4bea0e7783ad",
+      "name": "HTTP Request1",
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "E4xgdQJTCBSM526C",
+          "name": "Brevo account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Create Supabase Lead": {
+      "main": [
+        [
+          {
+            "node": "Create a contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Coupon Lead1": {
+      "main": [
+        [
+          {
+            "node": "Create Supabase Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Coupon Lead1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a contact1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4620f11b-009f-4c85-a57b-ab1f9aa7e100",
+  "activeVersionId": "4620f11b-009f-4c85-a57b-ab1f9aa7e100",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T20:14:56.087Z",
+      "createdAt": "2026-05-14T20:14:56.087Z",
+      "role": "workflow:owner",
+      "workflowId": "bbIMngH6a6UgPbE6",
+      "projectId": "2Cf6i0jib9PfATFz"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-07T10:55:25.749Z",
+    "createdAt": "2026-06-07T10:55:06.536Z",
+    "versionId": "4620f11b-009f-4c85-a57b-ab1f9aa7e100",
+    "workflowId": "bbIMngH6a6UgPbE6",
+    "nodes": [
+      {
+        "parameters": {
+          "schema": {
+            "__rl": true,
+            "value": "public",
+            "mode": "list"
+          },
+          "table": {
+            "__rl": true,
+            "value": "coupon_leads",
+            "mode": "list",
+            "cachedResultName": "coupon_leads"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "coupon_code": "={{ $json.couponCode }}",
+              "name": "={{ $json.name }}",
+              "email": "={{ $json.email }}",
+              "phone": "={{ $json.phone }}",
+              "coupon_type": "={{ $json.couponType }}",
+              "brand": "={{ $json.brand }}",
+              "source": "={{ $json.source }}",
+              "campaign": "={{ $json.campaign }}",
+              "privacy_consent": "={{ $json.privacyConsent }}",
+              "marketing_consent": "={{ $json.marketingConsent }}",
+              "created_at": "={{ $json.createdAt }}",
+              "expires_at": "={{ $json.expiresAt }}",
+              "status": "={{ $json.status }}",
+              "notes": "={{ $json.notes || '' }}",
+              "qr_url": "={{ $json.redeemUrl }}",
+              "qr_content": "={{ $json.qrContent }}",
+              "usage_limit": "={{ $json.usageLimit }}",
+              "redeem_attempts": 0,
+              "redeem_token": "={{ $json.redeemToken }}",
+              "redeem_url": "={{ $json.redeemUrl }}",
+              "qr_image_url": "={{ $json.qrImageUrl }}",
+              "redemption_mode": "={{ $json.redemptionMode }}",
+              "promo_days": "={{ $json.promoDays }}",
+              "promo_hours": "={{ $json.promoHours }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "coupon_code",
+                "displayName": "coupon_code",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "email",
+                "displayName": "email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "phone",
+                "displayName": "phone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "coupon_type",
+                "displayName": "coupon_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "brand",
+                "displayName": "brand",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "source",
+                "displayName": "source",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "campaign",
+                "displayName": "campaign",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "privacy_consent",
+                "displayName": "privacy_consent",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "boolean",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "marketing_consent",
+                "displayName": "marketing_consent",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "boolean",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "expires_at",
+                "displayName": "expires_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "notes",
+                "displayName": "notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "qr_url",
+                "displayName": "qr_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "qr_content",
+                "displayName": "qr_content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "usage_limit",
+                "displayName": "usage_limit",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "redeemed_at_text",
+                "displayName": "redeemed_at_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "redeemed_by",
+                "displayName": "redeemed_by",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "redeem_attempts",
+                "displayName": "redeem_attempts",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "last_redeem_attempt_at",
+                "displayName": "last_redeem_attempt_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "promo_days",
+                "displayName": "promo_days",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "promo_hours",
+                "displayName": "promo_hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "redeem_token",
+                "displayName": "redeem_token",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "redeem_url",
+                "displayName": "redeem_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "qr_image_url",
+                "displayName": "qr_image_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "redemption_mode",
+                "displayName": "redemption_mode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "inserted_at",
+                "displayName": "inserted_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "updated_at",
+                "displayName": "updated_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.2,
+        "position": [
+          2688,
+          2368
+        ],
+        "id": "ad3b4c57-826e-4c37-a37d-42045da90573",
+        "name": "Create Supabase Lead",
+        "credentials": {
+          "postgres": {
+            "id": "ln0nWKzBrIQmC9rX",
+            "name": "postgres supabase gotbun"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "event",
+                "name": "event",
+                "value": "={{ $json.body?.event || $json.event || 'coupon_claimed' }}",
+                "type": "string"
+              },
+              {
+                "id": "brand",
+                "name": "brand",
+                "value": "={{ $json.body?.brand || $json.brand || 'GotBun Riccione' }}",
+                "type": "string"
+              },
+              {
+                "id": "name",
+                "name": "name",
+                "value": "={{ ($json.body?.name || $json.name || '').trim() }}",
+                "type": "string"
+              },
+              {
+                "id": "email",
+                "name": "email",
+                "value": "={{ ($json.body?.email || $json.email || '').trim().toLowerCase() }}",
+                "type": "string"
+              },
+              {
+                "id": "phone",
+                "name": "phone",
+                "value": "={{ (() => {\n  const raw = ($json.body?.phone || $json.phone || '').trim().replace(/\\s+/g, '');\n  if (raw.startsWith('+')) return raw;\n  if (raw.startsWith('00')) return '+' + raw.slice(2);\n  return '+39' + raw.replace(/^0+/, '');\n})() }}",
+                "type": "string"
+              },
+              {
+                "id": "privacyConsent",
+                "name": "privacyConsent",
+                "value": "={{ Boolean($json.body?.privacyConsent ?? $json.privacyConsent) }}",
+                "type": "boolean"
+              },
+              {
+                "id": "marketingConsent",
+                "name": "marketingConsent",
+                "value": "={{ Boolean($json.body?.marketingConsent ?? $json.marketingConsent) }}",
+                "type": "boolean"
+              },
+              {
+                "id": "couponCode",
+                "name": "couponCode",
+                "value": "={{ $json.body?.couponCode || $json.couponCode }}",
+                "type": "string"
+              },
+              {
+                "id": "couponType",
+                "name": "couponType",
+                "value": "={{ $json.body?.couponType || $json.couponType || '2x1' }}",
+                "type": "string"
+              },
+              {
+                "id": "createdAt",
+                "name": "createdAt",
+                "value": "={{ $json.body?.createdAt || $json.createdAt || $now.toISO() }}",
+                "type": "string"
+              },
+              {
+                "id": "expiresAt",
+                "name": "expiresAt",
+                "value": "={{ $json.body?.expiresAt || $json.expiresAt }}",
+                "type": "string"
+              },
+              {
+                "id": "source",
+                "name": "source",
+                "value": "={{ $json.body?.source || $json.source || 'landing' }}",
+                "type": "string"
+              },
+              {
+                "id": "campaign",
+                "name": "campaign",
+                "value": "={{ $json.body?.campaign || $json.campaign || 'gotbun_tavoli_2x1' }}",
+                "type": "string"
+              },
+              {
+                "id": "redeemToken",
+                "name": "redeemToken",
+                "value": "={{ $json.body?.redeemToken || $json.redeemToken }}",
+                "type": "string"
+              },
+              {
+                "id": "redeemUrl",
+                "name": "redeemUrl",
+                "value": "={{ $json.body?.redeemUrl || $json.redeemUrl || $json.body?.qrContent || $json.qrContent }}",
+                "type": "string"
+              },
+              {
+                "id": "qrContent",
+                "name": "qrContent",
+                "value": "={{ $json.body?.qrContent || $json.qrContent || $json.body?.redeemUrl || $json.redeemUrl || $json.body?.couponCode || $json.couponCode }}",
+                "type": "string"
+              },
+              {
+                "id": "qrImageUrl",
+                "name": "qrImageUrl",
+                "value": "={{ $json.body?.qrImageUrl || $json.qrImageUrl }}",
+                "type": "string"
+              },
+              {
+                "id": "status",
+                "name": "status",
+                "value": "={{ $json.body?.status || $json.status || \"Active\" }}",
+                "type": "string"
+              },
+              {
+                "id": "redemptionMode",
+                "name": "redemptionMode",
+                "value": "={{ $json.body?.redemptionMode || $json.redemptionMode || \"in_store\" }}",
+                "type": "string"
+              },
+              {
+                "id": "usageLimit",
+                "name": "usageLimit",
+                "value": "={{ Number($json.body?.usageLimit || $json.usageLimit || 1) }}",
+                "type": "number"
+              },
+              {
+                "id": "promoDays",
+                "name": "promoDays",
+                "value": "={{ $json.body?.promoDays || $json.promoDays || \"lunedi-giovedi\" }}",
+                "type": "string"
+              },
+              {
+                "id": "promoHours",
+                "name": "promoHours",
+                "value": "={{ $json.body?.promoHours || $json.promoHours || \"18:30-22:30\" }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2464,
+          2368
+        ],
+        "id": "10b65ca8-0713-43d8-84ab-0be4f5cc8f14",
+        "name": "Normalize Coupon Lead1"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "gotbun-coupon",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          2240,
+          2368
+        ],
+        "id": "a66bf907-902b-4e3c-9e63-274095ab32d8",
+        "name": "Webhook",
+        "webhookId": "gotbun-coupon"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ {\n  success: true,\n  received: true,\n  couponCode: $('Normalize Coupon Lead1').item.json.couponCode,\n  qrContent: $('Normalize Coupon Lead1').item.json.qrContent,\n  qrImageUrl: $('Normalize Coupon Lead1').item.json.qrImageUrl,\n  redeemUrl: $('Normalize Coupon Lead1').item.json.redeemUrl,\n  status: $('Normalize Coupon Lead1').item.json.status,\n  email: $('Normalize Coupon Lead1').item.json.email,\n  airtableRecordId: $('Create Supabase Lead').item.json.id || '',\n  supabaseRecordId: $('Create Supabase Lead').item.json.id || '',\n  brevoMessageId: $json.messageId || ''\n} }}",
+          "options": {
+            "responseCode": 200
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          3360,
+          2368
+        ],
+        "id": "b65badaa-942e-4509-acfc-a08c043f3d00",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "resource": "contact",
+          "email": "={{ $('Normalize Coupon Lead1').item.json.email }}",
+          "createContactAttributes": {
+            "attributesValues": [
+              {
+                "fieldName": "FIRSTNAME",
+                "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.name }}"
+              },
+              {
+                "fieldName": "COUPON",
+                "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.couponCode }}"
+              },
+              {
+                "fieldName": "CAMPAIGN",
+                "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.campaign }}"
+              },
+              {
+                "fieldName": "PHONE_RAW",
+                "fieldValue": "={{ $('Normalize Coupon Lead1').item.json.phone }}"
+              },
+              {
+                "fieldName": "SMS",
+                "fieldValue": "={{$('Normalize Coupon Lead1').item.json.phone}}"
+              }
+            ]
+          },
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.sendInBlue",
+        "typeVersion": 1,
+        "position": [
+          2912,
+          2368
+        ],
+        "id": "528e2a62-3b36-46a5-8b6b-e1ab3e4cd07f",
+        "name": "Create a contact1",
+        "credentials": {
+          "sendInBlueApi": {
+            "id": "E4xgdQJTCBSM526C",
+            "name": "Brevo account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.brevo.com/v3/smtp/email",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "sendInBlueApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "accept",
+                "value": "application/json"
+              },
+              {
+                "name": "content-type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{\n{\n  to: [\n    {\n      email: $('Normalize Coupon Lead1').item.json.email,\n      name: $('Normalize Coupon Lead1').item.json.name\n    }\n  ],\n  templateId: 1,\n  params: {\n    name: $('Normalize Coupon Lead1').item.json.name,\n    couponCode: $('Normalize Coupon Lead1').item.json.couponCode,\n    qrImageUrl: $('Normalize Coupon Lead1').item.json.qrImageUrl,\n    redeemUrl: $('Normalize Coupon Lead1').item.json.redeemUrl,\n    expiresAt: (() => {\n      const raw = $('Normalize Coupon Lead1').item.json.expiresAt;\n      const date = new Date(raw);\n      return Number.isNaN(date.getTime())\n        ? raw\n        : new Intl.DateTimeFormat('it-IT', {\n            day: '2-digit',\n            month: 'long',\n            year: 'numeric',\n            timeZone: 'Europe/Rome'\n          }).format(date);\n    })()\n  }\n}\n}}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3136,
+          2368
+        ],
+        "id": "c3cfc3ea-f700-4259-9ff0-4bea0e7783ad",
+        "name": "HTTP Request1",
+        "credentials": {
+          "sendInBlueApi": {
+            "id": "E4xgdQJTCBSM526C",
+            "name": "Brevo account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Create Supabase Lead": {
+        "main": [
+          [
+            {
+              "node": "Create a contact1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Coupon Lead1": {
+        "main": [
+          [
+            {
+              "node": "Create Supabase Lead",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Normalize Coupon Lead1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a contact1": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request1": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "nikita bronovs",
+    "name": "Version 4620f11b",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
