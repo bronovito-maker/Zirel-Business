@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-03T17:29:24.392Z",
+  "updatedAt": "2026-06-08T22:08:41.602Z",
   "createdAt": "2026-03-01T23:45:29.584Z",
   "id": "vfYYOYyiEcSIzuze",
   "name": "Zirèl - AI Core",
@@ -194,7 +194,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        8744,
+        8752,
         -1328
       ],
       "id": "cc8a52f5-0c45-49db-966d-35aa78810f13",
@@ -262,7 +262,7 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-flash-latest",
+        "modelName": "models/gemini-flash-lite-latest",
         "options": {
           "temperature": 0.4
         }
@@ -1522,8 +1522,8 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
-  "activeVersionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
+  "versionId": "9f1e4576-bd4d-4310-9270-ab442368a3af",
+  "activeVersionId": "9f1e4576-bd4d-4310-9270-ab442368a3af",
   "triggerCount": 1,
   "shared": [
     {
@@ -1535,9 +1535,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-05-03T17:29:36.313Z",
-    "createdAt": "2026-05-03T17:29:24.394Z",
-    "versionId": "e2da85a2-d7e0-413b-bab4-5ec31a5ffb77",
+    "updatedAt": "2026-06-08T22:09:03.577Z",
+    "createdAt": "2026-06-08T22:08:41.604Z",
+    "versionId": "9f1e4576-bd4d-4310-9270-ab442368a3af",
     "workflowId": "vfYYOYyiEcSIzuze",
     "nodes": [
       {
@@ -1728,7 +1728,7 @@
         "type": "@n8n/n8n-nodes-langchain.agent",
         "typeVersion": 3.1,
         "position": [
-          8744,
+          8752,
           -1328
         ],
         "id": "cc8a52f5-0c45-49db-966d-35aa78810f13",
@@ -1796,7 +1796,7 @@
       },
       {
         "parameters": {
-          "modelName": "models/gemini-flash-latest",
+          "modelName": "models/gemini-flash-lite-latest",
           "options": {
             "temperature": 0.4
           }
@@ -3045,7 +3045,7 @@
       }
     },
     "authors": "nikita bronovs",
-    "name": "Version e2da85a2",
+    "name": "Version 9f1e4576",
     "description": "",
     "autosaved": true
   },
