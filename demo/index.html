@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zirèl Studio | Siti Web Intelligenti ad alta conversione</title>
+    <title>Siti Web Riccione e Rimini | Zirèl Studio — Siti che Rispondono ai Clienti 24/7</title>
     <meta name="description"
-        content="Creiamo Siti Web Intelligenti che lavorano al posto tuo. Integriamo un\'Intelligenza Artificiale proprietaria per gestire i tuoi contatti 24/7.">
+        content="Sviluppo siti web in Riviera Romagnola per attività locali. Aumenta le prenotazioni e azzera le chiamate perse con un sito che lavora per te 24 ore su 24.">
 
     <!-- SEO & Social Sharing -->
     <link rel="canonical" href="https://zirel.org" />
     <meta property="og:title"
-        content="Zirèl Studio | Siti Web Intelligenti ad alta conversione" />
+        content="Siti Web Riccione e Rimini | Zirèl Studio — Siti che Rispondono ai Clienti 24/7" />
     <meta property="og:description"
-        content="Zirèl risponde dal sito, raccoglie i dati importanti e prepara richieste chiare per hotel, ristoranti e professionisti." />
+        content="Sviluppo siti web in Riviera Romagnola per attività locali. Aumenta le prenotazioni e azzera le chiamate perse con un sito che lavora per te 24 ore su 24." />
     <meta property="og:url" content="https://zirel.org" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://zirel.org/hero_premium.png" />
@@ -23,16 +23,17 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title"
-        content="Zirèl Studio | Siti Web Intelligenti ad alta conversione" />
+        content="Siti Web Riccione e Rimini | Zirèl Studio — Siti che Rispondono ai Clienti 24/7" />
     <meta name="twitter:description"
-        content="Zirèl risponde dal sito, raccoglie i dati importanti e prepara richieste chiare per hotel, ristoranti e professionisti." />
+        content="Sviluppo siti web in Riviera Romagnola per attività locali. Aumenta le prenotazioni e azzera le chiamate perse con un sito che lavora per te 24 ore su 24." />
     <meta name="twitter:image" content="https://zirel.org/hero_premium.png" />
     <meta name="twitter:site" content="@zirelstudio" />
+
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "Zirèl",
+            "name": "Zirèl Studio",
             "url": "https://zirel.org",
             "inLanguage": "it-IT",
             "logo": "https://zirel.org/favicon.svg",
@@ -45,13 +46,11 @@
         {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Zirèl",
+            "name": "Zirèl Studio",
             "url": "https://zirel.org",
             "inLanguage": "it-IT"
         }
     </script>
-
-    <!-- Tailwind CSS CDN -->
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,7 +63,6 @@
     <link rel="stylesheet" href="/src/tailwind.css">
 
     <style>
-        /* Shared scroll effect script compat */
         .navbar.scrolled {
             background: rgba(0, 48, 73, 0.95);
             backdrop-filter: blur(15px);
@@ -82,118 +80,53 @@
                 radial-gradient(circle at bottom left, rgba(0, 48, 73, 0.12), transparent 36%);
         }
 
-        .core-shell {
-            border-color: rgba(147, 197, 253, 0.7);
-            box-shadow: 0 34px 90px rgba(2, 132, 199, 0.16);
-        }
-
-        .core-panel {
-            background: linear-gradient(180deg, #f6fbff 0%, #eef7ff 100%);
-            border: 1px solid rgba(147, 197, 253, 0.55);
-            box-shadow: 0 24px 60px rgba(2, 132, 199, 0.10);
-        }
-
         .page-core {
             background: linear-gradient(180deg, #eef6ff 0%, #ffffff 18%);
         }
 
-        .page-core .zirel-card {
-            border-color: rgba(147, 197, 253, 0.55);
-            box-shadow: 0 18px 42px rgba(2, 132, 199, 0.08);
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 48, 73, 0.05);
         }
 
-        .page-core #soluzioni,
-        .page-core #features {
-            background: linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
+        /* Interactive Tabs */
+        .tab-btn.active {
+            background-color: #003049;
+            color: white;
         }
 
-
-
-        .core-capability-panel {
-            background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(244, 250, 255, 0.98) 100%);
-            border: 1px solid rgba(147, 197, 253, 0.5);
-            box-shadow: 0 24px 60px rgba(2, 132, 199, 0.08);
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .core-capability-accent {
-            background: linear-gradient(145deg, #0a3552 0%, #0e4a72 55%, #146792 100%);
-            box-shadow: 0 24px 60px rgba(0, 48, 73, 0.18);
+        .tab-content.active {
+            display: block;
         }
 
-        .core-capability-item {
-            border-top: 1px solid rgba(147, 197, 253, 0.35);
-        }
-
-        .core-capability-item:first-child {
-            border-top: 0;
-        }
-
-        .core-capability-proof {
-            background: linear-gradient(135deg, rgba(255, 140, 66, 0.16), rgba(0, 174, 239, 0.1));
-            border: 1px solid rgba(147, 197, 253, 0.45);
-        }
-
-        .core-capability-note {
-            border-top: 1px dashed rgba(255, 255, 255, 0.18);
-        }
-
-        .core-editorial-shell {
-            background:
-                radial-gradient(circle at top left, rgba(0, 174, 239, 0.12), transparent 26%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 250, 255, 0.96) 100%);
-            border: 1px solid rgba(147, 197, 253, 0.55);
-            box-shadow: 0 28px 70px rgba(2, 132, 199, 0.10);
-        }
-
-        .core-editorial-spotlight {
-            background: linear-gradient(150deg, #07304a 0%, #0d4f77 58%, #1492cb 100%);
-            box-shadow: 0 30px 70px rgba(0, 48, 73, 0.18);
-        }
-
-        .core-editorial-rail {
-            border-top: 1px solid rgba(147, 197, 253, 0.32);
-        }
-
-        .core-editorial-rail:first-child {
-            border-top: 0;
-        }
-
-        .core-editorial-case {
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(147, 197, 253, 0.38);
-            box-shadow: 0 18px 40px rgba(2, 132, 199, 0.07);
-        }
-
-        .core-editorial-case.featured {
-            transform: translateY(-12px);
-            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
-            border-color: rgba(255, 140, 66, 0.32);
-            box-shadow: 0 24px 48px rgba(255, 140, 66, 0.12);
-        }
-
-        .core-editorial-tag {
-            background: rgba(255, 140, 66, 0.12);
-            color: #e67e22;
-        }
-
-        .core-final-panel {
-            background:
-                radial-gradient(circle at top left, rgba(255, 140, 66, 0.2), transparent 26%),
-                radial-gradient(circle at bottom right, rgba(0, 174, 239, 0.16), transparent 32%),
-                linear-gradient(145deg, #072f48 0%, #0c4c73 55%, #138bc2 100%);
-            box-shadow: 0 34px 90px rgba(0, 48, 73, 0.22);
-        }
-
-        .core-final-chip {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        @media (max-width: 1024px) {
-            .core-editorial-case.featured {
-                transform: none;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Image Mockup */
+        .mockup-container {
+            position: relative;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 8px solid #1e293b;
+            background-color: #f8fafc;
+            overflow: hidden;
         }
     </style>
     <!-- Vercel Analytics -->
@@ -203,19 +136,26 @@
 
 <body class="page-core font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="core">
 
-    <!-- 1. Header & Navigation -->
-            <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
+    <!-- 1. NAVIGAZIONE (NAV) -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand" style="color: #FF8C42 !important;">Zirèl</span>
+            <span style="color: #FFFFFF !important;">Studio</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="#cosa-riceve-team" class="nav-link">SERVIZI</a></li>
-            <li><a href="#portfolio" class="nav-link">PORTFOLIO</a></li>
+            <li><a href="#servizi" class="nav-link">SERVIZI</a></li>
+            <li><a href="#portfolio" class="nav-link">LAVORI</a></li>
+
+            <li><a href="#prezzi" class="nav-link">PREZZI</a></li>
             <li><a href="#faq" class="nav-link">FAQ</a></li>
-            <li><a href="demo.html" class="nav-link">DEMO IA</a></li>
-            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
             <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO</a></li>
+            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a></li>
         </ul>
-        <a href="contatti.html" class="cta-nav cta-nav-desktop">PREVENTIVO</a>
+        <div class="hidden lg:flex items-center gap-6">
+            <a href="tel:+393461027447"
+                class="font-bold text-white hover:text-brand-orange transition-colors flex items-center gap-2">
+                📞 +39 346 102 7447
+            </a>
+            <a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a>
+        </div>
         <div class="hamburger" id="hamburger">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -223,749 +163,802 @@
         </div>
     </nav>
 
-    <!-- 2. Hero Section (Il Gancio) -->
+    <!-- 2. HERO SECTION -->
     <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
-        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10">
-            <div class="md:w-3/5 text-center md:text-left mb-12 md:mb-0">
-                <span
-                    class="inline-block bg-white text-brand-blue px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6 border border-slate-200 shadow-sm">
-                    Basta siti che stanno lì a prendere polvere.
-                </span>
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6">
-                    Ti facciamo il sito. Poi lui
-                    <span class="text-brand-orange italic">risponde ai clienti al posto tuo — 24 ore su 24.</span>
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10 gap-12">
+            <div class="md:w-1/2 text-center md:text-left mb-12 md:mb-0">
+                <div
+                    class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-bold shadow-sm mb-6 border border-slate-100">
+                    <span class="text-amber-500">⭐⭐⭐⭐⭐</span>
+                    <span class="text-brand-blue">Già scelto da 15+ attività in Riviera Romagnola</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6 text-brand-blue">
+                    Il Sito Web che Lavora al Posto Tuo.<br />
+                    <span class="text-brand-orange">Più Prenotazioni, Zero Chiamate Perse.</span>
                 </h1>
-                <p class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
-                    Sei un ristoratore, un estetista, un professionista con l'agenda piena? I nostri siti filtrano i clienti su WhatsApp mentre lavori. Tu apri il telefono e trovi solo richieste già pronte. Zero chiamate perse. Agenda piena.
-                </p>
-                <div class="grid sm:grid-cols-3 gap-3 max-w-2xl mb-8 text-left">
-                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
-                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-blue/45 font-bold">da €69/mese</p>
-                        <p class="text-sm font-bold text-brand-blue mt-1">Sito Vetrina</p>
-                        <p class="text-[10px] text-brand-blue/50 mt-0.5">+ €349 setup</p>
-                    </div>
-                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
-                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-orange font-bold">da €129/mese</p>
-                        <p class="text-sm font-bold text-brand-blue mt-1">Sito Che Risponde</p>
-                        <p class="text-[10px] text-brand-blue/50 mt-0.5">+ €549 setup</p>
-                    </div>
-                    <div class="bg-white/90 border border-slate-200 rounded-2xl px-4 py-4 shadow-sm">
-                        <p class="text-[11px] uppercase tracking-[0.14em] text-brand-cyan font-bold">da €199/mese</p>
-                        <p class="text-sm font-bold text-brand-blue mt-1">Agenda Automatica</p>
-                        <p class="text-[10px] text-brand-blue/50 mt-0.5">setup su misura</p>
-                    </div>
-                </div>
+                <h2 class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Sviluppo siti web per attività locali a Riccione, Rimini e dintorni. Trasformiamo i visitatori in
+                    clienti paganti mentre tu gestisci il tuo locale, senza perdere tempo al telefono.
+                </h2>
+
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <a href="#pacchetti"
-                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-brand-orange/30 border border-white/20">
-                        Voglio un Preventivo Gratuito
-                    </a>
-                    <a href="#portfolio"
-                        class="px-10 py-5 rounded-full text-lg font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all text-center text-brand-blue shadow-sm">
-                        Vedi il Portfolio
+                    <a href="contatti.html"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-xl shadow-brand-orange/30 border border-white/20">
+                        VOGLIO PIÙ PRENOTAZIONI
                     </a>
                 </div>
-
             </div>
-            <div class="md:w-2/5 flex justify-center items-center relative">
-                <div class="relative w-full max-w-[400px] z-10 transform hover:-translate-y-2 transition-transform duration-500">
-                    <!-- Decorazione Sfondo -->
-                    <div class="absolute -inset-2 bg-gradient-to-r from-brand-orange via-brand-blue to-brand-cyan rounded-[1.5rem] blur-xl opacity-20"></div>
-                    
-                    <!-- CSS Browser Mockup -->
-                    <div class="relative rounded-[1.5rem] shadow-2xl border border-slate-200 bg-white overflow-hidden flex flex-col h-[450px]">
-                        <!-- Browser Header -->
-                        <div class="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
-                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                            <div class="mx-auto bg-white border border-slate-200 text-[10px] text-slate-400 font-mono px-4 py-1 rounded-full flex-grow max-w-[200px] text-center">iltuosito.it</div>
-                        </div>
-                        
-                        <!-- Website Content -->
-                        <div class="p-6 flex flex-col h-full bg-slate-50 relative">
-                            <!-- Nav -->
-                            <div class="flex justify-between items-center mb-8">
-                                <div class="w-16 h-4 bg-brand-blue rounded-full"></div>
-                                <div class="flex gap-2">
-                                    <div class="w-4 h-1 bg-slate-300 rounded-full"></div>
-                                    <div class="w-4 h-1 bg-slate-300 rounded-full"></div>
-                                    <div class="w-4 h-1 bg-slate-300 rounded-full"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Hero -->
-                            <div class="space-y-4 max-w-[80%]">
-                                <div class="w-full h-6 bg-brand-blue rounded-lg"></div>
-                                <div class="w-3/4 h-6 bg-brand-blue rounded-lg"></div>
-                                <div class="w-full h-2 bg-slate-200 rounded-full mt-4"></div>
-                                <div class="w-5/6 h-2 bg-slate-200 rounded-full"></div>
-                                <div class="w-1/2 h-8 bg-brand-orange rounded-full mt-6"></div>
-                            </div>
-                            
-                            <!-- Grid / Features -->
-                            <div class="grid grid-cols-2 gap-3 mt-8">
-                                <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                    <div class="w-6 h-6 bg-brand-cyan/20 rounded-md mb-2"></div>
-                                    <div class="w-full h-2 bg-slate-200 rounded-full mb-1"></div>
-                                    <div class="w-2/3 h-2 bg-slate-200 rounded-full"></div>
-                                </div>
-                                <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                    <div class="w-6 h-6 bg-brand-orange/20 rounded-md mb-2"></div>
-                                    <div class="w-full h-2 bg-slate-200 rounded-full mb-1"></div>
-                                    <div class="w-2/3 h-2 bg-slate-200 rounded-full"></div>
-                                </div>
-                            </div>
 
-                            <!-- Chat Widget Mockup -->
-                            <div class="absolute bottom-4 right-4 flex flex-col items-end gap-2 animate-bounce">
-                                <div class="bg-white text-brand-blue text-[10px] font-bold px-3 py-2 rounded-2xl rounded-br-none shadow-lg border border-slate-100">
-                                    Ciao! Come posso aiutarti? 👋
-                                </div>
-                                <div class="w-12 h-12 bg-zirel-gradient rounded-full shadow-xl flex items-center justify-center text-white text-xl border-2 border-white">
-                                    💬
-                                </div>
-                            </div>
-                        </div>
+            <div class="md:w-1/2 flex justify-center relative">
+                <!-- Mockup Smartphone Animato -->
+                <div
+                    class="mockup-container w-[300px] h-[600px] flex flex-col transform md:rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <div class="h-6 w-full bg-slate-900 rounded-t-xl flex justify-center pt-2 relative">
+                        <div class="w-20 h-4 bg-black rounded-b-xl absolute top-0"></div>
                     </div>
+                    <div class="flex-1 bg-slate-100 relative p-4 flex flex-col justify-center gap-4">
+                        <!-- Notifiche WhatsApp Mock -->
+                        <div
+                            class="bg-white p-4 rounded-xl shadow-md border-l-4 border-green-500 transform transition-all duration-500 translate-y-0 opacity-100">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    💬</div>
+                                <div>
+                                    <p class="font-bold text-sm">Zirèl Assistant</p>
+                                    <p class="text-xs text-slate-500">Ora</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium">Nuova prenotazione confermata! 🎉</p>
+                            <p class="text-xs text-slate-600 mt-1">Marco Rossi, Tavolo per 4 alle 20:30. Ha già
+                                accettato il menù fisso.</p>
+                        </div>
 
-                    <!-- Badge Fluttuante -->
-                    <div class="absolute -bottom-6 -left-8 md:-left-12 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-brand-sand flex items-center gap-3 transform hover:scale-105 transition-transform cursor-default">
-                        <div class="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center text-2xl text-brand-orange">⚡</div>
-                        <div>
-                            <p class="text-[10px] uppercase font-bold text-brand-blue/50 tracking-wider">Risultato</p>
-                            <p class="text-base font-black text-brand-blue">Sito Autopilot</p>
+                        <div
+                            class="bg-white p-4 rounded-xl shadow-md border-l-4 border-green-500 transform transition-all duration-500 translate-y-0 opacity-100 delay-100">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    💬</div>
+                                <div>
+                                    <p class="font-bold text-sm">Zirèl Assistant</p>
+                                    <p class="text-xs text-slate-500">5 min fa</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium">Richiesta Preventivo Qualificata 🔧</p>
+                            <p class="text-xs text-slate-600 mt-1">Sostituzione caldaia. Cliente ha inviato foto.
+                                Budget: €1500.</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Glow Effect -->
+                <div class="absolute inset-0 bg-brand-orange/20 blur-[100px] rounded-full z-[-1]"></div>
             </div>
         </div>
-
-        <!-- Background Elements -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
     </header>
 
-    <section class="py-12 bg-white border-y border-slate-100">
+    <!-- 3. POSIZIONAMENTO ANTI-AGENZIA ("Perché Zirèl Studio") -->
+    <section class="py-24 bg-brand-blue text-white relative">
         <div class="container mx-auto px-4 md:px-8">
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">I Nostri Siti</p>
-                    <p class="font-bold text-brand-blue mb-2">Un Commerciale Sempre Attivo</p>
-                    <p class="text-sm text-brand-blue/70 leading-relaxed">Il tuo sito non è più una vetrina passiva, ma un assistente che guida il cliente e fissa appuntamenti.</p>
+            <div class="max-w-4xl mx-auto text-center md:text-left grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-black mb-6 leading-tight">
+                        Non siamo l'agenzia di 30 dipendenti che sparisce dopo averti consegnato il sito.
+                    </h2>
+                    <p class="text-lg text-white/80 leading-relaxed mb-6">
+                        Siamo un'agenzia web strutturata che sviluppa siti, <strong>soluzioni web custom</strong> e
+                        <strong>CRM su misura</strong> per le tue esigenze. Inoltre, creiamo landing page strategiche e
+                        le sponsorizziamo sui maggiori canali social per raccogliere contatti reali.
+                    </p>
+                    <p class="text-lg text-white/80 leading-relaxed font-bold">
+                        Vogliamo darti il controllo totale sui dati raccolti dai tuoi clienti: a differenza delle grandi
+                        multinazionali, noi non nascondiamo mai i tuoi contatti. I dati sono di tua esclusiva proprietà.
+                    </p>
                 </div>
-                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Automazione</p>
-                    <p class="font-bold text-brand-blue mb-2">Zero Contatti Persi</p>
-                    <p class="text-sm text-brand-blue/70 leading-relaxed">Che sia domenica o mezzanotte, il sito qualifica i lead e ti fa trovare le richieste già filtrate.</p>
-                </div>
-                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-6">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Design & SEO</p>
-                    <p class="font-bold text-brand-blue mb-2">Veloce, Pulito, Indicizzato</p>
-                    <p class="text-sm text-brand-blue/70 leading-relaxed">Oltre all'intelligenza IA, garantiamo design premium e caricamenti istantanei per posizionarti su Google.</p>
+                <div class="relative">
+                    <img src="/hero.jpg" alt="Zirèl Studio Partner"
+                        class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-500">
+                    <div
+                        class="absolute -bottom-6 -left-6 bg-brand-orange text-white p-6 rounded-xl shadow-xl font-bold text-xl">
+                        Assistenza Diretta 🤝
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 3. Nuova Sezione Pacchetti -->
-    <section class="py-24 bg-white" id="pacchetti">
-        <div class="container mx-auto px-4 md:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Scegli quanto vuoi <span
-                        class="text-brand-orange">delegare</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Tre livelli. Un costo di attivazione una tantum. Un canone mensile trasparente. I prezzi sono qui sotto, in chiaro.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 items-stretch">
-                <!-- Tier 1 -->
-                <div class="zirel-card group border-slate-200">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-blue/50 font-bold mb-3">Livello 1</p>
-                    <h3 class="text-2xl font-bold mb-2">Sito Vetrina Veloce</h3>
-                    <p class="text-brand-blue/70 leading-relaxed mb-6">Il sito che ti fa trovare su Google in 2 secondi. Design pulito, mobile-first, SEO locale. Per chi vuole esserci senza sbatti.</p>
-                    <p class="text-sm font-bold text-brand-orange mb-4">Da €69/mese + €349 setup</p>
-                    <ul class="space-y-3 text-sm font-medium mb-8 text-brand-blue/80">
-                        <li class="flex items-center gap-2">✓ Sito che carica in 2 secondi (Google ti premia)</li>
-                        <li class="flex items-center gap-2">✓ Design su misura, non template da 50€</li>
-                        <li class="flex items-center gap-2">✓ Ti posizioniamo su Google nella tua zona</li>
-                    </ul>
-                    <a href="contatti.html" class="block text-center px-5 py-3 rounded-full border-2 border-brand-blue text-brand-blue font-bold hover:bg-brand-blue hover:text-white transition-all">Voglio un Preventivo Gratuito</a>
-                </div>
-                <!-- Tier 2 -->
-                <div class="zirel-card group border-brand-blue relative transform md:-translate-y-4 shadow-xl">
-                    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zirel-gradient text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">70% dei clienti</div>
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3 mt-2">Livello 2</p>
-                    <h3 class="text-2xl font-bold mb-2">Sito Che Risponde Da Solo</h3>
-                    <p class="text-brand-blue/70 leading-relaxed mb-6">Il sito che filtra i clienti su WhatsApp mentre dormi. L'IA Zirèl impara i tuoi servizi, risponde alle domande e ti lascia solo le richieste pronte.</p>
-                    <p class="text-sm font-bold text-brand-orange mb-4">Da €129/mese + €549 setup</p>
-                    <ul class="space-y-3 text-sm font-medium mb-8 text-brand-blue/80">
-                        <li class="flex items-center gap-2">✓ Tutto il piano Sito Vetrina Veloce</li>
-                        <li class="flex items-center gap-2 font-bold text-brand-orange">✓ Assistente IA sul sito che risponde 24/7</li>
-                        <li class="flex items-center gap-2">✓ L'IA impara i tuoi prezzi, orari e servizi (bastano 30 minuti di call con noi)</li>
-                        <li class="flex items-center gap-2">✓ Ogni mattina trovi su WhatsApp i clienti già filtrati</li>
-                    </ul>
-                    <a href="contatti.html" class="block text-center px-5 py-3 rounded-full bg-zirel-gradient text-white font-bold shadow-lg shadow-brand-orange/20 hover:-translate-y-1 transition-all">Voglio un Preventivo Gratuito</a>
-                </div>
-                <!-- Tier 3 -->
-                <div class="zirel-card group border-brand-cyan/40">
-                    <p class="text-[11px] uppercase tracking-[0.16em] text-brand-cyan font-bold mb-3">Livello 3</p>
-                    <h3 class="text-2xl font-bold mb-2">Agenda Automatica</h3>
-                    <p class="text-brand-blue/70 leading-relaxed mb-6">Il cliente prenota dal sito. Tu arrivi e trovi l'agenda già piena. WhatsApp, sito, calendario: tutto collegato.</p>
-                    <p class="text-sm font-bold text-brand-cyan mb-4">Da €199/mese + setup su misura</p>
-                    <ul class="space-y-3 text-sm font-medium mb-8 text-brand-blue/80">
-                        <li class="flex items-center gap-2">✓ Tutto il piano Sito Che Risponde Da Solo</li>
-                        <li class="flex items-center gap-2">✓ Zirèl anche su WhatsApp Business</li>
-                        <li class="flex items-center gap-2 font-bold text-brand-cyan">✓ Calendario appuntamenti automatico</li>
-                        <li class="flex items-center gap-2">✓ Landing page premium per campagne Ads</li>
-                    </ul>
-                    <a href="contatti.html" class="block text-center px-5 py-3 rounded-full border-2 border-brand-cyan text-brand-cyan font-bold hover:bg-brand-cyan hover:text-white transition-all">Voglio un Preventivo Gratuito</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- Sezione Portfolio -->
-    <section class="py-24 bg-slate-50" id="portfolio">
-        <div class="container mx-auto px-4 md:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">I Nostri <span class="text-brand-orange">Ultimi Lavori</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">Non siamo la solita agenzia che fa siti tutti uguali. Creiamo esperienze personalizzate, pulite e orientate al risultato.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto perspective-1000">
-                <!-- Progetto 1 (Sinistra): La Teglieria -->
-                <a href="https://lateglieria.it" target="_blank" class="block bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl border border-slate-200 group transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1">
-                    <!-- Browser Top Bar -->
-                    <div class="bg-slate-100 px-4 py-2 flex items-center gap-2 border-b border-slate-200">
-                        <div class="flex gap-1.5">
-                            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-                        </div>
-                        <div class="mx-auto text-[9px] text-slate-400 font-mono">lateglieria.it</div>
-                    </div>
-                    <!-- Anteprima -->
-                    <div class="h-56 bg-slate-900 flex flex-col justify-center items-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-red-600 to-amber-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="relative z-10 text-center">
-                            <span class="text-4xl mb-2 block">🍕</span>
-                            <p class="text-white font-black text-xl tracking-widest uppercase">La Teglieria</p>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-red-500 font-bold">Food & Delivery</p>
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2">La Teglieria</h4>
-                        <p class="text-brand-blue/70 text-sm">Esperienza utente studiata per velocizzare gli ordini e mostrare i prodotti in alta qualità.</p>
-                    </div>
-                </a>
-
-                <!-- Progetto 2 (Centro in evidenza): Got Bun -->
-                <a href="https://gotbunriccione.it" target="_blank" class="block bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200 group transform transition-all duration-500 hover:-translate-y-4 z-10 relative md:-mt-4">
-                    <!-- Browser Top Bar -->
-                    <div class="bg-slate-100 px-4 py-2 flex items-center gap-2 border-b border-slate-200">
-                        <div class="flex gap-1.5">
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                        </div>
-                        <div class="mx-auto text-[9px] text-slate-400 font-mono">gotbunriccione.it</div>
-                    </div>
-                    <!-- Anteprima -->
-                    <div class="h-64 bg-slate-900 flex flex-col justify-center items-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-brand-orange to-red-600 opacity-90 group-hover:scale-105 transition-transform duration-700"></div>
-                        <div class="relative z-10 text-center">
-                            <span class="text-5xl mb-3 block">🍔</span>
-                            <p class="text-white font-black text-2xl tracking-widest uppercase">Got Bun</p>
-                        </div>
-                        <div class="absolute bottom-4 right-4 bg-white/20 backdrop-blur px-3 py-1 rounded-full border border-white/30 text-white text-[10px] font-bold">Menu Digitale</div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-brand-orange font-bold">Ristorazione</p>
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2">Got Bun Riccione</h4>
-                        <p class="text-brand-blue/70 text-sm">Design aggressivo e accattivante per massimizzare le conversioni dei delivery locali.</p>
-                    </div>
-                </a>
-
-                <!-- Progetto 3 (Destra): Niki Tuttofare -->
-                <a href="https://nikituttofare.com" target="_blank" class="block bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl border border-slate-200 group transform transition-all duration-500 hover:-translate-y-2 hover:-rotate-1">
-                    <!-- Browser Top Bar -->
-                    <div class="bg-slate-100 px-4 py-2 flex items-center gap-2 border-b border-slate-200">
-                        <div class="flex gap-1.5">
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                        </div>
-                        <div class="mx-auto text-[9px] text-slate-400 font-mono">nikituttofare.com</div>
-                    </div>
-                    <!-- Anteprima -->
-                    <div class="h-56 bg-slate-900 flex flex-col justify-center items-center relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-brand-blue to-brand-cyan opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="relative z-10 text-center">
-                            <span class="text-4xl mb-2 block">🛠️</span>
-                            <p class="text-white font-black text-xl tracking-widest uppercase">Niki Tuttofare</p>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-brand-cyan font-bold">Servizi Professionali</p>
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2">Niki Tuttofare</h4>
-                        <p class="text-brand-blue/70 text-sm">Struttura chiara e form di contatto istantaneo per generare lead qualificati e proteggere l'agenda.</p>
-                    </div>
-                </a>            </div>
-        </div>
-    </section>
-
-    <!-- 4. Cosa fa davvero -->
-    <section class="py-24 bg-slate-50" id="features">
+    <!-- 4. COME FUNZIONA IN 3 STEP -->
+    <section class="py-24 bg-slate-50" id="servizi">
         <div class="container mx-auto px-4 md:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
-                    La Tecnologia <span class="text-brand-orange">Zirèl</span>
+                    Ti portiamo clienti pronti a comprare.<br>
+                    <span class="text-brand-orange">Senza farti impazzire con la tecnologia.</span>
                 </h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto text-lg">
-                    Non è un chatbot stupido. È il tuo miglior dipendente. E non dorme mai.
-                </p>
-                <div class="mt-8">
-                    <a href="demo.html"
-                        class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20"
-                        data-track="cta" data-track-location="core_features" data-track-label="core features demo">
-                        Prova la Demo IA
-                    </a>
-                </div>
-                
-                <!-- Blocco Anti-Obiezione IA -->
-                <div class="mt-12 max-w-4xl mx-auto bg-gradient-to-r from-brand-blue/5 to-brand-orange/5 border border-brand-orange/20 rounded-2xl p-6 md:p-8 text-left">
-                    <div class="flex items-start gap-4">
-                        <div class="text-4xl flex-shrink-0">🤔</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-blue mb-2">"E se un cliente vuole parlare con me, non con l'IA?"</h3>
-                            <p class="text-brand-blue/70 leading-relaxed">Zirèl sa quando farsi da parte. Se la richiesta è complessa, ti avvisa subito su WhatsApp. Il cliente non sa nemmeno che c'era un'IA di mezzo: pensa di parlare con un assistente umano. Tu decidi se intervenire o lasciare che l'IA gestisca. <strong>Nessun cliente perso. Nessuna figuraccia.</strong></p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div class="core-capability-panel rounded-[2.5rem] overflow-hidden">
-                <div class="grid lg:grid-cols-[1.1fr_1.6fr]">
-                    <div class="core-capability-accent p-10 md:p-12 text-white">
-                        <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Assistente operativo</p>
-                        <h3 class="text-3xl md:text-4xl font-black leading-tight mb-5">Non una chat da mettere online.<br>Una presenza che regge il lavoro vero.</h3>
-                        <p class="text-white/80 text-lg leading-relaxed mb-8">Zirèl tiene insieme tono, dati, regole e passaggi operativi. Per questo non sembra un widget appeso al sito, ma una parte credibile del tuo business.</p>
-                        <div class="core-capability-proof rounded-[1.75rem] px-5 py-5 mb-8">
-                            <p class="text-[11px] uppercase tracking-[0.16em] text-white/55 font-bold mb-2">Quando funziona davvero</p>
-                            <p class="text-base font-bold leading-relaxed">Quando una richiesta non si limita a ricevere una risposta, ma esce già più chiara, completa e pronta per il team.</p>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="rounded-2xl bg-white/10 border border-white/10 px-5 py-4">
-                                <p class="text-sm font-bold">Ogni risposta prepara il prossimo passo</p>
-                            </div>
-                            <div class="rounded-2xl bg-white/10 border border-white/10 px-5 py-4">
-                                <p class="text-sm font-bold">Ogni settore ha domande e dati diversi</p>
-                            </div>
-                        </div>
-                        <div class="core-capability-note mt-8 pt-6">
-                            <p class="text-white/68 leading-relaxed">Se oggi il contatto iniziale si perde tra messaggi, richieste vaghe e follow-up spezzati, Zirèl serve esattamente a rimettere ordine lì.</p>
-                        </div>
-                    </div>
-                    <div class="bg-white/80 px-6 md:px-10 py-8 md:py-10">
-                        <div class="core-capability-item py-6 md:py-7">
-                            <div class="flex items-start gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🎯</div>
-                                <div>
-                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Parla come il tuo brand</h4>
-                                    <p class="text-brand-blue/65 leading-relaxed">Risponde con tono, ritmo e livello di precisione coerenti con la tua attività, senza sembrare un componente esterno o improvvisato.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="core-capability-item py-6 md:py-7">
-                            <div class="flex items-start gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🗂️</div>
-                                <div>
-                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Usa dati reali</h4>
-                                    <p class="text-brand-blue/65 leading-relaxed">Lavora su informazioni strutturate, regole e contenuti reali del business. Non improvvisa: restituisce risposte che il team può difendere.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="core-capability-item py-6 md:py-7">
-                            <div class="flex items-start gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-brand-cyan/10 flex items-center justify-center text-2xl flex-shrink-0">⚙️</div>
-                                <div>
-                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Prepara il passo successivo</h4>
-                                    <p class="text-brand-blue/65 leading-relaxed">Non si ferma alla risposta: raccoglie i dati giusti, ordina la richiesta e la passa al team quando serve.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="core-capability-item py-6 md:py-7">
-                            <div class="flex items-start gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-brand-sand-dark/40 flex items-center justify-center text-2xl flex-shrink-0">✉️</div>
-                                <div>
-                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Conferme brandizzate</h4>
-                                    <p class="text-brand-blue/65 leading-relaxed">Riepiloghi, notifiche e conferme restano coerenti con la tua attività e con il contesto, così il cliente percepisce continuità e controllo.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="core-capability-item py-6 md:py-7">
-                            <div class="flex items-start gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-brand-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🧩</div>
-                                <div>
-                                    <h4 class="text-2xl font-black text-brand-blue mb-2">Si adatta al settore</h4>
-                                    <p class="text-brand-blue/65 leading-relaxed">Hotel, ristoranti e attività professionali non ricevono lo stesso template: cambiano passaggi, linguaggio e obiettivo operativo.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 rounded-[2rem] bg-brand-blue/[0.03] border border-brand-blue/10 px-6 py-6">
-                            <p class="text-[11px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-3">Firma del prodotto</p>
-                            <p class="text-xl md:text-2xl font-black text-brand-blue leading-tight">Parla bene. Raccoglie meglio. Fa avanzare il lavoro.</p>
-                        </div>
-                    </div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
+                <!-- Linea di connessione desktop -->
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-brand-orange/20 -translate-y-1/2 z-0">
+                </div>
+
+                <!-- Step 1 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10 transform hover:-translate-y-2 transition-transform">
+                    <div
+                        class="w-16 h-16 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg border-4 border-white">
+                        1</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">Parliamo 15 minuti</h3>
+                    <p class="text-brand-blue/70">Mi spieghi cosa ti serve, come lavori e soprattutto a quali chiamate o
+                        domande ripetitive non hai mai tempo di rispondere.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10 transform hover:-translate-y-2 transition-transform md:-mt-4">
+                    <div
+                        class="w-16 h-16 bg-brand-blue text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg border-4 border-white">
+                        2</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">Creo il tuo Sito Intelligente</h3>
+                    <p class="text-brand-blue/70">Sviluppo un sito web per il tuo ristorante, hotel o negozio che lavora
+                        per te: risponde alle domande frequenti 24/7 e filtra i contatti.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div
+                    class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10 transform hover:-translate-y-2 transition-transform">
+                    <div
+                        class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg border-4 border-white">
+                        3</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">Trovi l'agenda piena</h3>
+                    <p class="text-brand-blue/70">Tu fai il tuo lavoro. Ti svegli la mattina e trovi le prenotazioni già
+                        inserite o i clienti qualificati che ti aspettano su WhatsApp.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-24 bg-white" id="cosa-riceve-team">
+    <!-- 5. PORTFOLIO & CASI STUDIO COMPLETI -->
+    <section class="py-24 bg-white" id="portfolio">
         <div class="container mx-auto px-4 md:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Siti che portano <span class="text-brand-orange">risultati</span>, non solo visite</h2>
-                <p class="text-brand-blue/60 max-w-3xl mx-auto text-lg">Non ci limitiamo a fare un bel sito: creiamo una macchina automatizzata che trasforma i visitatori in contatti pronti per l'acquisto.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="zirel-card">
-                    <h3 class="text-xl font-bold mb-3">Traffico in Target</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Intercettiamo i clienti giusti grazie a campagne Ads e ottimizzazione SEO, portandoli sul tuo nuovo sito.</p>
-                </div>
-                <div class="zirel-card">
-                    <h3 class="text-xl font-bold mb-3">Conversione Intelligente</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">L'IA a bordo del sito accoglie i visitatori, risponde ai loro dubbi e raccoglie i loro dati di contatto H24.</p>
-                </div>
-                <div class="zirel-card">
-                    <h3 class="text-xl font-bold mb-3">Clienti Pronti all'Acquisto</h3>
-                    <p class="text-brand-blue/70 leading-relaxed">Ricevi notifiche ordinate con lead già qualificati. Tu devi solo chiudere la vendita o confermare l'appuntamento.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Perché Zirèl Studio (All-in-one) -->
-    <section class="carousel-section overflow-hidden">
-        <div class="container mx-auto px-4 md:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Perché <span
-                        class="text-brand-orange">Zirèl Studio</span></h2>
-                <p class="text-brand-blue/60 max-w-3xl mx-auto">Non siamo un'agenzia. Siamo quelli che restano. Le agenzie tradizionali ti consegnano 5 pagine, ti mandano la fattura e spariscono. Noi restiamo con te ogni mese: aggiornamenti, manutenzione, IA sempre attiva. Sei un cliente, non un progetto chiuso.</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    I risultati di chi ha già scelto <span class="text-brand-orange">Zirèl in Riviera</span>
+                </h2>
             </div>
 
-            <div class="core-editorial-shell rounded-[2.75rem] p-6 md:p-8 lg:p-10">
-                <div class="grid lg:grid-cols-[1.1fr_1.55fr] gap-6 lg:gap-8 items-stretch">
-                    <div class="core-editorial-spotlight rounded-[2.5rem] p-8 md:p-10 text-white flex flex-col justify-between">
-                        <div>
-                            <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Cosa ci rende diversi</p>
-                            <h3 class="text-3xl md:text-4xl font-black leading-tight mb-5">Costruiamo. Automatizziamo. Restiamo.</h3>
-                            <p class="text-white/80 text-lg leading-relaxed">Non vendiamo grafiche fini a se stesse. Ti diamo un sito che lavora: veloce per convertire, un'IA che risponde H24 e campagne mirate per portare traffico. Il tutto con un team solo. Niente giri tra agenzia, freelance e assistenza separata.</p>
-                        </div>
-                        <div class="mt-8 space-y-3">
-                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">Punto di riferimento unico</div>
-                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">IA addestrata su di te, non generalista</div>
-                            <div class="core-final-chip rounded-2xl px-4 py-3 text-sm font-bold">Risultati che vedi mese per mese</div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Card 1 -->
+                <div
+                    class="bg-slate-50 rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 group flex flex-col">
+                    <div class="h-48 bg-slate-900 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                            alt="Got Bun Riccione">
+                        <div class="relative z-10 text-center">
+                            <span class="text-4xl block mb-2">🍔</span>
+                            <span class="text-white font-black text-xl tracking-widest uppercase">Got Bun</span>
                         </div>
                     </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <p class="text-[10px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-2">🍔
+                            Ristorazione | 📍 Riccione</p>
+                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Got Bun Riccione</h4>
+                        <div class="mt-auto bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
+                            <p class="text-brand-blue/80 text-sm leading-relaxed">+40% di prenotazioni dirette. Il sito
+                                ha fatto risparmiare oltre 10 ore di segreteria a settimana gestendo asporto e tavoli.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="grid gap-5 md:grid-cols-2">
-                        <article class="core-editorial-case rounded-[2rem] p-6 md:p-7">
-                            <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Step 1</div>
-                            <h3 class="text-2xl font-black text-brand-blue mb-3">Sviluppo Web ad Alta Conversione.</h3>
-                            <p class="text-brand-blue/70 leading-relaxed mb-5">Costruiamo siti veloci, eleganti e ottimizzati per la SEO locale. Mettiamo in luce i tuoi punti di forza con design premium.</p>
-                            <div class="core-editorial-rail pt-4">
-                                <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
-                                <p class="text-sm text-brand-blue/65 mt-1">Il tuo brand appare subito più moderno e autorevole della concorrenza.</p>
-                            </div>
-                        </article>
+                <!-- Card 2 -->
+                <div
+                    class="bg-slate-50 rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 group flex flex-col">
+                    <div class="h-48 bg-slate-900 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                            alt="CRM Energia">
+                        <div class="absolute inset-0 bg-gradient-to-br from-brand-blue to-cyan-700 opacity-80"></div>
+                        <div class="relative z-10 text-center">
+                            <span class="text-4xl block mb-2">⚡️</span>
+                            <span class="text-white font-black text-xl tracking-widest uppercase">CRM Custom</span>
+                        </div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <p class="text-[10px] uppercase tracking-[0.16em] text-yellow-500 font-bold mb-2">⚡️ ENERGIA |
+                            📍 ITALIA</p>
+                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Distributore di Energia</h4>
+                        <div class="mt-auto bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
+                            <p class="text-brand-blue/80 text-sm leading-relaxed">Sviluppo di un CRM gestionale su
+                                misura per automatizzare la fatturazione e gestire migliaia di contratti. Riduzione del
+                                lavoro manuale del 70%.</p>
+                        </div>
+                    </div>
+                </div>
 
-                        <article class="core-editorial-case featured rounded-[2rem] p-6 md:p-7">
-                            <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Step 2</div>
-                            <h3 class="text-2xl font-black text-brand-blue mb-3">Integrazione Intelligenza Artificiale.</h3>
-                            <p class="text-brand-blue/70 leading-relaxed mb-5">Niente più clienti ignorati. Il nostro motore IA risponde per te dal sito e su WhatsApp, fissa appuntamenti e qualifica i lead 24/7.</p>
-                            <div class="core-editorial-rail pt-4">
-                                <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
-                                <p class="text-sm text-brand-blue/65 mt-1">Servizio clienti eccellente, 100% dei lead catturati, zero stress per il tuo team.</p>
-                            </div>
-                        </article>
-
-                        <article class="core-editorial-case rounded-[2rem] p-6 md:p-7 md:col-span-2">
-                            <div class="grid md:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
-                                <div>
-                                    <div class="core-editorial-tag inline-flex rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em] font-bold mb-4">Step 3</div>
-                                    <h3 class="text-2xl font-black text-brand-blue mb-3">Digital Marketing & Traffico Ads.</h3>
-                                </div>
-                                <div>
-                                    <p class="text-brand-blue/70 leading-relaxed mb-4">Alimentiamo la macchina. Creiamo e gestiamo campagne mirate su Google e Meta per intercettare esattamente chi cerca i tuoi servizi.</p>
-                                    <p class="text-sm font-bold text-brand-blue">Effetto percepito</p>
-                                    <p class="text-sm text-brand-blue/65 mt-1">Un flusso costante, scalabile e prevedibile di nuovi clienti qualificati ogni mese.</p>
-                                </div>
-                            </div>
-                        </article>
+                <!-- Card 3 -->
+                <div
+                    class="bg-slate-50 rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 group flex flex-col">
+                    <div class="h-48 bg-slate-900 flex items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1581141849291-1125c7b692b5?auto=format&fit=crop&w=800&q=80"
+                            class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                            alt="Niki Tuttofare">
+                        <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 opacity-60"></div>
+                        <div class="relative z-10 text-center">
+                            <span class="text-4xl block mb-2">🔧</span>
+                            <span class="text-white font-black text-xl tracking-widest uppercase">Niki Tuttofare</span>
+                        </div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <p class="text-[10px] uppercase tracking-[0.16em] text-slate-500 font-bold mb-2">🔧 Servizi | 📍
+                            Riviera Romagnola</p>
+                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Niki Tuttofare</h4>
+                        <div class="mt-auto bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
+                            <p class="text-brand-blue/80 text-sm leading-relaxed">Il sito qualifica in automatico i
+                                contatti e fissa appuntamenti solo per i lavori più redditizi, filtrando i perditempo
+                                prima che squilli il telefono.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="max-w-4xl mx-auto bg-brand-sand/20 p-8 md:p-12 rounded-[3rem] relative mt-14 text-center">
-                <h3 class="text-2xl md:text-4xl font-black text-brand-blue mb-4">Ti mostriamo esattamente cosa possiamo fare per te.</h3>
-                <p class="text-brand-blue/70 text-lg max-w-2xl mx-auto mb-8">30 minuti, zero impegno. Raccontaci la tua attività. Ti facciamo vedere come funziona Zirèl sui tuoi servizi reali, dal vivo. Se poi non ti piace, hai perso solo mezz'ora. Se ti piace, inizi a guadagnare ore di tempo tutte le settimane.</p>
-                <a href="contatti.html"
-                    class="inline-block bg-zirel-gradient text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 shadow-lg shadow-brand-orange/20"
-                    data-track="cta" data-track-location="core_why_zirel" data-track-label="core why zirel consulenza">
-                    Voglio un Preventivo Gratuito
-                </a>
-            </div>
         </div>
     </section>
 
-    <!-- Sezione Partnership Marketing -->
-    <section class="py-24 bg-brand-blue text-white overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-orange/20 rounded-full blur-3xl -mr-48 -mt-48"></div>
-        <div class="container mx-auto px-4 md:px-8 relative z-10">
-            <div class="max-w-4xl mx-auto text-center">
-                <p class="text-[11px] uppercase tracking-[0.18em] text-brand-orange font-bold mb-4">Ecosistema Completo</p>
-                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Un bel sito senza visitatori <br/><span class="text-brand-cyan">è un quadro al buio.</span></h2>
-                <p class="text-lg text-white/80 mb-10 leading-relaxed">
-                    Non ti serve solo un sito. Ti serve un sistema che porti clienti. Noi costruiamo il sito, lo facciamo rispondere con l'IA, e portiamo traffico mirato con Google e Meta Ads. Tu fai il tuo lavoro. Noi riempiamo l'agenda.
-                </p>
-                <a href="contatti.html" class="inline-block px-8 py-4 rounded-full bg-white text-brand-blue font-bold text-lg hover:shadow-2xl hover:-translate-y-1 transition-all">
-                    Voglio un Preventivo Gratuito
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq-section bg-slate-50 py-24 relative overflow-hidden" id="faq">
+    <!-- 6. SEZIONE VALORE PER VERTICALI ("Per chi è Zirèl") -->
+    <section class="py-24 bg-slate-100">
         <div class="container mx-auto px-4 md:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">Domande. <span
-                        class="text-brand-orange">Risposte.</span></h2>
-                <p class="text-brand-blue/60 max-w-2xl mx-auto">Zero giri di parole. Solo risposte chiare.</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    Un sito web pensato per chi ha le <span class="text-brand-orange">mani in pasta</span> tutti i
+                    giorni.
+                </h2>
             </div>
-            <div class="max-w-4xl mx-auto faq-grid space-y-4">
-                <!-- FAQ 1: IA e domande tecniche -->
-                
-                <!-- FAQ 1: L'IA funziona davvero? -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
+
+            <!-- Interfaccia a Tab JS (Semplice) -->
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+                <style>
+                    .hide-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+
+                    .hide-scrollbar {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                </style>
+                <div class="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 hide-scrollbar"
+                    style="-webkit-overflow-scrolling: touch;">
+                    <button class="tab-btn shrink-0 flex-1 py-4 px-6 font-bold text-center active transition-colors"
+                        data-target="tab-food">🍕 Ristoranti</button>
                     <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>L'IA funziona davvero o è un chatbot stupido?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70">Zirèl non è un copia-incolla automatico. Viene addestrato sui tuoi dati reali — servizi, prezzi, orari, policy di cancellazione. Se non sa rispondere, <strong>ti avvisa subito su WhatsApp</strong>. Non inventa. Non imbarazza. I tuoi clienti pensano di parlare con un assistente in carne e ossa.</p>
-                    </div>
+                        class="tab-btn shrink-0 flex-1 py-4 px-6 font-bold text-center text-brand-blue/60 hover:bg-slate-50 transition-colors"
+                        data-target="tab-hotel">🛎️ Hotel</button>
+                    <button
+                        class="tab-btn shrink-0 flex-1 py-4 px-6 font-bold text-center text-brand-blue/60 hover:bg-slate-50 transition-colors"
+                        data-target="tab-beach">🏖️ Stabilimenti</button>
+                    <button
+                        class="tab-btn shrink-0 flex-1 py-4 px-6 font-bold text-center text-brand-blue/60 hover:bg-slate-50 transition-colors"
+                        data-target="tab-beauty">✂️ Estetiste</button>
+                    <button
+                        class="tab-btn shrink-0 flex-1 py-4 px-6 font-bold text-center text-brand-blue/60 hover:bg-slate-50 transition-colors"
+                        data-target="tab-pro">🛠️ Artigiani</button>
                 </div>
 
-                <!-- FAQ 2: Integrazione o Restyling -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>E se un cliente vuole parlare con me, non con l'IA?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70">Zirèl sa riconoscere quando scavalcare. Richiesta complessa? <strong>Ti notifica subito su WhatsApp</strong>. Il cliente non sa nemmeno che c'era un'IA di mezzo: pensa di parlare con un assistente umano. Tu decidi se intervenire o lasciare che l'IA gestisca.</p>
+                <div class="p-8 md:p-12 min-h-[250px] flex items-center">
+                    <div id="tab-food" class="tab-content active w-full">
+                        <p class="text-sm font-bold text-brand-orange uppercase tracking-widest mb-4">Come ridurre le
+                            chiamate in segreteria in pieno servizio.</p>
+                        <p class="text-2xl md:text-3xl font-bold text-brand-blue leading-tight">
+                            Martedì mattina ti svegli e trovi 3 tavoli prenotati la domenica sera, mentre il locale era
+                            chiuso e tu dormivi.
+                        </p>
+                    </div>
+                    <div id="tab-hotel" class="tab-content w-full">
+                        <p class="text-sm font-bold text-brand-orange uppercase tracking-widest mb-4">Meno chiamate
+                            inutili in reception.</p>
+                        <p class="text-2xl md:text-3xl font-bold text-brand-blue leading-tight">
+                            Il tuo sito web risponde in automatico su parcheggio, animali ammessi e orari di check-in.
+                            Il tuo staff respira.
+                        </p>
+                    </div>
+                    <div id="tab-beach" class="tab-content w-full">
+                        <p class="text-sm font-bold text-brand-orange uppercase tracking-widest mb-4">Zero code sotto il
+                            sole.</p>
+                        <p class="text-2xl md:text-3xl font-bold text-brand-blue leading-tight">
+                            I turisti prenotano e pagano ombrellone e lettini dal telefono, mentre tu gestisci la
+                            spiaggia senza stress in cassa.
+                        </p>
+                    </div>
+                    <div id="tab-beauty" class="tab-content w-full">
+                        <p class="text-sm font-bold text-brand-orange uppercase tracking-widest mb-4">Basta interruzioni
+                            durante i trattamenti.</p>
+                        <p class="text-2xl md:text-3xl font-bold text-brand-blue leading-tight">
+                            Le tue clienti prenotano online in autonomia, incastrandosi perfettamente nei buchi della
+                            tua agenda.
+                        </p>
+                    </div>
+                    <div id="tab-pro" class="tab-content w-full">
+                        <p class="text-sm font-bold text-brand-orange uppercase tracking-widest mb-4">Basta chilometri a
+                            vuoto.</p>
+                        <p class="text-2xl md:text-3xl font-bold text-brand-blue leading-tight">
+                            Il sito qualifica i contatti chiedendo foto e dettagli del problema. Accendi il furgone solo
+                            per i preventivi già mezzo chiusi.
+                        </p>
                     </div>
                 </div>
-
-                <!-- FAQ 3: Tempi di consegna -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>In quanto tempo il mio sito sarà online e operativo?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70">In media <strong>3-4 settimane</strong> dalla firma all'online. In questo tempo progettiamo il design, sviluppiamo il sito, addestriamo l'IA sui tuoi dati reali e facciamo tutti i test. Per il piano Agenda Automatica i tempi possono variare in base alla complessità.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ 4: Traffico e ADV -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>Fate anche campagne pubblicitarie per portare clienti?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70"><strong>Sì.</strong> Un sito senza visitatori è inutile. Progettiamo e gestiamo campagne su <strong>Google Ads e Meta (Facebook/Instagram)</strong> per portare clienti in target sulle tue pagine. L'IA poi li accoglie e li converte. Vale per qualsiasi piano.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ 5: Tempi di consegna -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>In quanto tempo il mio nuovo sito sarà online e operativo?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70">In media <strong>3-4 settimane</strong> dalla firma all'online. In questo tempo progettiamo il design, sviluppiamo il sito, addestriamo l'IA sui tuoi dati reali e facciamo tutti i test. Per il piano Agenda Automatica i tempi possono variare in base alla complessità.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ 6: Privacy -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>Come gestite la privacy e il GDPR?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70">Tutti i dati sono custoditi in <strong>server europei sicuri</strong> e pienamente conformi al <strong>GDPR</strong>. I contatti dei tuoi clienti restano esclusivamente tuoi. Nessuna condivisione con terze parti. Mai.</p>
-                    </div>
-                </div>
-
-                <!-- FAQ 7: Contratti e vincoli -->
-                <div
-                    class="faq-item bg-white rounded-2xl shadow-sm border border-brand-sand overflow-hidden transition-all duration-300">
-                    <button
-                        class="faq-question w-full px-6 py-5 text-left flex justify-between items-center font-bold text-lg text-brand-blue hover:text-brand-orange transition-colors">
-                        <span>Ci sono vincoli? Il sito è mio o vostro?</span>
-                        <span class="faq-icon text-2xl transition-transform duration-300">
-                            <svg class="faq-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M3.5 6.25 8 10.75l4.5-4.5"></path>
-                            </svg>
-                        </span>
-                    </button>
-                    <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50">
-                        <p class="p-6 pt-2 text-brand-blue/70"><strong>Zero vincoli.</strong> Il dominio è tuo. Il sito è sviluppato da noi e resta online finché il canone è attivo. Puoi disdire in qualsiasi momento senza penali. Se smetti, i tuoi dati e contatti restano tuoi e puoi esportarli. L'attivazione iniziale non è rimborsabile: copre il lavoro già fatto.</p>
-                    </div>
-                </div>            </div>
+            </div>
         </div>
     </section>
 
-    <!-- 6. Call to Action Finale & Footer -->
-    <section class="py-24 relative overflow-hidden" id="contatti">
+    <!-- 6.5. DEMO INTERATTIVA -->
+    <section class="py-24 bg-brand-blue text-white relative overflow-hidden" id="demo">
+        <div class="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-brand-orange/20 blur-[120px] pointer-events-none"></div>
+
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <span class="inline-block bg-white/10 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.18em] mb-6 border border-white/10">
+                Tocca con mano
+            </span>
+            <h2 class="text-4xl md:text-5xl font-black mb-6">Non crederci sulla parola. <br/><span class="text-brand-orange italic font-serif">Provalo tu stesso.</span></h2>
+            <p class="text-lg text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Abbiamo preparato un ambiente di test in cui puoi interagire direttamente con la nostra IA (configurata per un ristorante). Fai domande, chiedi info sui parcheggi o simula una prenotazione in tempo reale.
+            </p>
+            <a href="demo.html" class="inline-flex items-center justify-center bg-zirel-gradient text-white px-8 py-5 rounded-full text-lg font-black shadow-[0_10px_40px_rgba(255,140,66,0.4)] hover:-translate-y-1 transition-all active:scale-95 group">
+                Avvia la Demo
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- 7. ABBONAMENTI E PREZZI TRASPARENTI -->
+    <section class="py-24 bg-white" id="prezzi">
         <div class="container mx-auto px-4 md:px-8">
-            <div
-                class="core-final-panel rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-16 lg:p-20 text-center text-white relative z-10 transition-all duration-500 hover:shadow-2xl">
-                <p class="text-[11px] uppercase tracking-[0.18em] text-white/55 font-bold mb-4">Inizia la Trasformazione</p>
-                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Pronto ad avere un sito che lavora al posto tuo?</h2>
-                <p class="text-lg text-white/78 mb-8 max-w-3xl mx-auto">Raccontaci il tuo progetto. Analizzeremo gratuitamente la tua presenza online attuale e ti proporremo la soluzione migliore tra Sviluppo Web, Integrazione IA o Campagne Ads.</p>
-                <div class="flex flex-wrap justify-center gap-3 mb-10">
-                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Sviluppo Web</div>
-                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Intelligenza Artificiale</div>
-                    <div class="core-final-chip rounded-full px-4 py-2 text-sm font-bold">Digital Marketing</div>
-                </div>
-                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    Prezzi chiari. Zero sorprese. <span class="text-brand-orange">Investimento garantito.</span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
+                <!-- Tier 1 -->
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-2">Vetrina</h3>
+                    <p class="text-brand-blue/70 mb-6">Il minimo indispensabile per esserci, farsi trovare su Google con
+                        stile e bloccare la concorrenza locale.</p>
+                    <div class="mb-6">
+                        <p class="text-3xl font-black text-brand-blue">€79<span
+                                class="text-lg font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm text-brand-blue/60">+ €549 setup iniziale</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span>Sito web fino a 3 pagine (Home, Servizi,
+                                Contatti)</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Ottimizzazione SEO Locale base
+                                (Riccione/Rimini)</span></li>
+                        <li class="flex gap-2 opacity-50"><span>❌</span> <span><strong>Nessuna Intelligenza
+                                    Artificiale</strong></span></li>
+                        <li class="flex gap-2 opacity-50"><span>❌</span> <span>Modifiche strutturali escluse</span></li>
+                    </ul>
                     <a href="contatti.html"
-                        class="bg-white text-brand-blue px-10 py-5 rounded-full text-xl font-black shadow-2xl hover:-translate-y-1 transition-all active:scale-95"
-                        data-track="cta" data-track-location="core_final_cta" data-track-label="core final preventivo">Voglio un Preventivo Gratuito</a>
-                    <a href="#portfolio"
-                        class="text-white px-8 py-4 rounded-full text-base font-bold border border-white/18 bg-white/8 hover:bg-white/14 transition-all"
-                        data-track="cta" data-track-location="core_final_cta" data-track-label="core final portfolio">Scopri il Portfolio</a>
+                        class="block w-full text-center px-6 py-3 rounded-full border-2 border-brand-blue text-brand-blue font-bold hover:bg-brand-blue hover:text-white transition-all mt-auto">Scegli
+                        Vetrina</a>
+                </div>
+
+                <!-- Tier 2 -->
+                <div
+                    class="bg-white rounded-3xl p-8 border-2 border-brand-orange shadow-2xl relative transform md:-translate-y-4 flex flex-col">
+                    <div
+                        class="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                        🌟 Scelto dal 70% dei clienti
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 mt-4">Che Risponde</h3>
+                    <p class="text-brand-blue/70 mb-6">Il sito che lavora per te. Risponde alle domande 24/7, filtra le
+                        richieste e ti gira solo i contatti caldi.</p>
+                    <div class="mb-6">
+                        <p class="text-4xl font-black text-brand-blue">€149<span
+                                class="text-xl font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm font-bold text-brand-orange">+ €890 setup iniziale</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span>Sito web completo ad alta conversione (fino a 5
+                                sezioni)</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span><strong>Integrazione e Addestramento Assistente
+                                    IA</strong> sul tuo catalogo/menu</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Configurazione WhatsApp Business o widget
+                                live</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Aggiornamenti continui del prompt IA</span></li>
+                    </ul>
+                    <a href="contatti.html"
+                        class="block w-full text-center px-6 py-4 rounded-full bg-brand-orange text-white font-bold hover:bg-orange-600 transition-all shadow-lg shadow-brand-orange/30 mt-auto">Scegli
+                        Che Risponde</a>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-2">Agenda Automatica</h3>
+                    <p class="text-brand-blue/70 mb-6">Il pacchetto totale. Deleghi prenotazioni e filtri al sito. Tu
+                        devi solo accogliere i clienti.</p>
+                    <div class="mb-6">
+                        <p class="text-3xl font-black text-brand-blue">€249<span
+                                class="text-lg font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm text-brand-blue/60">+ da €1.290 setup integrato</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span><strong>Tutto il pacchetto "Che
+                                    Risponde"</strong></span></li>
+                        <li class="flex gap-2"><span>✅</span> <span><strong>Sincronizzazione bidirezionale</strong> con
+                                i tuoi gestionali (Google Calendar, Calendly, ecc.)</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Sistema di promemoria automatico anti-showdown
+                                (SMS/WhatsApp prima dell'appuntamento)</span></li>
+                    </ul>
+                    <a href="contatti.html"
+                        class="block w-full text-center px-6 py-3 rounded-full border-2 border-brand-cyan text-brand-cyan font-bold hover:bg-brand-cyan hover:text-white transition-all mt-auto">Richiedi
+                        Info</a>
                 </div>
             </div>
-        </div>
 
-        <!-- Decorative backgrounds -->
-        <div
-            class="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-brand-blue/10 blur-[100px] pointer-events-none">
-        </div>
-        <div
-            class="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-brand-cyan/10 blur-[100px] pointer-events-none">
+            <!-- Risk Reversal / Pilastri Salva Contratto -->
+            <div
+                class="max-w-4xl mx-auto mt-16 bg-brand-blue text-white rounded-3xl p-8 md:p-10 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10 text-8xl pointer-events-none">🛡️</div>
+                <h3 class="text-2xl md:text-3xl font-black mb-8 text-brand-orange relative z-10">La nostra Garanzia
+                    "Zero Pensieri"</h3>
+                <ul class="space-y-6 relative z-10">
+                    <li class="flex gap-4">
+                        <span class="text-2xl">🔓</span>
+                        <div>
+                            <p class="font-bold text-lg">Nessun Vincolo</p>
+                            <p class="text-white/80">I canoni sono mensili. Se per qualsiasi motivo decidi di fermarti,
+                                puoi disdire quando vuoi senza alcuna penale.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="text-2xl">📦</span>
+                        <div>
+                            <p class="font-bold text-lg">Tutto Incluso</p>
+                            <p class="text-white/80">Hosting super veloce, certificato di sicurezza SSL, dominio
+                                personalizzato e costi dei token della chat sono sempre inclusi nel canone.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="text-2xl">🤝</span>
+                        <div>
+                            <p class="font-bold text-lg">Garanzia Riviera</p>
+                            <p class="text-white/80">Siamo del territorio. Se entro i primi 30 giorni dall'andata online
+                                il sito non ti soddisfa, ti restituiamo il 100% del setup iniziale. Senza domande.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </section>
 
-            <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
-                    <p>Studio di Sviluppo Web specializzato in Siti Web Intelligenti ad alta conversione, dotati di IA proprietaria.</p>
-                </div>
-                <div class="footer-links">
-                    <h4>Servizi</h4>
-                    <ul>
-                        <li><a href="#cosa-riceve-team">Sviluppo Web</a></li>
-                        <li><a href="#cosa-riceve-team">Intelligenza Artificiale</a></li>
-                        <li><a href="#cosa-riceve-team">Digital Marketing</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Portfolio & Demo</h4>
-                    <ul>
-                        <li><a href="#portfolio">I Nostri Lavori</a></li>
-                        <li><a href="demo.html">Testa una Demo Interattiva</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Lo Studio</h4>
-                    <ul>
-                        <li><a href="chi-siamo.html">Chi siamo</a></li>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                    </ul>
+    <!-- 8. TECNOLOGIA ZIRÈL -->
+    <section class="py-24 bg-slate-50 border-y border-slate-200 overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-12 max-w-6xl">
+            <div class="md:w-1/2">
+                <h2 class="text-3xl md:text-4xl font-black mb-6 text-brand-blue">
+                    Non è il solito "chatbot stupido". <span class="text-brand-orange">È il tuo miglior
+                        dipendente.</span>
+                </h2>
+                <p class="text-lg text-brand-blue/70 leading-relaxed mb-6">
+                    Scordati le voci registrate premi 1, premi 2. Il cuore del nostro sistema è un'assistenza virtuale
+                    che comprende l'italiano, dialoga in modo naturale con i tuoi clienti, capisce le loro esigenze e ti
+                    inoltra solo le richieste già pronte per essere chiuse.
+                </p>
+                <p class="text-lg font-bold text-brand-blue">Guarda la simulazione qui a fianco.</p>
+            </div>
+            <div class="md:w-1/2 w-full flex justify-center">
+                <!-- Simulazione Chat (Senza GIF, puro CSS animation per performance) -->
+                <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 w-full max-w-sm">
+                    <div class="bg-slate-100 rounded-2xl p-4 h-80 overflow-hidden relative flex flex-col justify-end">
+                        <div class="space-y-4 w-full animate-[slideUp_8s_ease-in-out_infinite]">
+                            <div class="flex justify-end">
+                                <div
+                                    class="bg-brand-blue text-white px-4 py-2 rounded-2xl rounded-br-none text-sm inline-block">
+                                    Vorrei prenotare un tavolo per stasera.
+                                </div>
+                            </div>
+                            <div class="flex justify-start">
+                                <div
+                                    class="bg-white border border-slate-200 text-brand-blue px-4 py-2 rounded-2xl rounded-bl-none text-sm shadow-sm">
+                                    Certamente! Per quante persone e a che ora preferite?
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <div
+                                    class="bg-brand-blue text-white px-4 py-2 rounded-2xl rounded-br-none text-sm inline-block">
+                                    Siamo in 4, verso le 20:30.
+                                </div>
+                            </div>
+                            <div class="flex justify-start">
+                                <div
+                                    class="bg-white border border-slate-200 text-brand-blue px-4 py-2 rounded-2xl rounded-bl-none text-sm shadow-sm">
+                                    Perfetto. Ho riservato il tavolo per 4 persone alle 20:30 a nome tuo. Ti invio la
+                                    conferma su WhatsApp! ✅
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Overlay per sfumare in cima -->
+                        <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-slate-100 to-transparent">
+                        </div>
+                    </div>
                 </div>
             </div>
-                                    <div class="mt-16 pt-8 border-t border-white/10 text-center text-[11px] text-white/30 flex flex-wrap justify-center items-baseline gap-x-3 gap-y-2 leading-none">
-                <span class="m-0 p-0 inline-block">&copy; 2026 Zirèl Studio. Tutti i diritti riservati.</span>
-                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
-                <a href="privacy.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Privacy Policy</a>
-                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
-                <a href="cookie.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Cookie Policy</a>
+        </div>
+    </section>
+
+    <!-- 9. FAQ & CONDIZIONI -->
+    <section class="py-24 bg-slate-50" id="faq">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    Patti chiari, <span class="text-brand-orange">amicizia lunga.</span>
+                </h2>
+                <p class="text-lg text-brand-blue/70">Non ci piacciono le sorprese. Ecco le regole d'oro per lavorare
+                    bene insieme e proteggere sia il tuo business che il nostro tempo.</p>
             </div>
+
+            <div class="space-y-4">
+                <!-- Clausola 1 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>1. Modifiche e "Sito Infinito"</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il canone mensile include il mantenimento tecnico, l'hosting e il corretto funzionamento
+                        dell'assistente IA. Sono incluse micro-modifiche testuali o di orari fino a un massimo di
+                        <strong>1 ora al mese</strong> (non cumulabile). Qualsiasi intervento strutturale, aggiunta di
+                        pagine o ri-progettazione grafica verrà preventivato a parte alla tariffa oraria di 50€/ora.
+                    </div>
+                </details>
+
+                <!-- Clausola 2 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>2. Chat IA illimitata? Sì, ma senza abusi.</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il canone include un volume di conversazioni dell'assistente IA pari a <strong>1.000
+                            chat/mese</strong>, ampiamente sufficiente per una normale attività locale. In caso di
+                        superamento anomalo (es. attacchi di spam o bot), Zirèl Studio si riserva il diritto di
+                        sospendere temporaneamente l'assistente o di adeguare il canone previo accordo con il cliente,
+                        per coprire i costi delle API.
+                    </div>
+                </details>
+
+                <!-- Clausola 3 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>3. "L'IA ha detto una cavolata, paghi tu!" (No.)</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        L'assistente virtuale si basa su modelli di Intelligenza Artificiale generativa. Sebbene il
+                        sistema venga istruito e testato accuratamente, Zirèl Studio non si assume alcuna responsabilità
+                        per risposte imprecise, errori di prezzo o malintesi generati dall'IA. Il cliente è tenuto a
+                        monitorare periodicamente le chat e a segnalare eventuali anomalie per ottimizzare
+                        l'addestramento.
+                    </div>
+                </details>
+
+                <!-- Clausola 4 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>4. Tempistiche e "Clienti Fantasma"</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il cliente si impegna a fornire tutto il materiale necessario (testi, foto, listini, loghi)
+                        entro <strong>14 giorni lavorativi</strong> dalla firma del contratto e dal versamento
+                        dell'anticipo per il setup. Passato tale termine, se il ritardo del cliente impedisce la
+                        consegna del sito, il progetto verrà comunque considerato "congelato" e Zirèl Studio si riserva
+                        il diritto di richiedere il saldo e applicare una penale per la successiva riattivazione.
+                    </div>
+                </details>
+
+                <!-- Clausola 5 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>5. Ritardi nei pagamenti</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il pagamento del canone mensile è anticipato. In caso di mancato pagamento o ritardo superiore a
+                        <strong>7 giorni</strong> dalla scadenza, il funzionamento del sito web e dell'assistente IA
+                        verrà sospeso automaticamente fino al saldo del debito. I costi di riattivazione del servizio in
+                        caso di sospensione sono pari a 50€.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. CHI SIAMO -->
+    <section class="py-24 bg-brand-blue text-white">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <div
+                class="flex flex-col md:flex-row items-center gap-12 bg-white/10 p-8 md:p-12 rounded-3xl border border-white/20 backdrop-blur-sm">
+                <div
+                    class="w-32 h-32 md:w-48 md:h-48 flex-shrink-0 bg-slate-300 rounded-full overflow-hidden border-4 border-brand-orange shadow-2xl relative">
+                    <!-- Placeholder img per Niki, supponiamo ci sia un team.jpg o la mettiamo generica se assente -->
+                    <div class="w-full h-full bg-brand-orange/20 flex items-center justify-center text-4xl">👨‍💻</div>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black mb-4">Dietro Zirèl Studio ci sono io.</h2>
+                    <p class="text-lg text-white/80 leading-relaxed mb-6">
+                        Ciao, sono Niki. Sono uno sviluppatore web e un "handyman" del digitale. Non amo i paroloni in
+                        inglese e le slide fumose. Ci metto la faccia e ti rispondo io direttamente.
+                    </p>
+                    <p class="text-lg text-white/80 leading-relaxed font-bold">
+                        Se hai un problema il sabato mattina, mi scrivi su WhatsApp e lo sistemiamo. La tua attività è
+                        locale, e anche il tuo web partner dovrebbe esserlo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. CTA FINALE AGGRESSIVA -->
+    <section class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <!-- Decorazioni Background -->
+        <div
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[120px] -mr-48 -mt-48">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-cyan/20 rounded-full blur-[120px] -ml-48 -mb-48">
+        </div>
+
+        <div class="container mx-auto px-4 md:px-8 relative z-10 max-w-5xl text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-6">
+                Smetti di perdere clienti perché non riesci a rispondere al telefono.
+            </h2>
+            <p class="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+                Ti mostro esattamente dove stai perdendo richieste oggi e come possiamo recuperarle. Compila il modulo
+                per un Audit Gratuito della tua situazione.
+            </p>
+
+            <form id="audit-form" action="#"
+                class="bg-white/10 backdrop-blur-md border border-white/20 p-6 md:p-8 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto shadow-2xl text-left">
+                <div class="flex flex-col">
+                    <label for="audit-attivita" class="text-white/80 text-sm font-bold mb-2 ml-2">Che attività hai?</label>
+                    <input type="text" id="audit-attivita" placeholder="es. Pizzeria"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                        required>
+                </div>
+                <div class="flex flex-col">
+                    <label for="audit-citta" class="text-white/80 text-sm font-bold mb-2 ml-2">In che città ti trovi?</label>
+                    <input type="text" id="audit-citta" placeholder="es. Riccione"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                        required>
+                </div>
+                <div class="flex flex-col">
+                    <label for="audit-problema" class="text-white/80 text-sm font-bold mb-2 ml-2">Qual è il tuo problema principale?</label>
+                    <input type="text" id="audit-problema" placeholder="es. Telefono suona a vuoto"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                        required>
+                </div>
+                <div class="flex flex-col justify-end">
+                    <button type="submit"
+                        class="w-full h-[56px] bg-brand-orange hover:bg-orange-600 text-white font-bold px-6 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
+                        <span>RICHIEDI AUDIT</span>
+                        <span class="text-xl">👉</span>
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                document.getElementById('audit-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const attivita = document.getElementById('audit-attivita').value.trim();
+                    const citta = document.getElementById('audit-citta').value.trim();
+                    const problema = document.getElementById('audit-problema').value.trim();
+                    
+                    const text = `Ciao Niki! 👋\nVorrei un Audit Gratuito per la mia attività.\n\n🍕 *Attività:* ${attivita}\n📍 *Città:* ${citta}\n🚨 *Problema:* ${problema}\n\nMi mostri dove sto perdendo clienti?`;
+                    
+                    const whatsappUrl = `https://wa.me/393461027447?text=${encodeURIComponent(text)}`;
+                    window.open(whatsappUrl, '_blank');
+                });
+            </script>
+            <p class="text-sm text-white/50 mt-6">Audit 100% gratuito e senza impegno. Riceverai un'analisi pratica.</p>
+        </div>
+    </section>
+
+    <!-- Footer base per mantenere la struttura coerente -->
+    <footer class="bg-slate-950 text-white py-12 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-bold text-xl mb-4">Zirèl Studio</p>
+            <p class="text-white/50 text-sm mb-6">Sviluppo Siti Web Intelligenti in Riviera Romagnola</p>
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/60 mb-4">
+                <a href="demo.html" class="hover:text-white transition-colors">Demo IA</a>
+                <a href="login.html" class="hover:text-white transition-colors">Login Clienti</a>
+                <a href="register.html" class="hover:text-white transition-colors">Registrati</a>
+            </div>
+            <div class="flex justify-center gap-4 text-sm text-white/40">
+                <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="cookie.html" class="hover:text-white transition-colors">Cookie Policy</a>
+            </div>
+            <p class="text-white/40 text-xs mt-8">© 2026 Zirèl Studio. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
+    <!-- Script per le Tab ed Header Scrolled -->
+    <script type="module" src="/ui-helpers.js"></script>
+    <script>
+        // Tabs Logic
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
 
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Rimuovi active da tutti
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-brand-blue', 'text-white');
+                    b.classList.add('text-brand-blue/60');
+                });
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Aggiungi active al cliccato
+                btn.classList.add('active', 'bg-brand-blue', 'text-white');
+                btn.classList.remove('text-brand-blue/60');
+
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
 
     <!-- Chat Tooltip -->
     <div id="chat-tooltip" class="chat-tooltip">
-        Serve aiuto? Ci pensa Zirèl! 💬
+        Ti aiuto a metterti in contatto in 1 minuto 💬
     </div>
 
     <!-- Custom Chat Widget -->
@@ -973,50 +966,43 @@
         class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
         <div
             class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
-
-            <!-- Widget Header -->
             <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
-                <!-- Avatar icona -->
                 <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
                     💬
                 </div>
-                <!-- Titolo + sottotitolo -->
                 <div class="flex-grow">
                     <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
-                    <p class="text-[11px] text-white/75 mt-0.5">Orientamento sulle soluzioni Zirèl</p>
+                    <p class="text-[11px] text-white/75 mt-0.5">Contatti, attivazione e prova</p>
                 </div>
-                <!-- Chiudi -->
                 <button onclick="toggleDemo()"
                     class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
                     Chiudi
                 </button>
             </div>
 
-            <!-- Messages Area -->
             <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
                 <div
                     class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
                     <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
-                    <p>Ciao, sono Zirèl. Ti aiuto a capire come rispondere meglio ai clienti dal tuo sito e raccogliere richieste più chiare.</p>
+                    <p>Posso aiutarti a scegliere il canale giusto, capire come partire o richiedere una prova guidata.</p>
                 </div>
 
                 <div class="quick-replies" id="quick-replies-container">
-                    <button class="quick-reply-btn" onclick="sendChatMessage('🏨 Ho un hotel')">
-                        🏨 Ho un hotel
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei un contatto rapido')">
+                        📞 Contatto rapido
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('🍝 Ho un ristorante')">
-                        🍝 Ho un ristorante
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Voglio richiedere una prova guidata')">
+                        🚀 Richiedi prova
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('💼 Ho uno studio o un servizio')">
-                        💼 Ho uno studio/servizio
+                    <button class="quick-reply-btn" onclick="sendChatMessage('💶 Ho dubbi su prezzi e attivazione')">
+                        💶 Prezzi e attivazione
                     </button>
-                    <button class="quick-reply-btn" onclick="sendChatMessage('🎬 Voglio vedere una demo')">
-                        🎬 Voglio vedere una demo
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🔐 Come accedo alla dashboard?')">
+                        🔐 Login dashboard
                     </button>
                 </div>
             </div>
 
-            <!-- Input Bar -->
             <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
                 <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
                     class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
@@ -1030,7 +1016,6 @@
                     </svg>
                 </button>
             </div>
-
         </div>
     </div>
 
@@ -1044,30 +1029,26 @@
 
     <script type="module" src="/config.js"></script>
     <script>
-        // Messaggi tooltip specifici della homepage Core
         window.zirelTooltipMessages = [
-            'Scopri come lavora Zirèl Studio 💬',
-            'Trova la soluzione giusta per il tuo business 🚀',
-            'Guarda le soluzioni attive per settore 🎯',
-            'Più richieste gestite. Meno occasioni perse. 📈',
+            'Vuoi parlare con noi in modo rapido? 💬',
+            'Ti aiutiamo a prenotare una demo 🚀',
+            'Dubbi su login o attivazione? 🔐',
+            'Posso indirizzarti al canale giusto 📞',
         ];
     </script>
-    <!-- Zirèl Widget Config -->
     <script>
         window.ZirelConfig = {
             tenantId: 'zirel_official',
             webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
         };
-        // This will be dynamically populated by the server/CDN in a real SaaS scenario
         window.ZirelWidgetConfig = {
             widget_title: 'Zirèl Assistant',
-            widget_subtitle: 'Demo e casi d’uso per settore',
+            widget_subtitle: 'Contatti, attivazione e prova',
             widget_color: '#FF8C42',
             widget_icon: '💬'
         };
     </script>
     <script type="module" src="/chat.js" data-tenant-id="zirel_official"></script>
-    <script type="module" src="/ui-helpers.js"></script>
 </body>
 
 </html>

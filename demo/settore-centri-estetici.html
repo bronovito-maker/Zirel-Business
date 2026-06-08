@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siti Web per Centri Estetici con Agenda Appuntamenti IA | Zirèl Studio</title>
+    <meta name="description"
+        content="Sviluppo siti web per centri estetici, saloni di bellezza e SPA. Gestisci gli appuntamenti in autonomia su WhatsApp e sito. Sincronizzazione automatica e zero no-show.">
+
+    <!-- SEO & Social Sharing -->
+    <link rel="canonical" href="https://zirel.org/settore-centri-estetici.html" />
+    <meta property="og:title" content="Siti Web per Centri Estetici con Agenda Appuntamenti IA | Zirèl Studio" />
+    <meta property="og:description"
+        content="Sviluppo siti web per centri estetici, saloni di bellezza e SPA. Gestisci gli appuntamenti in autonomia su WhatsApp e sito. Sincronizzazione automatica e zero no-show." />
+    <meta property="og:url" content="https://zirel.org/settore-centri-estetici.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://zirel.org/food_premium.png" />
+    <meta property="og:site_name" content="Zirèl Studio" />
+    <meta property="og:locale" content="it_IT" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="/src/tailwind.css">
+
+    <style>
+        .navbar.scrolled {
+            background: rgba(0, 48, 73, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 4rem;
+        }
+
+        .zirel-blue-gradient {
+            background: linear-gradient(135deg, #003049 0%, #00AEEF 100%);
+        }
+
+        .hero-pattern {
+            background-color: #eef6ff;
+            background-image:
+                radial-gradient(circle at top right, rgba(0, 174, 239, 0.16), transparent 28%),
+                radial-gradient(circle at bottom left, rgba(0, 48, 73, 0.12), transparent 36%);
+        }
+
+        .page-core {
+            background: linear-gradient(180deg, #eef6ff 0%, #ffffff 18%);
+        }
+
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 48, 73, 0.05);
+        }
+
+        /* Interactive Tabs */
+        .tab-btn.active {
+            background-color: #003049;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mockup Container */
+        .mockup-container {
+            position: relative;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 8px solid #1e293b;
+            background-color: #f8fafc;
+            overflow: hidden;
+        }
+    </style>
+    <!-- Vercel Analytics -->
+    <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <!-- JSON-LD per GEO ed LLM Optimization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "Sviluppo Siti Web per Centri Estetici con Prenotazione Appuntamenti IA",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "Zirèl Studio",
+        "url": "https://zirel.org",
+        "telephone": "+393461027447"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Italy"
+      },
+      "description": "Sviluppo siti web per centri estetici e saloni di bellezza con assistente IA che fissa i trattamenti in agenda tramite WhatsApp sincronizzato.",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "EUR",
+        "price": "890.00"
+      }
+    }
+    </script>
+</head>
+
+<body class="page-core font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="core">
+
+    <!-- 1. NAVIGAZIONE (NAV) -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand" style="color: #FF8C42 !important;">Zirèl</span>
+            <span style="color: #FFFFFF !important;">Studio</span></a>
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="#soluzione" class="nav-link">SOLUZIONE</a></li>
+            <li><a href="#funzionalita" class="nav-link">FUNZIONI</a></li>
+            <li><a href="#prezzi" class="nav-link">PREZZI</a></li>
+            <li><a href="#faq" class="nav-link">FAQ</a></li>
+            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
+            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a></li>
+        </ul>
+        <div class="hidden lg:flex items-center gap-6">
+            <a href="tel:+393461027447"
+                class="font-bold text-white hover:text-brand-orange transition-colors flex items-center gap-2">
+                📞 +39 346 102 7447
+            </a>
+            <a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </nav>
+
+    <!-- 2. HERO SECTION -->
+    <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
+        <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10 gap-12">
+            <div class="md:w-1/2 text-center md:text-left mb-12 md:mb-0">
+                <div
+                    class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-sm font-bold shadow-sm mb-6 border border-slate-100">
+                    <span class="text-amber-500">💅</span>
+                    <span class="text-brand-blue">Siti Web e Agende WhatsApp IA per Centri Estetici</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6 text-brand-blue">
+                    Basta Interrompere i Trattamenti.<br />
+                    <span class="text-brand-orange">L'IA fissa i tuoi appuntamenti.</span>
+                </h1>
+                <h2 class="text-lg md:text-xl text-brand-blue/80 mb-10 max-w-2xl leading-relaxed">
+                    Sviluppiamo siti web per saloni di bellezza ed estetiste integrati con assistenti IA conversazionali. I tuoi clienti scelgono il trattamento e si prenotano in totale autonomia su WhatsApp 24/7.
+                </h2>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="#audit-form"
+                        class="bg-zirel-gradient text-white px-10 py-5 rounded-full text-lg font-bold hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 text-center shadow-xl shadow-brand-orange/30 border border-white/20">
+                        AZZERA LE CHIAMATE PERSE ORA
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:w-1/2 flex justify-center relative">
+                <!-- Mockup Smartphone Animato -->
+                <div
+                    class="mockup-container w-[300px] h-[600px] flex flex-col transform md:rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <div class="h-6 w-full bg-slate-900 rounded-t-xl flex justify-center pt-2 relative">
+                        <div class="w-20 h-4 bg-black rounded-b-xl absolute top-0"></div>
+                    </div>
+                    <div class="flex-1 bg-slate-100 relative p-4 flex flex-col justify-center gap-4">
+                        <!-- Notifiche WhatsApp Mock -->
+                        <div
+                            class="bg-white p-4 rounded-xl shadow-md border-l-4 border-pink-500 transform transition-all duration-500 translate-y-0 opacity-100">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
+                                    ✂️</div>
+                                <div>
+                                    <p class="font-bold text-sm">Zirèl Beauty Assistant</p>
+                                    <p class="text-xs text-slate-500">Ora</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium">Appuntamento Fissato! 💅</p>
+                            <p class="text-xs text-slate-600 mt-1">Laminazione ciglia. Sincronizzato con l'agenda di Chiara.</p>
+                        </div>
+
+                        <div
+                            class="bg-white p-4 rounded-xl shadow-md border-l-4 border-pink-500 transform transition-all duration-500 translate-y-0 opacity-100 delay-100">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
+                                    💬</div>
+                                <div>
+                                    <p class="font-bold text-sm">Zirèl Beauty Assistant</p>
+                                    <p class="text-xs text-slate-500">5 min fa</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium">Richiesta Trattamento Gestita 🧴</p>
+                            <p class="text-xs text-slate-600 mt-1">Info su controindicazioni per trattamento viso fornite con successo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Glow Effect -->
+                <div class="absolute inset-0 bg-brand-orange/20 blur-[100px] rounded-full z-[-1]"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. LA SOLUZIONE PER CENTRI ESTETICI -->
+    <section class="py-24 bg-brand-blue text-white relative" id="soluzione">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="max-w-4xl mx-auto text-center md:text-left grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-black mb-6 leading-tight">
+                        Dedica il 100% del tempo alle tue clienti in salone.
+                    </h2>
+                    <p class="text-lg text-white/80 leading-relaxed mb-6">
+                        Rispondere al telefono con le mani occupate fa perdere tempo e infastidisce la cliente che sta ricevendo il trattamento. Eppure, ogni chiamata persa è un appuntamento regalato alla concorrenza.
+                    </p>
+                    <p class="text-lg text-white/80 leading-relaxed font-bold">
+                        Zirèl integra un'agenda intelligente gestita da un'IA direttamente sul tuo sito o su WhatsApp Business. Le clienti scelgono autonomamente il trattamento, la collaboratrice preferita e l'orario libero, ricevendo un promemoria automatico per azzerare i no-show.
+                    </p>
+                </div>
+                <div class="relative">
+                    <img src="food_premium.webp" alt="Gestione Appuntamenti Centro Estetico"
+                        class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-500">
+                    <div
+                        class="absolute -bottom-6 -left-6 bg-brand-orange text-white p-6 rounded-xl shadow-xl font-bold text-xl">
+                        Agenda Automatica Sincronizzata 🗓️
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. FUNZIONALITÀ KEY -->
+    <section class="py-24 bg-slate-50" id="funzionalita">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    Progettato per Saloni Dinamici ed Estetiste Professionali
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
+                <!-- Step 1 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10">
+                    <div class="w-16 h-16 bg-brand-orange text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">1</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">1. Agenda Intelligente</h3>
+                    <p class="text-brand-blue/70">L'IA propone solo gli orari liberi effettivi, ottimizzando i buchi in agenda ed evitando sovrapposizioni.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10">
+                    <div class="w-16 h-16 bg-brand-blue text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">2</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">2. Chat WhatsApp Business</h3>
+                    <p class="text-brand-blue/70">Le clienti non devono scaricare app o registrarsi. Scrivono semplicemente su WhatsApp come farebbero con un'amica.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center relative z-10">
+                    <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">3</div>
+                    <h3 class="text-2xl font-bold mb-4 text-brand-blue">3. Zero Appuntamenti Dimenticati</h3>
+                    <p class="text-brand-blue/70">Invio automatico di promemoria 24 ore prima dell'appuntamento, riducendo i no-show a zero.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. LISTINO PREZZI -->
+    <section class="py-24 bg-white" id="prezzi">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    Piani Trasparenti per Saloni ed Estetiste
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
+                <!-- Vetrina -->
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200 flex flex-col shadow-sm">
+                    <h3 class="text-2xl font-bold mb-2">Vetrina Salone</h3>
+                    <p class="text-brand-blue/70 mb-6">Sito moderno ed elegante per posizionare il tuo brand locale su Google e mostrare i listini trattamenti.</p>
+                    <div class="mb-6">
+                        <p class="text-3xl font-black text-brand-blue">€79<span class="text-lg font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm text-brand-blue/60">+ €549 setup iniziale</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span>Sito web ad altissima velocità</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Listino trattamenti integrato</span></li>
+                        <li class="flex gap-2 opacity-50"><span>❌</span> <span>Nessuna automazione WhatsApp IA</span></li>
+                    </ul>
+                    <a href="contatti.html" class="block w-full text-center px-6 py-3 rounded-full border-2 border-brand-blue text-brand-blue font-bold hover:bg-brand-blue hover:text-white transition-all mt-auto">Scegli Vetrina</a>
+                </div>
+
+                <!-- Che Risponde (Consigliato) -->
+                <div class="bg-white rounded-3xl p-8 border-2 border-brand-orange shadow-2xl relative transform md:-translate-y-4 flex flex-col">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                        🌟 Consigliato
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 mt-4">Risponditore IA Beauty</h3>
+                    <p class="text-brand-blue/70 mb-6">L'IA sul sito risponde su prezzi, prodotti utilizzati e spinge gli utenti a prenotare i trattamenti.</p>
+                    <div class="mb-6">
+                        <p class="text-4xl font-black text-brand-blue">€149<span class="text-xl font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm font-bold text-brand-orange">+ €890 setup iniziale</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span>Sito web completo (Home, Servizi, Contatti)</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span><strong>Integrazione Live Chat con IA</strong></span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>Link al tuo attuale gestionale appuntamenti</span></li>
+                    </ul>
+                    <a href="contatti.html" class="block w-full text-center px-6 py-4 rounded-full bg-brand-orange text-white font-bold hover:bg-orange-600 transition-all shadow-lg shadow-brand-orange/30 mt-auto">Scegli Risponditore IA</a>
+                </div>
+
+                <!-- Total Automation -->
+                <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200 flex flex-col shadow-sm">
+                    <h3 class="text-2xl font-bold mb-2">Agenda Sync WhatsApp</h3>
+                    <p class="text-brand-blue/70 mb-6">Automazione totale. Il risponditore WhatsApp fissa direttamente in agenda gli slot orari liberi, inviando promemoria.</p>
+                    <div class="mb-6">
+                        <p class="text-3xl font-black text-brand-blue">€249<span class="text-lg font-normal text-brand-blue/60">/mese</span></p>
+                        <p class="text-sm text-brand-blue/60">+ da €1.290 setup integrato</p>
+                    </div>
+                    <ul class="text-sm text-brand-blue/80 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><span>✅</span> <span>Tutto il pacchetto "Risponditore IA Beauty"</span></li>
+                        <li class="flex gap-2"><span>✅</span> <span><strong>Sincronizzazione Bidirezionale Agenda</strong></span></li>
+                        <li class="flex gap-2"><span>✅</span> <span>WhatsApp Business API incluse</span></li>
+                    </ul>
+                    <a href="contatti.html" class="block w-full text-center px-6 py-3 rounded-full border-2 border-brand-cyan text-brand-cyan font-bold hover:bg-brand-cyan hover:text-white transition-all mt-auto">Richiedi Studio Setup</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. FAQ (GEO OPTIMIZED) -->
+    <section class="py-24 bg-slate-50" id="faq">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4 font-sans text-brand-blue">
+                    FAQ Siti ed Agende per Estetiste
+                </h2>
+            </div>
+
+            <div class="space-y-4">
+                <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-xl text-brand-blue">
+                        <span>L'IA può gestire la prenotazione con collaboratori differenti?</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+            </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Sì. Se il tuo salone ha più collaboratori con diverse competenze ed orari, l'IA chiederà alla cliente con chi desidera effettuare il trattamento e verificherà la disponibilità specifica di quella risorsa.
+                    
+                <!-- Clausola 1 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>1. Modifiche e "Sito Infinito"</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il canone mensile include il mantenimento tecnico, l'hosting e il corretto funzionamento
+                        dell'assistente IA. Sono incluse micro-modifiche testuali o di orari fino a un massimo di
+                        <strong>1 ora al mese</strong> (non cumulabile). Qualsiasi intervento strutturale, aggiunta di
+                        pagine o ri-progettazione grafica verrà preventivato a parte alla tariffa oraria di 50€/ora.
+                    </div>
+                </details>
+
+                <!-- Clausola 2 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>2. Chat IA illimitata? Sì, ma senza abusi.</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il canone include un volume di conversazioni dell'assistente IA pari a <strong>1.000
+                            chat/mese</strong>, ampiamente sufficiente per una normale attività locale. In caso di
+                        superamento anomalo (es. attacchi di spam o bot), Zirèl Studio si riserva il diritto di
+                        sospendere temporaneamente l'assistente o di adeguare il canone previo accordo con il cliente,
+                        per coprire i costi delle API.
+                    </div>
+                </details>
+
+                <!-- Clausola 3 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>3. "L'IA ha detto una cavolata, paghi tu!" (No.)</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        L'assistente virtuale si basa su modelli di Intelligenza Artificiale generativa. Sebbene il
+                        sistema venga istruito e testato accuratamente, Zirèl Studio non si assume alcuna responsabilità
+                        per risposte imprecise, errori di prezzo o malintesi generati dall'IA. Il cliente è tenuto a
+                        monitorare periodicamente le chat e a segnalare eventuali anomalie per ottimizzare
+                        l'addestramento.
+                    </div>
+                </details>
+
+                <!-- Clausola 4 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>4. Tempistiche e "Clienti Fantasma"</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il cliente si impegna a fornire tutto il materiale necessario (testi, foto, listini, loghi)
+                        entro <strong>14 giorni lavorativi</strong> dalla firma del contratto e dal versamento
+                        dell'anticipo per il setup. Passato tale termine, se il ritardo del cliente impedisce la
+                        consegna del sito, il progetto verrà comunque considerato "congelato" e Zirèl Studio si riserva
+                        il diritto di richiedere il saldo e applicare una penale per la successiva riattivazione.
+                    </div>
+                </details>
+
+                <!-- Clausola 5 -->
+                <details
+                    class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary
+                        class="flex justify-between items-center font-bold cursor-pointer list-none [&::-webkit-details-marker]:hidden p-6 text-xl text-brand-blue">
+                        <span>5. Ritardi nei pagamenti</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                                width="24">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Il pagamento del canone mensile è anticipato. In caso di mancato pagamento o ritardo superiore a
+                        <strong>7 giorni</strong> dalla scadenza, il funzionamento del sito web e dell'assistente IA
+                        verrà sospeso automaticamente fino al saldo del debito. I costi di riattivazione del servizio in
+                        caso di sospensione sono pari a 50€.
+                    </div>
+                </details>
+</div>
+                </details>
+
+                <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-brand-blue/30 transition-colors">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-xl text-brand-blue">
+                        <span>Possiamo raccogliere caparre per trattamenti costosi?</span>
+                        <span class="transition group-open:rotate-180">👇</span>
+                    </summary>
+                    <div class="px-6 pb-6 text-brand-blue/70 leading-relaxed border-t border-slate-100 pt-4 mt-2">
+                        Sì. Per i servizi a maggior valore aggiunto, possiamo impostare il sistema affinché l'IA invii un link di pagamento sicuro (tramite Stripe o PayPal) per convalidare l'appuntamento solo dopo la ricezione di una caparra confirmatoria.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. AUDIT SECTION -->
+    <section class="py-24 bg-slate-900 text-white relative overflow-hidden" id="audit-form">
+        <div class="container mx-auto px-4 md:px-8 relative z-10 max-w-5xl text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-6">
+                Calcola quante ore sprechi al telefono ogni mese.
+            </h2>
+            <p class="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+                Ottieni un audit gratuito e scopri quanto tempo puoi risparmiare delegando la segreteria a un'agente IA.
+            </p>
+
+            <form id="audit-form-element" action="#"
+                class="bg-white/10 backdrop-blur-md border border-white/20 p-6 md:p-8 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto shadow-2xl text-left">
+                <div class="flex flex-col">
+                    <label for="audit-collaboratori" class="text-white/80 text-sm font-bold mb-2 ml-2">Numero di Collaboratori in Salone</label>
+                    <input type="number" id="audit-collaboratori" placeholder="es. 3"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none" required>
+                </div>
+                <div class="flex flex-col">
+                    <label for="audit-citta" class="text-white/80 text-sm font-bold mb-2 ml-2">Città del Salone</label>
+                    <input type="text" id="audit-citta" placeholder="es. Torino"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none" required>
+                </div>
+                <div class="flex flex-col">
+                    <label for="audit-nome" class="text-white/80 text-sm font-bold mb-2 ml-2">Nome Centro Estetico</label>
+                    <input type="text" id="audit-nome" placeholder="es. Glamour Beauty"
+                        class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none" required>
+                </div>
+                <div class="flex flex-col justify-end">
+                    <button type="submit"
+                        class="w-full h-[56px] bg-brand-orange hover:bg-orange-600 text-white font-bold px-6 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
+                        <span>CALCOLA ORA ORE RISPARMIATE</span>
+                        <span class="text-xl">👉</span>
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                document.getElementById('audit-form-element').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const staff = document.getElementById('audit-collaboratori').value.trim();
+                    const citta = document.getElementById('audit-citta').value.trim();
+                    const nome = document.getElementById('audit-nome').value.trim();
+                    
+                    const text = `Ciao Niki! 👋\nVorrei un Audit Gratuito del risparmio orario per il mio Centro Estetico.\n\n💅 *Centro Estetico:* ${nome}\n📍 *Città:* ${citta}\n👥 *Staff:* ${staff} collaboratori\n\nCome posso liberare tempo in cabina e automatizzare l'agenda con l'IA?`;
+                    
+                    const whatsappUrl = `https://wa.me/393461027447?text=${encodeURIComponent(text)}`;
+                    window.open(whatsappUrl, '_blank');
+                });
+            </script>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-white py-12 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-bold text-xl mb-4">Zirèl Studio</p>
+            <p class="text-white/50 text-sm mb-6">Sviluppo Siti Web Intelligenti per Centri Estetici e SPA</p>
+            <div class="flex justify-center gap-4 text-sm text-white/40">
+                <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="cookie.html" class="hover:text-white transition-colors">Cookie Policy</a>
+            </div>
+            <p class="text-white/40 text-xs mt-8">© 2026 Zirèl Studio. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <!-- Chat Tooltip -->
+    <div id="chat-tooltip" class="chat-tooltip">
+        Ti aiuto a metterti in contatto in 1 minuto 💬
+    </div>
+
+    <!-- Custom Chat Widget -->
+    <div id="n8n-widget-mock"
+        class="fixed top-0 left-0 bottom-0 sm:top-auto sm:left-auto sm:bottom-24 right-0 sm:right-6 z-[2000] scale-0 transition-transform origin-bottom-right duration-500 w-full sm:w-[350px] h-full sm:h-[500px]">
+        <div
+            class="bg-white w-full h-full sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-brand-sand">
+            <div class="brand-gradient px-5 py-4 text-white flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+                    💬
+                </div>
+                <div class="flex-grow">
+                    <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
+                    <p class="text-[11px] text-white/75 mt-0.5">Contatti, attivazione e prova</p>
+                </div>
+                <button onclick="toggleDemo()"
+                    class="text-white/70 hover:text-white transition-colors text-sm font-medium italic flex-shrink-0">
+                    Chiudi
+                </button>
+            </div>
+
+            <div class="flex-grow p-4 space-y-4 bg-brand-sand/10 overflow-y-auto" id="chat-messages">
+                <div
+                    class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[90%] text-sm border border-brand-sand/50">
+                    <p class="mb-2">Ciao! 👋 Sono <strong class="text-brand-orange font-sans">Zirèl</strong>.</p>
+                    <p>Posso aiutarti a scegliere il canale giusto, capire come partire o richiedere una prova guidata.</p>
+                </div>
+
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="quick-reply-btn" onclick="sendChatMessage('📞 Vorrei un contatto rapido')">
+                        📞 Contatto rapido
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🚀 Voglio richiedere una prova guidata')">
+                        🚀 Richiedi prova
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('💶 Ho dubbi su prezzi e attivazione')">
+                        💶 Prezzi e attivazione
+                    </button>
+                    <button class="quick-reply-btn" onclick="sendChatMessage('🔐 Come accedo alla dashboard?')">
+                        🔐 Login dashboard
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand flex gap-2 items-center bg-white">
+                <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
+                    class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
+                    onkeypress="if(event.key === 'Enter') handleTextInput()">
+                <button onclick="handleTextInput()"
+                    class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-5 h-5 ml-1">
+                        <path
+                            d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleDemo()" id="chat-toggle-btn"
+        class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-2xl z-[2001] hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden border-2 border-white">
+        <span id="toggle-icon-open" class="text-white drop-shadow-md flex items-center justify-center text-3xl">
+            💬
+        </span>
+    </button>
+
+    <script type="module" src="/config.js"></script>
+    <script>
+        window.zirelTooltipMessages = [
+            'Vuoi parlare con noi in modo rapido? 💬',
+            'Ti aiutiamo a prenotare una demo 🚀',
+            'Dubbi su login o attivazione? 🔐',
+            'Posso indirizzarti al canale giusto 📞',
+        ];
+    </script>
+    <script>
+        window.ZirelConfig = {
+            tenantId: 'zirel_official',
+            webhookUrl: 'https://primary-production-b2af.up.railway.app/webhook/d9e10e54-2d61-4643-98ed-7bbe6221699e/chat'
+        };
+        window.ZirelWidgetConfig = {
+            widget_title: 'Zirèl Assistant',
+            widget_subtitle: 'Contatti, attivazione e prova',
+            widget_color: '#FF8C42',
+            widget_icon: '💬'
+        };
+    </script>
+    <script type="module" src="/chat.js" data-tenant-id="zirel_official"></script>
+    <script type="module" src="/ui-helpers.js"></script>
+</body>
+</html>

@@ -34,22 +34,29 @@
 
 <body class="font-sans text-brand-blue bg-white overflow-x-hidden" data-page-type="contacts">
 
-            <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo"><span class="zirel-brand" style="color: #FF8C42 !important;">Zirèl</span>
+            <span style="color: #FFFFFF !important;">Studio</span></a>
         <ul class="nav-links" id="nav-menu">
-            <li><a href="index.html#cosa-riceve-team" class="nav-link">SERVIZI</a></li>
-            <li><a href="index.html#portfolio" class="nav-link">PORTFOLIO</a></li>
+            <li><a href="index.html#servizi" class="nav-link">SERVIZI</a></li>
+            <li><a href="index.html#portfolio" class="nav-link">LAVORI</a></li>
+
+            <li><a href="index.html#prezzi" class="nav-link">PREZZI</a></li>
             <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
-            <li><a href="demo.html" class="nav-link">DEMO IA</a></li>
-            <li><a href="pricing.html" class="nav-link">PRICING</a></li>
-            <li><a href="contatti.html" class="nav-link">CONTATTI</a></li>
-            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO</a></li>
+            <li><a href="contatti.html" class="nav-link active">CONTATTI</a></li>
+            <li class="cta-nav-mobile-li"><a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a></li>
         </ul>
-        <a href="contatti.html" class="cta-nav cta-nav-desktop">PREVENTIVO</a>
+        <div class="hidden lg:flex items-center gap-6">
+            <a href="tel:+393461027447"
+                class="font-bold text-white hover:text-brand-orange transition-colors flex items-center gap-2">
+                📞 +39 346 102 7447
+            </a>
+            <a href="contatti.html" class="cta-nav">PREVENTIVO GRATIS</a>
+        </div>
         <div class="hamburger" id="hamburger">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
+            <span class="bar bg-white"></span>
+            <span class="bar bg-white"></span>
+            <span class="bar bg-white"></span>
         </div>
     </nav>
 
@@ -65,6 +72,55 @@
                 <p class="text-lg md:text-xl text-brand-blue/70 max-w-3xl mx-auto leading-relaxed">
                     Tu ci spieghi come arrivano oggi le richieste. Noi ti mostriamo il flusso giusto per non perderle.
                 </p>
+            </div>
+
+            <div class="mb-16 max-w-4xl mx-auto">
+                <form id="audit-form" action="#"
+                    class="bg-brand-blue p-8 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4 shadow-2xl text-left">
+                    <div class="col-span-1 md:col-span-2 mb-4 text-center">
+                        <h2 class="text-2xl font-black text-white">Richiedi un Audit Gratuito</h2>
+                        <p class="text-white/80">Compila il modulo per farti mostrare dove stai perdendo richieste oggi.</p>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="audit-attivita" class="text-white/80 text-sm font-bold mb-2 ml-2">Che attività hai?</label>
+                        <input type="text" id="audit-attivita" placeholder="es. Pizzeria"
+                            class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                            required>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="audit-citta" class="text-white/80 text-sm font-bold mb-2 ml-2">In che città ti trovi?</label>
+                        <input type="text" id="audit-citta" placeholder="es. Riccione"
+                            class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                            required>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="audit-problema" class="text-white/80 text-sm font-bold mb-2 ml-2">Qual è il tuo problema principale?</label>
+                        <input type="text" id="audit-problema" placeholder="es. Telefono suona a vuoto"
+                            class="w-full bg-white/90 text-brand-blue px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-orange transition-all"
+                            required>
+                    </div>
+                    <div class="flex flex-col justify-end">
+                        <button type="submit"
+                            class="w-full h-[56px] bg-brand-orange hover:bg-orange-600 text-white font-bold px-6 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2">
+                            <span>RICHIEDI AUDIT</span>
+                            <span class="text-xl">👉</span>
+                        </button>
+                    </div>
+                </form>
+
+                <script>
+                    document.getElementById('audit-form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const attivita = document.getElementById('audit-attivita').value.trim();
+                        const citta = document.getElementById('audit-citta').value.trim();
+                        const problema = document.getElementById('audit-problema').value.trim();
+                        
+                        const text = `Ciao Niki! 👋\nVorrei un Audit Gratuito per la mia attività.\n\n🍕 *Attività:* ${attivita}\n📍 *Città:* ${citta}\n🚨 *Problema:* ${problema}\n\nMi mostri dove sto perdendo clienti?`;
+                        
+                        const whatsappUrl = `https://wa.me/393461027447?text=${encodeURIComponent(text)}`;
+                        window.open(whatsappUrl, '_blank');
+                    });
+                </script>
             </div>
 
             <div class="grid lg:grid-cols-3 gap-8 mb-16">
@@ -105,45 +161,21 @@
         </div>
     </main>
 
-            <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-info">
-                    <a href="index.html" class="logo"><span class="zirel-brand">Zirèl</span> <span>Studio</span></a>
-                    <p>Studio di Sviluppo Web specializzato in Siti Web Intelligenti ad alta conversione, dotati di IA proprietaria.</p>
-                </div>
-                <div class="footer-links">
-                    <h4>Servizi</h4>
-                    <ul>
-                        <li><a href="index.html#cosa-riceve-team">Sviluppo Web</a></li>
-                        <li><a href="index.html#cosa-riceve-team">Intelligenza Artificiale</a></li>
-                        <li><a href="index.html#cosa-riceve-team">Digital Marketing</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Portfolio & Demo</h4>
-                    <ul>
-                        <li><a href="index.html#portfolio">I Nostri Lavori</a></li>
-                        <li><a href="demo.html">Testa una Demo Interattiva</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Lo Studio</h4>
-                    <ul>
-                        <li><a href="chi-siamo.html">Chi siamo</a></li>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="contatti.html">Contatti</a></li>
-                        <li><a href="index.html#faq">FAQ</a></li>
-                    </ul>
-                </div>
+    <!-- Footer base per mantenere la struttura coerente -->
+    <footer class="bg-slate-950 text-white py-12 border-t border-white/10">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-bold text-xl mb-4">Zirèl Studio</p>
+            <p class="text-white/50 text-sm mb-6">Sviluppo Siti Web Intelligenti in Riviera Romagnola</p>
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/60 mb-4">
+                <a href="demo.html" class="hover:text-white transition-colors">Demo IA</a>
+                <a href="login.html" class="hover:text-white transition-colors">Login Clienti</a>
+                <a href="register.html" class="hover:text-white transition-colors">Registrati</a>
             </div>
-                                    <div class="mt-16 pt-8 border-t border-white/10 text-center text-[11px] text-white/30 flex flex-wrap justify-center items-baseline gap-x-3 gap-y-2 leading-none">
-                <span class="m-0 p-0 inline-block">&copy; 2026 Zirèl Studio. Tutti i diritti riservati.</span>
-                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
-                <a href="privacy.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Privacy Policy</a>
-                <span class="hidden md:inline-block m-0 p-0 opacity-50">|</span>
-                <a href="cookie.html" class="hover:text-white/70 transition-colors m-0 p-0 inline-block">Cookie Policy</a>
+            <div class="flex justify-center gap-4 text-sm text-white/40">
+                <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="cookie.html" class="hover:text-white transition-colors">Cookie Policy</a>
             </div>
+            <p class="text-white/40 text-xs mt-8">© 2026 Zirèl Studio. Tutti i diritti riservati.</p>
         </div>
     </footer>
 

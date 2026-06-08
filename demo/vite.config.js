@@ -28,6 +28,12 @@ export default defineConfig({
         privacy: resolve(__dirname, 'privacy.html'),
         cookie: resolve(__dirname, 'cookie.html'),
         chiSiamo: resolve(__dirname, 'chi-siamo.html'),
+        settoreHotel: resolve(__dirname, 'settore-hotel.html'),
+        settoreRistoranti: resolve(__dirname, 'settore-ristoranti.html'),
+        settoreCentriEstetici: resolve(__dirname, 'settore-centri-estetici.html'),
+        soluzioniIa: resolve(__dirname, 'soluzioni-ia.html'),
+        casiStudioGotBunRiccione: resolve(__dirname, 'casi-studio/got-bun-riccione.html'),
+        settoreArtigiani: resolve(__dirname, 'settore-artigiani.html'),
       },
       // Suppress Rollup warnings for static scripts intentionally served
       // from public/ without type="module". These scripts (config.js,

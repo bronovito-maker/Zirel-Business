@@ -195,10 +195,7 @@ section {
     font-family: var(--font-main);
 }
 
-.logo span {
-    color: var(--white);
-    /* Demo/Context secondary color */
-}
+
 
 .zirel-brand {
     font-family: var(--font-main) !important;
