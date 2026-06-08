@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import PublicDataDeletionPage from './components/PublicDataDeletionPage';
@@ -70,6 +71,7 @@ function App() {
       ) : (
         <Dashboard onLogout={handleLogout} />
       )}
+      <Analytics />
     </div>
   );
 }
