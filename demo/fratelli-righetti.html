@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F.lli Righetti | Idrotermosanitaria e Showroom a Riccione</title>
+    <meta name="description" content="Storico magazzino all'ingrosso idrotermosanitario a Riccione dal 1992. Caldaie, condizionamento e arredo bagno in pronta consegna. Ordina via WhatsApp ed evita le code.">
+    <link rel="canonical" href="https://zirel.org/fratelli-righetti" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons (Optional/CDN but styled clean with custom SVGs/CSS instead) -->
+    <style>
+        :root {
+            /* Brand Color Palette */
+            --primary: #0F2A4A;       /* Deep Navy Blue for Trust/Plumbing */
+            --primary-light: #1A3E6C;
+            --accent: #FF6B35;        /* Vibrant Orange for Zirèl Actions */
+            --accent-hover: #E85A24;
+            --bg-light: #F8FAFC;      /* Clean background */
+            --bg-card: #FFFFFF;
+            --text-dark: #1E293B;     /* Crisp readable text */
+            --text-muted: #64748B;
+            --white: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow-sm: 0 2px 8px rgba(15, 42, 74, 0.04);
+            --shadow-md: 0 10px 30px rgba(15, 42, 74, 0.08);
+            --shadow-lg: 0 20px 40px rgba(15, 42, 74, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        /* Container Grid */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Badge design */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .badge-blue {
+            background-color: rgba(15, 42, 74, 0.08);
+            color: var(--primary);
+        }
+
+        /* Buttons Styling */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: var(--radius-sm);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Sticky Glassmorphic Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-main {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-top: -2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .phone-link {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05rem;
+        }
+
+        .phone-link span {
+            color: var(--accent);
+        }
+
+        .phone-link:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            background: radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 10% 80%, rgba(15, 42, 74, 0.03) 0%, transparent 50%),
+                        var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-content h1 span {
+            color: var(--accent);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 620px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        /* Value Props Mini Grid */
+        .hero-props {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 32px;
+        }
+
+        .prop-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .prop-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .prop-text h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .prop-text p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Hero Image/Card Visual */
+        .hero-visual {
+            position: relative;
+        }
+
+        .real-photo-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(15, 42, 74, 0.05);
+            position: absolute;
+            top: -45px;
+            left: -40px;
+            width: 260px;
+            z-index: 3;
+            transform: rotate(-3deg);
+            transition: var(--transition);
+        }
+
+        .real-photo-card:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 4;
+        }
+
+        .real-photo-card img {
+            width: 100%;
+            border-radius: calc(var(--radius-md) - 8px);
+            display: block;
+        }
+
+        .real-photo-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .visual-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(15, 42, 74, 0.05);
+            position: relative;
+            z-index: 2;
+            margin-top: 20px;
+        }
+
+        .visual-bg-glow {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.12) 0%, transparent 60%);
+            z-index: 1;
+        }
+
+        .ai-assistant-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            max-width: 85%;
+            font-size: 0.9rem;
+        }
+
+        .chat-bubble.bot {
+            background-color: var(--bg-light);
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            border: 1px solid rgba(15, 42, 74, 0.05);
+        }
+
+        .chat-bubble.user {
+            background-color: var(--primary);
+            color: var(--white);
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+        }
+
+        .chat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        /* Section Global Settings */
+        .section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-header {
+            max-width: 700px;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* Sezione Magazzino (Target Idraulici) */
+        .warehouse-section {
+            background-color: var(--white);
+        }
+
+        .warehouse-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 20px;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(15, 42, 74, 0.2);
+        }
+
+        .step-card:nth-child(2) .step-number {
+            background-color: var(--accent);
+            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .step-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+        }
+
+        .warehouse-visual {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            border: 1px solid rgba(15, 42, 74, 0.05);
+        }
+
+        .brand-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .brand-badge {
+            background: var(--white);
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Showroom Gallery */
+        .showroom-gallery {
+            width: 100%;
+            margin-bottom: 56px;
+        }
+
+        .gallery-main-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 200px;
+            gap: 16px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(15, 42, 74, 0.05);
+            transition: var(--transition);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+            display: block;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        /* CSS Brand Sprites */
+        .brand-logo-sprite {
+            width: 120px;
+            height: 60px;
+            display: inline-block;
+            background-repeat: no-repeat;
+            background-color: var(--white);
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: var(--transition);
+            border-radius: var(--radius-sm);
+        }
+        .brand-logo-sprite:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        /* Sheet 1 (4 columns x 3 rows) - Arredo / Rubinetteria */
+        .sprite-s1-r0-c0 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 0% 0%; }
+        .sprite-s1-r0-c1 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 33.33% 0%; }
+        .sprite-s1-r0-c2 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 66.67% 0%; }
+        .sprite-s1-r0-c3 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 100% 0%; }
+        .sprite-s1-r1-c0 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 0% 50%; }
+        .sprite-s1-r1-c1 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 33.33% 50%; }
+        .sprite-s1-r1-c2 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 66.67% 50%; }
+        .sprite-s1-r1-c3 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 100% 50%; }
+        .sprite-s1-r2-c0 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 0% 100%; }
+        .sprite-s1-r2-c1 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 33.33% 100%; }
+        .sprite-s1-r2-c2 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 66.67% 100%; }
+        .sprite-s1-r2-c3 { background-image: url('./brand-sheet-1.png'); background-size: 400% 300%; background-position: 100% 100%; }
+
+        /* Sheet 2 (4 columns x 3 rows) - Ceramiche */
+        .sprite-s2-r0-c0 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 0% 0%; }
+        .sprite-s2-r0-c1 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 33.33% 0%; }
+        .sprite-s2-r0-c2 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 66.67% 0%; }
+        .sprite-s2-r0-c3 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 100% 0%; }
+        .sprite-s2-r1-c0 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 0% 50%; }
+        .sprite-s2-r1-c1 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 33.33% 50%; }
+        .sprite-s2-r1-c2 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 66.67% 50%; }
+        .sprite-s2-r1-c3 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 100% 50%; }
+        .sprite-s2-r2-c0 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 0% 100%; }
+        .sprite-s2-r2-c1 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 33.33% 100%; }
+        .sprite-s2-r2-c2 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 66.67% 100%; }
+        .sprite-s2-r2-c3 { background-image: url('./brand-sheet-2.png'); background-size: 400% 300%; background-position: 100% 100%; }
+
+        /* Sheet 3 (6 columns x 2 rows) - Riscaldamento */
+        .sprite-s3-r0-c0 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 0% 0%; }
+        .sprite-s3-r0-c1 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 20% 0%; }
+        .sprite-s3-r0-c2 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 40% 0%; }
+        .sprite-s3-r0-c3 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 60% 0%; }
+        .sprite-s3-r0-c4 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 80% 0%; }
+        .sprite-s3-r0-c5 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 100% 0%; }
+        .sprite-s3-r1-c0 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 0% 100%; }
+        .sprite-s3-r1-c1 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 20% 100%; }
+        .sprite-s3-r1-c2 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 40% 100%; }
+        .sprite-s3-r1-c3 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 60% 100%; }
+        .sprite-s3-r1-c4 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 80% 100%; }
+        .sprite-s3-r1-c5 { background-image: url('./brand-sheet-3.png'); background-size: 600% 200%; background-position: 100% 100%; }
+
+        /* Sheet 4 (6 columns x 2 rows) - Idraulica */
+        .sprite-s4-r0-c0 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 0% 0%; }
+        .sprite-s4-r0-c1 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 20% 0%; }
+        .sprite-s4-r0-c2 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 40% 0%; }
+        .sprite-s4-r0-c3 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 60% 0%; }
+        .sprite-s4-r0-c4 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 80% 0%; }
+        .sprite-s4-r0-c5 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 100% 0%; }
+        .sprite-s4-r1-c0 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 0% 100%; }
+        .sprite-s4-r1-c1 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 20% 100%; }
+        .sprite-s4-r1-c2 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 40% 100%; }
+        .sprite-s4-r1-c3 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 60% 100%; }
+        .sprite-s4-r1-c4 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 80% 100%; }
+        .sprite-s4-r1-c5 { background-image: url('./brand-sheet-4.png'); background-size: 600% 200%; background-position: 100% 100%; }
+
+        /* Sheet 5 (6 columns x 2 rows) - Attrezzatura */
+        .sprite-s5-r0-c0 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 0% 0%; }
+        .sprite-s5-r0-c1 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 20% 0%; }
+        .sprite-s5-r0-c2 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 40% 0%; }
+        .sprite-s5-r0-c3 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 60% 0%; }
+        .sprite-s5-r0-c4 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 80% 0%; }
+        .sprite-s5-r0-c5 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 100% 0%; }
+        .sprite-s5-r1-c0 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 0% 100%; }
+        .sprite-s5-r1-c1 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 20% 100%; }
+        .sprite-s5-r1-c2 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 40% 100%; }
+        .sprite-s5-r1-c3 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 60% 100%; }
+        .sprite-s5-r1-c4 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 80% 100%; }
+        .sprite-s5-r1-c5 { background-image: url('./brand-sheet-5.png'); background-size: 600% 200%; background-position: 100% 100%; }
+
+        @media (max-width: 768px) {
+            .gallery-main-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 150px;
+            }
+            .gallery-item.large {
+                grid-column: span 2;
+                grid-row: span 1;
+            }
+        }
+
+        /* Sezione Showroom */
+        .showroom-section {
+            background: linear-gradient(180deg, var(--bg-light) 0%, var(--white) 100%);
+        }
+
+        .showroom-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        .showroom-features {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .showroom-feat-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary);
+        }
+
+        .showroom-feat-card.accented {
+            border-left-color: var(--accent);
+        }
+
+        .showroom-feat-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .showroom-feat-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Showroom Booking Form Widget */
+        .booking-widget {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(15, 42, 74, 0.05);
+        }
+
+        .booking-widget h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .booking-widget .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #D1D5DB;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+        }
+
+        /* Sezione La Nostra Storia */
+        .history-section {
+            background-color: var(--primary);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-section h2, .history-section h3 {
+            color: var(--white);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .history-narrative p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-marker {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(5px);
+            flex-grow: 1;
+        }
+
+        .timeline-content h4 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #081628;
+            color: var(--white);
+            padding: 80px 0 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-logo-desc p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 16px;
+            font-size: 0.95rem;
+            max-width: 320px;
+        }
+
+        .footer-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .footer-contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .footer-contact-info span {
+            display: block;
+        }
+
+        .footer-contact-info strong {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .zirel-signature {
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .zirel-signature strong {
+            color: var(--accent);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .hero-grid, .warehouse-grid, .showroom-grid, .history-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-visual {
+                max-width: 550px;
+                margin: 0 auto;
+            }
+
+            .nav-menu {
+                display: none; /* In production a hamburger menu would toggle this */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-actions .btn {
+                display: none; /* Hide quick order button on small screens or swap to simple phone icon */
+            }
+
+            .hero {
+                padding: 140px 0 60px;
+            }
+
+            .hero-props {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+
+    <!-- Schema Markup JSON-LD (WholesaleStore / LocalBusiness) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WholesaleStore",
+      "name": "F.lli Righetti snc",
+      "alternateName": "Fratelli Righetti Idrotermosanitaria",
+      "description": "Storico magazzino all'ingrosso di idrotermosanitaria, caldaie, condizionamento e arredo bagno a Riccione. Servizio rapido senza code per installatori e idraulici.",
+      "image": "https://www.fratellirighetti.it/logo.png", 
+      "@id": "https://www.fratellirighetti.it/#wholesale-store",
+      "url": "https://www.fratellirighetti.it",
+      "telephone": "+390541602701",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Via del Progresso, 8-10",
+        "addressLocality": "Riccione",
+        "postalCode": "47838",
+        "addressRegion": "RN",
+        "addressCountry": "IT"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 43.992850,
+        "longitude": 12.646820
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "08:00",
+          "closes": "12:30"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+          ],
+          "opens": "14:00",
+          "closes": "19:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:00",
+          "closes": "12:30"
+        }
+      ],
+      "areaServed": [
+        {
+          "@type": "AdministrativeArea",
+          "name": "Riccione"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Rimini"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Riviera Romagnola"
+        }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+390541602701",
+        "contactType": "customer service",
+        "areaServed": "IT",
+        "availableLanguage": "Italian"
+      }
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <span class="logo-main">F.lli Righetti</span>
+                <span class="logo-sub">Idrotermosanitaria</span>
+            </a>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link active">Home</a></li>
+                    <li><a href="#magazzino" class="nav-link">Magazzino</a></li>
+                    <li><a href="#showroom" class="nav-link">Showroom</a></li>
+                    <li><a href="#storia" class="nav-link">La Nostra Storia</a></li>
+                    <li><a href="#contatti" class="nav-link">Contatti</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <a href="tel:0541602701" class="phone-link" id="header-phone-cta">
+                    <span>📞</span> 0541 602701
+                </a>
+                <a href="https://wa.me/393461027447?text=Ciao%20F.lli%20Righetti,%20avrei%20bisogno%20di%20verificare%20la%20disponibilit%C3%A0%20di%20un%20pezzo..." 
+                   class="btn btn-primary" id="header-quick-order-cta">
+                   Fai un Ordine Rapido
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <span class="badge">Evoluzione Digitale B2B</span>
+                <h1>Il magazzino idrotermosanitario per i professionisti di <span>Riccione</span>.</h1>
+                <p class="hero-subtitle">Caldaie, condizionamento e arredo bagno in pronta consegna. Ordina via WhatsApp con l'assistente Zirèl e passa a ritirare senza fare la fila al bancone.</p>
+                
+                <div class="hero-ctas">
+                    <a href="https://wa.me/393461027447?text=Ciao%20F.lli%20Righetti,%20volevo%20sapere%20se%20%C3%A8%20disponibile..." 
+                       class="btn btn-primary" id="hero-whatsapp-cta">
+                        Verifica Disponibilità Pezzi (WhatsApp)
+                    </a>
+                    <a href="#showroom" class="btn btn-secondary" id="hero-showroom-cta">
+                        Prenota Visita Showroom
+                    </a>
+                </div>
+
+                <div class="hero-props">
+                    <div class="prop-item">
+                        <div class="prop-icon">✓</div>
+                        <div class="prop-text">
+                            <h4>Zero Coda al Bancone</h4>
+                            <p>Prepariamo la merce prima che tu arrivi in sede.</p>
+                        </div>
+                    </div>
+                    <div class="prop-item">
+                        <div class="prop-icon">✓</div>
+                        <div class="prop-text">
+                            <h4>IA Zirèl Integrata</h4>
+                            <p>Verifica immediata del catalogo e dei prezzi dedicati.</p>
+                        </div>
+                    </div>
+                    <div class="prop-item">
+                        <div class="prop-icon">✓</div>
+                        <div class="prop-text">
+                            <h4>Showroom Privato</h4>
+                            <p>Accompagnamento personalizzato per i tuoi clienti.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="visual-bg-glow"></div>
+                <div class="real-photo-card">
+                    <img src="./righetti-insegna.png" alt="Insegna F.lli Righetti a Riccione">
+                    <div class="real-photo-label">Sede Storica - Via del Progresso, 8</div>
+                </div>
+                <div class="visual-card">
+                    <div class="ai-assistant-preview">
+                        <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 8px;">
+                            <span class="chat-label">Assistente IA Attivo 24/7</span>
+                            <h4 style="font-size: 1.1rem; color: var(--primary);">Zirèl Automation per F.lli Righetti</h4>
+                        </div>
+                        
+                        <div class="chat-bubble bot">
+                            <span class="chat-label">Zirèl Assistant</span>
+                            Ciao! Sono l'assistente virtuale di F.lli Righetti. Scrivimi pure il codice del pezzo o il marchio che cerchi.
+                        </div>
+
+                        <div class="chat-bubble user">
+                            <span class="chat-label" style="color: rgba(255,255,255,0.7);">Idraulico Termoidraulica</span>
+                            Ciao, avete disponibile una pompa di circolazione Baxi modello 5698260?
+                        </div>
+
+                        <div class="chat-bubble bot">
+                            <span class="chat-label">Zirèl Assistant</span>
+                            Verifico in tempo reale... 🔍<br>Sì, abbiamo 3 pezzi disponibili in Via del Progresso, 8. Vuoi che li metta da parte a tuo nome per il ritiro rapido tra 15 minuti?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Operativa Magazzino -->
+    <section class="section warehouse-section" id="magazzino">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge badge-blue">Ottimizzazione Tempi di Cantiere</span>
+                <h2>Sei in cantiere? Non perdere tempo al telefono.</h2>
+                <p>Niente più lunghe attese telefoniche per sapere se un pezzo è a scaffale. Con il nostro assistente intelligente puoi velocizzare ogni fase del tuo lavoro quotidiano.</p>
+            </div>
+
+            <div class="warehouse-grid">
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Scrivi il pezzo su WhatsApp</h3>
+                            <p>Invia una foto del pezzo rotto, il codice identificativo o semplicemente indica la marca (es. Baxi, Baxi caldaie, condizionatori).</p>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Verifica in 3 secondi</h3>
+                            <p>Il nostro sistema AI integrato interroga il magazzino e ti conferma disponibilità e prezzo netto installatore in un lampo.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Ritiro prioritario "Zero Coda"</h3>
+                            <p>Arrivi nel nostro magazzino in Via del Progresso, 8 a Riccione e ritiri la merce già imballata e pronta sul bancone.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warehouse-visual">
+                    <h3 style="margin-bottom: 16px; font-size: 1.35rem;">I principali marchi in pronta consegna</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Disponiamo di un ampio assortimento per impianti idraulici, riscaldamento e condizionamento di marche leader del settore.</p>
+                    
+                    <div class="brand-list" style="grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: center; justify-items: center;">
+                        <!-- Riscaldamento & Caldaie -->
+                        <div class="brand-logo-sprite sprite-s3-r0-c1" title="Chaffoteaux"></div>
+                        <div class="brand-logo-sprite sprite-s3-r0-c2" title="Panasonic"></div>
+                        <div class="brand-logo-sprite sprite-s3-r0-c3" title="Hisense"></div>
+                        <div class="brand-logo-sprite sprite-s3-r1-c4" title="Fondital"></div>
+                        <div class="brand-logo-sprite sprite-s3-r0-c5" title="Ravelli"></div>
+                        
+                        <!-- Idraulica & Valvole -->
+                        <div class="brand-logo-sprite sprite-s4-r1-c0" title="Caleffi"></div>
+                        <div class="brand-logo-sprite sprite-s4-r0-c1" title="Geberit"></div>
+                        <div class="brand-logo-sprite sprite-s4-r0-c5" title="Tece"></div>
+                        <div class="brand-logo-sprite sprite-s4-r1-c1" title="Far"></div>
+                        <div class="brand-logo-sprite sprite-s4-r1-c2" title="Itap"></div>
+                        
+                        <!-- Attrezzatura -->
+                        <div class="brand-logo-sprite sprite-s5-r0-c0" title="Rothenberger"></div>
+                        <div class="brand-logo-sprite sprite-s5-r1-c3" title="Fratelli Giacomini"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Showroom -->
+    <section class="section showroom-section" id="showroom">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">Showroom & Arredo Bagno</span>
+                <h2>Un'esposizione di arredo bagno per i tuoi clienti.</h2>
+                <p>Metti a disposizione dei tuoi clienti privati una vasta esposizione di sanitari, rubinetterie e mobili bagno a Riccione. Tu fai l'installazione, noi li guidiamo nella scelta.</p>
+            </div>
+
+            <!-- Galleria Immagini Showroom Reale -->
+            <div class="showroom-gallery">
+                <div class="gallery-main-grid">
+                    <div class="gallery-item large">
+                        <img src="./showroom-1.png" alt="Esposizione F.lli Righetti - Bagno Completo">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./showroom-2.png" alt="Esposizione F.lli Righetti - Lavabo e Dettagli Design">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./showroom-3.png" alt="Esposizione F.lli Righetti - Dettagli Rubinetteria">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./showroom-4.jpg" alt="Esposizione F.lli Righetti - Arredo e Mobili Bagno">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./showroom-5.png" alt="Esposizione F.lli Righetti - Sanitari e Rubinetti di Tendenza">
+                    </div>
+                </div>
+            </div>
+
+            <div class="showroom-grid">
+                <div class="showroom-features">
+                    <div class="showroom-feat-card">
+                        <h3>Accompagnamento Dedicato</h3>
+                        <p>I tuoi clienti saranno seguiti da consulenti professionisti che illustreranno le migliori soluzioni di design per il loro budget.</p>
+                    </div>
+
+                    <div class="showroom-feat-card accented">
+                        <h3>Trasparenza e Tutela per l'Installatore</h3>
+                        <p>Rilasciamo il preventivo dei materiali direttamente al cliente o a te, rispettando i tuoi margini professionali e il tuo lavoro.</p>
+                    </div>
+
+                    <div class="showroom-feat-card">
+                        <h3>Marchi di Tendenza</h3>
+                        <p>Dalle ceramiche di qualità alle rubinetterie di design, offriamo solo marchi che garantiscono durata e facilità di installazione.</p>
+                    </div>
+                </div>
+
+                <div class="booking-widget" id="booking-form-wrapper">
+                    <h3>Fissa un Appuntamento in Showroom</h3>
+                    <p class="subtitle">Inserisci i dati per riservare una consulenza personalizzata dedicata al tuo cliente.</p>
+                    
+                    <form id="showroom-booking-form" onsubmit="event.preventDefault(); alert('Grazie! La richiesta di appuntamento è stata inviata a Zirèl Studio AI. Ti risponderemo a breve.');">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="plumber-name" class="form-label">Idraulico di Riferimento</label>
+                                <input type="text" id="plumber-name" class="form-input" placeholder="Nome o Ragione Sociale" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-name" class="form-label">Nome Cliente Privato</label>
+                                <input type="text" id="customer-name" class="form-input" placeholder="Nome del tuo cliente" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-date" class="form-label">Data Preferita</label>
+                                <input type="date" id="booking-date" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-time" class="form-label">Ora Preferita</label>
+                                <input type="time" id="booking-time" class="form-input" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="booking-notes" class="form-label">Note o Esigenze Particolari</label>
+                                <input type="text" id="booking-notes" class="form-input" placeholder="Es. Rifacimento bagno completo, sostituzione vasca, ecc.">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="submit-booking-cta">Invia Richiesta Appuntamento</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Marchi Showroom -->
+            <div style="margin-top: 56px; border-top: 1px solid #E2E8F0; padding-top: 40px;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 24px; text-align: center; color: var(--primary); font-family: 'Outfit', sans-serif;">Alcuni dei marchi di design in esposizione</h3>
+                <div class="showroom-brand-list" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; align-items: center;">
+                    <div class="brand-logo-sprite sprite-s1-r0-c0" title="Colombo Design"></div>
+                    <div class="brand-logo-sprite sprite-s1-r1-c2" title="Hansgrohe"></div>
+                    <div class="brand-logo-sprite sprite-s1-r2-c3" title="Cordivari"></div>
+                    <div class="brand-logo-sprite sprite-s1-r2-c0" title="Arbi"></div>
+                    <div class="brand-logo-sprite sprite-s2-r1-c1" title="Globo"></div>
+                    <div class="brand-logo-sprite sprite-s2-r2-c0" title="Cielo"></div>
+                    <div class="brand-logo-sprite sprite-s2-r0-c1" title="Azzurra"></div>
+                    <div class="brand-logo-sprite sprite-s2-r0-c2" title="Duka"></div>
+                    <div class="brand-logo-sprite sprite-s1-r0-c1" title="Lineabeta"></div>
+                    <div class="brand-logo-sprite sprite-s2-r1-c3" title="Galassia"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione La Nostra Storia -->
+    <section class="section history-section" id="storia">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" style="background: rgba(255,255,255,0.1); color: var(--white);">Valori & Affidabilità</span>
+                <h2>Dal 1992, serietà e servizio in Riviera.</h2>
+                <p style="color: rgba(255,255,255,0.7);">La nostra forza risiede nelle nostre radici familiari e nella dedizione quotidiana al lavoro sul territorio.</p>
+            </div>
+
+            <div class="history-grid">
+                <div class="history-narrative">
+                    <p>La storia di <strong>F.lli Righetti snc</strong> ha inizio dal forte desiderio di <strong>Babbo Lino</strong>, che ha trasmesso ai figli la passione per il servizio e il lavoro ben fatto.</p>
+                    <p>Guidati da questa visione, i tre fratelli <strong>Guido, Luca e Andrea</strong> hanno unito le forze dando vita nel 1992 ad una realtà solida e dinamica a Riccione.</p>
+                    <p>Dal 1992 ad oggi, attraverso gli investimenti chiave del 2000, l'azienda si è evoluta costantemente, passando dall'essere un tradizionale magazzino di fornitura idraulica a un partner tecnologico operativo fondamentale per tutti gli idraulici e i professionisti termoidraulici della Riviera Romagnola.</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker">1992</div>
+                        <div class="timeline-content">
+                            <h4>La Fondazione</h4>
+                            <p>Nasce la F.lli Righetti snc a Riccione, concretizzando il sogno di Babbo Lino e dei fratelli Guido, Luca e Andrea.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2000</div>
+                        <div class="timeline-content">
+                            <h4>Espansione Showroom e Magazzino</h4>
+                            <p>Consolidamento della sede di Via del Progresso con l'ampliamento dell'offerta di arredo bagno e caldaie in pronta consegna.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2026</div>
+                        <div class="timeline-content">
+                            <h4>Era Digitale & Zirèl IA</h4>
+                            <p>Integrazione dei sistemi di intelligenza artificiale Zirèl per velocizzare la logistica del magazzino e azzerare le attese al bancone per gli installatori.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contatti">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-logo-desc">
+                    <a href="#" class="logo" style="margin-bottom: 20px;">
+                        <span class="logo-main" style="color: var(--white);">F.lli Righetti</span>
+                        <span class="logo-sub" style="color: var(--accent);">Idrotermosanitaria</span>
+                    </a>
+                    <p>Dal 1992, forniture termoidrauliche e showroom arredo bagno di riferimento a Riccione e provincia di Rimini.</p>
+                </div>
+
+                <div>
+                    <h3 class="footer-title">Link Rapidi</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#magazzino">Magazzino</a></li>
+                        <li><a href="#showroom">Showroom</a></li>
+                        <li><a href="#storia">La Nostra Storia</a></li>
+                        <li><a href="#contatti">Contatti</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="footer-title">Contatti & Sede</h3>
+                    <div class="footer-contact-info">
+                        <span><strong>Indirizzo:</strong> Via del Progresso, 8-10 - 47838 Riccione (RN)</span>
+                        <span><strong>Telefono:</strong> <a href="tel:0541602701" style="color: var(--white); font-weight: 700;">0541 602701</a></span>
+                        <span><strong>Fax:</strong> 0541 604253</span>
+                        <span><strong>Email:</strong> <a href="mailto:info@fratellirighetti.it" style="color: rgba(255, 255, 255, 0.6);">info@fratellirighetti.it</a></span>
+                        <span><strong>Orari:</strong> Lun-Ven 08:00-12:30, 14:00-19:00 | Sab 08:00-12:30</span>
+                        <span><strong>P.IVA:</strong> 02181850401</span>
+                        <span><strong>REA:</strong> RN014-136656</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 F.lli Righetti snc. Tutti i diritti riservati.</p>
+                <div class="zirel-signature">
+                    Sito Intelligente realizzato da <a href="https://zirel.studio" target="_blank"><strong>Zirèl Studio</strong></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

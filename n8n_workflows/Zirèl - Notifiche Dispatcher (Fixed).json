@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-01T20:29:57.167Z",
+  "updatedAt": "2026-06-08T23:03:56.625Z",
   "createdAt": "2026-03-05T20:34:53.494Z",
   "id": "nIfv95KmUsamVSDl",
   "name": "Zirèl - Notifiche Dispatcher (Fixed)",
@@ -850,8 +850,8 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "01e43c3b-30ed-4dee-96cb-72aa4358e9ef",
-  "activeVersionId": "01e43c3b-30ed-4dee-96cb-72aa4358e9ef",
+  "versionId": "6de04f4b-1700-42e1-903f-5b9bc639ebdb",
+  "activeVersionId": "6de04f4b-1700-42e1-903f-5b9bc639ebdb",
   "triggerCount": 1,
   "shared": [
     {
@@ -863,9 +863,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-04-01T20:27:33.642Z",
-    "createdAt": "2026-04-01T20:26:19.829Z",
-    "versionId": "01e43c3b-30ed-4dee-96cb-72aa4358e9ef",
+    "updatedAt": "2026-06-08T23:03:58.041Z",
+    "createdAt": "2026-06-08T23:03:56.628Z",
+    "versionId": "6de04f4b-1700-42e1-903f-5b9bc639ebdb",
     "workflowId": "nIfv95KmUsamVSDl",
     "nodes": [
       {
@@ -1693,7 +1693,7 @@
       }
     },
     "authors": "nikita bronovs",
-    "name": "Version 01e43c3b",
+    "name": "Version 6de04f4b",
     "description": "",
     "autosaved": true
   },

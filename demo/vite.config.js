@@ -28,9 +28,9 @@ export default defineConfig({
         settoreHotel: resolve(__dirname, 'settore-hotel.html'),
         settoreRistoranti: resolve(__dirname, 'settore-ristoranti.html'),
         settoreCentriEstetici: resolve(__dirname, 'settore-centri-estetici.html'),
-        soluzioniIa: resolve(__dirname, 'soluzioni-ia.html'),
         casiStudioGotBunRiccione: resolve(__dirname, 'casi-studio/got-bun-riccione.html'),
         settoreArtigiani: resolve(__dirname, 'settore-artigiani.html'),
+        demoRighetti: resolve(__dirname, 'fratelli-righetti.html'),
       },
       // Suppress Rollup warnings for static scripts intentionally served
       // from public/ without type="module". These scripts (config.js,

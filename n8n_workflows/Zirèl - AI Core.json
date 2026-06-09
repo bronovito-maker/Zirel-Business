@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-08T22:26:49.892Z",
+  "updatedAt": "2026-06-08T22:45:30.535Z",
   "createdAt": "2026-03-01T23:45:29.584Z",
   "id": "vfYYOYyiEcSIzuze",
   "name": "Zirèl - AI Core",
@@ -262,9 +262,9 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-3.1-flash-lite",
+        "modelName": "models/gemini-3.5-flash",
         "options": {
-          "temperature": 0.4
+          "temperature": 0.3
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
@@ -1523,8 +1523,8 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "17d12e3f-4eec-41b3-aee7-02257c8c3ef6",
-  "activeVersionId": "17d12e3f-4eec-41b3-aee7-02257c8c3ef6",
+  "versionId": "0328c289-77b3-4755-b83c-f5cbdc20d0e6",
+  "activeVersionId": "0328c289-77b3-4755-b83c-f5cbdc20d0e6",
   "triggerCount": 1,
   "shared": [
     {
@@ -1536,9 +1536,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-06-08T22:26:51.561Z",
-    "createdAt": "2026-06-08T22:26:49.893Z",
-    "versionId": "17d12e3f-4eec-41b3-aee7-02257c8c3ef6",
+    "updatedAt": "2026-06-08T22:45:32.750Z",
+    "createdAt": "2026-06-08T22:45:30.537Z",
+    "versionId": "0328c289-77b3-4755-b83c-f5cbdc20d0e6",
     "workflowId": "vfYYOYyiEcSIzuze",
     "nodes": [
       {
@@ -1797,9 +1797,9 @@
       },
       {
         "parameters": {
-          "modelName": "models/gemini-3.1-flash-lite",
+          "modelName": "models/gemini-3.5-flash",
           "options": {
-            "temperature": 0.4
+            "temperature": 0.3
           }
         },
         "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
@@ -3047,7 +3047,7 @@
       }
     },
     "authors": "nikita bronovs",
-    "name": "Version 17d12e3f",
+    "name": "Version 0328c289",
     "description": "",
     "autosaved": true
   },
