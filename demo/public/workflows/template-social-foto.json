@@ -1,0 +1,493 @@
+{
+  "name": "ConcessionariaAuto - Pubblicazione FOTO Upload Post",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "acf8b206-3b21-43fe-b17d-7cf48ba38aeb",
+        "formTitle": "Carica Foto sui Canali Social",
+        "formDescription": "Trascina le foto dell'auto, inserisci il link del sito Concessionaria Auto, indica il modello e seleziona l'account e le piattaforme di pubblicazione.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Link Veicolo",
+              "placeholder": "https://www.concessionaria.it/auto/usate/..."
+            },
+            {
+              "fieldLabel": "Modello Macchina",
+              "placeholder": "Es. Audi A3 Sportback 30 TFSI S tronic",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Account Social Ufficiale",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Account_Social_1"
+                  },
+                  {
+                    "option": "Account_Social_2"
+                  },
+                  {
+                    "option": "Account_Social_3"
+                  },
+                  {
+                    "option": "Account_Social_4"
+                  },
+                  {
+                    "option": "Account_Social_5"
+                  },
+                  {
+                    "option": "Account_Test"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Piattaforme di Pubblicazione",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Instagram"
+                  },
+                  {
+                    "option": "Facebook"
+                  },
+                  {
+                    "option": "TikTok"
+                  },
+                  {
+                    "option": "Google Business"
+                  }
+                ]
+              },
+              "multiselect": true,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Sede di Riferimento",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Account_Social_1 - Roma (Auto Nuove e Usate)"
+                  },
+                  {
+                    "option": "Sede Secondaria - Milano"
+                  },
+                  {
+                    "option": "Sede Terziaria - Torino"
+                  },
+                  {
+                    "option": "Sede Quaternaria - Bologna"
+                  },
+                  {
+                    "option": "Sede Test"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Data Pubblicazione (Opzionale)",
+              "fieldType": "date"
+            },
+            {
+              "fieldLabel": "Ora Pubblicazione (Opzionale)",
+              "placeholder": "Es. 14:30 (se vuoto, usa 10:00)"
+            },
+            {
+              "fieldLabel": "Copy Personalizzato (Opzionale)",
+              "placeholder": "Scrivi qui il testo del post (se valorizzato, non verrà generato dall'IA)"
+            },
+            {
+              "fieldType": "html",
+              "html": "<div style=\"background-color: var(--color-test-notice-bg, #221a0f); border: 1px solid var(--color-test-notice-border, #44321a); border-radius: var(--border-radius-card, 8px); padding: 12px; margin-bottom: 16px; color: var(--color-test-notice-text, #e6a23d); font-size: 12px; line-height: 1.5;\"><strong>⚠️ Promemoria Requisiti Piattaforme (Foto):</strong><ul style=\"margin: 6px 0 0 16px; padding: 0;\"><li><strong>TikTok:</strong> Solo file <code>.jpg</code>/<code>.jpeg</code> (il formato <code>.png</code> viene RIFIUTATO). Le foto devono essere quadrate (1:1) o verticali (9:16). Le foto orizzontali causano errori.</li><li><strong>Google Business:</strong> Supporta <strong>solo 1 foto</strong> per post (verrà pubblicata solo la prima foto del carosello).</li><li><strong>Facebook/Instagram:</strong> Accettano sia <code>.jpg</code> che <code>.png</code> (massimo 10 foto).</li></ul></div>"
+            },
+            {
+              "fieldLabel": "Trascina qui le foto (Massimo 10)",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "customCss": ":root {\n\t--font-family: 'Open Sans', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 12px;\n\t--font-size-label: 14px;\n\t--font-size-test-notice: 12px;\n\t--font-size-input: 14px;\n\t--font-size-header: 20px;\n\t--font-size-paragraph: 14px;\n\t--font-size-link: 12px;\n\t--font-size-error: 12px;\n\t--font-size-html-h1: 28px;\n\t--font-size-html-h2: 20px;\n\t--font-size-html-h3: 16px;\n\t--font-size-html-h4: 14px;\n\t--font-size-html-h5: 12px;\n\t--font-size-html-h6: 10px;\n\t--font-size-subheader: 14px;\n\n\t/* Colors (Dark Mode) */\n\t--color-background: #0f1115;          /* Sfondo principale scuro */\n\t--color-test-notice-text: #e6a23d;\n\t--color-test-notice-bg: #221a0f;\n\t--color-test-notice-border: #44321a;\n\t--color-card-bg: #161920;             /* Sfondo delle schede scuro */\n\t--color-card-border: #252932;         /* Bordi delle schede */\n\t--color-card-shadow: rgba(0, 0, 0, 0.4);\n\t--color-link: #9aa0a6;                /* Colore link secondari */\n\t--color-header: #e8eaed;              /* Titoli chiari su sfondo scuro */\n\t--color-label: #bdc1c6;               /* Etichette dei campi chiare */\n\t--color-input-border: #303641;        /* Bordi dei campi di testo */\n\t--color-input-text: #e8eaed;          /* Testo digitato nei campi */\n\t--color-focus-border: #ff6d5a;        /* Bordo del campo attivo (rosso brand) */\n\t--color-submit-btn-bg: #ff6d5a;       /* Pulsante rosso brand Concessionaria Auto */\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ea1f30;\n\t--color-required: #ff6d5a;\n\t--color-clear-button-bg: #303641;\n\t--color-html-text: #bdc1c6;\n\t--color-html-link: #ff6d5a;\n\t--color-header-subtext: #9aa0a6;\n\n\t/* Border Radii */\n\t--border-radius-card: 8px;\n\t--border-radius-input: 6px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 8px;\n\n\t/* Spacing */\n\t--padding-container-top: 24px;\n\t--padding-card: 24px;\n\t--padding-test-notice-vertical: 12px;\n\t--padding-test-notice-horizontal: 24px;\n\t--margin-bottom-card: 16px;\n\t--padding-form-input: 12px;\n\t--card-padding: 24px;\n\t--card-margin-bottom: 16px;\n\n\t/* Dimensions */\n\t--container-width: 448px;\n\t--submit-btn-height: 48px;\n\t--checkbox-size: 18px;\n\n\t/* Others */\n\t--box-shadow-card: 0px 4px 16px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.4;\n}\n\n/* Custom overrides for input fields */\ninput[type=\"text\"],\ninput[type=\"email\"],\ninput[type=\"number\"],\ninput[type=\"tel\"],\ninput[type=\"url\"],\ninput[type=\"date\"],\ninput[type=\"time\"],\ntextarea,\nselect,\n.el-input__inner,\n.el-textarea__inner,\n.el-select-dropdown__item {\n\tbackground-color: #1b1f27 !important;\n\tcolor: #e8eaed !important;\n\tborder-color: #303641 !important;\n}\n\ninput[type=\"text\"]:focus,\ninput[type=\"email\"]:focus,\ninput[type=\"number\"]:focus,\ninput[type=\"tel\"]:focus,\ninput[type=\"url\"]:focus,\ninput[type=\"date\"]:focus,\ninput[type=\"time\"]:focus,\ntextarea:focus,\nselect:focus,\n.el-input__inner:focus,\n.el-textarea__inner:focus {\n\tborder-color: #ff6d5a !important;\n}\n\ninput::placeholder,\ntextarea::placeholder {\n\tcolor: #71747a !important;\n\topacity: 0.8 !important;\n}"
+        }
+      },
+      "id": "779da265-33bd-4619-8cdf-633044aaf834",
+      "name": "n8n Form Trigger1",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [
+        5440,
+        5088
+      ],
+      "webhookId": "acf8b206-3b21-43fe-b17d-7cf48ba38aeb"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalizzazione dati provenienti dal Form\nconst input = $input.first();\nconst binaryData = input.binary || {};\nconst formPhotos = {};\nlet imgIndex = 1;\n\n// Mappa i file in foto_auto_1, foto_auto_2 ecc.\nfor (const key in binaryData) {\n  formPhotos[`foto_auto_${imgIndex}`] = binaryData[key];\n  imgIndex++;\n}\n\nreturn [{\n  json: {\n    source: 'form',\n    link_veicolo: input.json['Link Veicolo'],\n    modello_macchina: input.json['Modello Macchina'],\n    account_social: input.json['Account Social Ufficiale'],\n    piattaforme: input.json['Piattaforme di Pubblicazione'],\n    sede_riferimento: input.json['Sede di Riferimento'],\n    data_programmazione: input.json['Data Pubblicazione (Opzionale)'],\n    ora_programmazione: input.json['Ora Pubblicazione (Opzionale)'],\n    copy_personalizzato: input.json['Copy Personalizzato (Opzionale)']\n  },\n  binary: formPhotos\n}];"
+      },
+      "id": "3b4fee9c-464a-42f3-8399-adee5db4f030",
+      "name": "Normalize Form Data1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5664,
+        5088
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link_veicolo && $json.link_veicolo.startsWith('http') ? $json.link_veicolo : 'https://example.com' }}",
+        "options": {}
+      },
+      "id": "bc585a1b-3927-4ab4-949b-910f9818b4be",
+      "name": "Scrape Vehicle Page1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5888,
+        5088
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first();\nconst html = input.json.data || '';\nconst originalData = $(\"Normalize Form Data1\").first().json;\n\nlet cleanText = '';\ntry {\n  cleanText = html\n    .replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '')\n    .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n} catch (e) {\n  cleanText = 'Non è stato possibile caricare la pagina del veicolo.';\n}\n\ncleanText = cleanText.substring(0, 12000);\n\nreturn [{\n  json: {\n    link_veicolo: originalData.link_veicolo,\n    modello_macchina: originalData.modello_macchina,\n    account_social: originalData.account_social,\n    piattaforme: originalData.piattaforme,\n    sede_riferimento: originalData.sede_riferimento,\n    data_programmazione: originalData.data_programmazione,\n    ora_programmazione: originalData.ora_programmazione,\n    specifiche_veicolo: cleanText\n  },\n  binary: $(\"Normalize Form Data1\").first().binary\n}];"
+      },
+      "id": "61d7636e-5740-425a-a088-4df7d6093a61",
+      "name": "Clean HTML & Extract Text1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6112,
+        5088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first();\nconst binaryData = input.binary || {};\nconst resultBinary = {};\nlet photoIndex = 1;\n\nfor (const key in binaryData) {\n  if (key.startsWith('foto_auto') && photoIndex <= 10) {\n    resultBinary[`photo${photoIndex}`] = binaryData[key];\n    photoIndex++;\n  }\n}\n\nconst modello = input.json.modello_macchina;\nconst link = input.json.link_veicolo;\nconst account = input.json.account_social;\nconst platformsInput = input.json.piattaforme;\nconst sede = input.json.sede_riferimento;\nlet dateInput = (input.json.data_programmazione || \"\").trim();\nconst timeInput = (input.json.ora_programmazione || \"10:00\").trim();\nlet scheduled_date = \"\";\n\nif (dateInput) {\n  // Convert standard Italian format (DD/MM/YYYY or DD-MM-YYYY) to YYYY-MM-DD\n  if (dateInput.includes(\"/\") || dateInput.includes(\"-\")) {\n    const separator = dateInput.includes(\"/\") ? \"/\" : \"-\";\n    const parts = dateInput.split(separator);\n    if (parts.length === 3) {\n      if (parts[0].length === 4) {\n        // YYYY-MM-DD\n        dateInput = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;\n      } else {\n        // DD-MM-YYYY -> YYYY-MM-DD\n        dateInput = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;\n      }\n    }\n  }\n  const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;\n  const time = timeRegex.test(timeInput) ? timeInput : \"10:00\";\n  scheduled_date = `${dateInput}T${time}:00`;\n}\n\nconst platforms = Array.isArray(platformsInput) ? platformsInput : [platformsInput];\n\nlet baseCaption = (input.json.copy_personalizzato && input.json.copy_personalizzato.trim() !== \"\"\n  ? input.json.copy_personalizzato\n  : (input.json.text || input.json.output || \"\")\n).replace(/\\*/g, \"\").trim();\n\nconst sediTexts = {\n  \"Account_Social_1 - Roma (Auto Nuove e Usate)\": \"🚘 Concessionaria Auto 🛻 Auto Nuove e Usate Multimarca\\n🐴 Allestimenti Speciali\\n☎️ 0612345678 📧 roma@concessionaria.it\\n📍 Via Flaminia 123, Roma\\n💻 www.concessionaria.it\",\n  \"Sede Secondaria - Milano\": \"🚗 Concessionaria Auto 🚙 Gamma Veicoli\\n☎️ 0212345678 📧 milano@concessionaria.it\\n📍 Via Montenapoleone 45, Milano\\n💻 www.concessionaria.it\",\n  \"Sede Terziaria - Torino\": \"🛻 Concessionaria Auto 🚘 Gamma City Car e SUV\\n☎️ 01112345678 📧 torino@concessionaria.it\\n📍 Corso Vittorio Emanuele 16, Torino\\n💻 www.concessionaria.it\",\n  \"Sede Quaternaria - Bologna\": \"🛻 Concessionaria Auto 🚙 Auto Km0 e Usato Garantito\\n🚘 Gamma City Car\\n🚘 Gamma Crossover e SUV\\n☎️ 05112345678 📧 bologna@concessionaria.it\\n📍 Via dell Indipendenza 84, Bologna\\n💻 www.concessionaria.it\",\n  \"Sede Test\": \"📷 Studio Digitale - Servizio Foto & Video\\n📍 Via Garibaldi 12, Genova\"\n};\n\nconst sedeText = sediTexts[sede] || \"\";\n\nlet gbp_location_id = \"\";\nif (sede) {\n  if (sede.includes(\"Roma\")) {\n    gbp_location_id = \"locations/1111111111111111111\";\n  } else if (sede.includes(\"Milano\")) {\n    const modelloLower = modello.toLowerCase();\n    if (modelloLower.includes(\"lancia\")) {\n      gbp_location_id = \"locations/2222222222222222221\";\n    } else if (modelloLower.includes(\"abarth\")) {\n      gbp_location_id = \"locations/2222222222222222222\";\n    } else {\n      gbp_location_id = \"locations/2222222222222222223\";\n    }\n  } else if (sede.includes(\"Torino\")) {\n    const modelloLower = modello.toLowerCase();\n    if (modelloLower.includes(\"aixam\") || modelloLower.includes(\"minicar\")) {\n      gbp_location_id = \"locations/3333333333333333331\";\n    } else {\n      gbp_location_id = \"locations/3333333333333333332\";\n    }\n  } else if (sede.includes(\"Bologna\")) {\n    gbp_location_id = \"locations/4444444444444444444\";\n  } else if (sede.includes(\"Test\")) {\n    gbp_location_id = \"locations/5555555555555555555\";\n  }\n}\n\nconst platformMap = {\n  \"Facebook\": \"facebook\",\n  \"Instagram\": \"instagram\",\n  \"TikTok\": \"tiktok\",\n  \"Google Business\": \"google_business\",\n  \"YouTube\": \"youtube\"\n};\n\nconst outputItems = [];\n\nfor (const platform of platforms) {\n  const apiPlatform = platformMap[platform] || platform.toLowerCase();\n  \n  const hasLink = [\"Facebook\", \"YouTube\", \"Google Business\"].includes(platform) && link && link.trim() !== \"\" && link.startsWith(\"http\");\n  const caption = hasLink \n    ? `${baseCaption}\\n\\nScopri di più sul nostro sito:\\n🔗 ${link}\\n\\n${sedeText}`.trim()\n    : `${baseCaption}\\n\\n${sedeText}`.trim();\n\n  let finalCaption = caption;\n  if (apiPlatform === \"google_business\" && finalCaption.length > 1499) {\n    finalCaption = finalCaption.substring(0, 1496) + \"...\";\n  }\n\n  outputItems.push({\n    json: {\n      modello,\n      link,\n      account,\n      piattaforma: apiPlatform,\n      gbp_location_id,\n      caption: finalCaption,\n      scheduled_date,\n      timezone: \"Europe/Rome\"\n    },\n    binary: resultBinary\n  });\n}\n\nreturn outputItems;"
+      },
+      "id": "92cfdb9d-8aff-425a-9ea6-46e608e103e6",
+      "name": "Prepare Photos for API1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6912,
+        5088
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.upload-post.com/api/upload_photos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Apikey INSERISCI_TUA_API_KEY_QUI"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ $json.piattaforma === 'tiktok' ? 'unused_title' : 'title' }}",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "={{ $json.piattaforma === 'tiktok' ? 'title' : 'unused_tiktok_title' }}",
+              "value": "={{ ($json.modello || 'Auto').substring(0, 80) }}"
+            },
+            {
+              "name": "={{ $json.piattaforma === 'tiktok' ? 'description' : 'unused_description' }}",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "user",
+              "value": "={{ $json.account }}"
+            },
+            {
+              "name": "platform[]",
+              "value": "={{ $json.piattaforma }}"
+            },
+            {
+              "name": "gbp_location_id",
+              "value": "={{ $json.gbp_location_id }}"
+            },
+            {
+              "name": "={{ $json.scheduled_date ? 'scheduled_date' : 'unused_scheduled_date' }}",
+              "value": "={{ $json.scheduled_date }}"
+            },
+            {
+              "name": "={{ $json.scheduled_date ? 'timezone' : 'unused_timezone' }}",
+              "value": "={{ $json.timezone }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "photos[]",
+              "inputDataFieldName": "photo1"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo2 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_2' }}",
+              "inputDataFieldName": "={{ $binary.photo2 && $json.piattaforma !== 'google_business' ? 'photo2' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo3 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_3' }}",
+              "inputDataFieldName": "={{ $binary.photo3 && $json.piattaforma !== 'google_business' ? 'photo3' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo4 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_4' }}",
+              "inputDataFieldName": "={{ $binary.photo4 && $json.piattaforma !== 'google_business' ? 'photo4' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo5 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_5' }}",
+              "inputDataFieldName": "={{ $binary.photo5 && $json.piattaforma !== 'google_business' ? 'photo5' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo6 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_6' }}",
+              "inputDataFieldName": "={{ $binary.photo6 && $json.piattaforma !== 'google_business' ? 'photo6' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo7 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_7' }}",
+              "inputDataFieldName": "={{ $binary.photo7 && $json.piattaforma !== 'google_business' ? 'photo7' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo8 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_8' }}",
+              "inputDataFieldName": "={{ $binary.photo8 && $json.piattaforma !== 'google_business' ? 'photo8' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo9 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_9' }}",
+              "inputDataFieldName": "={{ $binary.photo9 && $json.piattaforma !== 'google_business' ? 'photo9' : 'photo1' }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "={{ $binary.photo10 && $json.piattaforma !== 'google_business' ? 'photos[]' : 'unused_10' }}",
+              "inputDataFieldName": "={{ $binary.photo10 && $json.piattaforma !== 'google_business' ? 'photo10' : 'photo1' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ec55ae1-e192-4aeb-a3d6-e51614bc25c4",
+      "name": "POST TO UPLOAD POST1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7136,
+        5088
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        6352,
+        5184
+      ],
+      "id": "8e5b9e12-dbd8-4760-886f-3f1581cbd194",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OgV1XQ7Qh3ugOP6A",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        6688,
+        5088
+      ],
+      "id": "8bbf90b1-6424-42a4-9642-b4134db5da14",
+      "name": "Merge Data1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Scrivi un copy accattivante per la pubblicazione sui social media per la seguente auto:\nModello: {{ $json.modello_macchina }}\n\nUsa le seguenti specifiche tecniche estratte dal sito per arricchire il testo (se disponibili):\n{{ $json.specifiche_veicolo }}\n\nCrea un testo persuasivo per la vendita, evidenziando il modello, inserendo call-to-action chiare e includendo hashtag pertinenti (es. #ConcessionariaAuto, #AutoUsate, #ModelloMarca).\n\nATTENZIONE - REGOLE E DIVIETI CRITICI:\n1. NON inserire alcun indirizzo, numero di telefono, e-mail o indirizzo web (come www.concessionaria.it o il link dell'auto) nel testo generato. Tutte le informazioni di contatto e i link verranno inseriti automaticamente a valle.\n2. NON utilizzare mai la formattazione markdown (come gli asterischi * o **) per evidenziare il testo in grassetto o corsivo. Scrivi solo testo semplice.\n3. NON INSERIRE MAI IL PREZZO del veicolo (anche se lo trovi nelle specifiche). Invita invece a scrivere nei commenti o a contattare la concessionaria per scoprire il prezzo e la rata personalizzata (questo serve a creare interazione).\n4. HASHTAG SICURI E LIMITATI: Inserisci solo un numero ridotto di hashtag (massimo 4-5) e assicurati che siano strettamente correlati al brand e all'auto (es. #ConcessionariaAuto, #AutoUsate, #Account_Social_1, o tag del marchio dell'auto come #Audi, #Fiat). NON usare MAI hashtag generici di spam o potenzialmente sensibili (es. legati a follower, like o termini di bellezza/corpo) per evitare che il post venga bloccato o penalizzato dagli algoritmi di sicurezza (in particolare Instagram).\n\nFornisci l'output come testo pulito pronto per essere pubblicato.",
+        "needsFallback": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        6336,
+        4960
+      ],
+      "id": "ed145c74-7ace-4ac6-97ff-eece75bb39bd",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        6480,
+        5184
+      ],
+      "id": "89f8ccd5-b51e-4755-9a3f-bd93a6f8c827",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "FB8cicC1OOAZZWTq",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "n8n Form Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Normalize Form Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Form Data1": {
+      "main": [
+        [
+          {
+            "node": "Scrape Vehicle Page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Vehicle Page1": {
+      "main": [
+        [
+          {
+            "node": "Clean HTML & Extract Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean HTML & Extract Text1": {
+      "main": [
+        [
+          {
+            "node": "Merge Data1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Photos for API1": {
+      "main": [
+        [
+          {
+            "node": "POST TO UPLOAD POST1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Data1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Photos for API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "cb335f23-119c-469f-9704-b943a97d9675",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8fdcf7e83cae1aca8385cead8a9dbacffcbe704e496a5b5b9c4b26c8ffbfdc87"
+  },
+  "nodeGroups": [],
+  "id": "QuWDunkwbOG6dPWe",
+  "tags": []
+}

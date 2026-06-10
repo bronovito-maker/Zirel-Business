@@ -31,6 +31,10 @@ export default defineConfig({
         casiStudioGotBunRiccione: resolve(__dirname, 'casi-studio/got-bun-riccione.html'),
         settoreArtigiani: resolve(__dirname, 'settore-artigiani.html'),
         demoRighetti: resolve(__dirname, 'fratelli-righetti.html'),
+        comeAutomatizzareSocialConN8n: resolve(__dirname, 'come-automatizzare-social-con-n8n.html'),
+        sviluppoSitiWebVeloci: resolve(__dirname, 'sviluppo-siti-web-veloci.html'),
+        sitiWebIntelligenti: resolve(__dirname, 'siti-web-intelligenti.html'),
+        comeNonPerdereClientiH24: resolve(__dirname, 'come-non-perdere-clienti-h24.html'),
       },
       // Suppress Rollup warnings for static scripts intentionally served
       // from public/ without type="module". These scripts (config.js,
