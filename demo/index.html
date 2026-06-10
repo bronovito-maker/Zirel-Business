@@ -55,6 +55,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://dashboard.zirel.org">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
@@ -160,9 +161,9 @@
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
-        </div>
     </nav>
 
+    <main>
     <!-- 2. HERO SECTION -->
     <header class="pt-32 pb-20 md:pt-48 md:pb-32 hero-pattern relative overflow-hidden">
         <div class="container mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center relative z-10 gap-12">
@@ -257,7 +258,7 @@
                     </p>
                 </div>
                 <div class="relative">
-                    <img src="/hero.jpg" alt="Zirèl Studio Partner"
+                    <img src="/hero.webp" alt="Zirèl Studio Partner" width="640" height="640"
                         class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-500">
                     <div
                         class="absolute -bottom-6 -left-6 bg-brand-orange text-white p-6 rounded-xl shadow-xl font-bold text-xl">
@@ -344,7 +345,7 @@
                     <div class="p-8 flex-1 flex flex-col">
                         <p class="text-[10px] uppercase tracking-[0.16em] text-brand-orange font-bold mb-2">🍔
                             Ristorazione | 📍 Riccione</p>
-                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Got Bun Riccione</h4>
+                        <h3 class="text-2xl font-bold mb-4 text-brand-blue">Got Bun Riccione</h3>
                         <div class="mt-auto space-y-4">
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                                 <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
@@ -378,7 +379,7 @@
                     <div class="p-8 flex-1 flex flex-col">
                         <p class="text-[10px] uppercase tracking-[0.16em] text-yellow-500 font-bold mb-2">⚡️ ENERGIA |
                             📍 ITALIA</p>
-                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Distributore di Energia</h4>
+                        <h3 class="text-2xl font-bold mb-4 text-brand-blue">Distributore di Energia</h3>
                         <div class="mt-auto space-y-4">
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                                 <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
@@ -410,7 +411,7 @@
                     <div class="p-8 flex-1 flex flex-col">
                         <p class="text-[10px] uppercase tracking-[0.16em] text-slate-500 font-bold mb-2">🔧 Servizi | 📍
                             Riviera Romagnola</p>
-                        <h4 class="text-2xl font-bold mb-4 text-brand-blue">Niki Tuttofare</h4>
+                        <h3 class="text-2xl font-bold mb-4 text-brand-blue">Niki Tuttofare</h3>
                         <div class="mt-auto space-y-4">
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                                 <p class="font-bold text-green-600 mb-1">Risultato Ottenuto:</p>
@@ -933,6 +934,7 @@
             <p class="text-sm text-white/50 mt-6">Audit 100% gratuito e senza impegno. Riceverai un'analisi pratica.</p>
         </div>
     </section>
+    </main>
 
     <!-- Footer base per mantenere la struttura coerente -->
     <footer class="bg-slate-950 text-white py-12 border-t border-white/10">
@@ -993,7 +995,7 @@
                     💬
                 </div>
                 <div class="flex-grow">
-                    <h6 class="font-bold text-base leading-tight">Zirèl Assistant</h6>
+                    <div class="font-bold text-base leading-tight">Zirèl Assistant</div>
                     <p class="text-[11px] text-white/75 mt-0.5">Contatti, attivazione e prova</p>
                 </div>
                 <button onclick="toggleDemo()"
@@ -1029,7 +1031,7 @@
                 <input type="text" id="chat-input-field" placeholder="Scrivi un messaggio..."
                     class="flex-grow bg-slate-100 h-10 rounded-full px-4 text-sm text-brand-blue border border-slate-200 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange placeholder:text-slate-400"
                     onkeypress="if(event.key === 'Enter') handleTextInput()">
-                <button onclick="handleTextInput()"
+                <button onclick="handleTextInput()" aria-label="Invia messaggio"
                     class="w-10 h-10 min-w-[40px] bg-brand-orange hover:bg-orange-500 rounded-full flex items-center justify-center text-white shadow-md transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                         class="w-5 h-5 ml-1">

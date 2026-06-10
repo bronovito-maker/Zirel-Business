@@ -1988,3 +1988,9 @@ body[data-page-type="restaurant-demo"] section.container.pb-16 .btn-secondary:ho
         transform: translateY(-8px) rotate(-45deg);
     }
 }
+
+/* Accessibility contrast overrides for text */
+.text-brand-orange, .text-orange-500, .text-brand-orange-dark {
+    color: #e25c0e !important;
+}
+
