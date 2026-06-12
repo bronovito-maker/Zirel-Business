@@ -10,3 +10,6 @@ node_modules/
 # Il build di produzione si deploya via pipeline CI (Vercel), non committing dist/
 demo/dist/
 dashboard/dist/
+
+# Credenziali e codici di sicurezza — NON pubblicare su GitHub
+recovery-codes-vercel.txt
